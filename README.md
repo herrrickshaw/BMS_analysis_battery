@@ -1,4 +1,4 @@
-- 👋 Hi, I’m @herrrickshaw
+- 👋 Hi, I’m @Umashankar
 - 👀 I’m interested in machines that are learning
 - 🌱 I’m currently learning about said machines
 - 💞️ I’m looking to collaborate on topics of common interest such as fluid modelling, financial modelling, token economics and teaching machines context 

@@ -55,7 +55,7 @@ TRADING_DAYS = 252
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# DATA FETCHING
+# DATA FETCHING  (nsepython primary → yfinance fallback)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _yf_symbol(sym: str) -> str:
@@ -65,13 +65,98 @@ def _yf_symbol(sym: str) -> str:
     return f"{sym}.NS"
 
 
+def _fetch_prices_nsepython(
+    symbols: list,
+    benchmark_sym: str = "NIFTY 50",
+    days: int = 504,
+) -> pd.DataFrame | None:
+    """
+    Fetches closing prices via nsepython's equity_history + index_history.
+
+    Returns a DataFrame (symbol columns + BENCHMARK) or None on failure.
+    nsepython hits NSE India's official historical data API.
+    """
+    try:
+        from nsepython import equity_history, index_history
+        from datetime import datetime, timedelta
+
+        end_dt   = datetime.today()
+        start_dt = end_dt - timedelta(days=days)
+        end_s    = end_dt.strftime("%d-%m-%Y")
+        start_s  = start_dt.strftime("%d-%m-%Y")
+
+        all_series: dict[str, pd.Series] = {}
+
+        for sym in symbols:
+            try:
+                df = equity_history(sym, "EQ", start_s, end_s)
+                if df is not None and not df.empty and "CH_CLOSING_PRICE" in df.columns:
+                    df["date"] = pd.to_datetime(df["CH_TIMESTAMP"])
+                    df = df.sort_values("date").set_index("date")
+                    all_series[sym] = df["CH_CLOSING_PRICE"].astype(float)
+            except Exception:
+                pass
+
+        if not all_series:
+            return None
+
+        # Benchmark (NIFTY 50)
+        try:
+            bdf = index_history(benchmark_sym, start_s, end_s)
+            if bdf is not None and not bdf.empty:
+                bdf = pd.DataFrame(bdf)
+                bdf["date"] = pd.to_datetime(bdf["HistoricalDate"], dayfirst=True)
+                bdf = bdf.sort_values("date").set_index("date")
+                close_col = next(
+                    (c for c in bdf.columns if "close" in c.lower()), None
+                )
+                if close_col:
+                    all_series["BENCHMARK"] = bdf[close_col].astype(float)
+        except Exception:
+            pass
+
+        prices = pd.DataFrame(all_series)
+        prices.dropna(how="all", inplace=True)
+        return prices if len(prices) > 10 else None
+
+    except ImportError:
+        return None
+    except Exception:
+        return None
+
+
 def fetch_prices(symbols: list, benchmark: str = BENCHMARK, period: str = PRICE_PERIOD) -> pd.DataFrame:
     """
     Downloads adjusted closing prices for *symbols* and *benchmark*.
 
+    Attempts data sources in order:
+      1. nsepython (equity_history + index_history via NSE India API)
+      2. yfinance  (.NS suffix, bulk download)
+
     Returns a DataFrame with one column per ticker; benchmark column is labelled
     "BENCHMARK".  Rows with all-NaN are dropped.
     """
+    # nsepython days from period string
+    _period_days = {
+        "1mo": 35,  "3mo": 95,  "6mo": 190,
+        "1y":  380, "2y":  760, "3y":  1140, "5y": 1900,
+    }
+    nse_days = _period_days.get(period, 760)
+
+    # ── 1. nsepython ──────────────────────────────────────────────────────────
+    prices_nse = _fetch_prices_nsepython(symbols, days=nse_days)
+    if prices_nse is not None and len(prices_nse.columns) > 1:
+        print("  [data source: nsepython]")
+        if "BENCHMARK" not in prices_nse.columns:
+            prices_nse["BENCHMARK"] = np.nan
+        # ensure all requested symbols present (fill missing with NaN)
+        for s in symbols:
+            if s not in prices_nse.columns:
+                prices_nse[s] = np.nan
+        return prices_nse
+
+    # ── 2. yfinance fallback ──────────────────────────────────────────────────
+    print("  [data source: yfinance]")
     tickers = [_yf_symbol(s) for s in symbols] + [benchmark]
     raw = yf.download(tickers, period=period, auto_adjust=True, progress=False)
 
@@ -80,11 +165,9 @@ def fetch_prices(symbols: list, benchmark: str = BENCHMARK, period: str = PRICE_
     else:
         prices = raw.copy()
 
-    # Re-label columns: original symbols + BENCHMARK
     col_map = {_yf_symbol(s): s for s in symbols}
     col_map[benchmark] = "BENCHMARK"
     prices.rename(columns=col_map, inplace=True)
-
     prices.dropna(how="all", inplace=True)
     return prices
 
@@ -396,12 +479,35 @@ def efficient_frontier_curve(
         else:
             frontier_vols.append(np.nan)
 
-    return target_rets * 100, np.array(frontier_vols) * 100
+    # Returns (vols_pct, rets_pct) — x-axis first, consistent with plot axes
+    return np.array(frontier_vols) * 100, target_rets * 100
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # VISUALISATION
 # ─────────────────────────────────────────────────────────────────────────────
+
+def _mc_frontier_hull(mc_df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Approximates the efficient frontier from the MC cloud by computing
+    the minimum-volatility portfolio for each return bucket.
+    Used for large portfolios where the analytical curve is too slow.
+    """
+    rets = mc_df["Return"].values * 100
+    vols = mc_df["Volatility"].values * 100
+    buckets = np.linspace(rets.min(), rets.max(), 120)
+    step    = (buckets[1] - buckets[0]) / 2
+    hull_v, hull_r = [], []
+    for r in buckets:
+        mask = (rets >= r - step) & (rets < r + step)
+        if mask.sum() > 0:
+            hull_r.append(r)
+            hull_v.append(vols[mask].min())
+    return np.array(hull_v), np.array(hull_r)
+
+
+LARGE_N_THRESHOLD = 40   # skip analytical frontier curve above this
+
 
 def plot_efficient_frontier(
     mc_df: pd.DataFrame,
@@ -415,11 +521,17 @@ def plot_efficient_frontier(
     """
     Saves a dark-themed efficient frontier chart showing:
       • Monte Carlo portfolio cloud (coloured by Sharpe ratio)
-      • Analytical efficient frontier line
+      • Analytical frontier line (small portfolios) or MC hull (large)
       • Max Sharpe, Min Volatility, and Current Portfolio markers
-      • Individual stock positions
+      • Individual stock positions (only shown when n ≤ LARGE_N_THRESHOLD)
     """
-    ef_rets, ef_vols = efficient_frontier_curve(mean_daily_returns, cov_annual)
+    n_assets = len(symbols)
+    if n_assets <= LARGE_N_THRESHOLD:
+        ef_vols, ef_rets = efficient_frontier_curve(mean_daily_returns, cov_annual)
+        frontier_label = "Efficient Frontier"
+    else:
+        ef_vols, ef_rets = _mc_frontier_hull(mc_df)
+        frontier_label = "Efficient Frontier (MC approx.)"
 
     fig, ax = plt.subplots(figsize=(13, 8))
     fig.patch.set_facecolor("#0d1117")
@@ -442,7 +554,7 @@ def plot_efficient_frontier(
 
     # Efficient frontier line
     valid = ~np.isnan(ef_vols)
-    ax.plot(ef_vols[valid], ef_rets[valid], "w-", linewidth=2.5, zorder=3, label="Efficient Frontier")
+    ax.plot(ef_vols[valid], ef_rets[valid], "w-", linewidth=2.5, zorder=3, label=frontier_label)
 
     # Capital Market Line (risk-free → max Sharpe)
     ms = optimal["max_sharpe"]
@@ -494,16 +606,17 @@ def plot_efficient_frontier(
         color="#FF6B6B", fontsize=8.5, fontweight="bold", zorder=6,
     )
 
-    # Individual stock dots
-    for i, sym in enumerate(symbols):
-        sr = mean_daily_returns[i] * TRADING_DAYS * 100
-        sv = np.sqrt(cov_annual[i, i]) * 100
-        ax.scatter(sv, sr, marker="o", s=90, color="#87CEFA", zorder=4)
-        ax.annotate(
-            sym, xy=(sv, sr),
-            xytext=(5, 5), textcoords="offset points",
-            color="#87CEFA", fontsize=8,
-        )
+    # Individual stock dots (only when portfolio is small enough to be legible)
+    if n_assets <= LARGE_N_THRESHOLD:
+        for i, sym in enumerate(symbols):
+            sr = mean_daily_returns[i] * TRADING_DAYS * 100
+            sv = np.sqrt(cov_annual[i, i]) * 100
+            ax.scatter(sv, sr, marker="o", s=90, color="#87CEFA", zorder=4)
+            ax.annotate(
+                sym, xy=(sv, sr),
+                xytext=(5, 5), textcoords="offset points",
+                color="#87CEFA", fontsize=8,
+            )
 
     # Risk-free rate marker
     ax.axhline(

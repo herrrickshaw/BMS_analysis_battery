@@ -8,6 +8,7 @@ import FilterSidebar from './components/FilterSidebar'
 import LivePanel     from './components/LivePanel'
 import ComparisonTable from './components/ComparisonTable'
 import SectorBenchmarks from './components/SectorBenchmarks'
+import PortfolioUpload  from './components/PortfolioUpload'
 import {
   uploadFile, runScan, exportResults,
   fetchLiveData, scanLiveData, compareLiveData,
@@ -82,12 +83,12 @@ export default function App() {
     finally    { setLoading(false) }
   }, [activeMarket, uploadedMarkets])
 
-  // ── Live fetch ───────────────────────────────────────────────────────────
-  const handleLiveFetch = useCallback(async (indexKey) => {
+  // ── Live fetch (index key OR explicit symbol list from portfolio upload) ──
+  const handleLiveFetch = useCallback(async (indexKey, symbols = null) => {
     setLoading(true); setError(null)
     setFetchStatus(prev => ({ ...prev, [activeMarket]: { status: 'fetching' } }))
     try {
-      const resp = await fetchLiveData(activeMarket, indexKey || null)
+      const resp = await fetchLiveData(activeMarket, indexKey || null, symbols)
       setFetchStatus(prev => ({
         ...prev,
         [activeMarket]: { status: 'done', total: resp.requested, done: resp.fetched, errors: resp.errors },
@@ -99,6 +100,10 @@ export default function App() {
     }
     finally { setLoading(false) }
   }, [activeMarket])
+
+  const handlePortfolioFetch = useCallback((symbols) => {
+    handleLiveFetch(null, symbols)
+  }, [handleLiveFetch])
 
   // ── Live scan ────────────────────────────────────────────────────────────
   const handleLiveScan = useCallback(async () => {
@@ -208,6 +213,11 @@ export default function App() {
               onSetActive={setActiveScan}
               loading={loading}
               hasData={uploadedMarkets.has(activeMarket)}
+            />
+            <PortfolioUpload
+              market={activeMarket}
+              onFetchSymbols={handlePortfolioFetch}
+              loading={loading}
             />
             <LivePanel
               market={activeMarket}

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import upload, scan, export, live, sectors
+from routers import upload, scan, export, live, sectors, portfolio
 
 app = FastAPI(title="Stock Screener API", version="1.0.0")
 
@@ -17,6 +17,7 @@ app.include_router(scan.router)
 app.include_router(export.router)
 app.include_router(live.router)
 app.include_router(sectors.router)
+app.include_router(portfolio.router)
 
 
 @app.get("/")

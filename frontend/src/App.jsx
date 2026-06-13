@@ -84,11 +84,11 @@ export default function App() {
   }, [activeMarket, uploadedMarkets])
 
   // ── Live fetch (index key OR explicit symbol list from portfolio upload) ──
-  const handleLiveFetch = useCallback(async (indexKey, symbols = null) => {
+  const handleLiveFetch = useCallback(async (indexKey, symbols = null, portfolioMarket = null) => {
     setLoading(true); setError(null)
     setFetchStatus(prev => ({ ...prev, [activeMarket]: { status: 'fetching' } }))
     try {
-      const resp = await fetchLiveData(activeMarket, indexKey || null, symbols)
+      const resp = await fetchLiveData(activeMarket, indexKey || null, symbols, portfolioMarket)
       setFetchStatus(prev => ({
         ...prev,
         [activeMarket]: { status: 'done', total: resp.requested, done: resp.fetched, errors: resp.errors },
@@ -101,8 +101,8 @@ export default function App() {
     finally { setLoading(false) }
   }, [activeMarket])
 
-  const handlePortfolioFetch = useCallback((symbols) => {
-    handleLiveFetch(null, symbols)
+  const handlePortfolioFetch = useCallback((symbols, portfolioMarket) => {
+    handleLiveFetch(null, symbols, portfolioMarket)
   }, [handleLiveFetch])
 
   // ── Live scan ────────────────────────────────────────────────────────────

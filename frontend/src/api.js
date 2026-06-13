@@ -27,11 +27,15 @@ export function exportResults(market, scanType = 'all') {
   window.open(`/api/export?market=${encodeURIComponent(market)}&scan_type=${scanType}`, '_blank')
 }
 
-export async function fetchLiveData(market, index = null, symbols = null) {
+export async function fetchLiveData(market, index = null, symbols = null, portfolioMarket = null) {
   return apiFetch(`/api/live/fetch?market=${encodeURIComponent(market)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ index: index || null, symbols: symbols || null }),
+    body: JSON.stringify({
+      index: index || null,
+      symbols: symbols || null,
+      portfolio_market: portfolioMarket || null,
+    }),
   })
 }
 
@@ -53,8 +57,11 @@ export async function fetchSectors(region = 'india') {
   return apiFetch(`/api/sectors?region=${encodeURIComponent(region)}`)
 }
 
-export async function parsePortfolio(file) {
+export async function parsePortfolio(file, market = 'india') {
   const form = new FormData()
   form.append('file', file)
-  return apiFetch('/api/portfolio/parse', { method: 'POST', body: form })
+  return apiFetch(`/api/portfolio/parse?market=${encodeURIComponent(market)}`, {
+    method: 'POST',
+    body: form,
+  })
 }

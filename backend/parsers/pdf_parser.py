@@ -1,61 +1,54 @@
 """
-Extract stock names and tickers from uploaded PDF files.
-
-Strategy:
-1. Use pdfplumber to extract tables — these preserve column structure and are
-   the most reliable source in brokerage statements / portfolio reports.
-2. Fall back to raw page text when no tables are found.
-3. Resolve each candidate via ISIN → NSE symbol → company name fuzzy match.
+Extract stock tickers from uploaded PDF files for any supported market.
 """
 from __future__ import annotations
 
 import io
 import re
-from parsers.symbol_db import (
-    lookup_by_symbol, lookup_by_isin, lookup_by_name,
-    extract_symbols_from_text,
-)
+from typing import Optional
 
-_ISIN_RE   = re.compile(r'\b(INE[A-Z0-9]{9})\b')
-_SYMBOL_RE = re.compile(r'\b([A-Z][A-Z0-9&]{1,14})\b')
+from parsers.market_db import lookup, lookup_by_name, extract_from_text
 
-# Headers that indicate a ticker / ISIN column in a PDF table
-_TICKER_HEADERS = {'symbol', 'ticker', 'scrip', 'script', 'nse symbol',
-                   'nse code', 'trading symbol', 'instrument', 'stock'}
-_NAME_HEADERS   = {'name', 'company', 'company name', 'scrip name',
-                   'instrument name', 'security name', 'stock name', 'issuer'}
-_ISIN_HEADERS   = {'isin', 'isin number', 'isin no', 'isin code'}
+_TICKER_HEADERS = {
+    'symbol', 'ticker', 'scrip', 'script', 'nse symbol', 'nse code',
+    'trading symbol', 'instrument', 'stock', 'code', 'yf_ticker', 'yf ticker',
+    'stock code', 'security code',
+}
+_NAME_HEADERS = {
+    'name', 'company', 'company name', 'scrip name', 'instrument name',
+    'security name', 'stock name', 'issuer', 'security', 'description',
+}
+_ISIN_HEADERS = {'isin', 'isin number', 'isin no', 'isin code'}
 
 
-def _col_role(header: str):
+def _col_role(header: str) -> Optional[str]:
     h = header.lower().strip().rstrip('.')
-    if h in _TICKER_HEADERS:
-        return 'ticker'
-    if h in _NAME_HEADERS:
-        return 'name'
-    if h in _ISIN_HEADERS:
-        return 'isin'
+    if h in _TICKER_HEADERS: return 'ticker'
+    if h in _NAME_HEADERS:   return 'name'
+    if h in _ISIN_HEADERS:   return 'isin'
     return None
 
 
-def _resolve(raw_ticker='', raw_name='', raw_isin='', sheet='') -> dict | None:
-    """Try to resolve a row to an NSE symbol."""
+def _resolve(raw_ticker: str, raw_name: str, raw_isin: str,
+             market: str, page: str) -> Optional[dict]:
     info = None
     matched_via = ''
 
     if raw_ticker:
-        sym = re.sub(r'[-/].*$', '', raw_ticker.upper().strip())
-        info = lookup_by_symbol(sym)
+        sym = re.sub(r'[ \t/-].*$', '', raw_ticker.upper().strip())
+        info = lookup(sym, market)
         if info:
             matched_via = 'symbol'
 
-    if not info and raw_isin and raw_isin.startswith('INE'):
-        info = lookup_by_isin(raw_isin)
-        if info:
+    if not info and raw_isin and raw_isin.startswith('IN') and market == 'india':
+        from parsers.symbol_db import lookup_by_isin
+        nse = lookup_by_isin(raw_isin)
+        if nse:
+            info = {'yf_ticker': nse['symbol'] + '.NS', 'name': nse['name']}
             matched_via = 'ISIN'
 
     if not info and raw_name:
-        info = lookup_by_name(raw_name)
+        info = lookup_by_name(raw_name, market)
         if info:
             matched_via = 'name (fuzzy)'
 
@@ -63,27 +56,23 @@ def _resolve(raw_ticker='', raw_name='', raw_isin='', sheet='') -> dict | None:
         return None
 
     return {
-        'symbol':      info['symbol'],
+        'yf_ticker':   info['yf_ticker'],
+        'symbol':      info['yf_ticker'],
         'name':        info.get('name') or raw_name,
-        'isin':        info.get('isin') or raw_isin,
-        'sheet':       sheet,
+        'sheet':       page,
         'matched_via': matched_via,
     }
 
 
-def _parse_table(table: list[list], page_label: str) -> list[dict]:
-    """Extract stocks from a pdfplumber table (list of rows, first row = header)."""
+def _parse_table(table: list[list], page_label: str, market: str) -> list[dict]:
     if not table or len(table) < 2:
         return []
-
-    # Detect column roles from header row
     header = [str(c or '').strip() for c in table[0]]
     role_map: dict[str, int] = {}
     for i, h in enumerate(header):
         role = _col_role(h)
         if role and role not in role_map:
             role_map[role] = i
-
     if not role_map:
         return []
 
@@ -94,24 +83,13 @@ def _parse_table(table: list[list], page_label: str) -> list[dict]:
         def cell(key):
             idx = role_map.get(key)
             return str(row[idx] or '').strip() if idx is not None and idx < len(row) else ''
-
-        rec = _resolve(
-            raw_ticker=cell('ticker'),
-            raw_name=cell('name'),
-            raw_isin=cell('isin'),
-            sheet=page_label,
-        )
+        rec = _resolve(cell('ticker'), cell('name'), cell('isin'), market, page_label)
         if rec:
             results.append(rec)
-
     return results
 
 
-def parse_pdf(file_bytes: bytes) -> dict:
-    """
-    Parse a PDF and return extracted stocks.
-    Returns {stocks: [...], warnings: [], pages_scanned: int}.
-    """
+def parse_pdf(file_bytes: bytes, market: str = 'india') -> dict:
     import pdfplumber
 
     stocks: dict[str, dict] = {}
@@ -121,34 +99,29 @@ def parse_pdf(file_bytes: bytes) -> dict:
 
     with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
         pages_scanned = len(pdf.pages)
-
         for page in pdf.pages:
             label = f'p{page.page_number}'
-
-            # --- Try structured tables first ---
-            tables = page.extract_tables()
-            for table in tables:
-                for rec in _parse_table(table, label):
-                    sym = rec['symbol']
-                    if sym not in stocks:
-                        stocks[sym] = rec
+            for table in page.extract_tables():
+                for rec in _parse_table(table, label, market):
+                    yf = rec['yf_ticker']
+                    if yf not in stocks:
+                        stocks[yf] = rec
                         table_hits += 1
 
-            # --- Fall back: raw text scan on every page ---
             text = page.extract_text() or ''
-            for rec in extract_symbols_from_text(text):
-                sym = rec['symbol']
-                if sym not in stocks:
-                    stocks[sym] = {**rec, 'sheet': label}
+            for rec in extract_from_text(text, market):
+                yf = rec['yf_ticker']
+                if yf not in stocks:
+                    stocks[yf] = {**rec, 'symbol': yf, 'sheet': label}
 
     if not stocks:
         warnings.append(
-            'No NSE symbols could be extracted. '
-            'The PDF may be scanned (image-only) or use a non-standard format.'
+            'No symbols could be extracted. The PDF may be scanned (image-only) '
+            'or use a non-standard format.'
         )
     elif table_hits == 0:
         warnings.append(
-            'No structured tables detected — symbols were matched from raw text. '
+            'No structured tables detected — symbols matched from raw text. '
             'Review the list carefully for false positives.'
         )
 

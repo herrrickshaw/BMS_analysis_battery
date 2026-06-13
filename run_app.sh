@@ -7,10 +7,12 @@ echo "==> Installing backend deps..."
 cd "$ROOT/backend"
 pip install -r requirements.txt -q
 
-echo "==> Refreshing NSE equity list for ticker lookup..."
+echo "==> Refreshing symbol lists for ticker lookup..."
 mkdir -p "$ROOT/data"
 curl -sL "https://archives.nseindia.com/content/equities/EQUITY_L.csv" \
-  -o "$ROOT/data/nse_equity_list.csv" || echo "  (warning: could not refresh NSE list, using cached copy)"
+  -o "$ROOT/data/nse_equity_list.csv" || echo "  (warning: could not refresh NSE list)"
+curl -sL "https://raw.githubusercontent.com/datasets/s-and-p-500-companies/main/data/constituents.csv" \
+  -o "$ROOT/data/sp500_list.csv" || echo "  (warning: could not refresh S&P 500 list)"
 
 echo "==> Starting backend on :8000..."
 uvicorn main:app --reload --port 8000 &

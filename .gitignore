@@ -12,3 +12,12 @@ data/*_chk.csv
 reports/*.png
 logs/
 data/nse_equity_list.csv
+node_modules/
+frontend/node_modules/
+frontend/.vite/
+*.pyc
+__pycache__/
+data/sp500_list.csv
+data/japan_list.csv
+data/korea_list.csv
+data/europe_list.csv

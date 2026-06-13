@@ -35,8 +35,9 @@ SCANNERS = {
 
 
 class FetchRequest(BaseModel):
-    index: Optional[str] = None         # 'nifty50' | 'nifty100' | ... | None
-    symbols: Optional[list[str]] = None  # explicit symbol list
+    index: Optional[str] = None              # 'nifty50' | 'nifty100' | ...
+    symbols: Optional[list[str]] = None      # explicit symbol list (with yfinance suffixes)
+    portfolio_market: Optional[str] = None   # 'india'|'us'|'europe'|'japan'|'korea'
 
 
 @router.post("/api/live/fetch")
@@ -48,7 +49,17 @@ async def fetch_live_data(market: str, req: FetchRequest = FetchRequest()):
       2. req.index   (NSE index archive CSV)
       3. tickers from uploaded Screener CSV for this market
     """
-    exchange = MARKET_EXCHANGE.get(market, 'NSE')
+    # portfolio_market overrides the tab-level exchange when fetching
+    # symbols extracted from an uploaded file (they already carry yfinance suffixes)
+    _PORTFOLIO_EXCHANGE = {
+        'india': 'NSE', 'us': 'US', 'europe': 'EUROPE',
+        'japan': 'JAPAN', 'korea': 'KOREA',
+    }
+    exchange = (
+        _PORTFOLIO_EXCHANGE.get(req.portfolio_market)
+        if req.portfolio_market
+        else MARKET_EXCHANGE.get(market, 'NSE')
+    )
 
     symbols: list[str] = []
 

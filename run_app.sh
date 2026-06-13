@@ -7,6 +7,11 @@ echo "==> Installing backend deps..."
 cd "$ROOT/backend"
 pip install -r requirements.txt -q
 
+echo "==> Refreshing NSE equity list for ticker lookup..."
+mkdir -p "$ROOT/data"
+curl -sL "https://archives.nseindia.com/content/equities/EQUITY_L.csv" \
+  -o "$ROOT/data/nse_equity_list.csv" || echo "  (warning: could not refresh NSE list, using cached copy)"
+
 echo "==> Starting backend on :8000..."
 uvicorn main:app --reload --port 8000 &
 BACKEND_PID=$!

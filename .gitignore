@@ -11,3 +11,4 @@ nse_bse_data/
 data/*_chk.csv
 reports/*.png
 logs/
+data/nse_equity_list.csv

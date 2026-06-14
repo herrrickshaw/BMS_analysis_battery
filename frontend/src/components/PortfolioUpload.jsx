@@ -337,71 +337,90 @@ const SIGNAL_CLS = {
   HOLD: 'text-amber-500',
 }
 
+function fmt(v, decimals = 0) {
+  if (v == null) return '—'
+  return v.toLocaleString(undefined, { maximumFractionDigits: decimals, minimumFractionDigits: decimals })
+}
+
+function SummaryCard({ label, value, positive, sub }) {
+  const cls = positive == null ? 'text-gray-200' : positive ? 'text-emerald-400' : 'text-red-400'
+  return (
+    <div className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
+      <p className="text-gray-600 mb-0.5 text-xs">{label}</p>
+      <p className={`font-mono font-bold text-sm ${cls}`}>{value}</p>
+      {sub && <p className="text-gray-700 text-xs mt-0.5">{sub}</p>}
+    </div>
+  )
+}
+
 function PnlPanel({ data }) {
   const { holdings, summary } = data
-  const totalPnl = summary?.total_unrealised_pnl
-  const pnlPos   = totalPnl != null && totalPnl >= 0
+  const totalPnl    = summary?.total_unrealised_pnl
+  const totalReturn = summary?.total_return_pnl
+  const pnlPos      = totalPnl    != null && totalPnl    >= 0
+  const retPos      = totalReturn != null && totalReturn >= 0
+  const hasDivs     = (summary?.total_dividends_received ?? 0) > 0
+
+  const sign = (v) => v != null && v >= 0 ? '+' : ''
 
   return (
     <div className="mt-1 space-y-2">
-      {/* Summary bar */}
-      <div className="grid grid-cols-2 gap-2 text-xs">
-        <div className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
-          <p className="text-gray-600 mb-0.5">Invested</p>
-          <p className="text-gray-200 font-mono font-bold">
-            {summary?.total_cost_basis != null
-              ? summary.total_cost_basis.toLocaleString(undefined, { maximumFractionDigits: 0 })
-              : '—'}
-          </p>
-        </div>
-        <div className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
-          <p className="text-gray-600 mb-0.5">Current Value</p>
-          <p className="text-gray-200 font-mono font-bold">
-            {summary?.total_current_value != null
-              ? summary.total_current_value.toLocaleString(undefined, { maximumFractionDigits: 0 })
-              : '—'}
-          </p>
-        </div>
-        <div className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
-          <p className="text-gray-600 mb-0.5">Unrealised P&L</p>
-          <p className={`font-mono font-bold ${pnlPos ? 'text-emerald-400' : 'text-red-400'}`}>
-            {totalPnl != null
-              ? `${pnlPos ? '+' : ''}${totalPnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
-              : '—'}
-          </p>
-        </div>
-        <div className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
-          <p className="text-gray-600 mb-0.5">Return %</p>
-          <p className={`font-mono font-bold ${pnlPos ? 'text-emerald-400' : 'text-red-400'}`}>
-            {summary?.total_pnl_pct != null
-              ? `${pnlPos ? '+' : ''}${summary.total_pnl_pct.toFixed(2)}%`
-              : '—'}
-          </p>
+      {/* Summary grid */}
+      <div className="grid grid-cols-3 gap-2 text-xs">
+        <SummaryCard
+          label="Invested"
+          value={fmt(summary?.total_cost_basis)}
+        />
+        <SummaryCard
+          label="Current Value"
+          value={fmt(summary?.total_current_value)}
+        />
+        <SummaryCard
+          label="Dividends Received"
+          value={hasDivs ? `+${fmt(summary.total_dividends_received)}` : '—'}
+          positive={hasDivs ? true : null}
+        />
+        <SummaryCard
+          label="Capital P&L"
+          value={totalPnl != null ? `${sign(totalPnl)}${fmt(totalPnl)}` : '—'}
+          positive={totalPnl != null ? pnlPos : null}
+          sub={summary?.total_pnl_pct != null ? `${sign(summary.total_pnl_pct)}${summary.total_pnl_pct.toFixed(2)}%` : null}
+        />
+        <SummaryCard
+          label="Total Return (incl. Div)"
+          value={totalReturn != null ? `${sign(totalReturn)}${fmt(totalReturn)}` : '—'}
+          positive={totalReturn != null ? retPos : null}
+          sub={summary?.total_return_pct != null ? `${sign(summary.total_return_pct)}${summary.total_return_pct.toFixed(2)}%` : null}
+        />
+        <div className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 flex flex-col justify-center">
+          <p className="text-gray-600 mb-1 text-xs">RSI Signals</p>
+          <div className="flex flex-col gap-0.5">
+            {summary?.rsi_buy  > 0 && <span className="text-emerald-400 font-mono text-xs">{summary.rsi_buy} BUY</span>}
+            {summary?.rsi_sell > 0 && <span className="text-red-400 font-mono text-xs">{summary.rsi_sell} SELL</span>}
+            {summary?.rsi_hold > 0 && <span className="text-gray-500 font-mono text-xs">{summary.rsi_hold} HOLD</span>}
+            {!summary?.rsi_buy && !summary?.rsi_sell && !summary?.rsi_hold && <span className="text-gray-700 text-xs">—</span>}
+          </div>
         </div>
       </div>
-
-      {/* RSI signal chips */}
-      {(summary?.rsi_buy > 0 || summary?.rsi_sell > 0) && (
-        <div className="flex gap-2 text-xs">
-          {summary.rsi_buy  > 0 && <span className="px-2 py-0.5 bg-emerald-900/30 text-emerald-400 border border-emerald-900 rounded-full">{summary.rsi_buy} RSI BUY</span>}
-          {summary.rsi_sell > 0 && <span className="px-2 py-0.5 bg-red-900/30 text-red-400 border border-red-900 rounded-full">{summary.rsi_sell} RSI SELL</span>}
-          {summary.rsi_hold > 0 && <span className="px-2 py-0.5 bg-gray-800 text-gray-500 border border-gray-700 rounded-full">{summary.rsi_hold} HOLD</span>}
-        </div>
-      )}
 
       {/* Per-holding table */}
       <div className="overflow-x-auto rounded-lg border border-gray-800 bg-gray-950">
         <table className="w-full text-xs">
           <thead className="sticky top-0 bg-gray-900 border-b border-gray-800">
             <tr>
-              {['Ticker','Buy Date','Price on Date','Buy Price','Current','Qty','P&L','Return','Signal'].map(h => (
+              {[
+                'Ticker', 'Buy Date', 'Price@Date', 'Buy Price', 'Current',
+                'Qty', 'Dividends', 'Capital P&L', 'Total Rtn', 'Signal'
+              ].map(h => (
                 <th key={h} className="px-2 py-1.5 text-left text-gray-500 font-medium whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {holdings.map((h, i) => {
-              const pnlPos = h.unrealised_pnl != null && h.unrealised_pnl >= 0
+              const capPos = h.unrealised_pnl  != null && h.unrealised_pnl  >= 0
+              const retPos = h.total_return_pnl != null && h.total_return_pnl >= 0
+              const hasDivRow = h.dividends_received > 0
               return (
                 <tr key={`${h.yf_ticker}-${i}`} className="border-b border-gray-800/40">
                   <td className="px-2 py-1.5 font-mono font-bold text-gray-200 whitespace-nowrap">{h.yf_ticker}</td>
@@ -409,7 +428,7 @@ function PnlPanel({ data }) {
                   <td className="px-2 py-1.5 font-mono text-gray-400 text-right whitespace-nowrap">
                     {h.price_on_date != null ? h.price_on_date.toFixed(2) : '—'}
                     {h.actual_date && h.actual_date !== h.purchase_date && (
-                      <span className="text-gray-700 ml-1 text-xs">({h.actual_date})</span>
+                      <span className="text-gray-700 ml-1">({h.actual_date})</span>
                     )}
                   </td>
                   <td className="px-2 py-1.5 font-mono text-gray-400 text-right whitespace-nowrap">
@@ -419,14 +438,43 @@ function PnlPanel({ data }) {
                     {h.current_price != null ? h.current_price.toFixed(2) : '—'}
                   </td>
                   <td className="px-2 py-1.5 font-mono text-gray-500 text-right">{h.quantity ?? '—'}</td>
-                  <td className={`px-2 py-1.5 font-mono text-right whitespace-nowrap ${h.unrealised_pnl != null ? (pnlPos ? 'text-emerald-400' : 'text-red-400') : 'text-gray-700'}`}>
+
+                  {/* Dividends */}
+                  <td className="px-2 py-1.5 text-right whitespace-nowrap">
+                    {hasDivRow ? (
+                      <span className="text-blue-400 font-mono">
+                        +{fmt(h.dividends_received)}
+                        <span className="text-gray-700 ml-1 font-normal">
+                          ({h.dividend_count}×{h.dividends_per_share?.toFixed(2)})
+                        </span>
+                      </span>
+                    ) : <span className="text-gray-700">—</span>}
+                  </td>
+
+                  {/* Capital P&L */}
+                  <td className={`px-2 py-1.5 font-mono text-right whitespace-nowrap ${h.unrealised_pnl != null ? (capPos ? 'text-emerald-400' : 'text-red-400') : 'text-gray-700'}`}>
                     {h.unrealised_pnl != null
-                      ? `${pnlPos ? '+' : ''}${h.unrealised_pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+                      ? `${capPos ? '+' : ''}${fmt(h.unrealised_pnl)}`
                       : '—'}
+                    {h.pnl_pct != null && (
+                      <span className="text-xs font-normal opacity-60 ml-1">
+                        {capPos ? '+' : ''}{h.pnl_pct.toFixed(1)}%
+                      </span>
+                    )}
                   </td>
-                  <td className={`px-2 py-1.5 font-mono text-right whitespace-nowrap ${h.pnl_pct != null ? (pnlPos ? 'text-emerald-400' : 'text-red-400') : 'text-gray-700'}`}>
-                    {h.pnl_pct != null ? `${pnlPos ? '+' : ''}${h.pnl_pct.toFixed(2)}%` : '—'}
+
+                  {/* Total return (capital + dividends) */}
+                  <td className={`px-2 py-1.5 font-mono text-right whitespace-nowrap font-semibold ${h.total_return_pnl != null ? (retPos ? 'text-emerald-300' : 'text-red-300') : 'text-gray-700'}`}>
+                    {h.total_return_pnl != null
+                      ? `${retPos ? '+' : ''}${fmt(h.total_return_pnl)}`
+                      : '—'}
+                    {h.total_return_pct != null && (
+                      <span className="text-xs font-normal opacity-70 ml-1">
+                        {retPos ? '+' : ''}{h.total_return_pct.toFixed(1)}%
+                      </span>
+                    )}
                   </td>
+
                   <td className={`px-2 py-1.5 font-bold whitespace-nowrap ${SIGNAL_CLS[h.rsi_signal] || 'text-gray-700'}`}>
                     {h.rsi_signal ?? '—'}
                     {h.rsi != null && <span className="font-normal text-gray-600 ml-1">{h.rsi.toFixed(0)}</span>}
@@ -437,6 +485,33 @@ function PnlPanel({ data }) {
           </tbody>
         </table>
       </div>
+
+      {/* Dividend payouts detail */}
+      {holdings.some(h => h.dividend_payouts?.length > 0) && (
+        <details className="text-xs">
+          <summary className="text-gray-600 cursor-pointer hover:text-gray-400 select-none py-1">
+            Dividend payout history ▸
+          </summary>
+          <div className="mt-1 space-y-1">
+            {holdings.filter(h => h.dividend_payouts?.length > 0).map(h => (
+              <div key={h.yf_ticker} className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
+                <p className="font-mono font-bold text-gray-300 mb-1">{h.yf_ticker}
+                  <span className="font-normal text-gray-600 ml-2">
+                    {h.dividend_count} payment{h.dividend_count !== 1 ? 's' : ''} · ₹{h.dividends_per_share?.toFixed(2)}/share · ₹{fmt(h.dividends_received)} total
+                  </span>
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {h.dividend_payouts.map(p => (
+                    <span key={p.date} className="px-1.5 py-0.5 bg-blue-950/40 border border-blue-900/40 text-blue-400 rounded font-mono">
+                      {p.date} · {p.amount.toFixed(2)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
     </div>
   )
 }

@@ -22,6 +22,20 @@ _NAME_HEADERS = {
     'security', 'description',
 }
 _ISIN_HEADERS = {'isin', 'isin number', 'isin code', 'isin no'}
+_DATE_HEADERS = {
+    'date', 'purchase date', 'buy date', 'transaction date', 'trade date',
+    'acquisition date', 'date of purchase', 'date of acquisition',
+    'invested on', 'purchase on',
+}
+_QTY_HEADERS = {
+    'quantity', 'qty', 'shares', 'units', 'no of shares', 'number of shares',
+    'no. of shares', 'holdings', 'nos', 'no', 'shares held',
+}
+_PRICE_HEADERS = {
+    'purchase price', 'buy price', 'cost price', 'avg price', 'average price',
+    'avg cost', 'average cost', 'buy rate', 'cost', 'price', 'invested price',
+    'acquisition price', 'avg buy price',
+}
 
 
 def _col_role(header: str) -> Optional[str]:
@@ -29,6 +43,9 @@ def _col_role(header: str) -> Optional[str]:
     if h in _TICKER_HEADERS: return 'ticker'
     if h in _NAME_HEADERS:   return 'name'
     if h in _ISIN_HEADERS:   return 'isin'
+    if h in _DATE_HEADERS:   return 'date'
+    if h in _QTY_HEADERS:    return 'qty'
+    if h in _PRICE_HEADERS:  return 'price'
     return None
 
 
@@ -47,9 +64,31 @@ def _find_header_row(ws, max_scan: int = 20):
     return None
 
 
+def _parse_float(raw: str) -> Optional[float]:
+    """Convert a cell value to float, stripping currency symbols and commas."""
+    try:
+        return float(re.sub(r'[₹$£€,\s]', '', str(raw)))
+    except (ValueError, TypeError):
+        return None
+
+
+def _parse_date_cell(raw) -> Optional[str]:
+    """Convert a cell value (datetime / date / string) to ISO date string."""
+    import datetime as _dt
+    if isinstance(raw, (_dt.datetime, _dt.date)):
+        d = raw.date() if isinstance(raw, _dt.datetime) else raw
+        return d.isoformat()
+    if raw is None or str(raw).strip() in ('', 'None', 'nan'):
+        return None
+    from fetchers.history import parse_date
+    d = parse_date(str(raw).strip())
+    return d.isoformat() if d else None
+
+
 def _resolve(raw_ticker: str, raw_name: str, raw_isin: str,
-             market: str, sheet: str) -> Optional[dict]:
-    """Try to resolve a row to a yfinance-ready symbol."""
+             market: str, sheet: str,
+             raw_date: str = '', raw_qty: str = '', raw_price: str = '') -> Optional[dict]:
+    """Resolve a row to a yfinance-ready symbol, including optional holding data."""
     info = None
     matched_via = ''
 
@@ -77,14 +116,30 @@ def _resolve(raw_ticker: str, raw_name: str, raw_isin: str,
     if not info:
         return None
 
-    return {
+    rec: dict = {
         'yf_ticker':   info['yf_ticker'],
-        'symbol':      info['yf_ticker'],          # UI compat
+        'symbol':      info['yf_ticker'],
         'name':        info.get('name') or raw_name,
         'isin':        info.get('isin') or raw_isin,
         'sheet':       sheet,
         'matched_via': matched_via,
     }
+
+    # Optional holding fields — included only when present
+    if raw_date:
+        parsed_date = _parse_date_cell(raw_date)
+        if parsed_date:
+            rec['purchase_date'] = parsed_date
+    if raw_qty:
+        qty = _parse_float(raw_qty)
+        if qty is not None:
+            rec['quantity'] = qty
+    if raw_price:
+        price = _parse_float(raw_price)
+        if price is not None:
+            rec['purchase_price'] = price
+
+    return rec
 
 
 def parse_excel(file_bytes: bytes, market: str = 'india') -> dict:
@@ -119,23 +174,34 @@ def parse_excel(file_bytes: bytes, market: str = 'india') -> dict:
         ticker_col = role_map.get('ticker')
         name_col   = role_map.get('name')
         isin_col   = role_map.get('isin')
+        date_col   = role_map.get('date')
+        qty_col    = role_map.get('qty')
+        price_col  = role_map.get('price')
 
         unresolved: list[str] = []
 
         for row in ws.iter_rows(min_row=header_row + 1, max_row=2000, values_only=True):
             def cell(col):
-                return str(row[col - 1]).strip() if col and row[col - 1] is not None else ''
+                return row[col - 1] if col and row[col - 1] is not None else ''
 
-            raw_ticker = cell(ticker_col)
-            raw_name   = cell(name_col)
-            raw_isin   = cell(isin_col)
+            def cell_str(col):
+                v = cell(col)
+                return str(v).strip() if v != '' else ''
+
+            raw_ticker = cell_str(ticker_col)
+            raw_name   = cell_str(name_col)
+            raw_isin   = cell_str(isin_col)
+            raw_date   = cell(date_col)       # keep raw for date parsing (may be datetime obj)
+            raw_qty    = cell_str(qty_col)
+            raw_price  = cell_str(price_col)
 
             if not any([raw_ticker, raw_name, raw_isin]):
                 continue
             if raw_ticker in ('None', 'nan', '-'):
                 raw_ticker = ''
 
-            rec = _resolve(raw_ticker, raw_name, raw_isin, market, sheet_name)
+            rec = _resolve(raw_ticker, raw_name, raw_isin, market, sheet_name,
+                           raw_date=raw_date, raw_qty=raw_qty, raw_price=raw_price)
             if rec:
                 yf = rec['yf_ticker']
                 if yf not in stocks:

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { parsePortfolio } from '../api'
+import { parsePortfolio, fetchPortfolioHistory } from '../api'
 
 const ACCEPT = '.xlsx,.xls,.pdf'
 
@@ -26,8 +26,11 @@ export default function PortfolioUpload({ onFetchSymbols, loading }) {
   const [warnings, setWarnings] = useState([])
   const [meta,     setMeta]     = useState(null)
   const [error,    setError]    = useState(null)
-  const [selected, setSelected] = useState(new Set())
-  const [dragging, setDragging] = useState(false)
+  const [selected,  setSelected]  = useState(new Set())
+  const [dragging,  setDragging]  = useState(false)
+  const [pnlData,   setPnlData]   = useState(null)
+  const [pnlLoading,setPnlLoading]= useState(false)
+  const [pnlError,  setPnlError]  = useState(null)
 
   const handleFile = async (file) => {
     if (!file) return
@@ -68,7 +71,37 @@ export default function PortfolioUpload({ onFetchSymbols, loading }) {
     if (syms.length) onFetchSymbols(syms, market)
   }
 
-  const reset = () => { setStocks(null); setWarnings([]); setMeta(null); setError(null) }
+  const reset = () => {
+    setStocks(null); setWarnings([]); setMeta(null); setError(null)
+    setPnlData(null); setPnlError(null)
+  }
+
+  const hasPurchaseDates = stocks?.some(s => s.purchase_date)
+
+  const handlePnl = async () => {
+    const holdings = stocks
+      .filter(s => selected.has(key(s)) && s.purchase_date)
+      .map(s => ({
+        yf_ticker:      key(s),
+        name:           s.name,
+        purchase_date:  s.purchase_date,
+        purchase_price: s.purchase_price ?? null,
+        quantity:       s.quantity ?? null,
+      }))
+    if (!holdings.length) {
+      setPnlError('No selected stocks have a purchase date. Add a "Purchase Date" column to your file.')
+      return
+    }
+    setPnlLoading(true); setPnlError(null); setPnlData(null)
+    try {
+      const result = await fetchPortfolioHistory(market, holdings)
+      setPnlData(result)
+    } catch (e) {
+      setPnlError(e.message)
+    } finally {
+      setPnlLoading(false)
+    }
+  }
 
   const activeMkt = MARKETS.find(m => m.id === market)
 
@@ -264,14 +297,145 @@ export default function PortfolioUpload({ onFetchSymbols, loading }) {
               >
                 {loading ? 'Fetching…' : `Fetch Live Data (${selected.size})`}
               </button>
+              {hasPurchaseDates && (
+                <button
+                  onClick={handlePnl}
+                  disabled={pnlLoading || selected.size === 0}
+                  className="flex-1 py-2 rounded-lg bg-teal-700 hover:bg-teal-600 disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-white transition-colors"
+                >
+                  {pnlLoading ? 'Calculating…' : 'Calculate P&L'}
+                </button>
+              )}
               <button onClick={reset}
                 className="px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs text-gray-400 transition-colors"
                 title="Upload a different file">
                 ↺
               </button>
             </div>
+
+            {/* P&L error */}
+            {pnlError && (
+              <div className="px-3 py-2 bg-red-950/40 border border-red-800 rounded text-xs text-red-300">
+                {pnlError}
+              </div>
+            )}
+
+            {/* P&L results panel */}
+            {pnlData && <PnlPanel data={pnlData} />}
           </>
         )}
+      </div>
+    </div>
+  )
+}
+
+// ── P&L Results Panel ─────────────────────────────────────────────────────────
+
+const SIGNAL_CLS = {
+  BUY:  'text-emerald-400',
+  SELL: 'text-red-400',
+  HOLD: 'text-amber-500',
+}
+
+function PnlPanel({ data }) {
+  const { holdings, summary } = data
+  const totalPnl = summary?.total_unrealised_pnl
+  const pnlPos   = totalPnl != null && totalPnl >= 0
+
+  return (
+    <div className="mt-1 space-y-2">
+      {/* Summary bar */}
+      <div className="grid grid-cols-2 gap-2 text-xs">
+        <div className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
+          <p className="text-gray-600 mb-0.5">Invested</p>
+          <p className="text-gray-200 font-mono font-bold">
+            {summary?.total_cost_basis != null
+              ? summary.total_cost_basis.toLocaleString(undefined, { maximumFractionDigits: 0 })
+              : '—'}
+          </p>
+        </div>
+        <div className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
+          <p className="text-gray-600 mb-0.5">Current Value</p>
+          <p className="text-gray-200 font-mono font-bold">
+            {summary?.total_current_value != null
+              ? summary.total_current_value.toLocaleString(undefined, { maximumFractionDigits: 0 })
+              : '—'}
+          </p>
+        </div>
+        <div className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
+          <p className="text-gray-600 mb-0.5">Unrealised P&L</p>
+          <p className={`font-mono font-bold ${pnlPos ? 'text-emerald-400' : 'text-red-400'}`}>
+            {totalPnl != null
+              ? `${pnlPos ? '+' : ''}${totalPnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+              : '—'}
+          </p>
+        </div>
+        <div className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
+          <p className="text-gray-600 mb-0.5">Return %</p>
+          <p className={`font-mono font-bold ${pnlPos ? 'text-emerald-400' : 'text-red-400'}`}>
+            {summary?.total_pnl_pct != null
+              ? `${pnlPos ? '+' : ''}${summary.total_pnl_pct.toFixed(2)}%`
+              : '—'}
+          </p>
+        </div>
+      </div>
+
+      {/* RSI signal chips */}
+      {(summary?.rsi_buy > 0 || summary?.rsi_sell > 0) && (
+        <div className="flex gap-2 text-xs">
+          {summary.rsi_buy  > 0 && <span className="px-2 py-0.5 bg-emerald-900/30 text-emerald-400 border border-emerald-900 rounded-full">{summary.rsi_buy} RSI BUY</span>}
+          {summary.rsi_sell > 0 && <span className="px-2 py-0.5 bg-red-900/30 text-red-400 border border-red-900 rounded-full">{summary.rsi_sell} RSI SELL</span>}
+          {summary.rsi_hold > 0 && <span className="px-2 py-0.5 bg-gray-800 text-gray-500 border border-gray-700 rounded-full">{summary.rsi_hold} HOLD</span>}
+        </div>
+      )}
+
+      {/* Per-holding table */}
+      <div className="overflow-x-auto rounded-lg border border-gray-800 bg-gray-950">
+        <table className="w-full text-xs">
+          <thead className="sticky top-0 bg-gray-900 border-b border-gray-800">
+            <tr>
+              {['Ticker','Buy Date','Price on Date','Buy Price','Current','Qty','P&L','Return','Signal'].map(h => (
+                <th key={h} className="px-2 py-1.5 text-left text-gray-500 font-medium whitespace-nowrap">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {holdings.map((h, i) => {
+              const pnlPos = h.unrealised_pnl != null && h.unrealised_pnl >= 0
+              return (
+                <tr key={`${h.yf_ticker}-${i}`} className="border-b border-gray-800/40">
+                  <td className="px-2 py-1.5 font-mono font-bold text-gray-200 whitespace-nowrap">{h.yf_ticker}</td>
+                  <td className="px-2 py-1.5 text-gray-500 whitespace-nowrap">{h.purchase_date || '—'}</td>
+                  <td className="px-2 py-1.5 font-mono text-gray-400 text-right whitespace-nowrap">
+                    {h.price_on_date != null ? h.price_on_date.toFixed(2) : '—'}
+                    {h.actual_date && h.actual_date !== h.purchase_date && (
+                      <span className="text-gray-700 ml-1 text-xs">({h.actual_date})</span>
+                    )}
+                  </td>
+                  <td className="px-2 py-1.5 font-mono text-gray-400 text-right whitespace-nowrap">
+                    {h.purchase_price != null ? h.purchase_price.toFixed(2) : '—'}
+                  </td>
+                  <td className="px-2 py-1.5 font-mono text-gray-300 text-right whitespace-nowrap">
+                    {h.current_price != null ? h.current_price.toFixed(2) : '—'}
+                  </td>
+                  <td className="px-2 py-1.5 font-mono text-gray-500 text-right">{h.quantity ?? '—'}</td>
+                  <td className={`px-2 py-1.5 font-mono text-right whitespace-nowrap ${h.unrealised_pnl != null ? (pnlPos ? 'text-emerald-400' : 'text-red-400') : 'text-gray-700'}`}>
+                    {h.unrealised_pnl != null
+                      ? `${pnlPos ? '+' : ''}${h.unrealised_pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+                      : '—'}
+                  </td>
+                  <td className={`px-2 py-1.5 font-mono text-right whitespace-nowrap ${h.pnl_pct != null ? (pnlPos ? 'text-emerald-400' : 'text-red-400') : 'text-gray-700'}`}>
+                    {h.pnl_pct != null ? `${pnlPos ? '+' : ''}${h.pnl_pct.toFixed(2)}%` : '—'}
+                  </td>
+                  <td className={`px-2 py-1.5 font-bold whitespace-nowrap ${SIGNAL_CLS[h.rsi_signal] || 'text-gray-700'}`}>
+                    {h.rsi_signal ?? '—'}
+                    {h.rsi != null && <span className="font-normal text-gray-600 ml-1">{h.rsi.toFixed(0)}</span>}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   )

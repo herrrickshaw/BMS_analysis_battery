@@ -1,13 +1,39 @@
 from __future__ import annotations
 
+from typing import Optional
 from fastapi import APIRouter, HTTPException, UploadFile, File, Query
 from fastapi.concurrency import run_in_threadpool
+from pydantic import BaseModel, field_validator
 
 from parsers.excel_parser import parse_excel
 from parsers.pdf_parser   import parse_pdf
 from parsers.market_db    import SUPPORTED_MARKETS, db_size
 
 router = APIRouter()
+
+
+# ── request models ────────────────────────────────────────────────────────────
+
+class HoldingInput(BaseModel):
+    yf_ticker:      str
+    name:           Optional[str]   = None
+    purchase_date:  Optional[str]   = None   # ISO date YYYY-MM-DD or common formats
+    purchase_price: Optional[float] = None
+    quantity:       Optional[float] = None
+
+    @field_validator('purchase_date', mode='before')
+    @classmethod
+    def coerce_date(cls, v):
+        if v is None:
+            return None
+        from fetchers.history import parse_date
+        d = parse_date(v)
+        return d.isoformat() if d else str(v)
+
+
+class HistoryRequest(BaseModel):
+    market:   str = 'india'
+    holdings: list[HoldingInput]
 
 ALLOWED_EXTENSIONS = {'xlsx': parse_excel, 'xls': parse_excel, 'pdf': parse_pdf}
 MAX_SIZE_MB = 20
@@ -69,6 +95,29 @@ async def parse_portfolio(
             'cassandra':       'online' if cass.is_available() else 'offline',
         },
     }
+
+
+@router.post('/api/portfolio/history')
+async def portfolio_history(req: HistoryRequest):
+    """
+    For each holding, retrieve:
+      - Closing price on the purchase date (yfinance / Cassandra cache)
+      - Current price + RSI signal (Cassandra / yfinance fallback)
+      - Cost basis, current value, unrealised P&L
+
+    Purchase date must be supplied per holding (ISO or common formats).
+    Holdings without a purchase_date still get current price + RSI signal.
+    """
+    if req.market not in SUPPORTED_MARKETS:
+        raise HTTPException(400, f'Unknown market "{req.market}"')
+    if not req.holdings:
+        raise HTTPException(400, 'holdings list is empty')
+
+    holdings_input = [h.model_dump() for h in req.holdings]
+
+    from fetchers.history import fetch_holdings_history
+    result = await run_in_threadpool(fetch_holdings_history, holdings_input)
+    return {'market': req.market, **result}
 
 
 @router.get('/api/portfolio/markets')

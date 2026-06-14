@@ -79,3 +79,11 @@ export async function seedMarket(market, force = false) {
     method: 'POST',
   })
 }
+
+export async function fetchPortfolioHistory(market, holdings) {
+  return apiFetch('/api/portfolio/history', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ market, holdings }),
+  })
+}

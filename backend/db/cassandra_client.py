@@ -104,6 +104,12 @@ _MIGRATIONS: list[str] = [
     f"ALTER TABLE {KEYSPACE}.stock_quotes ADD revenue_growth double",
     f"ALTER TABLE {KEYSPACE}.stock_quotes ADD eps            double",
     f"ALTER TABLE {KEYSPACE}.stock_quotes ADD dividend_yield double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ret_1d         double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ret_1w         double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ret_1m         double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ret_3m         double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ret_6m         double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ret_1y         double",
 ]
 
 

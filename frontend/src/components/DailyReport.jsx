@@ -48,6 +48,13 @@ function SignalBadge({ signal }) {
   )
 }
 
+function RetPct({ value }) {
+  if (value == null) return <span className="text-gray-700">—</span>
+  const n   = Number(value)
+  const cls = n >= 0 ? 'text-emerald-400' : 'text-red-400'
+  return <span className={`font-mono text-xs ${cls}`}>{n >= 0 ? '+' : ''}{n.toFixed(2)}%</span>
+}
+
 function CriteriaGrid({ criteria }) {
   const entries = Object.entries(criteria).filter(([k]) => !k.startsWith('_'))
   return (
@@ -119,6 +126,12 @@ function ScanTable({ rows, scanType, marketFilter }) {
             <SortTh k="pe"             label="P/E" />
             <SortTh k="roe"            label="ROE %" />
             <SortTh k="debt_to_equity" label="D/E" />
+            <SortTh k="ret_1d"         label="1D %" />
+            <SortTh k="ret_1w"         label="1W %" />
+            <SortTh k="ret_1m"         label="1M %" />
+            <SortTh k="ret_3m"         label="3M %" />
+            <SortTh k="ret_6m"         label="6M %" />
+            <SortTh k="ret_1y"         label="1Y %" />
             <SortTh k="ema_200"        label="EMA-200" />
             <SortTh k="macd"           label="MACD" />
             <SortTh k="volume_ratio"   label="Vol×" />
@@ -170,6 +183,12 @@ function ScanTable({ rows, scanType, marketFilter }) {
                 <td className="px-3 py-2.5 text-gray-400 font-mono text-xs whitespace-nowrap">
                   {row.debt_to_equity != null ? Number(row.debt_to_equity).toFixed(2) : '—'}
                 </td>
+                <td className="px-3 py-2.5 whitespace-nowrap"><RetPct value={row.ret_1d} /></td>
+                <td className="px-3 py-2.5 whitespace-nowrap"><RetPct value={row.ret_1w} /></td>
+                <td className="px-3 py-2.5 whitespace-nowrap"><RetPct value={row.ret_1m} /></td>
+                <td className="px-3 py-2.5 whitespace-nowrap"><RetPct value={row.ret_3m} /></td>
+                <td className="px-3 py-2.5 whitespace-nowrap"><RetPct value={row.ret_6m} /></td>
+                <td className="px-3 py-2.5 whitespace-nowrap"><RetPct value={row.ret_1y} /></td>
                 <td className="px-3 py-2.5 font-mono text-xs whitespace-nowrap">
                   {row.ema_200 != null ? (
                     <span className={row.cmp != null && row.cmp > row.ema_200 ? 'text-emerald-400' : 'text-red-400'}>
@@ -227,7 +246,7 @@ function ScanTable({ rows, scanType, marketFilter }) {
               </tr>
               {expanded === i && row.criteria && (
                 <tr>
-                  <td colSpan={17} className="px-3 pb-3">
+                  <td colSpan={23} className="px-3 pb-3">
                     <CriteriaGrid criteria={row.criteria} />
                   </td>
                 </tr>

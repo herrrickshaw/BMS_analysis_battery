@@ -3,6 +3,8 @@ REST endpoints for Cassandra database management.
 """
 from __future__ import annotations
 
+import asyncio
+
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.concurrency import run_in_threadpool
 
@@ -94,6 +96,101 @@ async def search_instruments(
 
     hits = await run_in_threadpool(_search, market, q.strip(), limit)
     return {'market': market, 'query': q, 'results': hits, 'source': 'cassandra'}
+
+
+@router.post('/fetch_quotes')
+async def fetch_quotes_one(
+    market: str = Query(..., description='Market: india | us | europe | japan | korea | china'),
+    batch_size: int = Query(50, ge=5, le=200,
+        description='Tickers per yf.download() call (default 50)'),
+    max_workers: int = Query(4, ge=1, le=12,
+        description='Threads for fundamentals phase (default 4)'),
+    with_fundamentals: bool = Query(True,
+        description='Also fetch PE/ROE/market-cap per ticker (slower)'),
+):
+    """
+    Start a background job that fetches live quotes for all instruments
+    in the given market and writes them to Cassandra stock_quotes.
+    Phase 1 uses yf.download() in batches (rate-limit friendly).
+    Phase 2 fetches fundamentals individually at ~30/min.
+    Returns immediately; poll /api/db/fetch_progress for status.
+    """
+    if market not in MARKETS:
+        raise HTTPException(400, f'Unknown market "{market}". Choose from: {MARKETS}')
+    if not await run_in_threadpool(cass.is_available):
+        raise HTTPException(503, 'Cassandra is offline')
+
+    from db.bulk_fetcher import fetch_market_quotes
+    loop = asyncio.get_running_loop()
+    loop.run_in_executor(
+        None, fetch_market_quotes, market, batch_size, max_workers, with_fundamentals,
+    )
+    return {
+        'status':  'started',
+        'market':  market,
+        'message': f'Fetching {market} in background (Phase 1: OHLCV bulk, Phase 2: fundamentals). Poll /api/db/fetch_progress.',
+    }
+
+
+@router.post('/fetch_quotes/all')
+async def fetch_quotes_all(
+    batch_size: int = Query(50, ge=5, le=200),
+    max_workers: int = Query(4, ge=1, le=12),
+    with_fundamentals: bool = Query(True),
+):
+    """
+    Fetch live quotes for ALL markets sequentially.
+    Phase 1: yf.download() batches (16 K tickers ≈ 20–40 min).
+    Phase 2: individual .info for fundamentals (1–3 hours, optional).
+    Returns immediately; poll /api/db/fetch_progress for status.
+    """
+    if not await run_in_threadpool(cass.is_available):
+        raise HTTPException(503, 'Cassandra is offline')
+
+    from db.bulk_fetcher import fetch_all_quotes, MARKETS as BF_MARKETS
+    loop = asyncio.get_running_loop()
+    loop.run_in_executor(None, fetch_all_quotes, None, batch_size, max_workers, with_fundamentals)
+
+    s = cass.session()
+    counts = {}
+    for m in BF_MARKETS:
+        try:
+            r = s.execute(
+                f'SELECT COUNT(*) FROM {cass.KEYSPACE}.instruments WHERE market = %s', (m,)
+            ).one()
+            counts[m] = int(r[0]) if r else 0
+        except Exception:
+            counts[m] = 0
+
+    total = sum(counts.values())
+    return {
+        'status':  'started',
+        'markets': BF_MARKETS,
+        'instrument_counts': counts,
+        'total_instruments': total,
+        'message': (
+            f'Fetching {total:,} instruments across {len(BF_MARKETS)} markets. '
+            f'Phase 1 (OHLCV+RSI) takes ~20-40min; '
+            f'Phase 2 (fundamentals) adds ~1-3h if with_fundamentals=true. '
+            f'Poll /api/db/fetch_progress.'
+        ),
+    }
+
+
+@router.post('/fetch_quotes/cancel')
+async def cancel_fetch():
+    """Cancel a running bulk fetch job."""
+    from db.bulk_fetcher import cancel
+    cancel()
+    return {'status': 'cancel_requested'}
+
+
+@router.get('/fetch_progress')
+async def fetch_progress():
+    """Return per-market progress for any running or completed bulk fetch."""
+    from db.bulk_fetcher import get_progress
+    progress = await run_in_threadpool(get_progress)
+    return {'progress': progress}
 
 
 def _search(market: str, q: str, limit: int) -> list[dict]:

@@ -80,6 +80,32 @@ export async function seedMarket(market, force = false) {
   })
 }
 
+// ── File workspace ────────────────────────────────────────────────────────────
+export async function listFiles() {
+  return apiFetch('/api/files')
+}
+
+export async function uploadWorkspaceFile(file, label = '') {
+  const form = new FormData()
+  form.append('file', file)
+  const qs = label ? `?label=${encodeURIComponent(label)}` : ''
+  return apiFetch(`/api/files/upload${qs}`, { method: 'POST', body: form })
+}
+
+export async function deleteFile(fileId) {
+  return apiFetch(`/api/files/${fileId}`, { method: 'DELETE' })
+}
+
+export async function previewFile(fileId, rows = 20) {
+  return apiFetch(`/api/files/${fileId}/preview?rows=${rows}`)
+}
+
+export async function analyseFile(fileId, analysis, market = 'india', scanType = null) {
+  let qs = `analysis=${encodeURIComponent(analysis)}&market=${encodeURIComponent(market)}`
+  if (scanType) qs += `&scan_type=${encodeURIComponent(scanType)}`
+  return apiFetch(`/api/files/${fileId}/analyse?${qs}`, { method: 'POST' })
+}
+
 export async function fetchDailyScan(markets = 'india,us,europe,japan,korea', scans = 'darvas,piotroski') {
   return apiFetch(
     `/api/db/daily/scan?markets=${encodeURIComponent(markets)}&scans=${encodeURIComponent(scans)}`,

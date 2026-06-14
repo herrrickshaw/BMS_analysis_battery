@@ -4,12 +4,14 @@ import { parsePortfolio, fetchPortfolioHistory } from '../api'
 const ACCEPT = '.xlsx,.xls,.pdf'
 
 const MARKETS = [
-  { id: 'india',  label: '🇮🇳 India',  sub: 'NSE / BSE',        suffix: '.NS',      currency: '₹' },
-  { id: 'us',     label: '🇺🇸 USA',     sub: 'NYSE / NASDAQ',    suffix: '',         currency: '$' },
-  { id: 'europe', label: '🇪🇺 Europe',  sub: 'STOXX 600',        suffix: '.PA / .DE …', currency: '€' },
-  { id: 'japan',  label: '🇯🇵 Japan',   sub: 'TSE',              suffix: '.T',       currency: '¥' },
-  { id: 'korea',  label: '🇰🇷 Korea',   sub: 'KRX',              suffix: '.KS',      currency: '₩' },
-  { id: 'china',  label: '🇨🇳 China',   sub: 'SSE / SZSE',       suffix: '.SS / .SZ', currency: '¥' },
+  { id: 'india',     label: '🇮🇳 India',     sub: 'NSE / BSE',           suffix: '.NS',        currency: '₹' },
+  { id: 'us',        label: '🇺🇸 USA',        sub: 'NYSE / NASDAQ',       suffix: '',           currency: '$' },
+  { id: 'europe',    label: '🇪🇺 Europe',     sub: 'STOXX 600',           suffix: '.PA / .DE …', currency: '€' },
+  { id: 'japan',     label: '🇯🇵 Japan',      sub: 'TSE',                 suffix: '.T',         currency: '¥' },
+  { id: 'korea',     label: '🇰🇷 Korea',      sub: 'KRX',                 suffix: '.KS',        currency: '₩' },
+  { id: 'china',     label: '🇨🇳 China',      sub: 'SSE / SZSE',          suffix: '.SS / .SZ',  currency: '¥' },
+  { id: 'hong_kong', label: '🇭🇰 Hong Kong',  sub: 'HKEX',                suffix: '.HK',        currency: 'HK$' },
+  { id: 'canada',    label: '🇨🇦 Canada',     sub: 'TSX',                 suffix: '.TO',        currency: 'C$' },
 ]
 
 const MATCH_COLOR = {

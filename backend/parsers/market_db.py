@@ -111,6 +111,20 @@ def _db(market: str) -> dict:
             extra_cols=['exchange'],
         )
 
+    elif market == 'hong_kong':
+        result = _load_csv(
+            os.path.join(_DATA, 'hk_list.csv'),
+            yf_col='yf_ticker', name_col='name', code_col='symbol',
+            extra_cols=['exchange'],
+        )
+
+    elif market == 'canada':
+        result = _load_csv(
+            os.path.join(_DATA, 'canada_list.csv'),
+            yf_col='yf_ticker', name_col='name', code_col='symbol',
+            extra_cols=['exchange'],
+        )
+
     else:
         result = {'by_yf': {}, 'by_code': {}, 'by_name': {}}
 
@@ -122,31 +136,37 @@ def _db(market: str) -> dict:
 
 # Regex patterns for recognising native tickers in raw text
 _PATTERNS = {
-    'india':  re.compile(r'\b([A-Z][A-Z0-9&]{1,14})\b'),
-    'us':     re.compile(r'\b([A-Z]{1,5})\b'),
-    'europe': re.compile(r'\b([A-Z0-9]{2,8}\.[A-Z]{2})\b'),
-    'japan':  re.compile(r'\b(\d{4,5}(?:\.T)?)\b'),
-    'korea':  re.compile(r'\b(\d{6}(?:\.KS|\.KQ)?)\b'),
-    'china':  re.compile(r'\b(\d{6}(?:\.SS|\.SZ)?)\b'),
+    'india':     re.compile(r'\b([A-Z][A-Z0-9&]{1,14})\b'),
+    'us':        re.compile(r'\b([A-Z]{1,5})\b'),
+    'europe':    re.compile(r'\b([A-Z0-9]{2,8}\.[A-Z]{2})\b'),
+    'japan':     re.compile(r'\b(\d{4,5}(?:\.T)?)\b'),
+    'korea':     re.compile(r'\b(\d{6}(?:\.KS|\.KQ)?)\b'),
+    'china':     re.compile(r'\b(\d{6}(?:\.SS|\.SZ)?)\b'),
+    'hong_kong': re.compile(r'\b(\d{4,5}(?:\.HK)?)\b'),
+    'canada':    re.compile(r'\b([A-Z]{1,6}(?:\.[A-Z]{1,2})?(?:\.TO)?)\b'),
 }
 
 # Exchange suffix added to raw code when querying yfinance
 _YF_SUFFIX = {
-    'india':  '.NS',
-    'us':     '',
-    'europe': '',       # suffix already embedded in yf_ticker
-    'japan':  '.T',
-    'korea':  '.KS',
-    'china':  '.SS',    # default; .SZ also used
+    'india':     '.NS',
+    'us':        '',
+    'europe':    '',       # suffix already embedded in yf_ticker
+    'japan':     '.T',
+    'korea':     '.KS',
+    'china':     '.SS',    # default; .SZ also used
+    'hong_kong': '.HK',
+    'canada':    '.TO',
 }
 
 _ISIN_PREFIX = {
-    'india':  'IN',
-    'us':     'US',
-    'europe': None,   # multiple country prefixes
-    'japan':  'JP',
-    'korea':  'KR',
-    'china':  'CN',
+    'india':     'IN',
+    'us':        'US',
+    'europe':    None,   # multiple country prefixes
+    'japan':     'JP',
+    'korea':     'KR',
+    'china':     'CN',
+    'hong_kong': 'HK',
+    'canada':    'CA',
 }
 
 _ISIN_RE = re.compile(r'\b([A-Z]{2}[A-Z0-9]{10})\b')
@@ -154,7 +174,7 @@ _ISIN_RE = re.compile(r'\b([A-Z]{2}[A-Z0-9]{10})\b')
 
 # ── public API ─────────────────────────────────────────────────────────────────
 
-SUPPORTED_MARKETS = ['india', 'us', 'europe', 'japan', 'korea', 'china']
+SUPPORTED_MARKETS = ['india', 'us', 'europe', 'japan', 'korea', 'china', 'hong_kong', 'canada']
 
 
 def lookup(raw: str, market: str) -> Optional[dict]:

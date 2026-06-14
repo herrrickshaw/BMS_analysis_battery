@@ -57,8 +57,18 @@ def _pts(crit: pd.Series, weight: int = 1) -> pd.Series:
 def _r(v) -> float | None:
     try:
         f = float(v)
-        return None if math.isnan(f) else round(f, 2)
+        return None if (math.isnan(f) or math.isinf(f)) else round(f, 2)
     except (TypeError, ValueError):
+        return None
+
+
+def _b(v) -> bool | None:
+    """Convert numpy/pandas bool-like to plain Python bool, None stays None."""
+    if v is None:
+        return None
+    try:
+        return bool(v)
+    except Exception:
         return None
 
 
@@ -146,7 +156,7 @@ def scan_darvas(df: pd.DataFrame) -> list[dict]:
             'opm':            _r(_col(d, 'opm').iat[i]),
             'debt_to_equity': _r(de.iat[i]),
             'market_cap':     _r(_col(d, 'market_cap').iat[i]),
-            'volume':         row.get('volume'),
+            'volume':         int(row['volume']) if row.get('volume') is not None else None,
             'beta':           _r(_col(d, 'beta').iat[i]),
             'current_ratio':  _r(_col(d, 'current_ratio').iat[i]),
             'revenue_growth': _r(_col(d, 'revenue_growth').iat[i]),
@@ -165,16 +175,16 @@ def scan_darvas(df: pd.DataFrame) -> list[dict]:
             'signal':         str(signal[i]),
             'completeness':   int(completeness.iat[i]),
             'criteria': {
-                'near_52w_high': c_near_high.iat[i],
-                'above_ema50':   c_above_e50.iat[i],
-                'range_strength': c_range_str.iat[i],
-                'rsi_healthy':   c_rsi_health.iat[i],
-                'buffett_roe':   c_roe.iat[i],
-                'buffett_pe':    c_pe.iat[i],
-                'buffett_de':    c_de.iat[i],
-                'above_ema200':  c_above_e200.iat[i],
-                'macd_bull':     c_macd_bull.iat[i],
-                'volume_surge':  c_vol_surge.iat[i],
+                'near_52w_high':  _b(c_near_high.iat[i]),
+                'above_ema50':    _b(c_above_e50.iat[i]),
+                'range_strength': _b(c_range_str.iat[i]),
+                'rsi_healthy':    _b(c_rsi_health.iat[i]),
+                'buffett_roe':    _b(c_roe.iat[i]),
+                'buffett_pe':     _b(c_pe.iat[i]),
+                'buffett_de':     _b(c_de.iat[i]),
+                'above_ema200':   _b(c_above_e200.iat[i]),
+                'macd_bull':      _b(c_macd_bull.iat[i]),
+                'volume_surge':   _b(c_vol_surge.iat[i]),
             },
             '_exchange': str(row.get('_exchange', '')),
         })
@@ -269,14 +279,14 @@ def scan_piotroski(df: pd.DataFrame) -> list[dict]:
             'signal':         str(signal[i]),
             'completeness':   int(completeness.iat[i]),
             'criteria': {
-                'F1_roe_positive':   c_f1.iat[i],
-                'F5_low_leverage':   c_f5.iat[i],
-                'F8_op_margin':      c_f8.iat[i],
-                'F9_rev_growth':     c_f9.iat[i],
-                'FX1_above_ema50':   c_fx1.iat[i],
-                'FX2_rsi_range':     c_fx2.iat[i],
-                'FX3_near_high':     c_fx3.iat[i],
-                'FX4_current_ratio': c_fx4.iat[i],
+                'F1_roe_positive':   _b(c_f1.iat[i]),
+                'F5_low_leverage':   _b(c_f5.iat[i]),
+                'F8_op_margin':      _b(c_f8.iat[i]),
+                'F9_rev_growth':     _b(c_f9.iat[i]),
+                'FX1_above_ema50':   _b(c_fx1.iat[i]),
+                'FX2_rsi_range':     _b(c_fx2.iat[i]),
+                'FX3_near_high':     _b(c_fx3.iat[i]),
+                'FX4_current_ratio': _b(c_fx4.iat[i]),
             },
             '_exchange': str(row.get('_exchange', '')),
         })

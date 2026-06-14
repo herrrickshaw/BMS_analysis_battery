@@ -271,6 +271,119 @@ except Exception as e:
     print(f"  (warning: could not refresh China list: {e})")
 PYEOF
 
+# Hong Kong – Hang Seng + broader HKEX list via FinanceDataReader
+python3 - << 'PYEOF'
+import csv, os, warnings
+warnings.filterwarnings('ignore')
+ROOT = os.environ.get('ROOT', '.')
+data_dir = os.path.join(ROOT, 'data')
+rows = []
+try:
+    import FinanceDataReader as fdr
+    df = fdr.StockListing('HKEX')
+    for _, r in df.iterrows():
+        code_raw = str(r.get('Code', r.get('Symbol', ''))).strip()
+        name = str(r.get('Name', r.get('CompanyName', ''))).strip()
+        if not code_raw or not name:
+            continue
+        # HKEX codes are up to 5 digits, zero-padded to 4
+        try:
+            code = str(int(float(code_raw))).zfill(4)
+        except Exception:
+            code = code_raw
+        if code.isdigit():
+            rows.append({'symbol': code, 'name': name, 'exchange': 'HKEX', 'yf_ticker': code + '.HK'})
+except Exception as e:
+    print(f"  (FDR failed for HK: {e})")
+
+# Fallback: hardcode Hang Seng 50 constituents
+if not rows:
+    hs50 = [
+        ('0700', 'Tencent Holdings'), ('0005', 'HSBC Holdings'), ('0939', 'China Construction Bank'),
+        ('1398', 'ICBC'), ('3988', 'Bank of China'), ('2318', 'Ping An Insurance'),
+        ('0941', 'China Mobile'), ('0883', 'CNOOC'), ('0388', 'Hong Kong Exchanges'),
+        ('1299', 'AIA Group'), ('0016', 'Sun Hung Kai Properties'), ('0001', 'CK Hutchison'),
+        ('2628', 'China Life Insurance'), ('0823', 'Link REIT'), ('0002', 'CLP Holdings'),
+        ('0003', 'Hong Kong & China Gas'), ('0006', 'Power Assets'), ('0011', 'Hang Seng Bank'),
+        ('0012', 'Henderson Land'), ('0017', 'New World Development'), ('0019', 'Swire Pacific'),
+        ('0027', 'Galaxy Entertainment'), ('0066', 'MTR Corporation'), ('0101', 'Hang Lung Properties'),
+        ('0175', 'Geely Automobile'), ('0267', 'CITIC'), ('0291', 'China Resources Beer'),
+        ('0316', 'Orient Overseas'), ('0386', 'Sinopec'), ('0669', 'Techtronic Industries'),
+        ('0688', 'China Overseas Land'), ('0762', 'China Unicom'), ('0857', 'PetroChina'),
+        ('0868', 'Xinyi Glass'), ('0960', 'Longfor Group'), ('1038', 'CK Infrastructure'),
+        ('1044', 'Hengan International'), ('1093', 'CSPC Pharmaceutical'), ('1109', 'China Resources Land'),
+        ('1177', 'Sino Biopharmaceutical'), ('1211', 'BYD Company'), ('1997', 'Wharf Real Estate'),
+        ('2020', 'ANTA Sports'), ('2269', 'WuXi Biologics'), ('2313', 'Shenzhou International'),
+        ('2382', 'Sunny Optical'), ('3690', 'Meituan'), ('6098', 'Country Garden Services'),
+        ('6862', 'Haidilao'), ('9988', 'Alibaba Group'),
+    ]
+    rows = [{'symbol': c, 'name': n, 'exchange': 'HKEX', 'yf_ticker': c + '.HK'} for c, n in hs50]
+
+if rows:
+    path = os.path.join(data_dir, 'hk_list.csv')
+    with open(path, 'w', newline='', encoding='utf-8') as f:
+        w = csv.DictWriter(f, fieldnames=['symbol','name','exchange','yf_ticker'])
+        w.writeheader(); w.writerows(rows)
+    print(f"  Hong Kong list: {len(rows)} stocks")
+else:
+    print("  (warning: could not build Hong Kong list)")
+PYEOF
+
+# Canada – S&P/TSX via FinanceDataReader
+python3 - << 'PYEOF'
+import csv, os, warnings
+warnings.filterwarnings('ignore')
+ROOT = os.environ.get('ROOT', '.')
+data_dir = os.path.join(ROOT, 'data')
+rows = []
+try:
+    import FinanceDataReader as fdr
+    df = fdr.StockListing('TSX')
+    for _, r in df.iterrows():
+        sym = str(r.get('Symbol', r.get('Code', ''))).strip()
+        name = str(r.get('Name', r.get('CompanyName', ''))).strip()
+        if sym and name and not sym.endswith('.TO'):
+            rows.append({'symbol': sym, 'name': name, 'exchange': 'TSX', 'yf_ticker': sym + '.TO'})
+except Exception as e:
+    print(f"  (FDR failed for TSX: {e})")
+
+# Fallback: S&P/TSX 60 constituents
+if not rows:
+    tsx60 = [
+        ('SHOP', "Shopify"), ('CNR', 'Canadian National Railway'), ('TD', 'Toronto-Dominion Bank'),
+        ('ENB', 'Enbridge'), ('RY', 'Royal Bank of Canada'), ('CP', 'Canadian Pacific Kansas City'),
+        ('BN', 'Brookfield Corp'), ('BAM', 'Brookfield Asset Management'), ('BCE', 'BCE Inc'),
+        ('SU', 'Suncor Energy'), ('TRI', 'Thomson Reuters'), ('ATD', 'Alimentation Couche-Tard'),
+        ('ABX', 'Barrick Gold'), ('AEM', 'Agnico Eagle Mines'), ('BNS', 'Bank of Nova Scotia'),
+        ('BMO', 'Bank of Montreal'), ('MFC', 'Manulife Financial'), ('SLF', 'Sun Life Financial'),
+        ('GIB.A', 'CGI Inc'), ('TRP', 'TC Energy'), ('CNQ', 'Canadian Natural Resources'),
+        ('CCO', 'Cameco'), ('CSU', 'Constellation Software'), ('DOL', 'Dollarama'),
+        ('EMA', 'Emera'), ('FTS', 'Fortis'), ('GWO', 'Great-West Lifeco'),
+        ('H', 'Hydro One'), ('IFC', 'Intact Financial'), ('IMO', 'Imperial Oil'),
+        ('K', 'Kinross Gold'), ('L', 'Loblaw Companies'), ('MRU', 'Metro Inc'),
+        ('NA', 'National Bank of Canada'), ('NTR', 'Nutrien'), ('OVV', 'Ovintiv'),
+        ('POW', 'Power Corporation of Canada'), ('PPL', 'Pembina Pipeline'),
+        ('QSR', 'Restaurant Brands International'), ('RCI.B', 'Rogers Communications'),
+        ('SAP', 'Saputo'), ('STBV', 'Stella-Jones'), ('T', 'TELUS'),
+        ('TOU', 'Tourmaline Oil'), ('WCN', 'Waste Connections'), ('WFG', 'West Fraser Timber'),
+        ('WN', 'George Weston'), ('WPM', 'Wheaton Precious Metals'), ('X', 'TMX Group'),
+        ('YRI', 'Yamana Gold'), ('ACO.X', 'ATCO'), ('ALA', 'AltaGas'), ('AQN', 'Algonquin Power'),
+        ('CAR.UN', 'Canadian Apartment REIT'), ('CCA', 'Cogeco Communications'),
+        ('CTC.A', 'Canadian Tire'), ('EQB', 'EQB Inc'), ('FM', 'First Quantum Minerals'),
+        ('GFL', 'GFL Environmental'), ('PKI', 'Parkland Corp'), ('PSI', 'Pason Systems'),
+    ]
+    rows = [{'symbol': s, 'name': n, 'exchange': 'TSX', 'yf_ticker': s + '.TO'} for s, n in tsx60]
+
+if rows:
+    path = os.path.join(data_dir, 'canada_list.csv')
+    with open(path, 'w', newline='', encoding='utf-8') as f:
+        w = csv.DictWriter(f, fieldnames=['symbol','name','exchange','yf_ticker'])
+        w.writeheader(); w.writerows(rows)
+    print(f"  Canada list: {len(rows)} stocks")
+else:
+    print("  (warning: could not build Canada list)")
+PYEOF
+
 echo "==> Starting backend on :8000..."
 # PREFETCH_HOUR / PREFETCH_MINUTE control the daily pre-compute schedule (default midnight)
 export PREFETCH_HOUR="${PREFETCH_HOUR:-0}"

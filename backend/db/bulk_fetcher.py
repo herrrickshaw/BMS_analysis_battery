@@ -32,15 +32,17 @@ from db.quote_updater import upsert_quotes
 
 log = logging.getLogger(__name__)
 
-MARKETS = ['india', 'us', 'europe', 'japan', 'korea', 'china']
+MARKETS = ['india', 'us', 'europe', 'japan', 'korea', 'china', 'hong_kong', 'canada']
 
 _MARKET_CFG: dict[str, dict] = {
-    'india':  {'suffix': '.NS', 'is_inr': True},
-    'us':     {'suffix': '',    'is_inr': False},
-    'europe': {'suffix': '',    'is_inr': False},
-    'japan':  {'suffix': '',    'is_inr': False},
-    'korea':  {'suffix': '',    'is_inr': False},
-    'china':  {'suffix': '',    'is_inr': False},
+    'india':     {'suffix': '.NS', 'is_inr': True},
+    'us':        {'suffix': '',    'is_inr': False},
+    'europe':    {'suffix': '',    'is_inr': False},
+    'japan':     {'suffix': '',    'is_inr': False},
+    'korea':     {'suffix': '',    'is_inr': False},
+    'china':     {'suffix': '',    'is_inr': False},
+    'hong_kong': {'suffix': '',    'is_inr': False},
+    'canada':    {'suffix': '',    'is_inr': False},
 }
 
 _progress: dict[str, dict] = {}

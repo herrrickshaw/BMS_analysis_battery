@@ -185,14 +185,31 @@ def _bare_ticker(yf_ticker: str) -> str:
     return yf_ticker
 
 
+_EUROPE_SUFFIXES = {
+    # Euronext
+    'PA', 'AS', 'BR', 'LS', 'MI', 'IR', 'OL',
+    # Deutsche Boerse
+    'DE', 'F',
+    # Nasdaq Nordic & Baltic
+    'ST', 'HE', 'CO', 'VS', 'TL', 'RG',
+    # BME / others
+    'MC', 'WA', 'AT', 'VI', 'L', 'SW', 'PR', 'RO', 'BD',
+}
+
+
 def _market_from_ticker(yf_ticker: str) -> str:
     sfx = yf_ticker.rsplit('.', 1)[-1].upper() if '.' in yf_ticker else ''
-    return {
+    _MAP = {
         'NS': 'india', 'BO': 'india',
         'T':  'japan',
         'KS': 'korea', 'KQ': 'korea',
         'SS': 'china', 'SZ': 'china',
-    }.get(sfx, 'us')
+    }
+    if sfx in _MAP:
+        return _MAP[sfx]
+    if sfx in _EUROPE_SUFFIXES:
+        return 'europe'
+    return 'us'
 
 
 # ── batch fetch ───────────────────────────────────────────────────────────────

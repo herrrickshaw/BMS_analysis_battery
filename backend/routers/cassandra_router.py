@@ -371,3 +371,19 @@ async def daily_scan(
         'totals':   totals,
         'results':  results,
     }
+
+
+@router.get('/providers')
+async def providers_status():
+    """
+    Return availability status of all configured data providers.
+    Providers without API keys or optional dependencies show available=false.
+    """
+    from fetchers.multi_source import provider_status
+    status = await run_in_threadpool(provider_status)
+    available = [name for name, s in status.items() if s['available']]
+    return {
+        'providers': status,
+        'available': available,
+        'count': len(available),
+    }

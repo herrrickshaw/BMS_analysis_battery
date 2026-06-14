@@ -26,3 +26,5 @@ data/china_list.csv
 data/hk_list.csv
 data/canada_list.csv
 uploads/
+.env.providers
+.env

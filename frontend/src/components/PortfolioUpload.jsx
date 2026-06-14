@@ -6,9 +6,10 @@ const ACCEPT = '.xlsx,.xls,.pdf'
 const MARKETS = [
   { id: 'india',  label: '🇮🇳 India',  sub: 'NSE / BSE',        suffix: '.NS' },
   { id: 'us',     label: '🇺🇸 USA',     sub: 'NYSE / NASDAQ',    suffix: '' },
-  { id: 'europe', label: '🇪🇺 Europe',  sub: 'Euronext / Xetra', suffix: '.PA / .DE …' },
+  { id: 'europe', label: '🇪🇺 Europe',  sub: 'STOXX 600',        suffix: '.PA / .DE …' },
   { id: 'japan',  label: '🇯🇵 Japan',   sub: 'TSE',              suffix: '.T' },
   { id: 'korea',  label: '🇰🇷 Korea',   sub: 'KRX',              suffix: '.KS' },
+  { id: 'china',  label: '🇨🇳 China',   sub: 'SSE / SZSE',       suffix: '.SS / .SZ' },
 ]
 
 const MATCH_COLOR = {
@@ -85,7 +86,7 @@ export default function PortfolioUpload({ onFetchSymbols, loading }) {
         {/* Market selector */}
         <div>
           <label className="text-xs text-gray-500 mb-1.5 block">Select market</label>
-          <div className="grid grid-cols-5 gap-1">
+          <div className="grid grid-cols-3 gap-1">
             {MARKETS.map(m => (
               <button
                 key={m.id}
@@ -163,6 +164,14 @@ export default function PortfolioUpload({ onFetchSymbols, loading }) {
                   · {meta.sheets_scanned.length} sheet{meta.sheets_scanned.length > 1 ? 's' : ''}
                 </span>
               )}
+              {meta?.quotes_enriched > 0 && (
+                <span className="text-green-600 font-medium">
+                  · {meta.quotes_enriched} live quotes cached
+                </span>
+              )}
+              {meta?.cassandra === 'online' && !meta?.quotes_enriched && (
+                <span className="text-gray-700">· Cassandra online</span>
+              )}
             </div>
 
             {/* Warnings */}
@@ -192,6 +201,8 @@ export default function PortfolioUpload({ onFetchSymbols, loading }) {
                     <th className="px-2 py-1.5 text-left text-gray-500 font-medium">Ticker</th>
                     <th className="px-2 py-1.5 text-left text-gray-500 font-medium">Name</th>
                     <th className="px-2 py-1.5 text-left text-gray-500 font-medium">Via</th>
+                    <th className="px-2 py-1.5 text-right text-gray-500 font-medium">CMP</th>
+                    <th className="px-2 py-1.5 text-left text-gray-500 font-medium">Signal</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -220,6 +231,22 @@ export default function PortfolioUpload({ onFetchSymbols, loading }) {
                         </td>
                         <td className={`px-2 py-1.5 whitespace-nowrap ${MATCH_COLOR[s.matched_via] || 'text-gray-600'}`}>
                           {s.matched_via?.split(' ')[0] || '?'}
+                        </td>
+                        <td className="px-2 py-1.5 text-right font-mono text-gray-400 text-xs whitespace-nowrap">
+                          {s.quote?.cmp != null ? s.quote.cmp.toFixed(2) : '—'}
+                        </td>
+                        <td className={`px-2 py-1.5 text-xs font-bold whitespace-nowrap ${
+                          s.quote?.rsi_signal === 'BUY'  ? 'text-emerald-400' :
+                          s.quote?.rsi_signal === 'SELL' ? 'text-red-400' :
+                          s.quote?.rsi_signal === 'HOLD' ? 'text-amber-500' :
+                          'text-gray-700'
+                        }`}>
+                          {s.quote?.rsi_signal ?? '—'}
+                          {s.quote?.rsi != null && (
+                            <span className="font-normal text-gray-600 ml-1">
+                              {s.quote.rsi.toFixed(0)}
+                            </span>
+                          )}
                         </td>
                       </tr>
                     )

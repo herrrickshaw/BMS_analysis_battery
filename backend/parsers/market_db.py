@@ -68,30 +68,43 @@ def _db(market: str) -> dict:
         result = {'by_yf': by_yf, 'by_code': by_code, 'by_name': by_name}
 
     elif market == 'us':
-        result = _load_csv(
-            os.path.join(_DATA, 'sp500_list.csv'),
-            yf_col='Symbol', name_col='Security',
-            extra_cols=['GICS Sector'],
-        )
+        # Try full US list first; fall back to S&P 500
+        full_path = os.path.join(_DATA, 'us_list.csv')
+        if os.path.exists(full_path):
+            result = _load_csv(full_path, yf_col='yf_ticker', name_col='name',
+                               code_col='symbol', extra_cols=['exchange'])
+        else:
+            result = _load_csv(
+                os.path.join(_DATA, 'sp500_list.csv'),
+                yf_col='Symbol', name_col='Security',
+                extra_cols=['GICS Sector'],
+            )
 
     elif market == 'europe':
         result = _load_csv(
             os.path.join(_DATA, 'europe_list.csv'),
             yf_col='yf_ticker', name_col='name',
-            extra_cols=['sector'],
+            extra_cols=['country'],
         )
 
     elif market == 'japan':
         result = _load_csv(
             os.path.join(_DATA, 'japan_list.csv'),
-            yf_col='yf_ticker', name_col='name', code_col='code',
+            yf_col='yf_ticker', name_col='name', code_col='symbol',
         )
 
     elif market == 'korea':
         result = _load_csv(
             os.path.join(_DATA, 'korea_list.csv'),
-            yf_col='yf_ticker', name_col='name', code_col='code',
+            yf_col='yf_ticker', name_col='name', code_col='symbol',
             extra_cols=['market'],
+        )
+
+    elif market == 'china':
+        result = _load_csv(
+            os.path.join(_DATA, 'china_list.csv'),
+            yf_col='yf_ticker', name_col='name', code_col='symbol',
+            extra_cols=['exchange'],
         )
 
     else:
@@ -110,6 +123,7 @@ _PATTERNS = {
     'europe': re.compile(r'\b([A-Z0-9]{2,8}\.[A-Z]{2})\b'),
     'japan':  re.compile(r'\b(\d{4,5}(?:\.T)?)\b'),
     'korea':  re.compile(r'\b(\d{6}(?:\.KS|\.KQ)?)\b'),
+    'china':  re.compile(r'\b(\d{6}(?:\.SS|\.SZ)?)\b'),
 }
 
 # Exchange suffix added to raw code when querying yfinance
@@ -119,6 +133,7 @@ _YF_SUFFIX = {
     'europe': '',       # suffix already embedded in yf_ticker
     'japan':  '.T',
     'korea':  '.KS',
+    'china':  '.SS',    # default; .SZ also used
 }
 
 _ISIN_PREFIX = {
@@ -127,6 +142,7 @@ _ISIN_PREFIX = {
     'europe': None,   # multiple country prefixes
     'japan':  'JP',
     'korea':  'KR',
+    'china':  'CN',
 }
 
 _ISIN_RE = re.compile(r'\b([A-Z]{2}[A-Z0-9]{10})\b')
@@ -134,7 +150,7 @@ _ISIN_RE = re.compile(r'\b([A-Z]{2}[A-Z0-9]{10})\b')
 
 # ── public API ─────────────────────────────────────────────────────────────────
 
-SUPPORTED_MARKETS = ['india', 'us', 'europe', 'japan', 'korea']
+SUPPORTED_MARKETS = ['india', 'us', 'europe', 'japan', 'korea', 'china']
 
 
 def lookup(raw: str, market: str) -> Optional[dict]:
@@ -161,6 +177,13 @@ def lookup(raw: str, market: str) -> Optional[dict]:
         yf_candidate = raw + suffix
         if yf_candidate in db['by_yf']:
             return db['by_yf'][yf_candidate]
+
+    # China: try both .SS and .SZ suffixes
+    if market == 'china':
+        for sfx in ('.SS', '.SZ'):
+            candidate = code + sfx
+            if candidate in db['by_yf']:
+                return db['by_yf'][candidate]
 
     return None
 

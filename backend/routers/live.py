@@ -53,7 +53,7 @@ async def fetch_live_data(market: str, req: FetchRequest = FetchRequest()):
     # symbols extracted from an uploaded file (they already carry yfinance suffixes)
     _PORTFOLIO_EXCHANGE = {
         'india': 'NSE', 'us': 'US', 'europe': 'EUROPE',
-        'japan': 'JAPAN', 'korea': 'KOREA',
+        'japan': 'JAPAN', 'korea': 'KOREA', 'china': 'CHINA',
     }
     exchange = (
         _PORTFOLIO_EXCHANGE.get(req.portfolio_market)
@@ -98,6 +98,14 @@ async def fetch_live_data(market: str, req: FetchRequest = FetchRequest()):
 
     errors = int(live_df.get('_error', pd.Series(dtype=str)).notna().sum()) if '_error' in live_df.columns else 0
     live_store[market] = live_df
+
+    # Persist quotes to Cassandra in a background thread (fire-and-forget)
+    from db import cassandra_client as cass
+    if cass.is_available():
+        import asyncio
+        from db.quote_updater import upsert_quotes
+        _snapshot = live_df.copy()
+        asyncio.get_running_loop().run_in_executor(None, upsert_quotes, market, _snapshot)
 
     fetch_progress[market] = {
         'status': 'done',

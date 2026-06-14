@@ -118,6 +118,46 @@ _MONEY_FIELDS: dict[str, str] = {
 }
 
 
+def _compute_rsi(closes: pd.Series, period: int = 14) -> 'float | None':
+    """Wilder's RSI-14."""
+    if len(closes) < period + 1:
+        return None
+    delta = closes.diff().dropna()
+    gains  = delta.clip(lower=0)
+    losses = (-delta).clip(lower=0)
+    avg_gain = gains.ewm(alpha=1 / period, adjust=False).mean().iloc[-1]
+    avg_loss = losses.ewm(alpha=1 / period, adjust=False).mean().iloc[-1]
+    if avg_loss == 0:
+        return 100.0
+    return round(100 - (100 / (1 + avg_gain / avg_loss)), 2)
+
+
+def _enrich_rsi(row: dict, ticker_obj: 'yf.Ticker') -> None:
+    """Append rsi, ema_50, and rsi_signal fields to an already-extracted row."""
+    try:
+        hist = ticker_obj.history(period='6mo')
+        if hist.empty or 'Close' not in hist.columns:
+            return
+        closes = hist['Close'].dropna()
+        if len(closes) < 15:
+            return
+        rsi   = _compute_rsi(closes)
+        ema50 = closes.ewm(span=50, adjust=False).mean().iloc[-1]
+        close = closes.iloc[-1]
+        row['rsi']   = rsi
+        row['ema_50'] = round(float(ema50), 2)
+        if rsi is None:
+            row['rsi_signal'] = 'HOLD'
+        elif rsi < 30 and close > ema50:
+            row['rsi_signal'] = 'BUY'
+        elif rsi > 70 and close < ema50:
+            row['rsi_signal'] = 'SELL'
+        else:
+            row['rsi_signal'] = 'HOLD'
+    except Exception:
+        pass
+
+
 def _extract_info(info: dict, ticker: str, is_inr: bool) -> dict:
     row: dict[str, object] = {
         'ticker': ticker,
@@ -156,15 +196,20 @@ def _extract_info(info: dict, ticker: str, is_inr: bool) -> dict:
 def _fetch_one(symbol: str, suffix: str, is_inr: bool) -> dict:
     yf_sym = f'{symbol}{suffix}'
     try:
-        info = yf.Ticker(yf_sym).info
+        t    = yf.Ticker(yf_sym)
+        info = t.info
         if not info or not info.get('regularMarketPrice'):
             # Try .NS fallback for BSE numeric codes
             if suffix == '.BO':
-                fallback = yf.Ticker(f'{symbol}.NS').info
-                if fallback and fallback.get('regularMarketPrice'):
-                    return _extract_info(fallback, symbol, is_inr)
+                t_fb = yf.Ticker(f'{symbol}.NS')
+                if t_fb.info and t_fb.info.get('regularMarketPrice'):
+                    row = _extract_info(t_fb.info, symbol, is_inr)
+                    _enrich_rsi(row, t_fb)
+                    return row
             return {'ticker': symbol, '_error': 'no price data', '_source': 'yfinance'}
-        return _extract_info(info, symbol, is_inr)
+        row = _extract_info(info, symbol, is_inr)
+        _enrich_rsi(row, t)
+        return row
     except Exception as exc:
         return {'ticker': symbol, '_error': str(exc)[:120], '_source': 'yfinance'}
 

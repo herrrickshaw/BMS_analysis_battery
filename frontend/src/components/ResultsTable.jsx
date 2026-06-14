@@ -1,6 +1,8 @@
 import { Fragment, useState } from 'react'
 import ScoreBadge from './ScoreBadge'
 
+const RSI_SIGNAL_COL = { key: 'rsi_signal', label: 'RSI Signal', cls: '' }
+
 const COLS = {
   darvas: [
     { key: 'name',         label: 'Company',       cls: 'text-gray-100 font-medium' },
@@ -12,6 +14,7 @@ const COLS = {
     { key: 'roe',          label: 'ROE %',          cls: 'text-gray-400 font-mono', fmt: (v) => v != null ? `${Number(v).toFixed(1)}%` : '—' },
     { key: 'score',        label: 'Score',          cls: '' },
     { key: 'completeness', label: 'Data',           cls: '' },
+    RSI_SIGNAL_COL,
   ],
   piotroski: [
     { key: 'name',         label: 'Company',        cls: 'text-gray-100 font-medium' },
@@ -22,6 +25,7 @@ const COLS = {
     { key: 'debt_to_equity', label: 'D/E',          cls: 'text-gray-400 font-mono', fmt: (v) => v != null ? Number(v).toFixed(2) : '—' },
     { key: 'score',        label: 'F-Score',        cls: '' },
     { key: 'completeness', label: 'Data',           cls: '' },
+    RSI_SIGNAL_COL,
   ],
   coffee_can: [
     { key: 'name',         label: 'Company',        cls: 'text-gray-100 font-medium' },
@@ -33,7 +37,31 @@ const COLS = {
     { key: 'moat_score',   label: 'Moat',           cls: 'text-gray-300 font-mono font-bold' },
     { key: 'score',        label: 'Pass',           cls: '' },
     { key: 'completeness', label: 'Data',           cls: '' },
+    RSI_SIGNAL_COL,
   ],
+}
+
+const RSI_BADGE = {
+  BUY:  'bg-emerald-900/50 text-emerald-300 border border-emerald-700',
+  SELL: 'bg-red-900/50 text-red-300 border border-red-700',
+  HOLD: 'bg-gray-800 text-gray-500 border border-gray-700',
+}
+
+function RsiSignalBadge({ signal, rsi, ema50 }) {
+  const s = signal ?? 'HOLD'
+  return (
+    <div className="flex flex-col items-start gap-0.5">
+      <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${RSI_BADGE[s] ?? RSI_BADGE.HOLD}`}>
+        {s}
+      </span>
+      {rsi != null && (
+        <span className="text-xs font-mono text-gray-600">
+          RSI {Number(rsi).toFixed(1)}
+          {ema50 != null && <> · EMA50 {Number(ema50).toFixed(1)}</>}
+        </span>
+      )}
+    </div>
+  )
 }
 
 function CriteriaGrid({ criteria }) {
@@ -81,8 +109,10 @@ export default function ResultsTable({ results, scanType, onExport, loading, sou
     else { setSortKey(key); setSortDir('desc') }
   }
 
-  const buyCount   = results.filter((r) => r.signal === 'BUY').length
-  const watchCount = results.filter((r) => r.signal === 'WATCH').length
+  const buyCount    = results.filter((r) => r.signal === 'BUY').length
+  const watchCount  = results.filter((r) => r.signal === 'WATCH').length
+  const rsiBuyCount  = results.filter((r) => r.rsi_signal === 'BUY').length
+  const rsiSellCount = results.filter((r) => r.rsi_signal === 'SELL').length
 
   if (!results.length && !loading) {
     return (
@@ -118,6 +148,16 @@ export default function ResultsTable({ results, scanType, onExport, loading, sou
           {watchCount > 0 && (
             <span className="text-xs px-2 py-0.5 bg-amber-900/40 text-amber-400 rounded-full">
               {watchCount} WATCH
+            </span>
+          )}
+          {rsiBuyCount > 0 && (
+            <span className="text-xs px-2 py-0.5 bg-emerald-900/30 text-emerald-500 rounded-full border border-emerald-900">
+              {rsiBuyCount} RSI BUY
+            </span>
+          )}
+          {rsiSellCount > 0 && (
+            <span className="text-xs px-2 py-0.5 bg-red-900/30 text-red-400 rounded-full border border-red-900">
+              {rsiSellCount} RSI SELL
             </span>
           )}
         </div>
@@ -160,7 +200,13 @@ export default function ResultsTable({ results, scanType, onExport, loading, sou
                 >
                   {cols.map((col) => (
                     <td key={col.key} className={`px-3 py-2.5 whitespace-nowrap ${col.cls || ''}`}>
-                      {col.key === 'score' ? (
+                      {col.key === 'rsi_signal' ? (
+                        <RsiSignalBadge
+                          signal={row.rsi_signal}
+                          rsi={row.rsi}
+                          ema50={row.ema_50}
+                        />
+                      ) : col.key === 'score' ? (
                         <ScoreBadge
                           score={row.score ?? 0}
                           maxScore={row.max_score ?? 9}

@@ -65,3 +65,17 @@ export async function parsePortfolio(file, market = 'india') {
     body: form,
   })
 }
+
+export async function fetchDbStatus() {
+  return apiFetch('/api/db/status')
+}
+
+export async function searchInstruments(market, q) {
+  return apiFetch(`/api/db/search?market=${encodeURIComponent(market)}&q=${encodeURIComponent(q)}`)
+}
+
+export async function seedMarket(market, force = false) {
+  return apiFetch(`/api/db/seed?market=${encodeURIComponent(market)}&force=${force}`, {
+    method: 'POST',
+  })
+}

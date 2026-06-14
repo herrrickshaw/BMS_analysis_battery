@@ -12,8 +12,8 @@ const MARKET_META = {
 }
 
 const SCAN_META = {
-  darvas:    { label: 'Darvas / Buffett', sub: 'Momentum + quality overlay', maxScore: 10 },
-  piotroski: { label: 'Piotroski',        sub: '9-point financial strength', maxScore: 9  },
+  darvas:    { label: 'Darvas / Buffett', sub: 'Momentum + quality overlay' },
+  piotroski: { label: 'Piotroski',        sub: '9-point financial strength' },
 }
 
 const RSI_BADGE = {
@@ -69,8 +69,6 @@ function ScanTable({ rows, scanType, marketFilter }) {
   const [sortDir, setSortDir]   = useState('desc')
   const [expanded, setExpanded] = useState(null)
 
-  const maxScore = SCAN_META[scanType]?.maxScore ?? 10
-
   const visible = marketFilter === 'all'
     ? rows
     : rows.filter(r => r.market === marketFilter)
@@ -112,17 +110,22 @@ function ScanTable({ rows, scanType, marketFilter }) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-800">
-            <SortTh k="market_label" label="Market" />
-            <SortTh k="name"         label="Company" />
-            <SortTh k="ticker"       label="Ticker" />
-            <SortTh k="signal"       label="Signal" />
-            <SortTh k="cmp"          label="Price" />
-            <SortTh k="score"        label={scanType === 'piotroski' ? 'F-Score' : 'Score'} />
-            <SortTh k="pe"           label="P/E" />
-            <SortTh k="roe"          label="ROE %" />
+            <SortTh k="market_label"   label="Market" />
+            <SortTh k="name"           label="Company" />
+            <SortTh k="ticker"         label="Ticker" />
+            <SortTh k="signal"         label="Signal" />
+            <SortTh k="cmp"            label="Price" />
+            <SortTh k="score"          label={scanType === 'piotroski' ? 'F-Score' : 'Score'} />
+            <SortTh k="pe"             label="P/E" />
+            <SortTh k="roe"            label="ROE %" />
             <SortTh k="debt_to_equity" label="D/E" />
-            <SortTh k="rsi"          label="RSI Signal" />
-            <SortTh k="completeness" label="Data" />
+            <SortTh k="ema_200"        label="EMA-200" />
+            <SortTh k="macd"           label="MACD" />
+            <SortTh k="volume_ratio"   label="Vol×" />
+            <SortTh k="beta"           label="Beta" />
+            <SortTh k="current_ratio"  label="Curr.R" />
+            <SortTh k="rsi"            label="RSI" />
+            <SortTh k="completeness"   label="Data" />
             <th className="w-6" />
           </tr>
         </thead>
@@ -153,7 +156,7 @@ function ScanTable({ rows, scanType, marketFilter }) {
                 <td className="px-3 py-2.5 whitespace-nowrap">
                   <ScoreBadge
                     score={row.score ?? 0}
-                    maxScore={maxScore}
+                    maxScore={row.max_score ?? 7}
                     signal={row.signal}
                     scanType={scanType}
                   />
@@ -167,6 +170,37 @@ function ScanTable({ rows, scanType, marketFilter }) {
                 <td className="px-3 py-2.5 text-gray-400 font-mono text-xs whitespace-nowrap">
                   {row.debt_to_equity != null ? Number(row.debt_to_equity).toFixed(2) : '—'}
                 </td>
+                <td className="px-3 py-2.5 font-mono text-xs whitespace-nowrap">
+                  {row.ema_200 != null ? (
+                    <span className={row.cmp != null && row.cmp > row.ema_200 ? 'text-emerald-400' : 'text-red-400'}>
+                      {Number(row.ema_200).toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                    </span>
+                  ) : '—'}
+                </td>
+                <td className="px-3 py-2.5 font-mono text-xs whitespace-nowrap">
+                  {row.macd != null ? (
+                    <span className={row.macd_signal != null && row.macd > row.macd_signal ? 'text-emerald-400' : 'text-red-400'}>
+                      {Number(row.macd).toFixed(3)}
+                    </span>
+                  ) : '—'}
+                </td>
+                <td className="px-3 py-2.5 font-mono text-xs whitespace-nowrap">
+                  {row.volume_ratio != null ? (
+                    <span className={row.volume_ratio > 1.5 ? 'text-amber-400' : 'text-gray-500'}>
+                      {Number(row.volume_ratio).toFixed(1)}×
+                    </span>
+                  ) : '—'}
+                </td>
+                <td className="px-3 py-2.5 text-gray-400 font-mono text-xs whitespace-nowrap">
+                  {row.beta != null ? Number(row.beta).toFixed(2) : '—'}
+                </td>
+                <td className="px-3 py-2.5 font-mono text-xs whitespace-nowrap">
+                  {row.current_ratio != null ? (
+                    <span className={row.current_ratio > 1.5 ? 'text-emerald-400' : 'text-amber-400'}>
+                      {Number(row.current_ratio).toFixed(1)}
+                    </span>
+                  ) : '—'}
+                </td>
                 <td className="px-3 py-2.5 whitespace-nowrap">
                   <div className="flex flex-col gap-0.5">
                     <span className={`px-1.5 py-0.5 rounded text-xs font-bold ${RSI_BADGE[row.rsi_signal] ?? RSI_BADGE.HOLD}`}>
@@ -174,7 +208,7 @@ function ScanTable({ rows, scanType, marketFilter }) {
                     </span>
                     {row.rsi != null && (
                       <span className="text-xs font-mono text-gray-600">
-                        RSI {Number(row.rsi).toFixed(1)}
+                        {Number(row.rsi).toFixed(1)}
                       </span>
                     )}
                   </div>
@@ -193,7 +227,7 @@ function ScanTable({ rows, scanType, marketFilter }) {
               </tr>
               {expanded === i && row.criteria && (
                 <tr>
-                  <td colSpan={12} className="px-3 pb-3">
+                  <td colSpan={17} className="px-3 pb-3">
                     <CriteriaGrid criteria={row.criteria} />
                   </td>
                 </tr>

@@ -73,9 +73,6 @@ def list_files():
         if disk_path.exists():
             info['size_bytes'] = disk_path.stat().st_size
             files.append({'id': fid, **info})
-        else:
-            # stale entry — remove
-            pass
     files.sort(key=lambda f: f.get('uploaded_at', ''), reverse=True)
     return {'files': files, 'count': len(files)}
 
@@ -207,19 +204,15 @@ async def analyse_file(
     if 'ticker' not in df.columns and 'name' not in df.columns:
         raise HTTPException(422, 'File does not appear to be a screener export (no ticker/name column).')
 
-    # Resolve which scan(s) to run
-    shorthand = {'darvas': 'darvas', 'piotroski': 'piotroski', 'coffee_can': 'coffee_can'}
-    if analysis in shorthand:
-        run_scans = [shorthand[analysis]]
-    else:
-        # analysis == 'screener'
-        target = scan_type or 'all'
-        from scanners import darvas, piotroski, coffee_can
-        all_scanners = {'darvas': darvas.scan, 'piotroski': piotroski.scan, 'coffee_can': coffee_can.scan}
-        run_scans = list(all_scanners) if target == 'all' else [target]
-
     from scanners import darvas as _d, piotroski as _p, coffee_can as _cc
     SCANNER_FN = {'darvas': _d.scan, 'piotroski': _p.scan, 'coffee_can': _cc.scan}
+
+    # Resolve which scan(s) to run
+    if analysis in SCANNER_FN:
+        run_scans = [analysis]
+    else:
+        target = scan_type or 'all'
+        run_scans = list(SCANNER_FN) if target == 'all' else [target]
 
     results: dict[str, list] = {}
     for st in run_scans:

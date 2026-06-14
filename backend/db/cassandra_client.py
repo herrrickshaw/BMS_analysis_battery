@@ -92,6 +92,20 @@ _SCHEMA: list[str] = [
     )""",
 ]
 
+# Applied at startup with per-statement try/except — safe to run repeatedly
+_MIGRATIONS: list[str] = [
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ema_200        double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD macd           double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD macd_signal    double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD volume_20d_avg bigint",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD volume_ratio   double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD beta           double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD current_ratio  double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD revenue_growth double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD eps            double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD dividend_yield double",
+]
+
 
 def connect(hosts: list[str] | None = None) -> bool:
     """
@@ -115,6 +129,11 @@ def connect(hosts: list[str] | None = None) -> bool:
             sess = _cluster.connect()
             for ddl in _SCHEMA:
                 sess.execute(ddl)
+            for ddl in _MIGRATIONS:
+                try:
+                    sess.execute(ddl)
+                except Exception:
+                    pass  # column already exists
             sess.set_keyspace(KEYSPACE)
             _session = sess
             _available = True

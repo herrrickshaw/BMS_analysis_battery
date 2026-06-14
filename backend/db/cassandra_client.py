@@ -77,6 +77,13 @@ _SCHEMA: list[str] = [
         debt_to_equity  double,
         PRIMARY KEY (market, yf_ticker)
     ) WITH CLUSTERING ORDER BY (yf_ticker ASC)""",
+    # ── historical price cache (date of purchase lookups) ────────────────────
+    f"""CREATE TABLE IF NOT EXISTS {KEYSPACE}.price_history (
+        yf_ticker   text,
+        price_date  date,
+        close_price double,
+        PRIMARY KEY (yf_ticker, price_date)
+    ) WITH CLUSTERING ORDER BY (price_date DESC)""",
     # ── seeding book-keeping ──────────────────────────────────────────────────
     f"""CREATE TABLE IF NOT EXISTS {KEYSPACE}.seed_status (
         market      text PRIMARY KEY,

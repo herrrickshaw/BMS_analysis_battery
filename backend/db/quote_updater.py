@@ -18,6 +18,44 @@ from db import cassandra_client as cass
 log = logging.getLogger(__name__)
 
 _stmts: dict[str, Any] = {}
+_hist_stmts: dict[str, Any] = {}
+
+
+def _prepare_hist(s) -> None:
+    if _hist_stmts:
+        return
+    ks = cass.KEYSPACE
+    _hist_stmts['insert'] = s.prepare(
+        f"INSERT INTO {ks}.price_history (yf_ticker, price_date, close_price) VALUES (?, ?, ?)"
+    )
+    _hist_stmts['select'] = s.prepare(
+        f"SELECT close_price FROM {ks}.price_history WHERE yf_ticker = ? AND price_date = ?"
+    )
+
+
+def cache_price_on_date(yf_ticker: str, price_date, close_price: float) -> None:
+    """Store a historical closing price in Cassandra. Silent no-op if offline."""
+    s = cass.session()
+    if s is None:
+        return
+    try:
+        _prepare_hist(s)
+        s.execute(_hist_stmts['insert'], (yf_ticker, price_date, close_price))
+    except Exception as exc:
+        log.debug('cache_price_on_date failed for %s %s: %s', yf_ticker, price_date, exc)
+
+
+def get_cached_price(yf_ticker: str, price_date) -> Optional[float]:
+    """Return cached closing price for a ticker on a given date, or None."""
+    s = cass.session()
+    if s is None:
+        return None
+    try:
+        _prepare_hist(s)
+        row = s.execute(_hist_stmts['select'], (yf_ticker, price_date)).one()
+        return float(row.close_price) if row and row.close_price is not None else None
+    except Exception:
+        return None
 
 
 def _prepare(s) -> None:

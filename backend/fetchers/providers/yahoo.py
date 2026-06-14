@@ -86,18 +86,24 @@ class YahooProvider(DataProvider):
                 if multi:
                     close_col  = ('Close',  ticker)
                     volume_col = ('Volume', ticker)
+                    high_col   = ('High',   ticker)
+                    low_col    = ('Low',    ticker)
                     if close_col not in raw.columns:
                         continue
                     closes  = raw[close_col].dropna()
                     volumes = raw[volume_col].dropna() if volume_col in raw.columns else None
+                    highs   = raw[high_col].dropna()   if high_col   in raw.columns else None
+                    lows    = raw[low_col].dropna()    if low_col    in raw.columns else None
                 else:
                     closes  = raw['Close'].dropna()
                     volumes = raw.get('Volume', pd.Series(dtype=float)).dropna()
+                    highs   = raw['High'].dropna() if 'High' in raw.columns else None
+                    lows    = raw['Low'].dropna()  if 'Low'  in raw.columns else None
 
                 if len(closes) < 2:
                     continue
 
-                tech = compute_technicals(closes, volumes)
+                tech = compute_technicals(closes, volumes, highs, lows)
                 if not tech.get('cmp'):
                     continue
 
@@ -139,9 +145,11 @@ class YahooProvider(DataProvider):
         df = self.get_ohlcv(ticker)
         if df.empty:
             return None
-        closes  = df['Close'].dropna() if 'Close' in df.columns else pd.Series(dtype=float)
+        closes  = df['Close'].dropna()  if 'Close'  in df.columns else pd.Series(dtype=float)
         volumes = df['Volume'].dropna() if 'Volume' in df.columns else None
-        tech = compute_technicals(closes, volumes)
+        highs   = df['High'].dropna()   if 'High'   in df.columns else None
+        lows    = df['Low'].dropna()    if 'Low'    in df.columns else None
+        tech = compute_technicals(closes, volumes, highs, lows)
         if not tech.get('cmp'):
             return None
         fund = self.get_fundamentals(ticker, market)

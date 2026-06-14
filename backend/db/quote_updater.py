@@ -64,21 +64,23 @@ def _prepare(s) -> None:
     ks = cass.KEYSPACE
     _stmts['upsert'] = s.prepare(
         f"INSERT INTO {ks}.stock_quotes "
-        "(market, yf_ticker, fetched_at, cmp, rsi, ema_50, ema_200, rsi_signal, "
+        "(market, yf_ticker, fetched_at, cmp, rsi, ema_20, ema_50, ema_200, rsi_signal, "
         " macd, macd_signal, pe, pb, roe, opm, market_cap, volume, volume_20d_avg, "
         " volume_ratio, high_52w, low_52w, debt_to_equity, beta, current_ratio, "
         " revenue_growth, eps, dividend_yield, "
         " ret_1d, ret_1w, ret_1m, ret_3m, ret_6m, ret_1y, "
-        " sector, industry) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        " sector, industry, "
+        " bb_upper, bb_lower, bb_pct, atr_14, stoch_k, stoch_d) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     _stmts['select_in'] = s.prepare(
-        f"SELECT yf_ticker, fetched_at, cmp, rsi, ema_50, ema_200, rsi_signal, "
+        f"SELECT yf_ticker, fetched_at, cmp, rsi, ema_20, ema_50, ema_200, rsi_signal, "
         f"macd, macd_signal, pe, pb, roe, opm, market_cap, volume, volume_20d_avg, "
         f"volume_ratio, high_52w, low_52w, debt_to_equity, beta, current_ratio, "
         f"revenue_growth, eps, dividend_yield, "
         f"ret_1d, ret_1w, ret_1m, ret_3m, ret_6m, ret_1y, "
-        f"sector, industry "
+        f"sector, industry, "
+        f"bb_upper, bb_lower, bb_pct, atr_14, stoch_k, stoch_d "
         f"FROM {ks}.stock_quotes WHERE market = ? AND yf_ticker IN ?"
     )
 
@@ -117,46 +119,92 @@ def upsert_quotes(market: str, live_df: pd.DataFrame) -> int:
     _prepare(s)
     now = datetime.now(timezone.utc)
 
+    # Pre-filter invalid rows before iterating (avoids per-row checks inside the loop)
+    error_mask = live_df.get('_error', pd.Series(False, index=live_df.index)).fillna(False).astype(bool)
+    ticker_mask = live_df['ticker'].notna() & (live_df['ticker'].astype(str).str.strip() != '') \
+        if 'ticker' in live_df.columns else pd.Series(False, index=live_df.index)
+    live_df = live_df[ticker_mask & ~error_mask].reset_index(drop=True)
+
+    if live_df.empty:
+        return 0
+
+    # itertuples is ~5x faster than iterrows — avoid Series creation per row
+    _ALL_COLS = [
+        'ticker', 'rsi_signal', '_error',
+        'cmp', 'rsi', 'ema_20', 'ema_50', 'ema_200', 'macd', 'macd_signal',
+        'pe', 'pb', 'roe', 'opm', 'market_cap', 'volume', 'volume_20d_avg',
+        'volume_ratio', 'high_52w', 'low_52w', 'debt_to_equity', 'beta',
+        'current_ratio', 'revenue_growth', 'eps', 'dividend_yield',
+        'ret_1d', 'ret_1w', 'ret_1m', 'ret_3m', 'ret_6m', 'ret_1y',
+        'sector', 'industry', 'bb_upper', 'bb_lower', 'bb_pct',
+        'atr_14', 'stoch_k', 'stoch_d',
+    ]
+    for col in _ALL_COLS:
+        if col not in live_df.columns:
+            live_df[col] = None
+
+    def _fv(v) -> Optional[float]:
+        try:
+            f = float(v)
+            return None if math.isnan(f) else f
+        except (TypeError, ValueError):
+            return None
+
+    def _iv(v) -> Optional[int]:
+        f = _fv(v)
+        return int(f) if f is not None else None
+
+    def _sv(v) -> Optional[str]:
+        if v is None or (isinstance(v, float) and math.isnan(v)):
+            return None
+        s = str(v).strip()
+        return s if s else None
+
     rows: list[tuple] = []
-    for _, row in live_df.iterrows():
-        ticker = str(row.get('ticker', '')).strip()
-        if not ticker or row.get('_error'):
-            continue
+    for row in live_df.itertuples(index=False, name='Q'):
+        ticker = str(row.ticker).strip()
         rows.append((
             market,
             ticker,
             now,
-            _f(row, 'cmp'),
-            _f(row, 'rsi'),
-            _f(row, 'ema_50'),
-            _f(row, 'ema_200'),
-            str(row.get('rsi_signal', 'HOLD') or 'HOLD'),
-            _f(row, 'macd'),
-            _f(row, 'macd_signal'),
-            _f(row, 'pe'),
-            _f(row, 'pb'),
-            _f(row, 'roe'),
-            _f(row, 'opm'),
-            _f(row, 'market_cap'),
-            _i(row, 'volume'),
-            _i(row, 'volume_20d_avg'),
-            _f(row, 'volume_ratio'),
-            _f(row, 'high_52w'),
-            _f(row, 'low_52w'),
-            _f(row, 'debt_to_equity'),
-            _f(row, 'beta'),
-            _f(row, 'current_ratio'),
-            _f(row, 'revenue_growth'),
-            _f(row, 'eps'),
-            _f(row, 'dividend_yield'),
-            _f(row, 'ret_1d'),
-            _f(row, 'ret_1w'),
-            _f(row, 'ret_1m'),
-            _f(row, 'ret_3m'),
-            _f(row, 'ret_6m'),
-            _f(row, 'ret_1y'),
-            _s(row, 'sector'),
-            _s(row, 'industry'),
+            _fv(row.cmp),
+            _fv(row.rsi),
+            _fv(row.ema_20),
+            _fv(row.ema_50),
+            _fv(row.ema_200),
+            str(getattr(row, 'rsi_signal', 'HOLD') or 'HOLD'),
+            _fv(row.macd),
+            _fv(row.macd_signal),
+            _fv(row.pe),
+            _fv(row.pb),
+            _fv(row.roe),
+            _fv(row.opm),
+            _fv(row.market_cap),
+            _iv(row.volume),
+            _iv(row.volume_20d_avg),
+            _fv(row.volume_ratio),
+            _fv(row.high_52w),
+            _fv(row.low_52w),
+            _fv(row.debt_to_equity),
+            _fv(row.beta),
+            _fv(row.current_ratio),
+            _fv(row.revenue_growth),
+            _fv(row.eps),
+            _fv(row.dividend_yield),
+            _fv(row.ret_1d),
+            _fv(row.ret_1w),
+            _fv(row.ret_1m),
+            _fv(row.ret_3m),
+            _fv(row.ret_6m),
+            _fv(row.ret_1y),
+            _sv(row.sector),
+            _sv(row.industry),
+            _fv(row.bb_upper),
+            _fv(row.bb_lower),
+            _fv(row.bb_pct),
+            _fv(row.atr_14),
+            _fv(row.stoch_k),
+            _fv(row.stoch_d),
         ))
 
     if not rows:
@@ -186,12 +234,13 @@ def get_market_quotes_df(market: str) -> pd.DataFrame:
     # Read all quotes for the market
     try:
         quote_rows = list(s.execute(
-            f"SELECT yf_ticker, cmp, rsi, ema_50, ema_200, rsi_signal, macd, macd_signal, "
+            f"SELECT yf_ticker, cmp, rsi, ema_20, ema_50, ema_200, rsi_signal, macd, macd_signal, "
             f"pe, pb, roe, opm, market_cap, volume, volume_20d_avg, volume_ratio, "
             f"high_52w, low_52w, debt_to_equity, beta, current_ratio, "
             f"revenue_growth, eps, dividend_yield, "
             f"ret_1d, ret_1w, ret_1m, ret_3m, ret_6m, ret_1y, "
-            f"sector, industry "
+            f"sector, industry, "
+            f"bb_upper, bb_lower, bb_pct, atr_14, stoch_k, stoch_d "
             f"FROM {cass.KEYSPACE}.stock_quotes WHERE market = %s",
             (market,),
         ))
@@ -226,6 +275,7 @@ def get_market_quotes_df(market: str) -> pd.DataFrame:
             'name':            name_map.get(r.yf_ticker, ''),
             'cmp':             r.cmp,
             'rsi':             r.rsi,
+            'ema_20':          getattr(r, 'ema_20', None),
             'ema_50':          r.ema_50,
             'ema_200':         getattr(r, 'ema_200', None),
             'macd':            getattr(r, 'macd', None),
@@ -255,6 +305,12 @@ def get_market_quotes_df(market: str) -> pd.DataFrame:
             'ret_1y':          getattr(r, 'ret_1y', None),
             'sector':          getattr(r, 'sector', None) or '',
             'industry':        getattr(r, 'industry', None) or '',
+            'bb_upper':        getattr(r, 'bb_upper', None),
+            'bb_lower':        getattr(r, 'bb_lower', None),
+            'bb_pct':          getattr(r, 'bb_pct', None),
+            'atr_14':          getattr(r, 'atr_14', None),
+            'stoch_k':         getattr(r, 'stoch_k', None),
+            'stoch_d':         getattr(r, 'stoch_d', None),
             '_exchange':       exch_map.get(r.yf_ticker, ''),
         }
         records.append(rec)
@@ -279,6 +335,7 @@ def get_quotes(market: str, yf_tickers: list[str]) -> dict[str, dict]:
             row.yf_ticker: {
                 'cmp':            row.cmp,
                 'rsi':            row.rsi,
+                'ema_20':         getattr(row, 'ema_20', None),
                 'ema_50':         row.ema_50,
                 'ema_200':        getattr(row, 'ema_200', None),
                 'macd':           getattr(row, 'macd', None),
@@ -308,6 +365,12 @@ def get_quotes(market: str, yf_tickers: list[str]) -> dict[str, dict]:
                 'ret_1y':         getattr(row, 'ret_1y', None),
                 'sector':         getattr(row, 'sector', None) or '',
                 'industry':       getattr(row, 'industry', None) or '',
+                'bb_upper':       getattr(row, 'bb_upper', None),
+                'bb_lower':       getattr(row, 'bb_lower', None),
+                'bb_pct':         getattr(row, 'bb_pct', None),
+                'atr_14':         getattr(row, 'atr_14', None),
+                'stoch_k':        getattr(row, 'stoch_k', None),
+                'stoch_d':        getattr(row, 'stoch_d', None),
                 'fetched_at':     row.fetched_at.isoformat() if row.fetched_at else None,
             }
             for row in rows

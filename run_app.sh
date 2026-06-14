@@ -162,6 +162,9 @@ except Exception as e:
 PYEOF
 
 echo "==> Starting backend on :8000..."
+# PREFETCH_HOUR / PREFETCH_MINUTE control the daily pre-compute schedule (default midnight)
+export PREFETCH_HOUR="${PREFETCH_HOUR:-0}"
+export PREFETCH_MINUTE="${PREFETCH_MINUTE:-0}"
 uvicorn main:app --reload --port 8000 &
 BACKEND_PID=$!
 

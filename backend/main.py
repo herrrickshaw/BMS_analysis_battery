@@ -23,9 +23,15 @@ async def lifespan(app: FastAPI):
     else:
         log.warning('Cassandra offline — running in CSV-only fallback mode')
 
+    # Start the daily pre-compute scheduler
+    import scheduler as sched
+    await run_in_threadpool(sched.start)
+
     yield   # ← app serves requests here
 
     # ── Shutdown ─────────────────────────────────────────────────────────────
+    import scheduler as sched
+    await run_in_threadpool(sched.stop)
     from db import cassandra_client as cass
     await run_in_threadpool(cass.close)
 

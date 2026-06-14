@@ -193,6 +193,51 @@ async def fetch_progress():
     return {'progress': progress}
 
 
+# ── Scheduler endpoints ───────────────────────────────────────────────────────
+
+@router.get('/scheduler/status')
+async def scheduler_status():
+    """
+    Return the daily pre-compute scheduler state:
+    next_run, last_run, last_status, total_written, elapsed_s.
+    """
+    import scheduler as sched
+    return await run_in_threadpool(sched.status)
+
+
+@router.post('/scheduler/trigger')
+async def scheduler_trigger():
+    """
+    Immediately fire a full-market prefetch in the background.
+    Returns 409 if a run is already in progress.
+    """
+    import scheduler as sched
+    started = await run_in_threadpool(sched.trigger)
+    if not started:
+        raise HTTPException(409, 'A prefetch is already running. Check /api/db/fetch_progress.')
+    return {
+        'status':  'triggered',
+        'message': 'Full-market prefetch started. Poll /api/db/fetch_progress for live progress.',
+    }
+
+
+@router.post('/scheduler/pause')
+async def scheduler_pause():
+    """Pause the daily job (does not stop a running prefetch)."""
+    import scheduler as sched
+    await run_in_threadpool(sched.pause)
+    return {'status': 'paused'}
+
+
+@router.post('/scheduler/resume')
+async def scheduler_resume():
+    """Resume a paused daily job."""
+    import scheduler as sched
+    await run_in_threadpool(sched.resume)
+    st = await run_in_threadpool(sched.status)
+    return {'status': 'resumed', 'next_run': st.get('next_run')}
+
+
 def _search(market: str, q: str, limit: int) -> list[dict]:
     s = cass.session()
     q_lower = q.lower()

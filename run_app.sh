@@ -159,6 +159,7 @@ try:
         print("  (warning: China list empty)")
 except Exception as e:
     print(f"  (warning: could not refresh China list: {e})")
+PYEOF
 
 echo "==> Starting backend on :8000..."
 uvicorn main:app --reload --port 8000 &

@@ -194,7 +194,7 @@ def _extract_info(info: dict, ticker: str, is_inr: bool) -> dict:
 
 
 def _fetch_one(symbol: str, suffix: str, is_inr: bool) -> dict:
-    yf_sym = f'{symbol}{suffix}'
+    yf_sym = symbol if (suffix and symbol.upper().endswith(suffix.upper())) else f'{symbol}{suffix}'
     try:
         t    = yf.Ticker(yf_sym)
         info = t.info

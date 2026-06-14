@@ -104,4 +104,7 @@ def _score(row: pd.Series) -> dict:
         'criteria': c,
         'passed': all_passed,
         'completeness': completeness(row, REQUIRED_FIELDS),
+        'rsi': row.get('rsi'),
+        'ema_50': row.get('ema_50'),
+        'rsi_signal': row.get('rsi_signal'),
     }

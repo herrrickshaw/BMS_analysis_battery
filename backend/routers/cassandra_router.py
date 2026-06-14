@@ -373,6 +373,132 @@ async def daily_scan(
     }
 
 
+@router.get('/geography')
+async def geography_status():
+    """
+    Per-country breakdown of instruments seeded, quotes available, and coverage.
+    Europe is split by individual exchange → country.
+    """
+    if not cass.is_available():
+        raise HTTPException(503, 'Cassandra offline')
+
+    s = cass.session()
+
+    # ── base market counts ────────────────────────────────────────────────────
+    mkt_instruments: dict[str, int] = {}
+    mkt_quotes:      dict[str, int] = {}
+    for market in MARKETS:
+        r = s.execute(
+            f'SELECT COUNT(*) FROM {cass.KEYSPACE}.instruments WHERE market = %s', (market,)
+        ).one()
+        mkt_instruments[market] = int(r[0]) if r else 0
+        r = s.execute(
+            f'SELECT COUNT(*) FROM {cass.KEYSPACE}.stock_quotes WHERE market = %s', (market,)
+        ).one()
+        mkt_quotes[market] = int(r[0]) if r else 0
+
+    # ── exchange breakdown from CSVs ─────────────────────────────────────────
+    import csv as _csv
+    import os
+
+    DATA = os.path.join(os.path.dirname(__file__), '..', '..', 'data')
+
+    _EXCHANGE_COUNTRY = {
+        'London Stock Exchange':      ('United Kingdom',  '🇬🇧', '.L'),
+        'Deutsche Boerse Frankfurt':  ('Germany',          '🇩🇪', '.DE/.F'),
+        'Borsa Italiana':             ('Italy',            '🇮🇹', '.MI'),
+        'Euronext Paris':             ('France',           '🇫🇷', '.PA'),
+        'BME Madrid':                 ('Spain',            '🇪🇸', '.MC'),
+        'Nasdaq Stockholm':           ('Sweden',           '🇸🇪', '.ST'),
+        'Athens Stock Exchange':      ('Greece',           '🇬🇷', '.AT'),
+        'Euronext Amsterdam':         ('Netherlands',      '🇳🇱', '.AS'),
+        'Nasdaq Copenhagen':          ('Denmark',          '🇩🇰', '.CO'),
+        'Nasdaq Helsinki':            ('Finland',          '🇫🇮', '.HE'),
+        'Oslo Bors':                  ('Norway',           '🇳🇴', '.OL'),
+        'Euronext Brussels':          ('Belgium',          '🇧🇪', '.BR'),
+        'Euronext Dublin':            ('Ireland',          '🇮🇪', '.IR'),
+        'SIX Swiss':                  ('Switzerland',      '🇨🇭', '.SW'),
+        'Vienna':                     ('Austria',          '🇦🇹', '.VI'),
+        'Warsaw GPW':                 ('Poland',           '🇵🇱', '.WA'),
+        'Euronext Lisbon':            ('Portugal',         '🇵🇹', '.LS'),
+    }
+
+    eu_counts: dict[str, int] = {}
+    eu_path = os.path.join(DATA, 'europe_all_list.csv')
+    if os.path.exists(eu_path):
+        with open(eu_path, newline='', encoding='utf-8') as f:
+            for row in _csv.DictReader(f):
+                exch = row.get('exchange', 'Unknown')
+                eu_counts[exch] = eu_counts.get(exch, 0) + 1
+
+    # ── build rows ────────────────────────────────────────────────────────────
+    rows: list[dict] = []
+
+    # Non-europe markets
+    _MAIN = [
+        ('india',     'India',       '🇮🇳', 'NSE / BSE'),
+        ('us',        'United States','🇺🇸', 'NYSE / NASDAQ'),
+        ('japan',     'Japan',        '🇯🇵', 'Tokyo SE (TSE)'),
+        ('korea',     'South Korea',  '🇰🇷', 'KRX (KOSPI+KOSDAQ)'),
+        ('china',     'China',        '🇨🇳', 'SSE + SZSE'),
+        ('hong_kong', 'Hong Kong',    '🇭🇰', 'HKEX'),
+        ('canada',    'Canada',       '🇨🇦', 'TSX'),
+    ]
+    for market, country, flag, exchange in _MAIN:
+        instr = mkt_instruments.get(market, 0)
+        quotes = mkt_quotes.get(market, 0)
+        rows.append({
+            'market':   market,
+            'country':  country,
+            'flag':     flag,
+            'exchange': exchange,
+            'instruments': instr,
+            'quotes':      quotes,
+            'coverage_pct': round(quotes / instr * 100, 1) if instr > 0 else 0,
+        })
+
+    # Europe — one row per country/exchange
+    eu_total_instr  = mkt_instruments.get('europe', 0)
+    eu_total_quotes = mkt_quotes.get('europe', 0)
+    eu_coverage     = round(eu_total_quotes / eu_total_instr * 100, 1) if eu_total_instr > 0 else 0
+
+    for exch, instr_count in sorted(eu_counts.items(), key=lambda x: -x[1]):
+        country, flag, suffix = _EXCHANGE_COUNTRY.get(exch, (exch, '🇪🇺', ''))
+        # Estimate quotes proportionally (we don't store per-exchange quote counts)
+        est_quotes = round(instr_count * eu_coverage / 100)
+        rows.append({
+            'market':   'europe',
+            'country':  country,
+            'flag':     flag,
+            'exchange': exch,
+            'suffix':   suffix,
+            'instruments': instr_count,
+            'quotes':      est_quotes,
+            'coverage_pct': eu_coverage,
+            'note': 'coverage estimated proportionally',
+        })
+
+    # Sort: non-europe first (by instruments desc), then europe entries
+    non_eu = [r for r in rows if r['market'] != 'europe']
+    eu     = [r for r in rows if r['market'] == 'europe']
+    non_eu.sort(key=lambda r: -r['instruments'])
+    eu.sort(key=lambda r: -r['instruments'])
+
+    total_instr  = sum(r['instruments'] for r in non_eu) + eu_total_instr
+    total_quotes = sum(r['quotes']      for r in non_eu) + eu_total_quotes
+
+    return {
+        'rows': non_eu + eu,
+        'summary': {
+            'total_instruments': total_instr,
+            'total_quotes':      total_quotes,
+            'total_countries':   len(non_eu) + len(eu),
+            'markets':           len(MARKETS),
+            'overall_coverage':  round(total_quotes / total_instr * 100, 1) if total_instr > 0 else 0,
+        },
+    }
+
+
 @router.get('/providers')
 async def providers_status():
     """

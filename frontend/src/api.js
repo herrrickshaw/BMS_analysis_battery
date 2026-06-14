@@ -106,6 +106,10 @@ export async function analyseFile(fileId, analysis, market = 'india', scanType =
   return apiFetch(`/api/files/${fileId}/analyse?${qs}`, { method: 'POST' })
 }
 
+export async function fetchGeographyStatus() {
+  return apiFetch('/api/db/geography')
+}
+
 export async function fetchDailyScan(markets = 'india,us,europe,japan,korea,china,hong_kong,canada', scans = 'darvas,piotroski') {
   return apiFetch(
     `/api/db/daily/scan?markets=${encodeURIComponent(markets)}&scans=${encodeURIComponent(scans)}`,

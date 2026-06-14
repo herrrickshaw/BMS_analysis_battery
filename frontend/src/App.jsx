@@ -11,6 +11,7 @@ import SectorBenchmarks from './components/SectorBenchmarks'
 import PortfolioUpload  from './components/PortfolioUpload'
 import DailyReport    from './components/DailyReport'
 import FileWorkspace  from './components/FileWorkspace'
+import GeographyStatus from './components/GeographyStatus'
 import {
   uploadFile, runScan, exportResults,
   fetchLiveData, scanLiveData, compareLiveData,
@@ -185,6 +186,7 @@ export default function App() {
               { key: 'live_scan',     label: 'Live Scan',     disabled: liveScanResults.length === 0 },
               { key: 'compare',       label: 'Compare',       disabled: !cmpData },
               { key: 'sectors',       label: 'Sector Benchmarks', disabled: false },
+              { key: 'geography',     label: '🌍 Geography',       disabled: false },
             ].map(btn => (
               <button
                 key={btn.key}
@@ -242,6 +244,8 @@ export default function App() {
               <DailyReport />
             ) : viewMode === 'files' ? (
               <FileWorkspace />
+            ) : viewMode === 'geography' ? (
+              <GeographyStatus />
             ) : viewMode === 'sectors' ? (
               <SectorBenchmarks />
             ) : viewMode === 'compare' ? (

@@ -38,6 +38,7 @@ async def lifespan(app: FastAPI):
 
 from routers import upload, scan, export, live, sectors, portfolio
 from routers.cassandra_router import router as cassandra_router
+from routers.files import router as files_router
 
 app = FastAPI(title='Stock Screener API', version='1.0.0', lifespan=lifespan)
 
@@ -56,6 +57,7 @@ app.include_router(live.router)
 app.include_router(sectors.router)
 app.include_router(portfolio.router)
 app.include_router(cassandra_router)
+app.include_router(files_router)
 
 
 @app.get('/')

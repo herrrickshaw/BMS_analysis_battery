@@ -9,7 +9,8 @@ import LivePanel     from './components/LivePanel'
 import ComparisonTable from './components/ComparisonTable'
 import SectorBenchmarks from './components/SectorBenchmarks'
 import PortfolioUpload  from './components/PortfolioUpload'
-import DailyReport from './components/DailyReport'
+import DailyReport    from './components/DailyReport'
+import FileWorkspace  from './components/FileWorkspace'
 import {
   uploadFile, runScan, exportResults,
   fetchLiveData, scanLiveData, compareLiveData,
@@ -178,7 +179,8 @@ export default function App() {
         {/* View mode toggle */}
         <div className="flex items-center gap-1">
             {[
-              { key: 'daily_report',  label: '⚡ Daily Report', disabled: false },
+              { key: 'daily_report',  label: '⚡ Daily Report',  disabled: false },
+              { key: 'files',         label: '📂 Files',          disabled: false },
               { key: 'screener_scan', label: 'Screener Scan', disabled: screenerScanResults.length === 0 },
               { key: 'live_scan',     label: 'Live Scan',     disabled: liveScanResults.length === 0 },
               { key: 'compare',       label: 'Compare',       disabled: !cmpData },
@@ -238,6 +240,8 @@ export default function App() {
           <div className="col-span-12 lg:col-span-9">
             {viewMode === 'daily_report' ? (
               <DailyReport />
+            ) : viewMode === 'files' ? (
+              <FileWorkspace />
             ) : viewMode === 'sectors' ? (
               <SectorBenchmarks />
             ) : viewMode === 'compare' ? (

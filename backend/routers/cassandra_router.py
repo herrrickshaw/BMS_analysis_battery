@@ -273,3 +273,97 @@ def _search(market: str, q: str, limit: int) -> list[dict]:
         pass
 
     return list(results.values())[:limit]
+
+
+# ── Daily scan report ─────────────────────────────────────────────────────────
+
+_MARKET_CURRENCY = {
+    'india':  '₹',
+    'us':     '$',
+    'europe': '€',
+    'japan':  '¥',
+    'korea':  '₩',
+    'china':  '¥',
+}
+
+_MARKET_LABEL = {
+    'india':  'India',
+    'us':     'US',
+    'europe': 'Europe',
+    'japan':  'Japan',
+    'korea':  'Korea',
+    'china':  'China',
+}
+
+
+def _run_daily_scan(markets: list[str], scan_types: list[str]) -> dict:
+    from db.quote_updater import get_market_quotes_df
+    from scanners.daily_scanner import scan_darvas, scan_piotroski
+
+    SCANNER_FN = {
+        'darvas':     scan_darvas,
+        'piotroski':  scan_piotroski,
+    }
+
+    results: dict[str, list] = {s: [] for s in scan_types}
+
+    for market in markets:
+        df = get_market_quotes_df(market)
+        if df.empty:
+            continue
+
+        currency = _MARKET_CURRENCY.get(market, '')
+        label    = _MARKET_LABEL.get(market, market)
+
+        for scan_type in scan_types:
+            fn  = SCANNER_FN.get(scan_type)
+            if fn is None:
+                continue
+            rows = fn(df)
+            for row in rows:
+                # Only include BUY and WATCH signals
+                if row.get('signal') not in ('BUY', 'WATCH'):
+                    continue
+                row['market']    = market
+                row['market_label'] = label
+                row['currency']  = currency
+                row['exchange']  = row.get('_exchange', '')
+                results[scan_type].append(row)
+
+    # Sort each scan type by score desc
+    for scan_type in results:
+        results[scan_type].sort(key=lambda r: r.get('score', 0) or 0, reverse=True)
+
+    return results
+
+
+@router.post('/daily/scan')
+async def daily_scan(
+    markets: str = Query(default='india,us,europe,japan,korea'),
+    scans:   str = Query(default='darvas,piotroski'),
+):
+    """
+    Run Darvas/Buffett and Piotroski scans across all Cassandra-cached markets.
+    Returns BUY + WATCH signals only, sorted by score descending.
+    """
+    if not cass.is_available():
+        raise HTTPException(503, 'Cassandra offline')
+
+    market_list = [m.strip() for m in markets.split(',') if m.strip()]
+    scan_list   = [s.strip() for s in scans.split(',')
+                   if s.strip() in ('darvas', 'piotroski')]
+
+    if not market_list:
+        raise HTTPException(400, 'No valid markets specified')
+    if not scan_list:
+        raise HTTPException(400, 'No valid scan types (darvas, piotroski)')
+
+    results = await run_in_threadpool(_run_daily_scan, market_list, scan_list)
+
+    totals = {s: len(v) for s, v in results.items()}
+    return {
+        'markets':  market_list,
+        'scans':    scan_list,
+        'totals':   totals,
+        'results':  results,
+    }

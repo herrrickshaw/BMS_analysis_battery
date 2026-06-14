@@ -110,6 +110,8 @@ _MIGRATIONS: list[str] = [
     f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ret_3m         double",
     f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ret_6m         double",
     f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ret_1y         double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD sector         text",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD industry       text",
 ]
 
 

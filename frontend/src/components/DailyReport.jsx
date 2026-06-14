@@ -29,6 +29,30 @@ const SIGNAL_BG = {
 
 const ALL_MARKETS = ['india', 'us', 'europe', 'japan', 'korea']
 
+const SECTOR_COLOR = {
+  'Technology':              'bg-blue-900/60 text-blue-300 border-blue-700',
+  'Financial Services':      'bg-emerald-900/60 text-emerald-300 border-emerald-700',
+  'Healthcare':              'bg-rose-900/60 text-rose-300 border-rose-700',
+  'Energy':                  'bg-amber-900/60 text-amber-300 border-amber-700',
+  'Consumer Cyclical':       'bg-orange-900/60 text-orange-300 border-orange-700',
+  'Consumer Defensive':      'bg-teal-900/60 text-teal-300 border-teal-700',
+  'Industrials':             'bg-slate-700/60 text-slate-300 border-slate-600',
+  'Basic Materials':         'bg-yellow-900/60 text-yellow-300 border-yellow-700',
+  'Communication Services':  'bg-violet-900/60 text-violet-300 border-violet-700',
+  'Utilities':               'bg-cyan-900/60 text-cyan-300 border-cyan-700',
+  'Real Estate':             'bg-pink-900/60 text-pink-300 border-pink-700',
+}
+
+function SectorBadge({ sector }) {
+  if (!sector) return null
+  const cls = SECTOR_COLOR[sector] ?? 'bg-gray-800 text-gray-400 border-gray-700'
+  return (
+    <span className={`inline-flex px-1.5 py-0.5 rounded border text-xs font-medium whitespace-nowrap ${cls}`}>
+      {sector}
+    </span>
+  )
+}
+
 function MarketBadge({ market }) {
   const m = MARKET_META[market] || { label: market, flag: '', color: 'bg-gray-800 text-gray-400 border-gray-700' }
   return (
@@ -71,14 +95,14 @@ function CriteriaGrid({ criteria }) {
   )
 }
 
-function ScanTable({ rows, scanType, marketFilter }) {
+function ScanTable({ rows, scanType, marketFilter, sectorFilter }) {
   const [sortKey, setSortKey]   = useState('score')
   const [sortDir, setSortDir]   = useState('desc')
   const [expanded, setExpanded] = useState(null)
 
-  const visible = marketFilter === 'all'
-    ? rows
-    : rows.filter(r => r.market === marketFilter)
+  const visible = rows
+    .filter(r => marketFilter === 'all' || r.market === marketFilter)
+    .filter(r => sectorFilter === 'all' || r.sector === sectorFilter)
 
   const sorted = [...visible].sort((a, b) => {
     const va = a[sortKey], vb = b[sortKey]
@@ -118,6 +142,7 @@ function ScanTable({ rows, scanType, marketFilter }) {
         <thead>
           <tr className="border-b border-gray-800">
             <SortTh k="market_label"   label="Market" />
+            <SortTh k="sector"         label="Sector" />
             <SortTh k="name"           label="Company" />
             <SortTh k="ticker"         label="Ticker" />
             <SortTh k="signal"         label="Signal" />
@@ -152,8 +177,14 @@ function ScanTable({ rows, scanType, marketFilter }) {
                 <td className="px-3 py-2.5 whitespace-nowrap">
                   <MarketBadge market={row.market} />
                 </td>
-                <td className="px-3 py-2.5 text-gray-100 font-medium max-w-[180px] truncate">
-                  {row.name || '—'}
+                <td className="px-3 py-2.5 whitespace-nowrap">
+                  <SectorBadge sector={row.sector} />
+                </td>
+                <td className="px-3 py-2.5 max-w-[180px]">
+                  <p className="text-gray-100 font-medium truncate">{row.name || '—'}</p>
+                  {row.industry && (
+                    <p className="text-xs text-gray-600 truncate mt-0.5">{row.industry}</p>
+                  )}
                 </td>
                 <td className="px-3 py-2.5 text-gray-400 font-mono text-xs whitespace-nowrap">
                   {row.ticker}
@@ -246,7 +277,7 @@ function ScanTable({ rows, scanType, marketFilter }) {
               </tr>
               {expanded === i && row.criteria && (
                 <tr>
-                  <td colSpan={23} className="px-3 pb-3">
+                  <td colSpan={24} className="px-3 pb-3">
                     <CriteriaGrid criteria={row.criteria} />
                   </td>
                 </tr>
@@ -268,6 +299,7 @@ export default function DailyReport() {
   const [scannedAt,    setScannedAt]    = useState(null)
   const [activeScan,   setActiveScan]   = useState('darvas')
   const [marketFilter, setMarketFilter] = useState('all')
+  const [sectorFilter, setSectorFilter] = useState('all')
 
   const run = async () => {
     setLoading(true)
@@ -280,6 +312,7 @@ export default function DailyReport() {
       setScannedAt(new Date().toLocaleTimeString())
       setActiveScan('darvas')
       setMarketFilter('all')
+      setSectorFilter('all')
     } catch (e) {
       setError(e.message)
     } finally {
@@ -288,12 +321,23 @@ export default function DailyReport() {
   }
 
   const activeRows = results?.[activeScan] ?? []
-  const visibleCount = marketFilter === 'all'
-    ? activeRows.length
-    : activeRows.filter(r => r.market === marketFilter).length
 
-  const buyCount   = activeRows.filter(r => r.signal === 'BUY'   && (marketFilter === 'all' || r.market === marketFilter)).length
-  const watchCount = activeRows.filter(r => r.signal === 'WATCH' && (marketFilter === 'all' || r.market === marketFilter)).length
+  // rows visible after both market + sector filters
+  const filteredRows = activeRows
+    .filter(r => marketFilter === 'all' || r.market === marketFilter)
+    .filter(r => sectorFilter === 'all' || r.sector === sectorFilter)
+
+  const buyCount   = filteredRows.filter(r => r.signal === 'BUY').length
+  const watchCount = filteredRows.filter(r => r.signal === 'WATCH').length
+
+  // unique sectors in market-filtered rows, sorted by count desc
+  const marketRows   = marketFilter === 'all' ? activeRows : activeRows.filter(r => r.market === marketFilter)
+  const sectorCounts = marketRows.reduce((acc, r) => {
+    if (r.sector) acc[r.sector] = (acc[r.sector] ?? 0) + 1
+    return acc
+  }, {})
+  const sectors = Object.entries(sectorCounts).sort((a, b) => b[1] - a[1]).map(([s]) => s)
+  const hasSectors = sectors.length > 0
 
   return (
     <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
@@ -366,7 +410,7 @@ export default function DailyReport() {
               return (
                 <button
                   key={key}
-                  onClick={() => { setActiveScan(key); setMarketFilter('all') }}
+                  onClick={() => { setActiveScan(key); setMarketFilter('all'); setSectorFilter('all') }}
                   className={`flex items-center gap-2 pb-3 px-1 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                     activeScan === key
                       ? 'border-indigo-500 text-indigo-300'
@@ -388,14 +432,12 @@ export default function DailyReport() {
           <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-800/60 overflow-x-auto">
             <span className="text-xs text-gray-600 mr-1 shrink-0">Filter:</span>
             {['all', ...ALL_MARKETS].map(m => {
-              const meta = MARKET_META[m]
-              const mRows = m === 'all'
-                ? activeRows
-                : activeRows.filter(r => r.market === m)
+              const meta  = MARKET_META[m]
+              const mRows = m === 'all' ? activeRows : activeRows.filter(r => r.market === m)
               return (
                 <button
                   key={m}
-                  onClick={() => setMarketFilter(m)}
+                  onClick={() => { setMarketFilter(m); setSectorFilter('all') }}
                   className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
                     marketFilter === m
                       ? 'bg-indigo-700 text-white'
@@ -413,7 +455,7 @@ export default function DailyReport() {
             {/* Summary stats */}
             <div className="ml-auto flex items-center gap-2 shrink-0">
               <span className="text-xs px-2 py-0.5 bg-gray-800 rounded-full text-gray-400">
-                {visibleCount} stocks
+                {filteredRows.length} stocks
               </span>
               {buyCount > 0 && (
                 <span className="text-xs px-2 py-0.5 bg-emerald-900/40 text-emerald-400 rounded-full">
@@ -428,10 +470,45 @@ export default function DailyReport() {
             </div>
           </div>
 
+          {/* Sector filter row — shown only when sector data is available */}
+          {hasSectors && (
+            <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-800/60 overflow-x-auto bg-gray-900/40">
+              <span className="text-xs text-gray-600 mr-1 shrink-0">Sector:</span>
+              <button
+                onClick={() => setSectorFilter('all')}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
+                  sectorFilter === 'all'
+                    ? 'bg-indigo-700 text-white'
+                    : 'bg-gray-800 text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                All <span className={sectorFilter === 'all' ? 'text-indigo-200' : 'text-gray-600'}>({marketRows.length})</span>
+              </button>
+              {sectors.map(s => {
+                const cnt  = sectorCounts[s]
+                const cls  = SECTOR_COLOR[s] ?? 'bg-gray-800 text-gray-400 border-gray-700'
+                const active = sectorFilter === s
+                return (
+                  <button
+                    key={s}
+                    onClick={() => setSectorFilter(s)}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors whitespace-nowrap ${
+                      active ? cls + ' opacity-100' : 'bg-gray-800/60 text-gray-400 border-gray-700 hover:text-gray-200'
+                    }`}
+                  >
+                    {s}
+                    <span className={active ? 'opacity-70' : 'text-gray-600'}>({cnt})</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
           <ScanTable
             rows={activeRows}
             scanType={activeScan}
             marketFilter={marketFilter}
+            sectorFilter={sectorFilter}
           />
         </>
       )}

@@ -134,6 +134,116 @@ except Exception as e:
     print(f"  (warning: could not refresh Korea list: {e})")
 PYEOF
 
+# Europe – build comprehensive list if missing (966 stocks across all major exchanges)
+python3 - << 'PYEOF'
+import os, csv, io, time
+import requests
+
+ROOT = os.environ.get('ROOT', '.')
+data_dir = os.path.join(ROOT, 'data')
+out_path = os.path.join(data_dir, 'europe_all_list.csv')
+
+# Skip if file exists and was built within 30 days
+if os.path.exists(out_path):
+    age_days = (time.time() - os.path.getmtime(out_path)) / 86400
+    if age_days < 30:
+        import csv as _csv
+        with open(out_path) as f:
+            count = sum(1 for _ in _csv.DictReader(f))
+        print(f"  Europe list: {count} stocks (cached, {age_days:.0f}d old)")
+        exit(0)
+
+print("  Europe list: building from Wikipedia indices...")
+session = requests.Session()
+session.headers['User-Agent'] = 'Mozilla/5.0'
+europe = {}
+
+def add(yf, name, index, exchange):
+    if yf not in europe:
+        europe[yf] = {'yf_ticker': yf, 'name': name, 'index': index, 'exchange': exchange}
+
+def wiki_table(url, suffix, index_name, exchange, tick_aliases=None, name_aliases=None):
+    import pandas as pd
+    tick_aliases = tick_aliases or ['Ticker','Symbol','Ticker symbol','MNEM code','Code']
+    name_aliases = name_aliases or ['Company','Name','Stock']
+    try:
+        r = session.get(url, timeout=15)
+        tables = pd.read_html(io.StringIO(r.text))
+        for t in tables:
+            tc = next((c for c in t.columns if str(c) in tick_aliases), None)
+            nc = next((c for c in t.columns if str(c) in name_aliases), None)
+            if tc and nc and t.shape[0] >= 10:
+                for _, row in t.iterrows():
+                    sym = str(row[tc]).strip().split('.')[0]
+                    nm  = str(row[nc]).strip()
+                    if sym and sym != 'nan':
+                        add(sym + suffix, nm, index_name, exchange)
+                time.sleep(0.6); return
+    except Exception:
+        pass
+    time.sleep(0.6)
+
+# Euronext
+wiki_table('https://en.wikipedia.org/wiki/CAC_40',          '.PA', 'CAC40',   'Euronext Paris')
+wiki_table('https://en.wikipedia.org/wiki/AEX_index',       '.AS', 'AEX25',   'Euronext Amsterdam')
+wiki_table('https://en.wikipedia.org/wiki/BEL_20',          '.BR', 'BEL20',   'Euronext Brussels')
+wiki_table('https://en.wikipedia.org/wiki/PSI-20',          '.LS', 'PSI20',   'Euronext Lisbon')
+wiki_table('https://en.wikipedia.org/wiki/OBX_Index',       '.OL', 'OBX25',   'Oslo Bors')
+wiki_table('https://en.wikipedia.org/wiki/FTSE_MIB',        '.MI', 'FTSEMIB', 'Borsa Italiana')
+wiki_table('https://en.wikipedia.org/wiki/ISEQ_20',         '.IR', 'ISEQ20',  'Euronext Dublin', tick_aliases=['MNEM code'])
+# Nasdaq Nordic
+wiki_table('https://en.wikipedia.org/wiki/OMX_Stockholm_30',  '.ST', 'OMXS30', 'Nasdaq Stockholm')
+wiki_table('https://en.wikipedia.org/wiki/OMX_Helsinki_25',   '.HE', 'OMXH25', 'Nasdaq Helsinki')
+wiki_table('https://en.wikipedia.org/wiki/OMX_Copenhagen_25', '.CO', 'OMXC25', 'Nasdaq Copenhagen')
+# BME / SIX
+wiki_table('https://en.wikipedia.org/wiki/IBEX_35',           '.MC', 'IBEX35', 'BME Madrid')
+wiki_table('https://en.wikipedia.org/wiki/Swiss_Market_Index','.SW', 'SMI20',  'SIX Swiss')
+
+# Hardcoded: ATX Vienna
+for sym, nm in [('EBS','Erste Group Bank'),('OMV','OMV'),('VER','Verbund'),('RBI','Raiffeisen Bank International'),
+    ('VOE','voestalpine'),('ANDR','Andritz'),('TKA','Telekom Austria'),('POST','Oesterreichische Post'),
+    ('WIE','Wienerberger'),('LNZ','Lenzing'),('VIG','Vienna Insurance Group'),('MMK','Mayr-Melnhof Karton'),
+    ('BG','BAWAG Group'),('FLU','Flughafen Wien'),('UQA','UNIQA Insurance Group'),('STR','Strabag'),
+    ('SBO','Schoeller-Bleckmann'),('IIA','Immofinanz'),('CAI','CA Immobilien Anlagen'),('PYT','Polytec Holding')]:
+    add(sym+'.VI', nm, 'ATX20', 'Vienna')
+
+# Hardcoded: WIG20 Warsaw
+for sym, nm in [('ALLEGRO','Allegro.eu'),('DINO','Dino Polska'),('CDR','CD Projekt'),('PKO','PKO Bank Polski'),
+    ('PZU','PZU'),('PKN','PKN Orlen'),('PEO','Bank Pekao'),('KGHM','KGHM Polska Miedz'),('LPP','LPP'),
+    ('CCC','CCC'),('JSW','JSW'),('MBK','mBank'),('OPL','Orange Polska'),('ALE','Allegro'),
+    ('DNP','DataWalk'),('KTY','Kety'),('MRC','Mercator Medical'),('SGN','Shaftesbury'),('BDX','Budimex'),('ATC','Atlantic')]:
+    add(sym+'.WA', nm, 'WIG20', 'Warsaw GPW')
+
+# Hardcoded: Athens
+for sym, nm in [('ALPHA','Alpha Bank'),('TPEIR','Piraeus Financial Holdings'),('ETE','National Bank of Greece'),
+    ('EUROB','Eurobank Ergasias'),('OPAP','OPAP'),('MYTIL','Mytilineos'),('HTO','Hellenic Telecommunications'),
+    ('MOH','Motor Oil Hellas'),('ELPE','Hellenic Petroleum'),('EYDAP','Athens Water Supply'),
+    ('ADMIE','ADMIE Holding'),('PPC','Public Power'),('LAMDA','Lamda Development'),('GEK','GEK Terna'),
+    ('TITC','Titan Cement'),('INLOT','Intralot'),('BELA','Jumbo'),('ELLAKTOR','Ellaktor'),
+    ('OTOEL','Autohellas'),('PLATH','Athens Medical Group'),('EUPIC','European Reliance'),
+    ('GEKTERNA','GEK Terna'),('NKAS','Nikos Kazantzakis Airport'),('GEBKA','Gebka'),('FLEXO','Flexopack')]:
+    add(sym+'.AT', nm, 'FTSEATHEX', 'Athens Stock Exchange')
+
+# Frankfurt list
+for path, exch in [
+    (os.path.join(data_dir, 'frankfurt_list.csv'), 'Deutsche Boerse Frankfurt'),
+    (os.path.join(data_dir, 'london_list.csv'), 'London Stock Exchange'),
+]:
+    if os.path.exists(path):
+        with open(path) as f:
+            for row in csv.DictReader(f):
+                add(row['yf_ticker'], row['name'], row['index'], exch)
+
+if europe:
+    rows = sorted(europe.values(), key=lambda x: x['exchange']+x['yf_ticker'])
+    with open(out_path, 'w', newline='', encoding='utf-8') as f:
+        w = csv.DictWriter(f, fieldnames=['yf_ticker','name','index','exchange'])
+        w.writeheader(); w.writerows(rows)
+    print(f"  Europe list: {len(rows)} stocks (rebuilt)")
+else:
+    print("  (warning: could not build Europe list)")
+PYEOF
+
 # China – akshare A-shares
 python3 - << 'PYEOF'
 import csv, os, warnings

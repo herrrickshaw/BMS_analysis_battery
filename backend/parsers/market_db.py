@@ -81,10 +81,14 @@ def _db(market: str) -> dict:
             )
 
     elif market == 'europe':
+        # Prefer comprehensive all-exchanges list; fall back to legacy STOXX 600 list
+        europe_path = os.path.join(_DATA, 'europe_all_list.csv')
+        if not os.path.exists(europe_path):
+            europe_path = os.path.join(_DATA, 'europe_list.csv')
         result = _load_csv(
-            os.path.join(_DATA, 'europe_list.csv'),
+            europe_path,
             yf_col='yf_ticker', name_col='name',
-            extra_cols=['country'],
+            extra_cols=['exchange', 'index'],
         )
 
     elif market == 'japan':

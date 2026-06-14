@@ -1,5 +1,5 @@
-import { Fragment, useState } from 'react'
-import { fetchDailyScan } from '../api'
+import { Fragment, useState, useEffect, useRef } from 'react'
+import { fetchDailyScan, fetchStockNews, fetchSectorNews } from '../api'
 import ScoreBadge from './ScoreBadge'
 
 const MARKET_META = {
@@ -77,6 +77,129 @@ function RetPct({ value }) {
   const n   = Number(value)
   const cls = n >= 0 ? 'text-emerald-400' : 'text-red-400'
   return <span className={`font-mono text-xs ${cls}`}>{n >= 0 ? '+' : ''}{n.toFixed(2)}%</span>
+}
+
+// ── time-ago helper ───────────────────────────────────────────────────────────
+function timeAgo(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  if (isNaN(d)) return dateStr
+  const diff = Math.floor((Date.now() - d) / 1000)
+  if (diff < 60)   return `${diff}s ago`
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
+  if (diff < 86400)return `${Math.floor(diff / 3600)}h ago`
+  return `${Math.floor(diff / 86400)}d ago`
+}
+
+function NewsItem({ article }) {
+  return (
+    <a
+      href={article.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block group hover:bg-gray-800/60 rounded-md px-2.5 py-2 transition-colors"
+    >
+      <p className="text-xs text-gray-200 group-hover:text-white leading-snug line-clamp-2">
+        {article.title}
+      </p>
+      <p className="text-[10px] text-gray-600 mt-0.5 flex gap-1.5 items-center">
+        {article.publisher && <span className="text-gray-500">{article.publisher}</span>}
+        {article.published_at && (
+          <span className="text-gray-700">{timeAgo(article.published_at)}</span>
+        )}
+        <span className="ml-auto text-indigo-700 group-hover:text-indigo-500 text-[9px] font-mono">↗</span>
+      </p>
+    </a>
+  )
+}
+
+function StockNews({ ticker, market }) {
+  const [state, setState] = useState({ loading: true, articles: [], error: null })
+  const fetched = useRef(false)
+
+  useEffect(() => {
+    if (fetched.current) return
+    fetched.current = true
+    fetchStockNews(ticker, market)
+      .then(r => setState({ loading: false, articles: r.articles ?? [], error: null }))
+      .catch(e => setState({ loading: false, articles: [], error: e.message }))
+  }, [ticker, market])
+
+  if (state.loading) {
+    return (
+      <div className="flex items-center gap-2 py-4 px-2">
+        <span className="inline-block w-3.5 h-3.5 border-2 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin" />
+        <span className="text-xs text-gray-600">Loading news…</span>
+      </div>
+    )
+  }
+  if (state.error || !state.articles.length) {
+    return <p className="text-xs text-gray-700 px-2 py-3">No recent news found.</p>
+  }
+  return (
+    <div>
+      <p className="text-[10px] text-gray-600 uppercase tracking-wider px-2.5 mb-1 font-medium">Recent News</p>
+      <div className="space-y-0.5">
+        {state.articles.map((a, i) => <NewsItem key={i} article={a} />)}
+      </div>
+    </div>
+  )
+}
+
+function SectorNewsDrawer({ sector, market, onClose }) {
+  const [state, setState] = useState({ loading: true, articles: [], error: null })
+
+  useEffect(() => {
+    setState({ loading: true, articles: [], error: null })
+    fetchSectorNews(sector, market)
+      .then(r => setState({ loading: false, articles: r.articles ?? [], error: null }))
+      .catch(e => setState({ loading: false, articles: [], error: e.message }))
+  }, [sector, market])
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
+      <div
+        className="w-full max-w-sm h-full bg-gray-950 border-l border-gray-800 flex flex-col shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Drawer header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 shrink-0">
+          <div>
+            <p className="text-sm font-semibold text-gray-100">{sector} News</p>
+            <p className="text-[10px] text-gray-600 mt-0.5">
+              {market !== 'all' ? `${MARKET_META[market]?.label ?? market} · ` : ''}Google News
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-600 hover:text-gray-300 text-lg leading-none font-bold px-1"
+          >
+            ×
+          </button>
+        </div>
+        {/* Drawer body */}
+        <div className="flex-1 overflow-y-auto py-2 px-1">
+          {state.loading && (
+            <div className="flex items-center gap-2 py-6 px-4">
+              <span className="inline-block w-4 h-4 border-2 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin" />
+              <span className="text-xs text-gray-600">Fetching sector news…</span>
+            </div>
+          )}
+          {!state.loading && state.error && (
+            <p className="text-xs text-red-400 px-4 py-4">{state.error}</p>
+          )}
+          {!state.loading && !state.error && !state.articles.length && (
+            <p className="text-xs text-gray-600 px-4 py-4">No news found for this sector.</p>
+          )}
+          {!state.loading && state.articles.map((a, i) => (
+            <div key={i} className="border-b border-gray-800/40 last:border-0">
+              <NewsItem article={a} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function CriteriaGrid({ criteria }) {
@@ -278,7 +401,12 @@ function ScanTable({ rows, scanType, marketFilter, sectorFilter }) {
               {expanded === i && row.criteria && (
                 <tr>
                   <td colSpan={24} className="px-3 pb-3">
-                    <CriteriaGrid criteria={row.criteria} />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-0.5">
+                      <CriteriaGrid criteria={row.criteria} />
+                      <div className="bg-gray-950 rounded-lg border border-gray-800/50 p-1.5">
+                        <StockNews ticker={row.ticker} market={row.market} />
+                      </div>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -300,6 +428,7 @@ export default function DailyReport() {
   const [activeScan,   setActiveScan]   = useState('darvas')
   const [marketFilter, setMarketFilter] = useState('all')
   const [sectorFilter, setSectorFilter] = useState('all')
+  const [sectorNews,   setSectorNews]   = useState(null)  // { sector, market } | null
 
   const run = async () => {
     setLoading(true)
@@ -313,6 +442,7 @@ export default function DailyReport() {
       setActiveScan('darvas')
       setMarketFilter('all')
       setSectorFilter('all')
+      setSectorNews(null)
     } catch (e) {
       setError(e.message)
     } finally {
@@ -401,6 +531,14 @@ export default function DailyReport() {
         </div>
       )}
 
+      {sectorNews && (
+        <SectorNewsDrawer
+          sector={sectorNews.sector}
+          market={sectorNews.market}
+          onClose={() => setSectorNews(null)}
+        />
+      )}
+
       {results && !loading && (
         <>
           {/* Scan type tabs + summary */}
@@ -485,20 +623,28 @@ export default function DailyReport() {
                 All <span className={sectorFilter === 'all' ? 'text-indigo-200' : 'text-gray-600'}>({marketRows.length})</span>
               </button>
               {sectors.map(s => {
-                const cnt  = sectorCounts[s]
-                const cls  = SECTOR_COLOR[s] ?? 'bg-gray-800 text-gray-400 border-gray-700'
+                const cnt    = sectorCounts[s]
+                const cls    = SECTOR_COLOR[s] ?? 'bg-gray-800 text-gray-400 border-gray-700'
                 const active = sectorFilter === s
                 return (
-                  <button
-                    key={s}
-                    onClick={() => setSectorFilter(s)}
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors whitespace-nowrap ${
-                      active ? cls + ' opacity-100' : 'bg-gray-800/60 text-gray-400 border-gray-700 hover:text-gray-200'
-                    }`}
-                  >
-                    {s}
-                    <span className={active ? 'opacity-70' : 'text-gray-600'}>({cnt})</span>
-                  </button>
+                  <div key={s} className="flex items-center gap-0.5 shrink-0">
+                    <button
+                      onClick={() => setSectorFilter(s)}
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-l-full text-xs font-medium border border-r-0 transition-colors whitespace-nowrap ${
+                        active ? cls + ' opacity-100' : 'bg-gray-800/60 text-gray-400 border-gray-700 hover:text-gray-200'
+                      }`}
+                    >
+                      {s}
+                      <span className={active ? 'opacity-70' : 'text-gray-600'}>({cnt})</span>
+                    </button>
+                    <button
+                      title={`${s} news`}
+                      onClick={() => setSectorNews(n => n?.sector === s ? null : { sector: s, market: marketFilter })}
+                      className="px-1.5 py-1 rounded-r-full bg-gray-800/60 border border-gray-700 hover:bg-gray-700 text-gray-600 hover:text-gray-300 text-[10px] transition-colors"
+                    >
+                      🗞
+                    </button>
+                  </div>
                 )
               })}
             </div>

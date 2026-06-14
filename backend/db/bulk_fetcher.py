@@ -195,6 +195,25 @@ def _fetch_ohlcv_batch(
                 vol_avg     = int(volumes.iloc[-window:].mean())
                 vol_ratio   = round(float(volumes.iloc[-1]) / vol_avg, 2) if vol_avg > 0 else None
 
+            # Period returns — all derived from existing close series, no extra calls
+            def _ret(n_back: int):
+                if len(closes) <= n_back:
+                    return None
+                prev = float(closes.iloc[-(n_back + 1)])
+                if math.isnan(prev) or prev <= 0:
+                    return None
+                return round((cmp - prev) / prev * 100, 2)
+
+            ret_1d = _ret(1)
+            ret_1w = _ret(5)
+            ret_1m = _ret(21)
+            ret_3m = _ret(63)
+            ret_6m = _ret(126)
+            # 1y: first available close in the downloaded window vs today
+            first = float(closes.iloc[0])
+            ret_1y = round((cmp - first) / first * 100, 2) \
+                     if not math.isnan(first) and first > 0 else None
+
             if rsi is None:
                 signal = 'HOLD'
             elif rsi < 30 and cmp > ema50:
@@ -218,6 +237,12 @@ def _fetch_ohlcv_batch(
                 'volume':         vol,
                 'volume_20d_avg': vol_avg,
                 'volume_ratio':   vol_ratio,
+                'ret_1d':         ret_1d,
+                'ret_1w':         ret_1w,
+                'ret_1m':         ret_1m,
+                'ret_3m':         ret_3m,
+                'ret_6m':         ret_6m,
+                'ret_1y':         ret_1y,
                 '_source':        'yfinance_bulk',
             })
         except Exception as exc:

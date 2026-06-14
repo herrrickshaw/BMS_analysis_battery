@@ -67,14 +67,16 @@ def _prepare(s) -> None:
         "(market, yf_ticker, fetched_at, cmp, rsi, ema_50, ema_200, rsi_signal, "
         " macd, macd_signal, pe, pb, roe, opm, market_cap, volume, volume_20d_avg, "
         " volume_ratio, high_52w, low_52w, debt_to_equity, beta, current_ratio, "
-        " revenue_growth, eps, dividend_yield) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        " revenue_growth, eps, dividend_yield, "
+        " ret_1d, ret_1w, ret_1m, ret_3m, ret_6m, ret_1y) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     _stmts['select_in'] = s.prepare(
         f"SELECT yf_ticker, fetched_at, cmp, rsi, ema_50, ema_200, rsi_signal, "
         f"macd, macd_signal, pe, pb, roe, opm, market_cap, volume, volume_20d_avg, "
         f"volume_ratio, high_52w, low_52w, debt_to_equity, beta, current_ratio, "
-        f"revenue_growth, eps, dividend_yield "
+        f"revenue_growth, eps, dividend_yield, "
+        f"ret_1d, ret_1w, ret_1m, ret_3m, ret_6m, ret_1y "
         f"FROM {ks}.stock_quotes WHERE market = ? AND yf_ticker IN ?"
     )
 
@@ -137,6 +139,12 @@ def upsert_quotes(market: str, live_df: pd.DataFrame) -> int:
             _f(row, 'revenue_growth'),
             _f(row, 'eps'),
             _f(row, 'dividend_yield'),
+            _f(row, 'ret_1d'),
+            _f(row, 'ret_1w'),
+            _f(row, 'ret_1m'),
+            _f(row, 'ret_3m'),
+            _f(row, 'ret_6m'),
+            _f(row, 'ret_1y'),
         ))
 
     if not rows:
@@ -169,7 +177,8 @@ def get_market_quotes_df(market: str) -> pd.DataFrame:
             f"SELECT yf_ticker, cmp, rsi, ema_50, ema_200, rsi_signal, macd, macd_signal, "
             f"pe, pb, roe, opm, market_cap, volume, volume_20d_avg, volume_ratio, "
             f"high_52w, low_52w, debt_to_equity, beta, current_ratio, "
-            f"revenue_growth, eps, dividend_yield "
+            f"revenue_growth, eps, dividend_yield, "
+            f"ret_1d, ret_1w, ret_1m, ret_3m, ret_6m, ret_1y "
             f"FROM {cass.KEYSPACE}.stock_quotes WHERE market = %s",
             (market,),
         ))
@@ -225,6 +234,12 @@ def get_market_quotes_df(market: str) -> pd.DataFrame:
             'revenue_growth':  getattr(r, 'revenue_growth', None),
             'eps':             getattr(r, 'eps', None),
             'dividend_yield':  getattr(r, 'dividend_yield', None),
+            'ret_1d':          getattr(r, 'ret_1d', None),
+            'ret_1w':          getattr(r, 'ret_1w', None),
+            'ret_1m':          getattr(r, 'ret_1m', None),
+            'ret_3m':          getattr(r, 'ret_3m', None),
+            'ret_6m':          getattr(r, 'ret_6m', None),
+            'ret_1y':          getattr(r, 'ret_1y', None),
             '_exchange':       exch_map.get(r.yf_ticker, ''),
         }
         records.append(rec)
@@ -270,6 +285,12 @@ def get_quotes(market: str, yf_tickers: list[str]) -> dict[str, dict]:
                 'revenue_growth': getattr(row, 'revenue_growth', None),
                 'eps':            getattr(row, 'eps', None),
                 'dividend_yield': getattr(row, 'dividend_yield', None),
+                'ret_1d':         getattr(row, 'ret_1d', None),
+                'ret_1w':         getattr(row, 'ret_1w', None),
+                'ret_1m':         getattr(row, 'ret_1m', None),
+                'ret_3m':         getattr(row, 'ret_3m', None),
+                'ret_6m':         getattr(row, 'ret_6m', None),
+                'ret_1y':         getattr(row, 'ret_1y', None),
                 'fetched_at':     row.fetched_at.isoformat() if row.fetched_at else None,
             }
             for row in rows

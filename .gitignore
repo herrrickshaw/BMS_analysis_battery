@@ -18,6 +18,8 @@ frontend/.vite/
 *.pyc
 __pycache__/
 data/sp500_list.csv
+data/us_list.csv
 data/japan_list.csv
 data/korea_list.csv
 data/europe_list.csv
+data/china_list.csv

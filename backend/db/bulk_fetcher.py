@@ -277,6 +277,10 @@ def _fetch_info_one(ticker: str, suffix: str, is_inr: bool) -> dict:
                     except (TypeError, ValueError):
                         return None
 
+                def _txt(k):
+                    v = info.get(k)
+                    return str(v).strip() if v and str(v).strip() else None
+
                 return {
                     'pe':             rat('trailingPE'),
                     'pb':             rat('priceToBook'),
@@ -289,6 +293,8 @@ def _fetch_info_one(ticker: str, suffix: str, is_inr: bool) -> dict:
                     'revenue_growth': pct('revenueGrowth'),
                     'eps':            rat('trailingEps'),
                     'dividend_yield': pct('dividendYield'),
+                    'sector':         _txt('sector'),
+                    'industry':       _txt('industry'),
                 }
             except Exception as exc:
                 if 'rate' in str(exc).lower() or '429' in str(exc):

@@ -147,11 +147,13 @@ def fetch_current_price(yf_ticker: str) -> dict:
     """
     # Try Cassandra stock_quotes first
     from db.quote_updater import get_quotes
-    # Determine market from suffix
     market = _market_from_ticker(yf_ticker)
-    cached = get_quotes(market, [yf_ticker])
-    if cached and yf_ticker in cached:
-        q = cached[yf_ticker]
+    # Cassandra stores India tickers as bare NSE symbols (no .NS/.BO suffix)
+    bare = _bare_ticker(yf_ticker)
+    cached = get_quotes(market, [bare, yf_ticker])
+    hit = cached.get(bare) or cached.get(yf_ticker)
+    if hit:
+        q = hit
         if q.get('cmp'):
             return {
                 'close':      round(q['cmp'], 2),
@@ -171,6 +173,16 @@ def fetch_current_price(yf_ticker: str) -> dict:
         return {'error': 'no price in yfinance info'}
     except Exception as exc:
         return {'error': str(exc)[:120]}
+
+
+def _bare_ticker(yf_ticker: str) -> str:
+    """Strip known market suffixes (.NS, .BO, .T, .KS, .KQ, .SS, .SZ) for Cassandra lookup."""
+    SUFFIXES = {'.NS', '.BO', '.T', '.KS', '.KQ', '.SS', '.SZ'}
+    upper = yf_ticker.upper()
+    for sfx in SUFFIXES:
+        if upper.endswith(sfx):
+            return yf_ticker[:len(yf_ticker) - len(sfx)]
+    return yf_ticker
 
 
 def _market_from_ticker(yf_ticker: str) -> str:

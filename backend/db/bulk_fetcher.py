@@ -140,9 +140,6 @@ def _fetch_ohlcv_batch(
             log.warning('_fetch_ohlcv_batch: download error: %s', exc)
             return []
 
-    if raw is None or (hasattr(raw, 'empty') and raw.empty):
-        return []
-
     if raw is None or raw.empty:
         return []
 
@@ -170,12 +167,33 @@ def _fetch_ohlcv_batch(
             cmp   = float(closes.iloc[-1])
             rsi   = _compute_rsi(closes)
             ema50 = float(closes.ewm(span=50, adjust=False).mean().iloc[-1])
-            h52   = float(closes.max())
-            l52   = float(closes.min())
+            h52   = float(closes.rolling(window=min(252, len(closes))).max().iloc[-1])
+            l52   = float(closes.rolling(window=min(252, len(closes))).min().iloc[-1])
             vol   = int(volumes.iloc[-1]) if not volumes.empty else None
 
             if math.isnan(cmp):
                 continue
+
+            # EMA-200 (long-term trend)
+            ema200 = round(float(closes.ewm(span=200, adjust=False).mean().iloc[-1]), 2) \
+                     if len(closes) >= 50 else None
+
+            # MACD = EMA-12 minus EMA-26; signal = EMA-9 of MACD
+            macd_val = macd_sig = None
+            if len(closes) >= 26:
+                ema12     = closes.ewm(span=12, adjust=False).mean()
+                ema26     = closes.ewm(span=26, adjust=False).mean()
+                macd_line = ema12 - ema26
+                macd_val  = round(float(macd_line.iloc[-1]), 4)
+                if len(macd_line) >= 9:
+                    macd_sig = round(float(macd_line.ewm(span=9, adjust=False).mean().iloc[-1]), 4)
+
+            # 20-day average volume and today's volume ratio
+            vol_avg = vol_ratio = None
+            if not volumes.empty and len(volumes) >= 5:
+                window      = min(20, len(volumes))
+                vol_avg     = int(volumes.iloc[-window:].mean())
+                vol_ratio   = round(float(volumes.iloc[-1]) / vol_avg, 2) if vol_avg > 0 else None
 
             if rsi is None:
                 signal = 'HOLD'
@@ -186,17 +204,21 @@ def _fetch_ohlcv_batch(
             else:
                 signal = 'HOLD'
 
-            mc_raw = cmp  # no market-cap from download; will be filled by Phase 2
             rows.append({
-                'ticker':     orig,
-                'cmp':        round(cmp,   2),
-                'rsi':        rsi,
-                'ema_50':     round(ema50, 2),
-                'rsi_signal': signal,
-                'high_52w':   round(h52, 2),
-                'low_52w':    round(l52, 2),
-                'volume':     vol,
-                '_source':    'yfinance_bulk',
+                'ticker':         orig,
+                'cmp':            round(cmp,   2),
+                'rsi':            rsi,
+                'ema_50':         round(ema50, 2),
+                'ema_200':        ema200,
+                'macd':           macd_val,
+                'macd_signal':    macd_sig,
+                'rsi_signal':     signal,
+                'high_52w':       round(h52, 2),
+                'low_52w':        round(l52, 2),
+                'volume':         vol,
+                'volume_20d_avg': vol_avg,
+                'volume_ratio':   vol_ratio,
+                '_source':        'yfinance_bulk',
             })
         except Exception as exc:
             log.debug('_fetch_ohlcv_batch[%s]: %s', yf_sym, exc)
@@ -231,12 +253,17 @@ def _fetch_info_one(ticker: str, suffix: str, is_inr: bool) -> dict:
                         return None
 
                 return {
-                    'pe':            rat('trailingPE'),
-                    'pb':            rat('priceToBook'),
-                    'roe':           pct('returnOnEquity'),
-                    'opm':           pct('operatingMargins'),
-                    'market_cap':    round(mc / (1e7 if is_inr else 1e6), 2) if mc else None,
+                    'pe':             rat('trailingPE'),
+                    'pb':             rat('priceToBook'),
+                    'roe':            pct('returnOnEquity'),
+                    'opm':            pct('operatingMargins'),
+                    'market_cap':     round(mc / (1e7 if is_inr else 1e6), 2) if mc else None,
                     'debt_to_equity': rat('debtToEquity'),
+                    'beta':           rat('beta'),
+                    'current_ratio':  rat('currentRatio'),
+                    'revenue_growth': pct('revenueGrowth'),
+                    'eps':            rat('trailingEps'),
+                    'dividend_yield': pct('dividendYield'),
                 }
             except Exception as exc:
                 if 'rate' in str(exc).lower() or '429' in str(exc):
@@ -252,10 +279,10 @@ def _fetch_info_one(ticker: str, suffix: str, is_inr: bool) -> dict:
 
 def fetch_market_quotes(
     market: str,
-    batch_size: int = 50,
-    max_workers: int = 4,
+    batch_size: int = 100,
+    max_workers: int = 6,
     with_fundamentals: bool = True,
-    inter_batch_delay: float = 1.0,
+    inter_batch_delay: float = 0.5,
 ) -> dict:
     """
     Fetch live quotes for every instrument in one market and persist to Cassandra.
@@ -362,8 +389,8 @@ def fetch_market_quotes(
 
 def fetch_all_quotes(
     markets: Optional[list[str]] = None,
-    batch_size: int = 50,
-    max_workers: int = 4,
+    batch_size: int = 100,
+    max_workers: int = 6,
     with_fundamentals: bool = True,
 ) -> list[dict]:
     """Fetch quotes for all markets sequentially to respect rate limits."""

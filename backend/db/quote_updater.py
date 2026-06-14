@@ -64,13 +64,17 @@ def _prepare(s) -> None:
     ks = cass.KEYSPACE
     _stmts['upsert'] = s.prepare(
         f"INSERT INTO {ks}.stock_quotes "
-        "(market, yf_ticker, fetched_at, cmp, rsi, ema_50, rsi_signal, "
-        " pe, pb, roe, opm, market_cap, volume, high_52w, low_52w, debt_to_equity) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "(market, yf_ticker, fetched_at, cmp, rsi, ema_50, ema_200, rsi_signal, "
+        " macd, macd_signal, pe, pb, roe, opm, market_cap, volume, volume_20d_avg, "
+        " volume_ratio, high_52w, low_52w, debt_to_equity, beta, current_ratio, "
+        " revenue_growth, eps, dividend_yield) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     _stmts['select_in'] = s.prepare(
-        f"SELECT yf_ticker, fetched_at, cmp, rsi, ema_50, rsi_signal, "
-        f"pe, pb, roe, opm, market_cap, volume, high_52w, low_52w, debt_to_equity "
+        f"SELECT yf_ticker, fetched_at, cmp, rsi, ema_50, ema_200, rsi_signal, "
+        f"macd, macd_signal, pe, pb, roe, opm, market_cap, volume, volume_20d_avg, "
+        f"volume_ratio, high_52w, low_52w, debt_to_equity, beta, current_ratio, "
+        f"revenue_growth, eps, dividend_yield "
         f"FROM {ks}.stock_quotes WHERE market = ? AND yf_ticker IN ?"
     )
 
@@ -113,16 +117,26 @@ def upsert_quotes(market: str, live_df: pd.DataFrame) -> int:
             _f(row, 'cmp'),
             _f(row, 'rsi'),
             _f(row, 'ema_50'),
+            _f(row, 'ema_200'),
             str(row.get('rsi_signal', 'HOLD') or 'HOLD'),
+            _f(row, 'macd'),
+            _f(row, 'macd_signal'),
             _f(row, 'pe'),
             _f(row, 'pb'),
             _f(row, 'roe'),
             _f(row, 'opm'),
             _f(row, 'market_cap'),
             _i(row, 'volume'),
+            _i(row, 'volume_20d_avg'),
+            _f(row, 'volume_ratio'),
             _f(row, 'high_52w'),
             _f(row, 'low_52w'),
             _f(row, 'debt_to_equity'),
+            _f(row, 'beta'),
+            _f(row, 'current_ratio'),
+            _f(row, 'revenue_growth'),
+            _f(row, 'eps'),
+            _f(row, 'dividend_yield'),
         ))
 
     if not rows:
@@ -152,8 +166,10 @@ def get_market_quotes_df(market: str) -> pd.DataFrame:
     # Read all quotes for the market
     try:
         quote_rows = list(s.execute(
-            f"SELECT yf_ticker, cmp, rsi, ema_50, rsi_signal, pe, pb, roe, opm, "
-            f"market_cap, volume, high_52w, low_52w, debt_to_equity "
+            f"SELECT yf_ticker, cmp, rsi, ema_50, ema_200, rsi_signal, macd, macd_signal, "
+            f"pe, pb, roe, opm, market_cap, volume, volume_20d_avg, volume_ratio, "
+            f"high_52w, low_52w, debt_to_equity, beta, current_ratio, "
+            f"revenue_growth, eps, dividend_yield "
             f"FROM {cass.KEYSPACE}.stock_quotes WHERE market = %s",
             (market,),
         ))
@@ -184,22 +200,32 @@ def get_market_quotes_df(market: str) -> pd.DataFrame:
         if r.cmp is None:
             continue
         rec = {
-            'ticker':         r.yf_ticker,
-            'name':           name_map.get(r.yf_ticker, ''),
-            'cmp':            r.cmp,
-            'rsi':            r.rsi,
-            'ema_50':         r.ema_50,
-            'rsi_signal':     r.rsi_signal or 'HOLD',
-            'pe':             r.pe,
-            'pb':             r.pb,
-            'roe':            r.roe,
-            'opm':            r.opm,
-            'market_cap':     r.market_cap,
-            'volume':         r.volume,
-            'high_52w':       r.high_52w,
-            'low_52w':        r.low_52w,
-            'debt_to_equity': r.debt_to_equity,
-            '_exchange':      exch_map.get(r.yf_ticker, ''),
+            'ticker':          r.yf_ticker,
+            'name':            name_map.get(r.yf_ticker, ''),
+            'cmp':             r.cmp,
+            'rsi':             r.rsi,
+            'ema_50':          r.ema_50,
+            'ema_200':         getattr(r, 'ema_200', None),
+            'macd':            getattr(r, 'macd', None),
+            'macd_signal':     getattr(r, 'macd_signal', None),
+            'rsi_signal':      r.rsi_signal or 'HOLD',
+            'pe':              r.pe,
+            'pb':              r.pb,
+            'roe':             r.roe,
+            'opm':             r.opm,
+            'market_cap':      r.market_cap,
+            'volume':          r.volume,
+            'volume_20d_avg':  getattr(r, 'volume_20d_avg', None),
+            'volume_ratio':    getattr(r, 'volume_ratio', None),
+            'high_52w':        r.high_52w,
+            'low_52w':         r.low_52w,
+            'debt_to_equity':  r.debt_to_equity,
+            'beta':            getattr(r, 'beta', None),
+            'current_ratio':   getattr(r, 'current_ratio', None),
+            'revenue_growth':  getattr(r, 'revenue_growth', None),
+            'eps':             getattr(r, 'eps', None),
+            'dividend_yield':  getattr(r, 'dividend_yield', None),
+            '_exchange':       exch_map.get(r.yf_ticker, ''),
         }
         records.append(rec)
 
@@ -221,20 +247,30 @@ def get_quotes(market: str, yf_tickers: list[str]) -> dict[str, dict]:
         rows = s.execute(_stmts['select_in'], (market, yf_tickers))
         return {
             row.yf_ticker: {
-                'cmp':           row.cmp,
-                'rsi':           row.rsi,
-                'ema_50':        row.ema_50,
-                'rsi_signal':    row.rsi_signal,
-                'pe':            row.pe,
-                'pb':            row.pb,
-                'roe':           row.roe,
-                'opm':           row.opm,
-                'market_cap':    row.market_cap,
-                'volume':        row.volume,
-                'high_52w':      row.high_52w,
-                'low_52w':       row.low_52w,
+                'cmp':            row.cmp,
+                'rsi':            row.rsi,
+                'ema_50':         row.ema_50,
+                'ema_200':        getattr(row, 'ema_200', None),
+                'macd':           getattr(row, 'macd', None),
+                'macd_signal':    getattr(row, 'macd_signal', None),
+                'rsi_signal':     row.rsi_signal,
+                'pe':             row.pe,
+                'pb':             row.pb,
+                'roe':            row.roe,
+                'opm':            row.opm,
+                'market_cap':     row.market_cap,
+                'volume':         row.volume,
+                'volume_20d_avg': getattr(row, 'volume_20d_avg', None),
+                'volume_ratio':   getattr(row, 'volume_ratio', None),
+                'high_52w':       row.high_52w,
+                'low_52w':        row.low_52w,
                 'debt_to_equity': row.debt_to_equity,
-                'fetched_at':    row.fetched_at.isoformat() if row.fetched_at else None,
+                'beta':           getattr(row, 'beta', None),
+                'current_ratio':  getattr(row, 'current_ratio', None),
+                'revenue_growth': getattr(row, 'revenue_growth', None),
+                'eps':            getattr(row, 'eps', None),
+                'dividend_yield': getattr(row, 'dividend_yield', None),
+                'fetched_at':     row.fetched_at.isoformat() if row.fetched_at else None,
             }
             for row in rows
         }

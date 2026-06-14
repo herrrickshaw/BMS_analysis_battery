@@ -244,8 +244,8 @@ def _search(market: str, q: str, limit: int) -> list[dict]:
     q_upper_sym = q.upper()
 
     # Compute prefix-range upper bounds
-    def _next(s: str) -> str:
-        return s[:-1] + chr(ord(s[-1]) + 1) if s else '￿'
+    def _next(t: str) -> str:
+        return t[:-1] + chr(ord(t[-1]) + 1) if t else '￿'
 
     name_upper = _next(q_lower)
     sym_upper  = _next(q_upper_sym)
@@ -259,7 +259,7 @@ def _search(market: str, q: str, limit: int) -> list[dict]:
             (market, q_lower, name_upper, limit),
         ):
             results[row.yf_ticker] = {'yf_ticker': row.yf_ticker, 'name': row.name}
-    except Exception as exc:
+    except Exception:
         pass
 
     try:

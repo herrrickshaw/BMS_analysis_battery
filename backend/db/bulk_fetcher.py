@@ -1,16 +1,18 @@
 """
 Bulk live-quote fetcher for all instruments in Cassandra.
 
-Two-phase approach to stay within Yahoo Finance rate limits:
-  Phase 1 — yf.download(batch_of_50, period='1y')
-             One API call per 50 tickers: price, volume, 52W hi/lo, RSI, EMA
-             Handles ~16K tickers with minimal requests.
-  Phase 2 — individual yf.Ticker().info (throttled to 30/min)
-             Fundamentals: PE, PB, ROE, OPM, market cap, D/E.
-             Optional; can run after Phase 1.
+Uses the multi-source provider system (fetchers/multi_source.py) which
+routes requests to the best available provider per market with fallback:
+  US:     Polygon → IEX → Tradier → TradingView → Alpha Vantage → Yahoo
+  India:  IB → Yahoo → TradingView → Alpha Vantage
+  Europe: IB → Yahoo → TradingView → Alpha Vantage
+  Others: Yahoo → TradingView
 
-Suffix strategy (per Cassandra instruments inspection):
-  india  — bare NSE symbols (20MICRONS) → appends .NS
+Phase 1 — bulk OHLCV via get_quotes_bulk() (provider-specific batch endpoints)
+Phase 2 — per-ticker fundamentals via get_fundamentals() (merged across providers)
+
+Suffix strategy (per Cassandra instruments):
+  india  — bare NSE symbols (20MICRONS) → appends .NS for yfinance
   us     — bare symbols (AAPL)          → no suffix
   europe — pre-suffixed (1COV.DE …)     → no suffix
   japan  — pre-suffixed (1301.T …)      → no suffix
@@ -19,7 +21,6 @@ Suffix strategy (per Cassandra instruments inspection):
 from __future__ import annotations
 
 import logging
-import math
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -85,226 +86,47 @@ def _yf_sym(ticker: str, suffix: str) -> str:
     return ticker if ticker.upper().endswith(suffix.upper()) else f'{ticker}{suffix}'
 
 
-# ── Phase 1: bulk OHLCV via yf.download ──────────────────────────────────────
-
-def _compute_rsi(closes: pd.Series, period: int = 14) -> Optional[float]:
-    if len(closes) < period + 1:
-        return None
-    delta  = closes.diff().dropna()
-    gains  = delta.clip(lower=0)
-    losses = (-delta).clip(lower=0)
-    ag = gains.ewm(alpha=1 / period, adjust=False).mean().iloc[-1]
-    al = losses.ewm(alpha=1 / period, adjust=False).mean().iloc[-1]
-    if al == 0:
-        return 100.0
-    return round(100 - 100 / (1 + ag / al), 2)
-
-
-_RATE_LIMIT_BACKOFF = [90, 180, 300]   # seconds to wait on successive rate-limit hits
-
+# ── Phase 1: bulk OHLCV via multi-source provider ────────────────────────────
 
 def _fetch_ohlcv_batch(
     tickers: list[str],
     suffix: str,
     is_inr: bool,
+    market: str = 'us',
 ) -> list[dict]:
     """
-    Download 1-year OHLCV for up to ~100 tickers in one yf.download() call,
-    compute RSI-14, EMA-50, CMP, volume, 52W hi/lo per ticker.
-    Retries with exponential backoff on YFRateLimitError.
+    Fetch 1-year OHLCV for a batch of tickers via the best available provider.
     Returns a list of row dicts (without fundamentals).
     """
-    try:
-        import yfinance as yf
-    except ImportError:
-        return []
+    from fetchers.multi_source import get_quotes_bulk
 
-    yf_syms  = [_yf_sym(t, suffix) for t in tickers]
-    sym_back = dict(zip(yf_syms, tickers))   # yf_sym → original DB ticker
+    # Build yf-style ticker symbols (India needs .NS suffix added)
+    yf_tickers = [_yf_sym(t, suffix) for t in tickers]
+    sym_back   = dict(zip(yf_tickers, tickers))   # yf_ticker → original DB key
 
-    raw = None
-    for attempt, backoff in enumerate([0] + _RATE_LIMIT_BACKOFF):
-        if backoff:
-            log.warning('_fetch_ohlcv_batch: rate-limited, sleeping %ds (attempt %d)', backoff, attempt)
-            time.sleep(backoff)
-        try:
-            raw = yf.download(
-                yf_syms,
-                period='1y',
-                auto_adjust=True,
-                progress=False,
-                threads=False,   # avoid nested thread issues
-            )
-            break
-        except Exception as exc:
-            if 'rate' in str(exc).lower() or '429' in str(exc):
-                continue
-            log.warning('_fetch_ohlcv_batch: download error: %s', exc)
-            return []
-
-    if raw is None or raw.empty:
-        return []
-
-    # yf.download with >1 ticker returns MultiIndex columns (field, yf_sym)
-    # With 1 ticker it returns flat (field) columns.
-    multi = isinstance(raw.columns, pd.MultiIndex)
+    batch_results = get_quotes_bulk(yf_tickers, market)
 
     rows: list[dict] = []
-    for yf_sym, orig in sym_back.items():
-        try:
-            if multi:
-                close_col = ('Close', yf_sym)
-                vol_col   = ('Volume', yf_sym)
-                if close_col not in raw.columns:
-                    continue
-                closes  = raw[close_col].dropna()
-                volumes = raw[vol_col].dropna() if vol_col in raw.columns else pd.Series(dtype=float)
-            else:
-                closes  = raw['Close'].dropna()
-                volumes = raw['Volume'].dropna() if 'Volume' in raw.columns else pd.Series(dtype=float)
-
-            if len(closes) < 15:
-                continue
-
-            cmp   = float(closes.iloc[-1])
-            rsi   = _compute_rsi(closes)
-            ema50 = float(closes.ewm(span=50, adjust=False).mean().iloc[-1])
-            h52   = float(closes.rolling(window=min(252, len(closes))).max().iloc[-1])
-            l52   = float(closes.rolling(window=min(252, len(closes))).min().iloc[-1])
-            vol   = int(volumes.iloc[-1]) if not volumes.empty else None
-
-            if math.isnan(cmp):
-                continue
-
-            # EMA-200 (long-term trend)
-            ema200 = round(float(closes.ewm(span=200, adjust=False).mean().iloc[-1]), 2) \
-                     if len(closes) >= 50 else None
-
-            # MACD = EMA-12 minus EMA-26; signal = EMA-9 of MACD
-            macd_val = macd_sig = None
-            if len(closes) >= 26:
-                ema12     = closes.ewm(span=12, adjust=False).mean()
-                ema26     = closes.ewm(span=26, adjust=False).mean()
-                macd_line = ema12 - ema26
-                macd_val  = round(float(macd_line.iloc[-1]), 4)
-                if len(macd_line) >= 9:
-                    macd_sig = round(float(macd_line.ewm(span=9, adjust=False).mean().iloc[-1]), 4)
-
-            # 20-day average volume and today's volume ratio
-            vol_avg = vol_ratio = None
-            if not volumes.empty and len(volumes) >= 5:
-                window      = min(20, len(volumes))
-                vol_avg     = int(volumes.iloc[-window:].mean())
-                vol_ratio   = round(float(volumes.iloc[-1]) / vol_avg, 2) if vol_avg > 0 else None
-
-            # Period returns — all derived from existing close series, no extra calls
-            def _ret(n_back: int):
-                if len(closes) <= n_back:
-                    return None
-                prev = float(closes.iloc[-(n_back + 1)])
-                if math.isnan(prev) or prev <= 0:
-                    return None
-                return round((cmp - prev) / prev * 100, 2)
-
-            ret_1d = _ret(1)
-            ret_1w = _ret(5)
-            ret_1m = _ret(21)
-            ret_3m = _ret(63)
-            ret_6m = _ret(126)
-            # 1y: first available close in the downloaded window vs today
-            first = float(closes.iloc[0])
-            ret_1y = round((cmp - first) / first * 100, 2) \
-                     if not math.isnan(first) and first > 0 else None
-
-            if rsi is None:
-                signal = 'HOLD'
-            elif rsi < 30 and cmp > ema50:
-                signal = 'BUY'
-            elif rsi > 70 and cmp < ema50:
-                signal = 'SELL'
-            else:
-                signal = 'HOLD'
-
-            rows.append({
-                'ticker':         orig,
-                'cmp':            round(cmp,   2),
-                'rsi':            rsi,
-                'ema_50':         round(ema50, 2),
-                'ema_200':        ema200,
-                'macd':           macd_val,
-                'macd_signal':    macd_sig,
-                'rsi_signal':     signal,
-                'high_52w':       round(h52, 2),
-                'low_52w':        round(l52, 2),
-                'volume':         vol,
-                'volume_20d_avg': vol_avg,
-                'volume_ratio':   vol_ratio,
-                'ret_1d':         ret_1d,
-                'ret_1w':         ret_1w,
-                'ret_1m':         ret_1m,
-                'ret_3m':         ret_3m,
-                'ret_6m':         ret_6m,
-                'ret_1y':         ret_1y,
-                '_source':        'yfinance_bulk',
-            })
-        except Exception as exc:
-            log.debug('_fetch_ohlcv_batch[%s]: %s', yf_sym, exc)
+    for yf_sym, quote in batch_results.items():
+        orig = sym_back.get(yf_sym, yf_sym)
+        d    = quote.to_dict()
+        d['ticker']  = orig
+        d['_source'] = quote.source
+        rows.append(d)
 
     return rows
 
 
-# ── Phase 2: individual .info for fundamentals (throttled) ───────────────────
+# ── Phase 2: per-ticker fundamentals via multi-source ────────────────────────
 
-def _fetch_info_one(ticker: str, suffix: str, is_inr: bool) -> dict:
-    """Fetch fundamentals for one ticker with rate-limit retry."""
+def _fetch_info_one(ticker: str, suffix: str, is_inr: bool, market: str = 'us') -> dict:
+    """Fetch and merge fundamentals for one ticker from the best available providers."""
+    from fetchers.multi_source import get_fundamentals
+    yf_sym = _yf_sym(ticker, suffix)
     try:
-        import yfinance as yf
-        yf_sym = _yf_sym(ticker, suffix)
-        for attempt in range(3):
-            try:
-                info = yf.Ticker(yf_sym).info
-                if not info:
-                    return {}
-                mc = info.get('marketCap')
-
-                def pct(k):
-                    v = info.get(k)
-                    return round(float(v) * 100, 2) if v and not math.isnan(float(v)) else None
-
-                def rat(k):
-                    v = info.get(k)
-                    try:
-                        f = float(v)
-                        return None if math.isnan(f) else f
-                    except (TypeError, ValueError):
-                        return None
-
-                def _txt(k):
-                    v = info.get(k)
-                    return str(v).strip() if v and str(v).strip() else None
-
-                return {
-                    'pe':             rat('trailingPE'),
-                    'pb':             rat('priceToBook'),
-                    'roe':            pct('returnOnEquity'),
-                    'opm':            pct('operatingMargins'),
-                    'market_cap':     round(mc / (1e7 if is_inr else 1e6), 2) if mc else None,
-                    'debt_to_equity': rat('debtToEquity'),
-                    'beta':           rat('beta'),
-                    'current_ratio':  rat('currentRatio'),
-                    'revenue_growth': pct('revenueGrowth'),
-                    'eps':            rat('trailingEps'),
-                    'dividend_yield': pct('dividendYield'),
-                    'sector':         _txt('sector'),
-                    'industry':       _txt('industry'),
-                }
-            except Exception as exc:
-                if 'rate' in str(exc).lower() or '429' in str(exc):
-                    time.sleep(60 * (attempt + 1))
-                else:
-                    return {}
-        return {}
-    except Exception:
+        return get_fundamentals(yf_sym, market)
+    except Exception as exc:
+        log.debug('_fetch_info_one(%s): %s', ticker, exc)
         return {}
 
 
@@ -353,7 +175,7 @@ def fetch_market_quotes(
         if _cancel.is_set():
             break
         batch = tickers[i:i + batch_size]
-        batch_rows = _fetch_ohlcv_batch(batch, suffix, is_inr)
+        batch_rows = _fetch_ohlcv_batch(batch, suffix, is_inr, market)
 
         for row in batch_rows:
             phase1_rows[row['ticker']] = row
@@ -384,7 +206,7 @@ def fetch_market_quotes(
         fund_tickers = list(phase1_rows.keys())
         with ThreadPoolExecutor(max_workers=max_workers) as pool:
             futs = {
-                pool.submit(_fetch_info_one, t, suffix, is_inr): t
+                pool.submit(_fetch_info_one, t, suffix, is_inr, market): t
                 for t in fund_tickers
             }
             for fut in as_completed(futs, timeout=600):

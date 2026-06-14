@@ -3,12 +3,14 @@ import { fetchDailyScan, fetchStockNews, fetchSectorNews } from '../api'
 import ScoreBadge from './ScoreBadge'
 
 const MARKET_META = {
-  india:  { label: 'India',  flag: '🇮🇳', color: 'bg-orange-900/50 text-orange-300 border-orange-800' },
-  us:     { label: 'US',     flag: '🇺🇸', color: 'bg-blue-900/50 text-blue-300 border-blue-800' },
-  europe: { label: 'Europe', flag: '🇪🇺', color: 'bg-indigo-900/50 text-indigo-300 border-indigo-800' },
-  japan:  { label: 'Japan',  flag: '🇯🇵', color: 'bg-red-900/50 text-red-300 border-red-800' },
-  korea:  { label: 'Korea',  flag: '🇰🇷', color: 'bg-cyan-900/50 text-cyan-300 border-cyan-800' },
-  china:  { label: 'China',  flag: '🇨🇳', color: 'bg-yellow-900/50 text-yellow-300 border-yellow-800' },
+  india:     { label: 'India',     flag: '🇮🇳', color: 'bg-orange-900/50 text-orange-300 border-orange-800' },
+  us:        { label: 'US',        flag: '🇺🇸', color: 'bg-blue-900/50 text-blue-300 border-blue-800' },
+  europe:    { label: 'Europe',    flag: '🇪🇺', color: 'bg-indigo-900/50 text-indigo-300 border-indigo-800' },
+  japan:     { label: 'Japan',     flag: '🇯🇵', color: 'bg-red-900/50 text-red-300 border-red-800' },
+  korea:     { label: 'Korea',     flag: '🇰🇷', color: 'bg-cyan-900/50 text-cyan-300 border-cyan-800' },
+  china:     { label: 'China',     flag: '🇨🇳', color: 'bg-yellow-900/50 text-yellow-300 border-yellow-800' },
+  hong_kong: { label: 'Hong Kong', flag: '🇭🇰', color: 'bg-rose-900/50 text-rose-300 border-rose-800' },
+  canada:    { label: 'Canada',    flag: '🇨🇦', color: 'bg-red-900/50 text-red-200 border-red-700' },
 }
 
 const SCAN_META = {
@@ -27,7 +29,7 @@ const SIGNAL_BG = {
   WATCH: 'hover:bg-amber-950/20',
 }
 
-const ALL_MARKETS = ['india', 'us', 'europe', 'japan', 'korea']
+const ALL_MARKETS = ['india', 'us', 'europe', 'japan', 'korea', 'china', 'hong_kong', 'canada']
 
 const SECTOR_COLOR = {
   'Technology':              'bg-blue-900/60 text-blue-300 border-blue-700',

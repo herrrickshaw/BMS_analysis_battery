@@ -58,7 +58,7 @@ async def db_status():
 
 @router.post('/seed')
 async def seed_one(
-    market: str = Query(..., description='Market: india | us | europe | japan | korea | china'),
+    market: str = Query(..., description='Market: india | us | europe | japan | korea | china | hong_kong | canada'),
     force: bool = Query(False, description='Re-seed even if already loaded'),
 ):
     """Seed (or re-seed) one market's instrument list into Cassandra."""
@@ -100,7 +100,7 @@ async def search_instruments(
 
 @router.post('/fetch_quotes')
 async def fetch_quotes_one(
-    market: str = Query(..., description='Market: india | us | europe | japan | korea | china'),
+    market: str = Query(..., description='Market: india | us | europe | japan | korea | china | hong_kong | canada'),
     batch_size: int = Query(50, ge=5, le=200,
         description='Tickers per yf.download() call (default 50)'),
     max_workers: int = Query(4, ge=1, le=12,
@@ -278,21 +278,25 @@ def _search(market: str, q: str, limit: int) -> list[dict]:
 # ── Daily scan report ─────────────────────────────────────────────────────────
 
 _MARKET_CURRENCY = {
-    'india':  '₹',
-    'us':     '$',
-    'europe': '€',
-    'japan':  '¥',
-    'korea':  '₩',
-    'china':  '¥',
+    'india':     '₹',
+    'us':        '$',
+    'europe':    '€',
+    'japan':     '¥',
+    'korea':     '₩',
+    'china':     '¥',
+    'hong_kong': 'HK$',
+    'canada':    'C$',
 }
 
 _MARKET_LABEL = {
-    'india':  'India',
-    'us':     'US',
-    'europe': 'Europe',
-    'japan':  'Japan',
-    'korea':  'Korea',
-    'china':  'China',
+    'india':     'India',
+    'us':        'US',
+    'europe':    'Europe',
+    'japan':     'Japan',
+    'korea':     'Korea',
+    'china':     'China',
+    'hong_kong': 'Hong Kong',
+    'canada':    'Canada',
 }
 
 
@@ -339,7 +343,7 @@ def _run_daily_scan(markets: list[str], scan_types: list[str]) -> dict:
 
 @router.post('/daily/scan')
 async def daily_scan(
-    markets: str = Query(default='india,us,europe,japan,korea'),
+    markets: str = Query(default='india,us,europe,japan,korea,china,hong_kong,canada'),
     scans:   str = Query(default='darvas,piotroski'),
 ):
     """

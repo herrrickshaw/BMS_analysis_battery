@@ -16,7 +16,7 @@ from db import cassandra_client as cass
 
 log = logging.getLogger(__name__)
 
-MARKETS = ['india', 'us', 'europe', 'japan', 'korea', 'china']
+MARKETS = ['india', 'us', 'europe', 'japan', 'korea', 'china', 'hong_kong', 'canada']
 
 _stmts: dict[str, Any] = {}
 

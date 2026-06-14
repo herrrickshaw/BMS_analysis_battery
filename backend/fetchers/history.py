@@ -176,8 +176,8 @@ def fetch_current_price(yf_ticker: str) -> dict:
 
 
 def _bare_ticker(yf_ticker: str) -> str:
-    """Strip known market suffixes (.NS, .BO, .T, .KS, .KQ, .SS, .SZ) for Cassandra lookup."""
-    SUFFIXES = {'.NS', '.BO', '.T', '.KS', '.KQ', '.SS', '.SZ'}
+    """Strip known market suffixes for Cassandra lookup."""
+    SUFFIXES = {'.NS', '.BO', '.T', '.KS', '.KQ', '.SS', '.SZ', '.HK', '.TO', '.V'}
     upper = yf_ticker.upper()
     for sfx in SUFFIXES:
         if upper.endswith(sfx):
@@ -204,6 +204,8 @@ def _market_from_ticker(yf_ticker: str) -> str:
         'T':  'japan',
         'KS': 'korea', 'KQ': 'korea',
         'SS': 'china', 'SZ': 'china',
+        'HK': 'hong_kong',
+        'TO': 'canada', 'V': 'canada',
     }
     if sfx in _MAP:
         return _MAP[sfx]

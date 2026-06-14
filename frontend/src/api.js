@@ -80,6 +80,13 @@ export async function seedMarket(market, force = false) {
   })
 }
 
+export async function fetchDailyScan(markets = 'india,us,europe,japan,korea', scans = 'darvas,piotroski') {
+  return apiFetch(
+    `/api/db/daily/scan?markets=${encodeURIComponent(markets)}&scans=${encodeURIComponent(scans)}`,
+    { method: 'POST' },
+  )
+}
+
 export async function fetchPortfolioHistory(market, holdings) {
   return apiFetch('/api/portfolio/history', {
     method: 'POST',

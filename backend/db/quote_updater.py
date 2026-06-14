@@ -138,6 +138,74 @@ def upsert_quotes(market: str, live_df: pd.DataFrame) -> int:
         return 0
 
 
+def get_market_quotes_df(market: str) -> pd.DataFrame:
+    """
+    Read ALL cached quotes for a market into a DataFrame ready for scanner input.
+    Joins with instruments table for name/exchange. Returns empty DataFrame on failure.
+    """
+    s = cass.session()
+    if s is None:
+        return pd.DataFrame()
+
+    _prepare(s)
+
+    # Read all quotes for the market
+    try:
+        quote_rows = list(s.execute(
+            f"SELECT yf_ticker, cmp, rsi, ema_50, rsi_signal, pe, pb, roe, opm, "
+            f"market_cap, volume, high_52w, low_52w, debt_to_equity "
+            f"FROM {cass.KEYSPACE}.stock_quotes WHERE market = %s",
+            (market,),
+        ))
+    except Exception as exc:
+        log.warning('get_market_quotes_df: read error for %s: %s', market, exc)
+        return pd.DataFrame()
+
+    if not quote_rows:
+        return pd.DataFrame()
+
+    # Build name + exchange lookup from instruments table
+    name_map: dict[str, str] = {}
+    exch_map: dict[str, str] = {}
+    try:
+        inst_rows = s.execute(
+            f"SELECT yf_ticker, name, exchange FROM {cass.KEYSPACE}.instruments WHERE market = %s",
+            (market,),
+        )
+        for r in inst_rows:
+            if r.yf_ticker:
+                name_map[r.yf_ticker] = r.name or ''
+                exch_map[r.yf_ticker] = r.exchange or ''
+    except Exception as exc:
+        log.debug('get_market_quotes_df: instrument lookup failed for %s: %s', market, exc)
+
+    records = []
+    for r in quote_rows:
+        if r.cmp is None:
+            continue
+        rec = {
+            'ticker':         r.yf_ticker,
+            'name':           name_map.get(r.yf_ticker, ''),
+            'cmp':            r.cmp,
+            'rsi':            r.rsi,
+            'ema_50':         r.ema_50,
+            'rsi_signal':     r.rsi_signal or 'HOLD',
+            'pe':             r.pe,
+            'pb':             r.pb,
+            'roe':            r.roe,
+            'opm':            r.opm,
+            'market_cap':     r.market_cap,
+            'volume':         r.volume,
+            'high_52w':       r.high_52w,
+            'low_52w':        r.low_52w,
+            'debt_to_equity': r.debt_to_equity,
+            '_exchange':      exch_map.get(r.yf_ticker, ''),
+        }
+        records.append(rec)
+
+    return pd.DataFrame(records) if records else pd.DataFrame()
+
+
 def get_quotes(market: str, yf_tickers: list[str]) -> dict[str, dict]:
     """
     Fetch cached quote data for a list of yfinance tickers.

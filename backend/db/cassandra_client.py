@@ -112,6 +112,14 @@ _MIGRATIONS: list[str] = [
     f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ret_1y         double",
     f"ALTER TABLE {KEYSPACE}.stock_quotes ADD sector         text",
     f"ALTER TABLE {KEYSPACE}.stock_quotes ADD industry       text",
+    # Phase-1 extended technical indicators
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD ema_20         double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD bb_upper       double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD bb_lower       double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD bb_pct         double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD atr_14         double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD stoch_k        double",
+    f"ALTER TABLE {KEYSPACE}.stock_quotes ADD stoch_d        double",
 ]
 
 

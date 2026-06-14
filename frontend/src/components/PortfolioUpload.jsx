@@ -4,12 +4,12 @@ import { parsePortfolio, fetchPortfolioHistory } from '../api'
 const ACCEPT = '.xlsx,.xls,.pdf'
 
 const MARKETS = [
-  { id: 'india',  label: '🇮🇳 India',  sub: 'NSE / BSE',        suffix: '.NS' },
-  { id: 'us',     label: '🇺🇸 USA',     sub: 'NYSE / NASDAQ',    suffix: '' },
-  { id: 'europe', label: '🇪🇺 Europe',  sub: 'STOXX 600',        suffix: '.PA / .DE …' },
-  { id: 'japan',  label: '🇯🇵 Japan',   sub: 'TSE',              suffix: '.T' },
-  { id: 'korea',  label: '🇰🇷 Korea',   sub: 'KRX',              suffix: '.KS' },
-  { id: 'china',  label: '🇨🇳 China',   sub: 'SSE / SZSE',       suffix: '.SS / .SZ' },
+  { id: 'india',  label: '🇮🇳 India',  sub: 'NSE / BSE',        suffix: '.NS',      currency: '₹' },
+  { id: 'us',     label: '🇺🇸 USA',     sub: 'NYSE / NASDAQ',    suffix: '',         currency: '$' },
+  { id: 'europe', label: '🇪🇺 Europe',  sub: 'STOXX 600',        suffix: '.PA / .DE …', currency: '€' },
+  { id: 'japan',  label: '🇯🇵 Japan',   sub: 'TSE',              suffix: '.T',       currency: '¥' },
+  { id: 'korea',  label: '🇰🇷 Korea',   sub: 'KRX',              suffix: '.KS',      currency: '₩' },
+  { id: 'china',  label: '🇨🇳 China',   sub: 'SSE / SZSE',       suffix: '.SS / .SZ', currency: '¥' },
 ]
 
 const MATCH_COLOR = {
@@ -118,27 +118,24 @@ export default function PortfolioUpload({ onFetchSymbols, loading }) {
       <div className="p-3 space-y-3">
         {/* Market selector */}
         <div>
-          <label className="text-xs text-gray-500 mb-1.5 block">Select market</label>
-          <div className="grid grid-cols-3 gap-1">
+          <label className="text-xs text-gray-500 mb-1.5 block" htmlFor="mkt-select">
+            Market
+          </label>
+          <select
+            id="mkt-select"
+            value={market}
+            onChange={e => { setMarket(e.target.value); reset() }}
+            className="w-full bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 cursor-pointer"
+          >
             {MARKETS.map(m => (
-              <button
-                key={m.id}
-                onClick={() => { setMarket(m.id); reset() }}
-                title={`${m.label} — ${m.sub}`}
-                className={`flex flex-col items-center py-2 px-1 rounded-lg text-xs transition-colors border ${
-                  market === m.id
-                    ? 'bg-indigo-700/40 border-indigo-600 text-indigo-200'
-                    : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-gray-200 hover:border-gray-600'
-                }`}
-              >
-                <span className="text-base leading-tight">{m.label.split(' ')[0]}</span>
-                <span className="text-gray-500 mt-0.5 font-mono" style={{fontSize:'9px'}}>{m.sub}</span>
-              </button>
+              <option key={m.id} value={m.id}>
+                {m.label} — {m.sub}
+              </option>
             ))}
-          </div>
+          </select>
           {activeMkt && (
             <p className="text-xs text-gray-700 mt-1">
-              yfinance symbols: <span className="font-mono text-gray-600">{activeMkt.suffix || 'no suffix (e.g. AAPL)'}</span>
+              Ticker suffix: <span className="font-mono text-gray-600">{activeMkt.suffix || 'none (e.g. AAPL)'}</span>
             </p>
           )}
         </div>
@@ -321,7 +318,7 @@ export default function PortfolioUpload({ onFetchSymbols, loading }) {
             )}
 
             {/* P&L results panel */}
-            {pnlData && <PnlPanel data={pnlData} />}
+            {pnlData && <PnlPanel data={pnlData} market={market} />}
           </>
         )}
       </div>
@@ -353,8 +350,9 @@ function SummaryCard({ label, value, positive, sub }) {
   )
 }
 
-function PnlPanel({ data }) {
+function PnlPanel({ data, market }) {
   const { holdings, summary } = data
+  const cur = MARKETS.find(m => m.id === market)?.currency ?? ''
   const totalPnl    = summary?.total_unrealised_pnl
   const totalReturn = summary?.total_return_pnl
   const pnlPos      = totalPnl    != null && totalPnl    >= 0
@@ -497,7 +495,7 @@ function PnlPanel({ data }) {
               <div key={h.yf_ticker} className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2">
                 <p className="font-mono font-bold text-gray-300 mb-1">{h.yf_ticker}
                   <span className="font-normal text-gray-600 ml-2">
-                    {h.dividend_count} payment{h.dividend_count !== 1 ? 's' : ''} · ₹{h.dividends_per_share?.toFixed(2)}/share · ₹{fmt(h.dividends_received)} total
+                    {h.dividend_count} payment{h.dividend_count !== 1 ? 's' : ''} · {cur}{h.dividends_per_share?.toFixed(2)}/share · {cur}{fmt(h.dividends_received)} total
                   </span>
                 </p>
                 <div className="flex flex-wrap gap-1">

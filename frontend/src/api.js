@@ -113,6 +113,14 @@ export async function fetchDailyScan(markets = 'india,us,europe,japan,korea', sc
   )
 }
 
+export async function fetchStockNews(ticker, market = 'india', limit = 8) {
+  return apiFetch(`/api/news/stock/${encodeURIComponent(ticker)}?market=${encodeURIComponent(market)}&limit=${limit}`)
+}
+
+export async function fetchSectorNews(sector, market = 'all', limit = 10) {
+  return apiFetch(`/api/news/sector?name=${encodeURIComponent(sector)}&market=${encodeURIComponent(market)}&limit=${limit}`)
+}
+
 export async function fetchPortfolioHistory(market, holdings) {
   return apiFetch('/api/portfolio/history', {
     method: 'POST',

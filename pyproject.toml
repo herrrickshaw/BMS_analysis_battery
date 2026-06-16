@@ -1,36 +1,75 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# pyproject.toml — the modern Python project configuration file (PEP 517/518).
+#
+# Before this file existed, each tool (pytest, mypy, ruff, black) needed its
+# own config file (.pytest.ini, .mypy.ini, setup.cfg, etc.).  pyproject.toml
+# puts all tool configuration in one place.
+#
+# Python dependencies are still listed in backend/requirements.txt because we
+# use pip directly (simpler for Docker).  If you ever switch to Poetry or PDM,
+# you'd move dependencies here into [project.dependencies].
+# ─────────────────────────────────────────────────────────────────────────────
+
 [project]
 name = "herrrickshaw"
 version = "0.1.0"
 description = "Multi-market investment research and trading analytics platform"
 requires-python = ">=3.11"
-dependencies = []   # declared in backend/requirements.txt
+# Runtime dependencies live in backend/requirements.txt, not here.
+# This list stays empty so pip/Docker pick up requirements.txt directly.
+dependencies = []
 
+# ── ruff — linter and import sorter ──────────────────────────────────────────
+# ruff replaces flake8 + isort in one very fast tool.
+# Run manually: ruff check backend/
+# Run with auto-fix: ruff check --fix backend/
 [tool.ruff]
-line-length = 100
-target-version = "py311"
-src = ["backend"]
+line-length = 100          # warn when lines exceed 100 characters
+target-version = "py311"   # ruff applies rules appropriate for Python 3.11+
+src = ["backend"]          # treat backend/ as the root for import resolution
 
 [tool.ruff.lint]
+# Which rule sets to enable:
+#   E/W = pycodestyle (PEP 8 style)
+#   F   = pyflakes (undefined names, unused imports)
+#   I   = isort (import ordering)
 select = ["E", "F", "W", "I"]
 ignore = [
-    "E501",   # line too long — handled by formatter
-    "F401",   # imported but unused — some intentional re-exports
+    "E501",   # line-too-long — we allow up to 100 chars (set above); formatter handles the rest
+    "F401",   # imported-but-unused — some modules are intentionally re-exported
 ]
 
 [tool.ruff.lint.isort]
+# These are our own packages (not third-party).
+# ruff/isort will put them in their own import group, separated from libraries.
 known-first-party = ["config", "db", "routers", "scanners", "fetchers", "events"]
 
+# ── mypy — static type checker ────────────────────────────────────────────────
+# mypy reads the type hints in the code and catches type errors before runtime.
+# Run manually: mypy backend/
 [tool.mypy]
 python_version = "3.11"
+# Don't error on third-party libraries that don't ship type stubs (e.g. yfinance).
 ignore_missing_imports = true
+# Warn if you write "# type: ignore" on a line that doesn't actually need it.
 warn_unused_ignores = true
 warn_return_any = false
+# Enable pydantic-aware type inference (understands BaseModel field types).
 plugins = ["pydantic.mypy"]
 
+# ── pytest — test runner ──────────────────────────────────────────────────────
+# Run tests with: pytest
+# pytest auto-discovers files matching python_files, classes matching
+# python_classes, and functions matching python_functions below.
 [tool.pytest.ini_options]
+# Look for tests only in the tests/ directory.
 testpaths = ["tests"]
+# Add backend/ to the Python path so test files can do `from routers import ...`
+# without needing to install the package or add sys.path hacks.
 pythonpath = ["backend"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+# -v: verbose (show each test name)
+# --tb=short: print short tracebacks on failure (not the full wall of text)
 addopts = "-v --tb=short"

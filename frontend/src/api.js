@@ -132,3 +132,31 @@ export async function fetchPortfolioHistory(market, holdings) {
     body: JSON.stringify({ market, holdings }),
   })
 }
+
+// ── Event-driven news alerts ──────────────────────────────────────────────────
+
+export async function addToAlertWatchlist(tickers, market = 'india') {
+  return apiFetch('/api/alerts/portfolio', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tickers, market }),
+  })
+}
+
+export async function getAlertWatchlist() {
+  return apiFetch('/api/alerts/portfolio')
+}
+
+export async function removeFromAlertWatchlist(ticker) {
+  return apiFetch(`/api/alerts/portfolio/${encodeURIComponent(ticker)}`, { method: 'DELETE' })
+}
+
+export async function getLatestAlerts(limit = 20) {
+  return apiFetch(`/api/alerts/latest?limit=${limit}`)
+}
+
+export async function triggerAlertFetch(ticker, market = 'india') {
+  return apiFetch(`/api/alerts/trigger/${encodeURIComponent(ticker)}?market=${encodeURIComponent(market)}`, {
+    method: 'POST',
+  })
+}

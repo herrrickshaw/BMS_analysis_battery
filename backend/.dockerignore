@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.log
+.env
+.env.providers
+uploads/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/

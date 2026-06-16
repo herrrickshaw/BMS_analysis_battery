@@ -32,6 +32,20 @@ def _parse_args():
                    help="Restrict to specific instruments (default: all)")
     p.add_argument("--log-level", default="INFO",
                    choices=["DEBUG", "INFO", "WARNING", "ERROR"])
+    # ── Strategy mode (Sensibull-style) ────────────────────────────────────
+    p.add_argument("--strategy", action="store_true",
+                   help="Run strategy builder / analyser (no broker required)")
+    p.add_argument("--symbol", default="BANKNIFTY",
+                   help="Symbol to analyse in strategy mode (default: BANKNIFTY)")
+    p.add_argument("--outlook", default="neutral",
+                   choices=["bullish", "bearish", "neutral", "volatile"],
+                   help="Market outlook for strategy recommendations")
+    p.add_argument("--lots", type=int, default=1,
+                   help="Contracts per leg (default: 1)")
+    p.add_argument("--expiry", default=None,
+                   help="Expiry date YYYY-MM-DD (default: nearest available)")
+    p.add_argument("--otm-pct", type=float, default=0.02,
+                   help="OTM %% for spread/strangle wings, e.g. 0.02 = 2%% (default: 0.02)")
     return p.parse_args()
 
 
@@ -43,10 +57,15 @@ def main():
         _run_backtest(args)
         return
 
+    if args.strategy:
+        _run_strategy(args)
+        return
+
     # Live trading
+    import put_call_parity.config as cfg_module
+
     from .broker import get_broker
     from .strategy import Strategy
-    import put_call_parity.config as cfg_module
 
     if args.instrument:
         # Restrict the INSTRUMENTS dict in place
@@ -57,6 +76,89 @@ def main():
     broker = get_broker(args.broker)
     strategy = Strategy(broker=broker)
     strategy.run()
+
+
+# ---------------------------------------------------------------------------
+# Strategy builder mode (Sensibull-style)
+# ---------------------------------------------------------------------------
+def _run_strategy(args):
+    """
+    Interactive options strategy analysis — no broker or API key required.
+
+    Fetches the option chain via yfinance (or uses a synthetic Black-Scholes
+    chain for Indian instruments that yfinance doesn't cover), then prints
+    recommended strategies plus full payoff metrics for every strategy.
+
+    Examples:
+        python -m put_call_parity.main --strategy --symbol BANKNIFTY --outlook neutral
+        python -m put_call_parity.main --strategy --symbol AAPL --outlook bullish --lots 2
+        python -m put_call_parity.main --strategy --symbol NIFTY --outlook volatile --otm-pct 0.025
+    """
+    from .strategy_scanner import run_strategy_scan
+
+    symbol  = args.symbol.upper()
+    outlook = args.outlook
+    lots    = args.lots
+    otm_pct = args.otm_pct
+
+    print(f"\n{'='*72}")
+    print("  SENSIBULL-STYLE STRATEGY ANALYSIS")
+    print(f"  Symbol: {symbol}  |  Outlook: {outlook.upper()}  |  Lots: {lots}")
+    print(f"{'='*72}")
+    print("  Fetching option chain …")
+
+    result = run_strategy_scan(symbol, outlook, lots, args.expiry, otm_pct)
+
+    print(f"\n  Spot:     {result['spot']:,.2f}")
+    print(f"  Expiry:   {result['expiry']}  ({result['T_days']} days)")
+    print(f"  ATM IV:   {result['atm_iv_pct']:.1f}%")
+    print(f"  IV Rank:  {result['iv_rank']:.0f}/100  "
+          f"({'HIGH — favour selling' if result['iv_rank'] > 60 else 'LOW — favour buying' if result['iv_rank'] < 40 else 'NEUTRAL'})")
+    print(f"  Data:     {result['data_source']}")
+
+    # ── Recommended strategies ──────────────────────────────────────────────
+    print(f"\n{'─'*72}")
+    print(f"  RECOMMENDED FOR {outlook.upper()} VIEW")
+    print(f"{'─'*72}")
+    for strat in result['recommended']:
+        _print_strategy(strat)
+
+    # ── Full catalogue ──────────────────────────────────────────────────────
+    print(f"\n{'─'*72}")
+    print("  ALL 14 STRATEGIES (summary)")
+    print(f"{'─'*72}")
+    hdr = f"  {'Strategy':<25} {'Outlook':<10} {'Net Prem':>10} {'Max Profit':>12} {'Max Loss':>10} {'Breakevens'}"
+    print(hdr)
+    print(f"  {'-'*24} {'-'*9} {'-'*10} {'-'*12} {'-'*10} {'-'*20}")
+    for key, s in result['strategies'].items():
+        mp  = f"{s['max_profit']:>12,.0f}" if isinstance(s['max_profit'], (int, float)) else f"{'unlimited':>12}"
+        ml  = f"{s['max_loss']:>10,.0f}"   if isinstance(s['max_loss'],   (int, float)) else f"{'unlimited':>10}"
+        bes = ', '.join(f"{b:,.0f}" for b in s['breakevens'][:2]) or '—'
+        print(f"  {s['name']:<25} {s['outlook']:<10} {s['net_premium']:>10,.0f} {mp} {ml} {bes}")
+
+    print(f"\n{'='*72}\n")
+
+
+def _print_strategy(s: dict) -> None:
+    """Pretty-print a single strategy with its legs and key metrics."""
+    mp  = f"{s['max_profit']:,.0f}" if isinstance(s['max_profit'], (int, float)) else 'unlimited'
+    ml  = f"{s['max_loss']:,.0f}"   if isinstance(s['max_loss'],   (int, float)) else 'unlimited'
+    bes = ', '.join(f"{b:,.0f}" for b in s['breakevens']) or '—'
+
+    print(f"\n  ▶ {s['name']}")
+    print(f"    {s['description']}")
+    print(f"    Net premium  : {'DEBIT ' if s['net_premium'] > 0 else 'CREDIT'} ₹{abs(s['net_premium']):,.0f}")
+    print(f"    Max profit   : ₹{mp}")
+    print(f"    Max loss     : ₹{ml}")
+    print(f"    Breakeven(s) : {bes}")
+    g = s['combined_greeks']
+    print(f"    Greeks       : Δ {g['delta']:+.3f}  Γ {g['gamma']:.5f}  "
+          f"Θ {g['theta']:+.2f}/day  ν {g['vega']:+.2f}/1%IV")
+    print("    Legs:")
+    for leg in s['legs']:
+        iv_str = f"IV {leg['iv_pct']:.1f}%" if leg.get('iv_pct') else ""
+        print(f"      {leg['action']:<5} {leg['option_type']}  K={leg['strike']:>8,.0f}  "
+              f"₹{leg['premium']:>8,.2f}  {iv_str}")
 
 
 # ---------------------------------------------------------------------------
@@ -84,8 +186,9 @@ def _run_backtest(args):
     """
     import json
     from pathlib import Path
-    from .parity_engine import ParityEngine
+
     from .config import INSTRUMENTS
+    from .parity_engine import ParityEngine
 
     snapshot_path = Path("option_chain_snapshot.json")
     if not snapshot_path.exists():

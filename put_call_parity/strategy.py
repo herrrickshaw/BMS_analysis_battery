@@ -19,13 +19,13 @@ from .broker import BrokerBase, get_broker
 from .config import (
     BROKER,
     INSTRUMENTS,
-    MAX_OPEN_POSITIONS,
+    LOG_FILE,
     MAX_DTE,
+    MAX_OPEN_POSITIONS,
     MIN_DTE,
     MIN_OI_THRESHOLD,
     RISK_FREE_RATE,
     SCAN_INTERVAL_SECONDS,
-    LOG_FILE,
 )
 from .parity_engine import ParityEngine, ParitySignal
 from .trade_manager import PositionBook, TradeManager

@@ -24,8 +24,8 @@ Trading signals:
         Action: BUY call, SELL put, BUY futures   (synthetic long futures vs real long)
 """
 
-import math
 import logging
+import math
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Dict, List, Optional, Tuple

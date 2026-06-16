@@ -8,7 +8,6 @@ Covers BankNifty (NSE), Crude Oil Futures (MCX), and Silver Futures (MCX).
 from dataclasses import dataclass, field
 from typing import Dict
 
-
 # ---------------------------------------------------------------------------
 # Broker / API credentials  — fill via environment variables or .env file
 # ---------------------------------------------------------------------------

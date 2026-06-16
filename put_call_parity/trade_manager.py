@@ -289,8 +289,6 @@ class TradeManager:
     # P&L
     # -----------------------------------------------------------------------
     def _calculate_pnl(self, position: Dict, exit_prices: Dict[str, float], cfg) -> float:
-        lot_size = cfg.lot_size
-        lots = position["lots"]
         qty = position["qty"]
 
         if position["direction"] == "SHORT_CALL_LONG_PUT":

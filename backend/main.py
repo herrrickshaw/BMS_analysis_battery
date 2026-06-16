@@ -30,6 +30,7 @@ from routers.alerts import router as alerts_router
 from routers.cassandra_router import router as cassandra_router
 from routers.files import router as files_router
 from routers.news import router as news_router
+from routers.options_strategies import router as options_router
 
 # ── Logging setup ─────────────────────────────────────────────────────────────
 # This must happen before any module creates a logger, so we call it at the
@@ -143,6 +144,7 @@ app.include_router(cassandra_router)
 app.include_router(files_router)
 app.include_router(news_router)
 app.include_router(alerts_router)
+app.include_router(options_router)
 
 
 # ── Root endpoint ─────────────────────────────────────────────────────────────

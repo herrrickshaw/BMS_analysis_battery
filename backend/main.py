@@ -27,9 +27,16 @@ async def lifespan(app: FastAPI):
     import scheduler as sched
     await run_in_threadpool(sched.start)
 
+    # Wire event-driven news pipeline
+    from events.news_enricher import setup as setup_enricher
+    from events.portfolio_monitor import monitor as portfolio_monitor
+    setup_enricher()
+    portfolio_monitor.start()
+
     yield   # ← app serves requests here
 
     # ── Shutdown ─────────────────────────────────────────────────────────────
+    portfolio_monitor.stop()
     import scheduler as sched
     await run_in_threadpool(sched.stop)
     from db import cassandra_client as cass
@@ -40,6 +47,7 @@ from routers import upload, scan, export, live, sectors, portfolio
 from routers.cassandra_router import router as cassandra_router
 from routers.files import router as files_router
 from routers.news import router as news_router
+from routers.alerts import router as alerts_router
 
 app = FastAPI(title='Stock Screener API', version='1.0.0', lifespan=lifespan)
 
@@ -60,6 +68,7 @@ app.include_router(portfolio.router)
 app.include_router(cassandra_router)
 app.include_router(files_router)
 app.include_router(news_router)
+app.include_router(alerts_router)
 
 
 @app.get('/')

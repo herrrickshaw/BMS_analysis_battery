@@ -13,6 +13,7 @@ import DailyReport    from './components/DailyReport'
 import FileWorkspace  from './components/FileWorkspace'
 import GeographyStatus from './components/GeographyStatus'
 import NewsAlerts from './components/NewsAlerts'
+import SurgePricing from './components/SurgePricing'
 import {
   uploadFile, runScan, exportResults,
   fetchLiveData, scanLiveData, compareLiveData,
@@ -189,6 +190,7 @@ export default function App() {
               { key: 'sectors',       label: 'Sector Benchmarks', disabled: false },
               { key: 'geography',     label: '🌍 Geography',       disabled: false },
               { key: 'news_alerts',   label: '📰 News Alerts',     disabled: false },
+              { key: 'surge_pricing', label: '⚡ Surge Pricing',   disabled: false },
             ].map(btn => (
               <button
                 key={btn.key}
@@ -246,6 +248,8 @@ export default function App() {
               <DailyReport />
             ) : viewMode === 'files' ? (
               <FileWorkspace />
+            ) : viewMode === 'surge_pricing' ? (
+              <SurgePricing />
             ) : viewMode === 'news_alerts' ? (
               <NewsAlerts />
             ) : viewMode === 'geography' ? (

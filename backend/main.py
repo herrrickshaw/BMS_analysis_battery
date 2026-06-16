@@ -109,6 +109,7 @@ from routers.cassandra_router import router as cassandra_router
 from routers.files import router as files_router
 from routers.news import router as news_router
 from routers.alerts import router as alerts_router
+from routers.pricing import router as pricing_router
 from config.providers import cfg   # typed settings singleton
 
 
@@ -144,6 +145,7 @@ app.include_router(cassandra_router)
 app.include_router(files_router)
 app.include_router(news_router)
 app.include_router(alerts_router)
+app.include_router(pricing_router)
 
 
 # ── Root endpoint ─────────────────────────────────────────────────────────────

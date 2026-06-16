@@ -1,71 +1,73 @@
 """
-Data provider API key configuration.
+Data provider API key configuration via pydantic-settings.
 
-All keys are read from environment variables.  Copy .env.providers.example
-to .env.providers and fill in keys, then source it before starting the app:
-
-    set -a && source .env.providers && set +a
-
-Or export them directly in your shell / deployment environment.
+All values are read from environment variables (or .env.providers / .env files).
+Copy .env.providers.example to .env.providers and fill in keys before starting.
 """
 from __future__ import annotations
 
-import os
+from pydantic import AliasChoices, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-def _env(key: str, default: str = '') -> str:
-    return os.environ.get(key, default).strip()
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=('.env.providers', '.env'),
+        env_file_encoding='utf-8',
+        extra='ignore',
+    )
 
-
-class ProviderConfig:
-    # ── Yahoo Finance ─────────────────────────────────────────────────────────
-    # No API key required — uses yfinance library (unofficial scraper)
+    # ── Yahoo Finance — no key required ───────────────────────────────────────
 
     # ── Alpha Vantage ─────────────────────────────────────────────────────────
-    # Free tier: 25 req/day · Premium: up to 1200/min
-    # https://www.alphavantage.co/support/#api-key
-    ALPHA_VANTAGE_KEY: str = _env('ALPHA_VANTAGE_API_KEY')
+    ALPHA_VANTAGE_KEY: str = Field(default='', validation_alias='ALPHA_VANTAGE_API_KEY')
 
     # ── Polygon.io ────────────────────────────────────────────────────────────
-    # Free tier: 5 req/min delayed · Paid: unlimited real-time
-    # https://polygon.io/dashboard/signup
-    POLYGON_KEY: str = _env('POLYGON_API_KEY')
+    POLYGON_KEY: str = Field(default='', validation_alias='POLYGON_API_KEY')
 
     # ── IEX Cloud ─────────────────────────────────────────────────────────────
-    # Credit-based; free sandbox available (sandbox.iexapis.com)
-    # https://iexcloud.io/cloud-login#/register
-    IEX_TOKEN: str = _env('IEX_TOKEN')
-    IEX_BASE: str  = _env('IEX_BASE_URL', 'https://cloud.iexapis.com/stable')
+    IEX_TOKEN: str = ''
+    IEX_BASE: str = Field(
+        default='https://cloud.iexapis.com/stable',
+        validation_alias='IEX_BASE_URL',
+    )
 
     # ── Tradier ───────────────────────────────────────────────────────────────
-    # Brokerage or developer sandbox account
-    # https://developer.tradier.com/user/sign_up
-    TRADIER_TOKEN: str = _env('TRADIER_API_KEY')
-    TRADIER_BASE: str  = _env('TRADIER_BASE_URL', 'https://api.tradier.com/v1')
+    TRADIER_TOKEN: str = Field(default='', validation_alias='TRADIER_API_KEY')
+    TRADIER_BASE: str = Field(
+        default='https://api.tradier.com/v1',
+        validation_alias='TRADIER_BASE_URL',
+    )
 
-    # ── Quandl / Nasdaq Data Link ─────────────────────────────────────────────
-    # https://data.nasdaq.com/sign-up
-    QUANDL_KEY: str = _env('NASDAQ_DATA_LINK_API_KEY') or _env('QUANDL_API_KEY')
+    # ── Quandl / Nasdaq Data Link — accepts either env var name ───────────────
+    QUANDL_KEY: str = Field(
+        default='',
+        validation_alias=AliasChoices('NASDAQ_DATA_LINK_API_KEY', 'QUANDL_API_KEY'),
+    )
 
     # ── Currencylayer ─────────────────────────────────────────────────────────
-    # Free tier: 100 req/month (USD base only) · https://currencylayer.com/signup
-    CURRENCYLAYER_KEY: str = _env('CURRENCYLAYER_ACCESS_KEY')
+    CURRENCYLAYER_KEY: str = Field(default='', validation_alias='CURRENCYLAYER_ACCESS_KEY')
     CURRENCYLAYER_BASE: str = 'https://api.currencylayer.com'
 
-    # ── Interactive Brokers (ib_insync) ───────────────────────────────────────
-    # Requires IB Gateway or TWS running locally
-    # Paper trading port: 7497  |  Live trading port: 7496
-    IB_HOST: str      = _env('IB_HOST', '127.0.0.1')
-    IB_PORT: int      = int(_env('IB_PORT', '7497'))
-    IB_CLIENT_ID: int = int(_env('IB_CLIENT_ID', '1'))
+    # ── Interactive Brokers ───────────────────────────────────────────────────
+    IB_HOST: str = '127.0.0.1'
+    IB_PORT: int = 7497
+    IB_CLIENT_ID: int = 1
 
-    # ── TradingView (tvdatafeed — unofficial) ─────────────────────────────────
-    # Works without credentials (delayed data) or with TV account for more history
-    TRADINGVIEW_USER: str = _env('TRADINGVIEW_USERNAME')
-    TRADINGVIEW_PASS: str = _env('TRADINGVIEW_PASSWORD')
+    # ── TradingView ───────────────────────────────────────────────────────────
+    TRADINGVIEW_USER: str = Field(default='', validation_alias='TRADINGVIEW_USERNAME')
+    TRADINGVIEW_PASS: str = Field(default='', validation_alias='TRADINGVIEW_PASSWORD')
+
+    # ── App / infrastructure settings ─────────────────────────────────────────
+    CASSANDRA_HOST: str = '127.0.0.1'
+    CASSANDRA_PORT: int = 9042
+    CORS_ORIGINS: list[str] = ['http://localhost:5173', 'http://localhost:3000']
+    LOG_JSON: bool = False
+    PREFETCH_HOUR: int = 0
+    PREFETCH_MINUTE: int = 0
 
 
-cfg = ProviderConfig()
+cfg = Settings()
 
 
 def configured_providers() -> list[str]:
@@ -83,6 +85,6 @@ def configured_providers() -> list[str]:
         out.append('quandl')
     if cfg.CURRENCYLAYER_KEY:
         out.append('currencylayer')
-    out.append('tradingview')   # works without credentials
+    out.append('tradingview')          # works without credentials
     out.append('interactive_brokers')  # tried at runtime; fails gracefully if gateway offline
     return out

@@ -51,6 +51,37 @@ def day_of_week_multiplier(dt: datetime) -> float:
     return 1.00
 
 
+def booking_pace_factor(
+    current_bookings: int,
+    historical_expected: int,
+    days: int,
+) -> float:
+    """
+    Compares current booking velocity against the historical expected bookings
+    at this same point in the advance-purchase window.
+
+    This is the single most important factor real airlines (AA, Lufthansa) use
+    that simple fill-rate models miss.  A flight booking 2× faster than usual
+    should be priced up immediately; one booking at half the expected pace
+    needs stimulation (lower prices or promotions).
+
+    ratio < 0.5  → significantly under-pacing → discount factor (0.80)
+    ratio ≈ 1.0  → on track → neutral (1.0)
+    ratio = 2.0  → double the pace → surge (up to 2.2×)
+    """
+    if historical_expected <= 0:
+        return 1.0
+    ratio = current_bookings / historical_expected
+    if ratio <= 0.30: return 0.75
+    if ratio <= 0.55: return 0.85
+    if ratio <= 0.80: return 0.95
+    if ratio <= 1.10: return 1.00
+    if ratio <= 1.40: return 1.15
+    if ratio <= 1.80: return 1.35
+    if ratio <= 2.50: return 1.65
+    return min(2.20, 1.0 + ratio * 0.40)
+
+
 def sigmoid_ramp(x: float, steepness: float = 5.0) -> float:
     """
     Smooth 0→1 ramp via sigmoid.

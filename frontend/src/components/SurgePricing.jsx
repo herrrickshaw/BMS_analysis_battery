@@ -182,6 +182,18 @@ function ErrorBox({ msg }) {
 
 // ── Flight tab ────────────────────────────────────────────────────────────────
 
+const AIRLINE_MODELS = [
+  { value: 'legacy',     label: 'Legacy (Lufthansa / American)', desc: 'Fare-bucket bid-price + booking pace + competitor anchor' },
+  { value: 'lcc',        label: 'LCC (Ryanair)',                 desc: 'Load-active / yield-passive — fill plane first, recover via ancillaries' },
+  { value: 'continuous', label: 'Continuous (PROS/Amadeus)',      desc: 'Smooth price curve — approximates Lufthansa Request-Specific Pricing' },
+]
+
+const MODEL_COLORS = {
+  legacy:     'bg-blue-950/50 border-blue-700 text-blue-300',
+  lcc:        'bg-orange-950/50 border-orange-700 text-orange-300',
+  continuous: 'bg-purple-950/50 border-purple-700 text-purple-300',
+}
+
 function FlightForm() {
   const [form, setForm] = useState({
     origin: 'BOM', destination: 'LHR',
@@ -189,12 +201,18 @@ function FlightForm() {
     seat_class: 'economy',
     seats_available: 45, seats_total: 180,
     base_fare: 350, currency: 'USD',
+    airline_model: 'legacy',
+    current_bookings: 0, historical_expected: 0,
+    competitor_fare: 0, competitor_weight: 0.25,
+    ancillary_per_pax: 25,
   })
   const [result, setResult]   = useState(null)
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState(null)
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+  const isLCC = form.airline_model === 'lcc'
 
   const submit = async (e) => {
     e.preventDefault()
@@ -208,6 +226,11 @@ function FlightForm() {
           seats_available: Number(form.seats_available),
           seats_total: Number(form.seats_total),
           base_fare: Number(form.base_fare),
+          current_bookings: Number(form.current_bookings),
+          historical_expected: Number(form.historical_expected),
+          competitor_fare: Number(form.competitor_fare),
+          competitor_weight: Number(form.competitor_weight),
+          ancillary_per_pax: Number(form.ancillary_per_pax),
         }),
       })
       if (!res.ok) throw new Error((await res.json()).detail || `HTTP ${res.status}`)
@@ -219,8 +242,32 @@ function FlightForm() {
     }
   }
 
+  const activeModelMeta = AIRLINE_MODELS.find(m => m.value === form.airline_model)
+
   return (
     <div className="space-y-5">
+      {/* Model selector */}
+      <div>
+        <Label>Airline pricing model</Label>
+        <div className="grid grid-cols-3 gap-2 mt-1">
+          {AIRLINE_MODELS.map(m => (
+            <button
+              key={m.value}
+              type="button"
+              onClick={() => set('airline_model', m.value)}
+              className={`rounded-lg border p-2.5 text-left transition-all text-xs ${
+                form.airline_model === m.value
+                  ? MODEL_COLORS[m.value] + ' ring-1 ring-current'
+                  : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600'
+              }`}
+            >
+              <div className="font-semibold">{m.label}</div>
+              <div className="text-gray-500 mt-0.5 leading-tight">{m.desc}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <form onSubmit={submit} className="grid grid-cols-2 gap-3">
         <Field label="Origin (IATA)">
           <Input value={form.origin} onChange={e => set('origin', e.target.value)} placeholder="BOM" required />
@@ -231,8 +278,8 @@ function FlightForm() {
         <Field label="Departure date & time">
           <Input type="datetime-local" value={form.departure_dt} onChange={e => set('departure_dt', e.target.value)} required />
         </Field>
-        <Field label="Cabin class">
-          <Select value={form.seat_class} onChange={e => set('seat_class', e.target.value)}>
+        <Field label={isLCC ? 'Cabin class (N/A for LCC)' : 'Cabin class'}>
+          <Select value={form.seat_class} onChange={e => set('seat_class', e.target.value)} disabled={isLCC}>
             {['economy','premium_economy','business','first'].map(c => (
               <option key={c} value={c}>{c.replace('_', ' ').replace(/\b\w/g, x => x.toUpperCase())}</option>
             ))}
@@ -252,6 +299,62 @@ function FlightForm() {
             {['USD','EUR','GBP','INR','JPY'].map(c => <option key={c}>{c}</option>)}
           </Select>
         </Field>
+
+        {/* Advanced: booking pace + competitor anchor */}
+        <div className="col-span-2">
+          <button
+            type="button"
+            onClick={() => setShowAdvanced(v => !v)}
+            className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+          >
+            <span>{showAdvanced ? '▾' : '▸'}</span>
+            {showAdvanced ? 'Hide' : 'Show'} advanced inputs (booking pace · competitor fare · ancillary)
+          </button>
+        </div>
+
+        {showAdvanced && (
+          <>
+            <div className="col-span-2 border-t border-gray-800 pt-3">
+              <div className="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">
+                Booking Pace (used by Legacy + Continuous models)
+              </div>
+            </div>
+            <Field label="Current bookings on this flight">
+              <Input type="number" min={0} value={form.current_bookings} onChange={e => set('current_bookings', e.target.value)} />
+            </Field>
+            <Field label="Historical expected at same point">
+              <Input type="number" min={0} value={form.historical_expected} onChange={e => set('historical_expected', e.target.value)} placeholder="e.g. 80" />
+            </Field>
+
+            <div className="col-span-2 border-t border-gray-800 pt-3">
+              <div className="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">
+                Competitor Anchor (Legacy + Continuous)
+              </div>
+            </div>
+            <Field label="Competitor fare (0 = ignore)">
+              <Input type="number" min={0} step="0.01" value={form.competitor_fare} onChange={e => set('competitor_fare', e.target.value)} />
+            </Field>
+            <Field label="Blend weight (0–1)">
+              <Input type="number" min={0} max={1} step="0.05" value={form.competitor_weight} onChange={e => set('competitor_weight', e.target.value)} />
+            </Field>
+
+            {isLCC && (
+              <>
+                <div className="col-span-2 border-t border-gray-800 pt-3">
+                  <div className="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">
+                    LCC Ancillary Revenue
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <Field label="Ancillary revenue per pax (bags + seat + boarding)">
+                    <Input type="number" min={0} step="1" value={form.ancillary_per_pax} onChange={e => set('ancillary_per_pax', e.target.value)} />
+                  </Field>
+                </div>
+              </>
+            )}
+          </>
+        )}
+
         <div className="col-span-2">
           <button
             type="submit"
@@ -263,8 +366,29 @@ function FlightForm() {
           </button>
         </div>
       </form>
+
       {error  && <ErrorBox msg={error} />}
-      {result && <ResultCard result={result} currency={result.currency} />}
+
+      {result && (
+        <div className="space-y-3">
+          <ResultCard result={result} currency={result.currency} />
+          {/* Model notes */}
+          {result.model_notes?.length > 0 && (
+            <div className="rounded-lg bg-gray-800/40 border border-gray-700 p-3 space-y-1">
+              <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Model Logic</div>
+              {result.model_notes.map((n, i) => (
+                <div key={i} className="text-xs text-gray-400">· {n}</div>
+              ))}
+              {result.ancillary_estimate > 0 && (
+                <div className="text-xs text-orange-400 font-semibold mt-1">
+                  Total revenue/pax (ticket + ancillary): {result.currency === 'INR' ? '₹' : result.currency === 'USD' ? '$' : result.currency + ' '}
+                  {(result.final_fare + result.ancillary_estimate).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -489,20 +613,24 @@ function RailwayForm() {
 // ── Demand model explainer ────────────────────────────────────────────────────
 
 function DemandExplainer() {
-  const sections = [
+  const [subtab, setSubtab] = useState('factors')
+
+  const factorSections = [
     {
-      title: '✈ Flight Pricing',
+      title: '✈ Flight Pricing Factors',
       color: 'indigo',
       rows: [
         ['Days ahead → multiplier', '90+ → 1.0× · 30 → 1.4× · 14 → 2.0× · 3 → 3.2× · same day → 5.0×'],
         ['Seat fill rate', 'Empty → 1.0× · 70% full → 1.8× · 95%+ full → 3.5×'],
-        ['Cabin class', 'Economy 1× · Premium 1.55× · Business 3.2× · First 6×'],
-        ['Season', 'Dec/Jan 1.5× · Oct/Nov 1.25× · May/Jun 1.35× · Feb/Sep 1.0×'],
+        ['Booking pace', 'Under-pace 0.75× · On-track 1.0× · 2× pace → 1.65× (LCC: deeper discounts when lagging)'],
+        ['Cabin class', 'Economy 1× · Premium Economy 1.55× · Business 3.2× · First 6×'],
+        ['Season', 'Dec/Jan 1.5× · Oct/Nov 1.28× · May/Jun 1.35× · Feb/Sep 1.0×'],
         ['Day of week', 'Fri 1.25× · Sun 1.2× · Mon/Thu 1.1× · Tue–Wed 1.0×'],
+        ['Competitor anchor', 'Blends own price toward market rate (default 25% weight)'],
       ],
     },
     {
-      title: '🚗 Ride-Share Pricing',
+      title: '🚗 Ride-Share Pricing Factors',
       color: 'yellow',
       rows: [
         ['Demand/supply ratio', '<0.8 → 0.9× · 1.2 → 1.3× · 1.8 → 1.8× · 2.5 → 2.5× (capped 6×)'],
@@ -512,7 +640,7 @@ function DemandExplainer() {
       ],
     },
     {
-      title: '🚂 Railway Pricing',
+      title: '🚂 Railway Pricing Factors',
       color: 'emerald',
       rows: [
         ['Availability', 'Plenty → 1.0× · <30% left → 1.6× · Last few → 2.8× · WL1-10 → 1.9×'],
@@ -525,6 +653,32 @@ function DemandExplainer() {
     },
   ]
 
+  const comparisonRows = [
+    ['Objective',          'Max revenue/seat', 'Max load factor first', 'Max network yield', 'Max network yield'],
+    ['Fare structure',     'Multiplier (4 classes)', 'Single cabin, many price points', '20+ ATPCO fare buckets', 'Continuous (no buckets)'],
+    ['Primary signal',     'Days + fill rate', 'Booking pace vs. target', 'Bid price curve', 'Request-specific AI'],
+    ['Booking pace',       'Partial (pace factor)', 'Core — cuts fares if lagging', 'Full curve comparison', 'Deep neural network'],
+    ['Competitor pricing', 'Anchor blend (optional)', 'Real-time scraping + response', 'Monitored, not auto-blended', 'Real-time competitive AI'],
+    ['Overbooking',        'Not modeled', 'Minimal (LCC practice)', 'Full statistical model', 'Full statistical model'],
+    ['Ancillary revenue',  'Not modeled', 'Core (~40% of revenue)', 'Modeled (PROS Dynamic Ancillary)', 'Growing'],
+    ['Distribution',       'N/A', 'Direct only (no GDS)', 'GDS + direct + metasearch', 'GDS + NDC direct'],
+    ['Pricing engine',     'Custom formula', 'Proprietary + external RM', 'PROS Request-Specific + Sabre', 'PROS RM + Sabre CRO'],
+    ['Revenue uplift',     'N/A', 'N/A', '5.2% via PROS (2024)', '$500M/yr (AA legacy RM est.)'],
+    ['Customer context',   'Not modeled', 'Not modeled', 'Device, loyalty, session data', 'Loyalty tier, booking history'],
+    ['Network O&D optim.', 'Not modeled', 'Point-to-point only', 'Full network optimization', 'Full network optimization'],
+  ]
+
+  const gapRows = [
+    ['Booking pace velocity', 'Added as optional factor', 'Real airlines treat this as the #1 signal — current pace vs. historical curve'],
+    ['O&D network effects', 'Not modeled', 'AA/Lufthansa optimize across all connections, not just this flight segment'],
+    ['Customer willingness-to-pay', 'Approximated via class multiplier', 'Lufthansa uses device, session time, loyalty status, referral source per request'],
+    ['Overbooking model', 'Not modeled', 'AA/Lufthansa statistically oversell based on historical no-show rates'],
+    ['Route-specific demand curve', 'Universal formula', 'Real systems have per-route curves built from years of historical O&D data'],
+    ['Dynamic ancillary pricing', 'LCC add-on only', 'Lufthansa now dynamically prices bags/seats/upgrades based on trip dimensions'],
+    ['Price elasticity by segment', 'Implicit via class mult.', 'Real systems separate business (inelastic) from leisure (elastic) demand pools'],
+    ['Real-time competitor scraping', 'Optional anchor input', 'Airlines monitor competitors every few minutes and auto-adjust'],
+  ]
+
   const colorMap = {
     indigo: 'text-indigo-400 border-indigo-700 bg-indigo-950/30',
     yellow: 'text-yellow-400 border-yellow-700 bg-yellow-950/30',
@@ -533,21 +687,94 @@ function DemandExplainer() {
 
   return (
     <div className="space-y-4">
-      {sections.map(s => (
-        <div key={s.title} className={`rounded-xl border p-4 ${colorMap[s.color]}`}>
-          <div className={`text-sm font-bold mb-3 ${colorMap[s.color].split(' ')[0]}`}>{s.title}</div>
+      <div className="flex gap-1">
+        {[
+          { key: 'factors',    label: 'Our Factors' },
+          { key: 'comparison', label: 'vs. Real Airlines' },
+          { key: 'gaps',       label: 'Model Gaps' },
+        ].map(t => (
+          <button
+            key={t.key}
+            onClick={() => setSubtab(t.key)}
+            className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+              subtab === t.key
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-800 text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {subtab === 'factors' && (
+        <div className="space-y-4">
+          {factorSections.map(s => (
+            <div key={s.title} className={`rounded-xl border p-4 ${colorMap[s.color]}`}>
+              <div className={`text-sm font-bold mb-3 ${colorMap[s.color].split(' ')[0]}`}>{s.title}</div>
+              <table className="w-full text-xs">
+                <tbody>
+                  {s.rows.map(([k, v]) => (
+                    <tr key={k} className="border-t border-white/5">
+                      <td className="py-1.5 pr-3 text-gray-400 font-medium w-36 align-top">{k}</td>
+                      <td className="py-1.5 text-gray-300">{v}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {subtab === 'comparison' && (
+        <div className="rounded-xl border border-gray-700 overflow-hidden">
           <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-gray-800">
+                <th className="text-left py-2 px-3 text-gray-400 font-semibold w-36">Dimension</th>
+                <th className="text-left py-2 px-3 text-indigo-400 font-semibold">Our Model</th>
+                <th className="text-left py-2 px-3 text-orange-400 font-semibold">Ryanair (ULCC)</th>
+                <th className="text-left py-2 px-3 text-blue-400 font-semibold">American (Legacy)</th>
+                <th className="text-left py-2 px-3 text-purple-400 font-semibold">Lufthansa (PROS)</th>
+              </tr>
+            </thead>
             <tbody>
-              {s.rows.map(([k, v]) => (
-                <tr key={k} className="border-t border-white/5">
-                  <td className="py-1.5 pr-3 text-gray-400 font-medium w-40 align-top">{k}</td>
-                  <td className="py-1.5 text-gray-300">{v}</td>
+              {comparisonRows.map(([dim, ...vals], i) => (
+                <tr key={dim} className={i % 2 === 0 ? 'bg-gray-900/40' : 'bg-gray-800/20'}>
+                  <td className="py-2 px-3 text-gray-400 font-medium align-top">{dim}</td>
+                  {vals.map((v, j) => (
+                    <td key={j} className="py-2 px-3 text-gray-300 align-top">{v}</td>
+                  ))}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      ))}
+      )}
+
+      {subtab === 'gaps' && (
+        <div className="space-y-3">
+          <p className="text-xs text-gray-500">
+            These are factors real airline RM systems use that our model approximates or omits. Each gap represents a research area for model improvement.
+          </p>
+          {gapRows.map(([gap, ours, real]) => (
+            <div key={gap} className="rounded-lg border border-gray-700 bg-gray-800/30 p-3">
+              <div className="text-xs font-bold text-white mb-1">{gap}</div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-indigo-400 font-semibold">Our model: </span>
+                  <span className="text-gray-400">{ours}</span>
+                </div>
+                <div>
+                  <span className="text-orange-400 font-semibold">Real systems: </span>
+                  <span className="text-gray-400">{real}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

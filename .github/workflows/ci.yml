@@ -1,18 +1,43 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# GitHub Actions CI (Continuous Integration) workflow.
+#
+# What is CI?
+#   Every time code is pushed to GitHub, this file tells GitHub to
+#   automatically spin up a fresh Linux machine, install all dependencies,
+#   and run our linters and tests.  If anything fails, GitHub marks the commit
+#   red and (optionally) blocks it from being merged into main.
+#
+# This workflow has three jobs that run in parallel where possible:
+#   1. lint-and-test  — checks Python code style and runs pytest
+#   2. lint-frontend  — verifies the React app compiles without errors
+#   3. docker-build   — builds both Docker images (runs AFTER jobs 1 & 2 pass)
+# ─────────────────────────────────────────────────────────────────────────────
+
 name: CI
 
+# ── When to run this workflow ──────────────────────────────────────────────────
 on:
   push:
+    # Run on pushes to main, any claude/* branch, or any feature/* branch.
     branches: [main, "claude/**", "feature/**"]
+  # Also run on every pull request (regardless of branch name).
   pull_request:
 
 jobs:
+
+  # ── Job 1: Python lint + tests ────────────────────────────────────────────
   lint-and-test:
     name: Lint & Test (Python)
+    # GitHub provides a fresh Ubuntu virtual machine for each run.
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Download the repository code onto the CI machine.
       - uses: actions/checkout@v4
 
+      # Step 2: Install the requested Python version.
+      # "cache: pip" tells GitHub to cache downloaded packages between runs —
+      # so the second run is faster because packages are already on disk.
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
@@ -20,18 +45,29 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements.txt
 
+      # Step 3: Install our app's dependencies plus testing tools.
+      # ruff and pytest aren't in requirements.txt (they're dev-only tools),
+      # so we install them here alongside the app's runtime dependencies.
       - name: Install dependencies
         run: pip install -r backend/requirements.txt ruff pytest
 
+      # Step 4: Run the linter.
+      # ruff checks for style violations and common bugs.
+      # If any file has an error, the job fails and no tests run.
       - name: Lint (ruff)
         run: ruff check backend/
 
+      # Step 5: Run the test suite.
+      # pytest discovers and runs all test_*.py files in the tests/ directory.
+      # We set CASSANDRA_HOST even though no Cassandra runs in CI — the app
+      # detects the connection failure and falls back to CSV-only mode,
+      # which is sufficient for unit tests.
       - name: Run tests
         run: pytest
         env:
-          # No real Cassandra in CI — app falls back to CSV mode
           CASSANDRA_HOST: "127.0.0.1"
 
+  # ── Job 2: Frontend lint + build ─────────────────────────────────────────
   lint-frontend:
     name: Lint & Build (Frontend)
     runs-on: ubuntu-latest
@@ -39,6 +75,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Install the right Node.js version.
+      # "cache: npm" caches node_modules downloads between runs.
       - name: Set up Node 20
         uses: actions/setup-node@v4
         with:
@@ -46,24 +84,34 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
+      # npm ci (clean install) is stricter than npm install:
+      # it reads package-lock.json exactly, giving reproducible installs.
       - name: Install dependencies
         run: npm ci
         working-directory: frontend
 
+      # "npm run build" runs Vite to compile the React app.
+      # If any TypeScript/JSX syntax is broken, this step fails.
       - name: Build
         run: npm run build
         working-directory: frontend
 
+  # ── Job 3: Docker image build check ──────────────────────────────────────
   docker-build:
     name: Docker build check
     runs-on: ubuntu-latest
+    # This job only starts if BOTH jobs above pass.
+    # No point building Docker images if the code has lint errors or test failures.
     needs: [lint-and-test, lint-frontend]
 
     steps:
       - uses: actions/checkout@v4
 
+      # Build the backend Docker image to confirm the Dockerfile has no errors.
+      # We don't push the image to a registry here — just verify it builds.
       - name: Build backend image
         run: docker build -t herrrickshaw-backend ./backend
 
+      # Build the frontend Docker image (Node compile + nginx packaging).
       - name: Build frontend image
         run: docker build -t herrrickshaw-frontend ./frontend

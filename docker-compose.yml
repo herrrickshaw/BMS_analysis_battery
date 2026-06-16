@@ -1,53 +1,123 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.yml — orchestrates all three containers as one application.
+#
+# What is Docker Compose?
+#   Instead of starting three separate `docker run` commands (one each for
+#   Cassandra, the backend, and the frontend), docker-compose reads this file
+#   and starts everything together with `docker compose up --build`.
+#
+# How to use:
+#   1. Copy .env.providers.example → .env.providers and fill in your API keys.
+#   2. Run: docker compose up --build
+#   3. Visit http://localhost (frontend) or http://localhost:8000/docs (API).
+#   4. To stop everything: docker compose down
+#   5. To wipe the database too: docker compose down -v
+# ─────────────────────────────────────────────────────────────────────────────
+
 services:
 
+  # ── Service 1: Cassandra database ──────────────────────────────────────────
+  # Cassandra is a distributed NoSQL database that stores instrument lists,
+  # OHLCV quotes, and price history for all markets.
   cassandra:
+    # Pull the official Cassandra 4.1 image from Docker Hub.
     image: cassandra:4.1
+
     ports:
+      # "host_port:container_port" — expose Cassandra's native CQL port so you
+      # can connect to it with cqlsh or a GUI tool from your own machine.
       - "9042:9042"
+
     volumes:
+      # Persist database data to a named Docker volume so it survives restarts.
+      # Without this, every `docker compose down` would wipe your data.
       - cassandra_data:/var/lib/cassandra
+
     environment:
+      # Name shown in the Cassandra cluster metadata — can be anything.
       CASSANDRA_CLUSTER_NAME: herrrickshaw
       CASSANDRA_DC: dc1
+      # Heap size controls how much RAM Cassandra uses.  These are conservative
+      # values suitable for a single-node dev setup.  Production would be higher.
       HEAP_NEWSIZE: 128M
       MAX_HEAP_SIZE: 512M
-    healthcheck:
-      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
-      interval: 30s
-      timeout: 10s
-      start_period: 60s
-      retries: 10
 
+    healthcheck:
+      # Ask Cassandra if it's ready by listing keyspaces via cqlsh.
+      # Docker Compose waits for this to succeed before starting the backend.
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 30s    # check every 30 seconds
+      timeout: 10s     # give each check up to 10 seconds to respond
+      start_period: 60s  # Cassandra takes ~60s to fully boot — don't start checking until then
+      retries: 10      # mark unhealthy only after 10 consecutive failures
+
+  # ── Service 2: FastAPI backend ─────────────────────────────────────────────
   backend:
     build:
+      # Build using the Dockerfile inside the backend/ directory.
       context: ./backend
       dockerfile: Dockerfile
+
     ports:
+      # Expose the FastAPI server on port 8000 of your machine.
+      # Swagger UI: http://localhost:8000/docs
       - "8000:8000"
+
+    # Load API keys from .env.providers (copy .env.providers.example first).
+    # Values from this file become environment variables inside the container.
     env_file:
       - .env.providers
+
     environment:
+      # "cassandra" resolves to the Cassandra container's IP inside Docker's
+      # internal network — no need for a real IP address.
       CASSANDRA_HOST: cassandra
       CASSANDRA_PORT: 9042
+
+      # Emit logs as JSON lines (easier to parse by log aggregation tools).
+      # Set to "false" if you prefer human-readable logs during development.
       LOG_JSON: "true"
+
     volumes:
-      - ./data:/app/data:ro         # market instrument CSVs (read-only)
+      # Mount the local data/ folder (instrument CSV files) into the container.
+      # :ro means read-only — the backend reads CSVs but never writes them.
+      - ./data:/app/data:ro
+      # Named volume for uploaded files (portfolio Excel/PDFs).
       - uploads:/app/uploads
+
     depends_on:
+      # Don't start the backend until Cassandra is healthy.
+      # Without this gate, the backend would start, fail to connect, and crash.
       cassandra:
         condition: service_healthy
+
+    # Automatically restart the backend if it crashes unexpectedly.
+    # "unless-stopped" means: restart always, except when you explicitly
+    # stopped it with `docker compose stop`.
     restart: unless-stopped
 
+  # ── Service 3: React frontend (nginx) ──────────────────────────────────────
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+
     ports:
+      # Expose nginx on port 80 — the standard HTTP port.
+      # Visit http://localhost in your browser.
       - "80:80"
+
     depends_on:
+      # Start the frontend only after the backend is up.
+      # The frontend itself is static files, but we want the backend ready
+      # before users can make API calls.
       - backend
+
     restart: unless-stopped
 
+# ── Named volumes ─────────────────────────────────────────────────────────────
+# Docker manages these volumes — you don't need to create folders on disk.
+# They persist between container restarts but are removed by `docker compose down -v`.
 volumes:
-  cassandra_data:
-  uploads:
+  cassandra_data:   # stores the Cassandra database files
+  uploads:          # stores uploaded portfolio files

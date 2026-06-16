@@ -135,9 +135,10 @@ def connect(hosts: list[str] | None = None) -> bool:
         try:
             from cassandra.cluster import Cluster
             from cassandra.policies import RoundRobinPolicy
+            from config.providers import cfg
             _cluster = Cluster(
-                hosts or ['127.0.0.1'],
-                port=9042,
+                hosts or [cfg.CASSANDRA_HOST],
+                port=cfg.CASSANDRA_PORT,
                 load_balancing_policy=RoundRobinPolicy(),
                 connect_timeout=5,
                 control_connection_timeout=5,

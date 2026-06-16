@@ -28,3 +28,15 @@ data/canada_list.csv
 uploads/
 .env.providers
 .env
+
+# Build artifacts
+frontend/dist/
+frontend/.vite/
+
+# Tool caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Docker
+*.tar

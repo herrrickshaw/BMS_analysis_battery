@@ -1,0 +1,36 @@
+[project]
+name = "herrrickshaw"
+version = "0.1.0"
+description = "Multi-market investment research and trading analytics platform"
+requires-python = ">=3.11"
+dependencies = []   # declared in backend/requirements.txt
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["backend"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = [
+    "E501",   # line too long — handled by formatter
+    "F401",   # imported but unused — some intentional re-exports
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["config", "db", "routers", "scanners", "fetchers", "events"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_return_any = false
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["backend"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"

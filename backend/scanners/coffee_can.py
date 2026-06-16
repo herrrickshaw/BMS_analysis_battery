@@ -1,4 +1,3 @@
-from __future__ import annotations
 """
 Coffee Can Portfolio scan (Saurabh Mukherjea framework).
 
@@ -18,7 +17,10 @@ Moat score 0-5 (bonus signals):
 
 Signal: BUY if all hard filters pass; WATCH if >= 70% pass; AVOID otherwise.
 """
+from __future__ import annotations
+
 import pandas as pd
+
 from column_map import completeness, sanitize_result
 
 REQUIRED_FIELDS = [

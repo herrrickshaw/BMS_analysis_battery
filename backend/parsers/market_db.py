@@ -59,7 +59,8 @@ def _db(market: str) -> dict:
 
     if market == 'india':
         # Reuse symbol_db; build a compatible dict here
-        from parsers.symbol_db import _load as _nse_load, _BY_SYMBOL, _BY_NAME
+        from parsers.symbol_db import _BY_NAME, _BY_SYMBOL
+        from parsers.symbol_db import _load as _nse_load
         _nse_load()
         by_yf  = {s: {'yf_ticker': s + '.NS', 'name': v['name'], 'code': s}
                   for s, v in _BY_SYMBOL.items()}
@@ -228,7 +229,7 @@ def lookup_by_name(name: str, market: str) -> Optional[dict]:
 
 def extract_from_text(text: str, market: str) -> list[dict]:
     """Scan raw text for tickers/codes matching the given market's pattern."""
-    db = _db(market)
+    _db(market)  # ensure market db is loaded into module-level cache
     pattern = _PATTERNS.get(market)
     found: dict[str, dict] = {}
 

@@ -6,9 +6,10 @@ from __future__ import annotations
 import io
 import re
 from typing import Optional
+
 import openpyxl
 
-from parsers.market_db import lookup, lookup_by_name, extract_from_text, _YF_SUFFIX
+from parsers.market_db import _YF_SUFFIX, extract_from_text, lookup, lookup_by_name
 
 _TICKER_HEADERS = {
     'symbol', 'ticker', 'nse code', 'nse symbol', 'bse code', 'scrip',
@@ -40,12 +41,18 @@ _PRICE_HEADERS = {
 
 def _col_role(header: str) -> Optional[str]:
     h = header.lower().strip().rstrip('.')
-    if h in _TICKER_HEADERS: return 'ticker'
-    if h in _NAME_HEADERS:   return 'name'
-    if h in _ISIN_HEADERS:   return 'isin'
-    if h in _DATE_HEADERS:   return 'date'
-    if h in _QTY_HEADERS:    return 'qty'
-    if h in _PRICE_HEADERS:  return 'price'
+    if h in _TICKER_HEADERS:
+        return 'ticker'
+    if h in _NAME_HEADERS:
+        return 'name'
+    if h in _ISIN_HEADERS:
+        return 'isin'
+    if h in _DATE_HEADERS:
+        return 'date'
+    if h in _QTY_HEADERS:
+        return 'qty'
+    if h in _PRICE_HEADERS:
+        return 'price'
     return None
 
 

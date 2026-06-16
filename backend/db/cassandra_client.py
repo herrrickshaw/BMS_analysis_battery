@@ -135,6 +135,7 @@ def connect(hosts: list[str] | None = None) -> bool:
         try:
             from cassandra.cluster import Cluster
             from cassandra.policies import RoundRobinPolicy
+
             from config.providers import cfg
             _cluster = Cluster(
                 hosts or [cfg.CASSANDRA_HOST],

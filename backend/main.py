@@ -11,15 +11,25 @@ functions that can pause and resume without blocking other requests —
 important when fetching data from yfinance or Cassandra.
 """
 from __future__ import annotations
+
 import asyncio
 import logging
 import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.concurrency import run_in_threadpool
+from fastapi.middleware.cors import CORSMiddleware
 
+# ── Router imports ────────────────────────────────────────────────────────────
+# Each router file owns a group of related API endpoints.
+# Keeping them in separate files stops main.py from growing to thousands of lines.
+from config.providers import cfg  # typed settings singleton
+from routers import export, live, portfolio, scan, sectors, upload
+from routers.alerts import router as alerts_router
+from routers.cassandra_router import router as cassandra_router
+from routers.files import router as files_router
+from routers.news import router as news_router
 
 # ── Logging setup ─────────────────────────────────────────────────────────────
 # This must happen before any module creates a logger, so we call it at the
@@ -99,17 +109,6 @@ async def lifespan(app: FastAPI):
     await run_in_threadpool(sched.stop)
     from db import cassandra_client as cass
     await run_in_threadpool(cass.close)
-
-
-# ── Router imports ────────────────────────────────────────────────────────────
-# Each router file owns a group of related API endpoints.
-# Keeping them in separate files stops main.py from growing to thousands of lines.
-from routers import upload, scan, export, live, sectors, portfolio
-from routers.cassandra_router import router as cassandra_router
-from routers.files import router as files_router
-from routers.news import router as news_router
-from routers.alerts import router as alerts_router
-from config.providers import cfg   # typed settings singleton
 
 
 # ── App creation ──────────────────────────────────────────────────────────────

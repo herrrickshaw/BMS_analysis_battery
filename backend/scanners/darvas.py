@@ -1,4 +1,3 @@
-from __future__ import annotations
 """
 Darvas Box scan with Warren Buffett quality overlay.
 
@@ -18,7 +17,10 @@ Buffett overlay (quality filter):
 
 Score 0-10. Signal: BUY >= 7, WATCH >= 4, AVOID < 4.
 """
+from __future__ import annotations
+
 import pandas as pd
+
 from column_map import completeness, sanitize_result
 from damodaran import get_sector_pe
 

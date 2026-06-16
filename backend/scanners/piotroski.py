@@ -1,4 +1,3 @@
-from __future__ import annotations
 """
 Piotroski F-Score (0-9).
 
@@ -20,7 +19,10 @@ Operating Efficiency:
 If Screener.in pre-computed Piotroski score is present it is used directly.
 Signal: BUY >= 8, WATCH >= 6, AVOID <= 5.
 """
+from __future__ import annotations
+
 import pandas as pd
+
 from column_map import completeness, sanitize_result
 
 REQUIRED_FIELDS = [

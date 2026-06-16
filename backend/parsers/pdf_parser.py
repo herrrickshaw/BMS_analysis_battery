@@ -7,7 +7,7 @@ import io
 import re
 from typing import Optional
 
-from parsers.market_db import lookup, lookup_by_name, extract_from_text
+from parsers.market_db import extract_from_text, lookup, lookup_by_name
 
 _TICKER_HEADERS = {
     'symbol', 'ticker', 'scrip', 'script', 'nse symbol', 'nse code',
@@ -23,9 +23,12 @@ _ISIN_HEADERS = {'isin', 'isin number', 'isin no', 'isin code'}
 
 def _col_role(header: str) -> Optional[str]:
     h = header.lower().strip().rstrip('.')
-    if h in _TICKER_HEADERS: return 'ticker'
-    if h in _NAME_HEADERS:   return 'name'
-    if h in _ISIN_HEADERS:   return 'isin'
+    if h in _TICKER_HEADERS:
+        return 'ticker'
+    if h in _NAME_HEADERS:
+        return 'name'
+    if h in _ISIN_HEADERS:
+        return 'isin'
     return None
 
 

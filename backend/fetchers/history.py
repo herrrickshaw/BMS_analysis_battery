@@ -280,7 +280,7 @@ def fetch_holdings_history(holdings: list[dict], max_workers: int = 8) -> dict:
             ticker = div_futs[fut]
             try:
                 div_results[ticker] = fut.result()
-            except Exception as exc:
+            except Exception:
                 div_results[ticker] = {'total_per_share': 0.0, 'count': 0, 'payouts': []}
 
     # Assemble enriched rows (preserve original order)

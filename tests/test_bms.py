@@ -18,8 +18,14 @@ from bms.soc_estimator import EKFSOCEstimator
 from bms.soh_estimator import SOHEstimator
 from bms.cell_balancer import CellBalancer
 from bms.power_limits import PowerLimitsCalculator
-from bms.supervisor import SupervisoryController, BMSState, FaultCode
+from bms.supervisor import SupervisoryController, BMSState, FaultCode, AlertCode
 from bms.bms_controller import BMSController
+from bms.chemistries import LFP, LEAD_ACID, NMC
+from bms.thermal import FanController, FanFaultCode
+from bms.vehicles import (
+    TWO_WHEELER, FOUR_WHEELER_RETRO, FOUR_WHEELER_MODERN, ELECTRIC_BUS,
+    make_bms_controller,
+)
 
 
 # -------------------------------------------------------------------------
@@ -308,3 +314,228 @@ class TestBMSController:
         bms = BMSController(n_cells=4, soc_init=0.50)
         state = bms.step(current=50.0, dt=1.0)
         assert 0 < state.soh.soh_capacity_pct <= 100.0
+
+
+# -------------------------------------------------------------------------
+# Multi-chemistry cell models
+# -------------------------------------------------------------------------
+
+class TestMultiChemistry:
+    def test_lead_acid_ocv_at_full(self):
+        v = LFP.ocv_table[-1, 1]
+        assert v == pytest.approx(3.65, abs=0.01)
+        v_pba = LEAD_ACID.ocv_table[-1, 1]
+        assert v_pba == pytest.approx(2.30, abs=0.01)
+
+    def test_lead_acid_cell_model_discharge(self):
+        cell = CellModel(config=LEAD_ACID.cell_config, ocv_table=LEAD_ACID.ocv_table, soc_init=0.80)
+        state = cell.step(current=10.0, dt=3600.0)
+        assert state.soc < 0.80
+        assert state.v_terminal > 1.5      # should not collapse entirely
+
+    def test_nmc_ocv_monotone(self):
+        ocv_vals = NMC.ocv_table[:, 1]
+        assert all(b > a for a, b in zip(ocv_vals, ocv_vals[1:]))
+
+    def test_lfp_cell_nominal_voltage(self):
+        assert LFP.cell_config.v_nominal == pytest.approx(3.20, abs=0.01)
+
+    def test_pba_three_stage_flag(self):
+        assert FOUR_WHEELER_RETRO.charging_stages == 3
+
+    def test_chemistry_registry_keys(self):
+        from bms.chemistries import CHEMISTRY_REGISTRY
+        assert "LFP" in CHEMISTRY_REGISTRY
+        assert "PbA" in CHEMISTRY_REGISTRY
+        assert "NMC" in CHEMISTRY_REGISTRY
+
+
+# -------------------------------------------------------------------------
+# Vehicle profiles
+# -------------------------------------------------------------------------
+
+class TestVehicleProfiles:
+    def test_two_wheeler_voltage(self):
+        # 15 cells × 3.2 V = 48 V
+        assert TWO_WHEELER.nominal_pack_voltage_v == pytest.approx(48.0, abs=0.5)
+
+    def test_four_wheeler_retro_voltage(self):
+        # 36 cells × 2.0 V = 72 V
+        assert FOUR_WHEELER_RETRO.nominal_pack_voltage_v == pytest.approx(72.0, abs=0.5)
+
+    def test_electric_bus_energy(self):
+        # 128S2P, 200 Ah per cell → 400 Ah pack, 409.6 V → ~163.8 kWh
+        assert ELECTRIC_BUS.nominal_pack_energy_kwh == pytest.approx(163.8, rel=0.05)
+
+    def test_bus_is_active_cooled(self):
+        assert ELECTRIC_BUS.has_active_cooling is True
+
+    def test_two_wheeler_passive_cooled(self):
+        assert TWO_WHEELER.has_active_cooling is False
+
+    def test_make_bms_controller_two_wheeler(self):
+        bms = make_bms_controller(TWO_WHEELER, soc_init=0.80)
+        state = bms.step(current=20.0, dt=1.0)
+        # 15 cells × ~3.28 V = ~49.2 V at 80% SOC
+        assert 40.0 < state.pack_voltage_v < 60.0
+
+    def test_make_bms_controller_retro_4w(self):
+        bms = make_bms_controller(FOUR_WHEELER_RETRO, soc_init=0.80)
+        state = bms.step(current=43.0, dt=1.0)
+        # 36 cells × ~2.10 V (at 80% SOC) ≈ 75.6 V
+        assert 50.0 < state.pack_voltage_v < 100.0
+
+    def test_make_bms_controller_bus(self):
+        bms = make_bms_controller(ELECTRIC_BUS, soc_init=0.80)
+        # Use low current to avoid large R0 drop: pack OCV ≈ 128 × 3.28 ≈ 420 V
+        state = bms.step(current=10.0, dt=1.0)
+        assert 380.0 < state.pack_voltage_v < 460.0
+
+
+# -------------------------------------------------------------------------
+# Thermal / fan controller
+# -------------------------------------------------------------------------
+
+class TestFanController:
+    def test_fan_off_below_threshold(self):
+        fan = FanController(t_fan_on=35.0, t_fan_full=50.0)
+        state = fan.update(temperature=25.0)
+        assert state.fan_pwm_pct == pytest.approx(0.0, abs=0.1)
+        assert not state.cooling_active
+
+    def test_fan_full_above_t_high(self):
+        fan = FanController(t_fan_on=35.0, t_fan_full=50.0)
+        state = fan.update(temperature=55.0)
+        assert state.fan_pwm_pct == pytest.approx(100.0, abs=0.1)
+
+    def test_fan_ramps_linearly(self):
+        fan = FanController(t_fan_on=35.0, t_fan_full=50.0)
+        s_low = fan.update(temperature=35.0)
+        # force fan_on so hysteresis doesn't suppress
+        s_mid = fan.update(temperature=42.5)
+        s_high = fan.update(temperature=50.0)
+        assert s_low.fan_pwm_pct <= s_mid.fan_pwm_pct <= s_high.fan_pwm_pct
+
+    def test_heater_on_below_t_heat(self):
+        fan = FanController(t_heat_on=5.0)
+        state = fan.update(temperature=2.0)
+        assert state.heater_on is True
+        assert state.cooling_mode == "HEATER"
+
+    def test_fan_fault_detection(self):
+        fan = FanController(t_fan_on=35.0, t_fan_full=50.0)
+        fan.update(temperature=55.0)  # ensure fan_on state
+        state = fan.update(temperature=55.0, fan_speed_feedback=0.0)  # stuck
+        assert state.fan_fault == FanFaultCode.FAN_STUCK
+
+    def test_no_fault_without_feedback(self):
+        fan = FanController(t_fan_on=35.0, t_fan_full=50.0)
+        state = fan.update(temperature=55.0, fan_speed_feedback=None)
+        assert state.fan_fault == FanFaultCode.NONE
+
+
+# -------------------------------------------------------------------------
+# 3-stage charging + alert codes (supervisory)
+# -------------------------------------------------------------------------
+
+class TestThreeStageCharging:
+    """Validate lead-acid 3-stage charging transitions in supervisor."""
+
+    def _make_sv_3stage(self):
+        return SupervisoryController(
+            cv_voltage_per_cell=2.40,
+            cv_term_current_a=1.0,
+            cc_current_a=-10.0,
+            float_voltage_per_cell=2.27,
+            charging_stages=3,
+            ov_fault_v=2.50,
+            uv_fault_v=1.65,
+            t_max_fault_c=50.0,
+            t_min_fault_c=0.0,
+        )
+
+    def _inputs(self, **kw):
+        base = dict(
+            v_cell_max=2.10, v_cell_min=2.08, t_cell_max=30.0,
+            soc_mean=0.80, current=-10.0, v_spread=0.010,
+            charge_requested=True, discharge_requested=False,
+            isolation_ok=True,
+        )
+        base.update(kw)
+        return base
+
+    def _reach_charging_cc(self, sv):
+        """Advance supervisor to CHARGING_CC state (INIT×3 → IDLE×1 → PRE_CHARGE×2 → CC)."""
+        for _ in range(7):
+            sv.update(**self._inputs())
+
+    def test_reaches_charging_cc(self):
+        sv = self._make_sv_3stage()
+        self._reach_charging_cc(sv)
+        assert sv.state == BMSState.CHARGING_CC
+
+    def test_transitions_to_cv(self):
+        sv = self._make_sv_3stage()
+        self._reach_charging_cc(sv)
+        # trigger CV: v_max hits absorption voltage
+        sv.update(**self._inputs(v_cell_max=2.41))
+        assert sv.state == BMSState.CHARGING_CV
+
+    def test_transitions_cc_to_float_via_cv(self):
+        sv = self._make_sv_3stage()
+        self._reach_charging_cc(sv)
+        sv.update(**self._inputs(v_cell_max=2.41))  # → CV
+        # current tapers below termination threshold → should go to FLOAT
+        sv.update(**self._inputs(current=-0.5, v_cell_max=2.41))
+        assert sv.state == BMSState.CHARGING_FLOAT
+
+    def test_float_state_output_has_charging_complete_alert(self):
+        sv = self._make_sv_3stage()
+        self._reach_charging_cc(sv)
+        sv.update(**self._inputs(v_cell_max=2.41))
+        sv.update(**self._inputs(current=-0.5, v_cell_max=2.41))
+        out = sv.update(**self._inputs(current=-0.3, v_cell_max=2.27))
+        assert AlertCode.CHARGING_COMPLETE in out.alerts
+
+
+class TestAlertCodes:
+    def _make_sv(self):
+        return SupervisoryController(cv_voltage_per_cell=3.65, cv_term_current_a=5.0)
+
+    def _idle_inputs(self, **kw):
+        base = dict(
+            v_cell_max=3.3, v_cell_min=3.25, t_cell_max=28.0,
+            soc_mean=0.50, current=0.0, v_spread=0.005,
+            charge_requested=False, discharge_requested=False,
+            isolation_ok=True,
+        )
+        base.update(kw)
+        return base
+
+    def _reach_idle(self, sv):
+        for _ in range(5):
+            sv.update(**self._idle_inputs())
+
+    def test_low_soc_alert(self):
+        sv = self._make_sv()
+        self._reach_idle(sv)
+        out = sv.update(**self._idle_inputs(soc_mean=0.10))
+        assert AlertCode.LOW_SOC in out.alerts
+
+    def test_high_temperature_alert(self):
+        sv = self._make_sv()
+        self._reach_idle(sv)
+        out = sv.update(**self._idle_inputs(t_cell_max=53.0))
+        assert AlertCode.HIGH_TEMPERATURE in out.alerts
+
+    def test_cell_imbalance_alert(self):
+        sv = self._make_sv()
+        self._reach_idle(sv)
+        out = sv.update(**self._idle_inputs(v_spread=0.060))
+        assert AlertCode.CELL_IMBALANCE in out.alerts
+
+    def test_no_alerts_in_nominal_conditions(self):
+        sv = self._make_sv()
+        self._reach_idle(sv)
+        out = sv.update(**self._idle_inputs())
+        assert out.alerts == []

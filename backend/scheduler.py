@@ -15,7 +15,6 @@ Lifecycle:
 from __future__ import annotations
 
 import logging
-import os
 import threading
 import time
 from datetime import datetime, timezone
@@ -96,8 +95,9 @@ def start():
         log.warning('scheduler: apscheduler not installed — daily prefetch disabled')
         return
 
-    hour   = int(os.environ.get('PREFETCH_HOUR',   '0'))
-    minute = int(os.environ.get('PREFETCH_MINUTE', '0'))
+    from config.providers import cfg
+    hour   = cfg.PREFETCH_HOUR
+    minute = cfg.PREFETCH_MINUTE
 
     _scheduler = BackgroundScheduler(daemon=True)
     _scheduler.add_job(

@@ -28,14 +28,24 @@ router = APIRouter(prefix="/api/pricing", tags=["surge_pricing"])
 # ── Request models ─────────────────────────────────────────────────────────────
 
 class FlightQuoteRequest(BaseModel):
-    origin:          str
-    destination:     str
-    departure_dt:    datetime
-    seat_class:      str   = "economy"   # economy | premium_economy | business | first
-    seats_available: int   = Field(ge=0, default=50)
-    seats_total:     int   = Field(ge=1, default=180)
-    base_fare:       float = Field(ge=0, default=200.0)
-    currency:        str   = "USD"
+    origin:               str
+    destination:          str
+    departure_dt:         datetime
+    seat_class:           str   = "economy"  # economy | premium_economy | business | first
+    seats_available:      int   = Field(ge=0, default=50)
+    seats_total:          int   = Field(ge=1, default=180)
+    base_fare:            float = Field(ge=0, default=200.0)
+    currency:             str   = "USD"
+    # Airline model mode
+    airline_model:        str   = "legacy"   # legacy | lcc | continuous
+    # Booking pace (current bookings vs. historical expected at same point)
+    current_bookings:     int   = Field(ge=0, default=0)
+    historical_expected:  int   = Field(ge=0, default=0)
+    # Competitor anchor
+    competitor_fare:      float = Field(ge=0, default=0.0)
+    competitor_weight:    float = Field(ge=0, le=1, default=0.25)
+    # LCC ancillary estimate per pax
+    ancillary_per_pax:    float = Field(ge=0, default=25.0)
 
 
 class UberQuoteRequest(BaseModel):
@@ -69,12 +79,18 @@ class RailwayQuoteRequest(BaseModel):
 def quote_flight(req: FlightQuoteRequest):
     """Return a surge-priced flight quote."""
     result = price_flight(
-        base_fare       = req.base_fare,
-        departure_dt    = req.departure_dt,
-        seat_class      = req.seat_class,
-        seats_available = req.seats_available,
-        seats_total     = req.seats_total,
-        currency        = req.currency,
+        base_fare           = req.base_fare,
+        departure_dt        = req.departure_dt,
+        seat_class          = req.seat_class,
+        seats_available     = req.seats_available,
+        seats_total         = req.seats_total,
+        currency            = req.currency,
+        airline_model       = req.airline_model,
+        current_bookings    = req.current_bookings,
+        historical_expected = req.historical_expected,
+        competitor_fare     = req.competitor_fare,
+        competitor_weight   = req.competitor_weight,
+        ancillary_per_pax   = req.ancillary_per_pax,
     )
     return {
         "transport":    "flight",

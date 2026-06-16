@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, Query
 from fastapi.concurrency import run_in_threadpool
 
 from db import cassandra_client as cass
-from db.seeder import seed_market, seed_all, MARKETS
+from db.seeder import MARKETS, seed_all, seed_market
 
 router = APIRouter(prefix='/api/db', tags=['cassandra'])
 
@@ -147,7 +147,8 @@ async def fetch_quotes_all(
     if not await run_in_threadpool(cass.is_available):
         raise HTTPException(503, 'Cassandra is offline')
 
-    from db.bulk_fetcher import fetch_all_quotes, MARKETS as BF_MARKETS
+    from db.bulk_fetcher import MARKETS as BF_MARKETS
+    from db.bulk_fetcher import fetch_all_quotes
     loop = asyncio.get_running_loop()
     loop.run_in_executor(None, fetch_all_quotes, None, batch_size, max_workers, with_fundamentals)
 

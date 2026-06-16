@@ -18,8 +18,8 @@ from typing import Optional
 
 import pandas as pd
 
-from fetchers.providers.base import DataProvider, QuoteData, compute_technicals
 from config.providers import cfg
+from fetchers.providers.base import DataProvider, QuoteData, compute_technicals
 
 log = logging.getLogger(__name__)
 _lock = threading.Lock()
@@ -57,7 +57,7 @@ def _disconnect():
 
 def _contract_for(ticker: str, market: str):
     """Build an ib_insync Contract for a given ticker + market."""
-    from ib_insync import Stock, Forex
+    from ib_insync import Forex, Stock
     exchange_map = {
         'us':        ('SMART',    'USD'),
         'india':     ('NSE',      'INR'),

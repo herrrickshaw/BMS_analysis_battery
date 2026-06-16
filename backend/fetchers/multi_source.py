@@ -27,9 +27,17 @@ from typing import Optional
 import pandas as pd
 
 from fetchers.providers import (
-    yahoo, alpha_vantage, polygon, iex, tradier,
-    quandl, currencylayer, interactive_brokers, tradingview,
-    QuoteData, DataProvider,
+    DataProvider,
+    QuoteData,
+    alpha_vantage,
+    currencylayer,
+    iex,
+    interactive_brokers,
+    polygon,
+    quandl,
+    tradier,
+    tradingview,
+    yahoo,
 )
 from fetchers.providers.currencylayer import MARKET_CURRENCY_CODE
 

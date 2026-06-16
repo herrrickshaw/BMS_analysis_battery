@@ -74,7 +74,7 @@ class PortfolioMonitor:
             await asyncio.sleep(self._interval)
 
     async def _poll(self) -> None:
-        from events.event_bus import bus, MarketEvent
+        from events.event_bus import MarketEvent, bus
         for ticker, state in list(self._tickers.items()):
             try:
                 data = await asyncio.to_thread(_fetch_ticker_data, ticker, state.market)

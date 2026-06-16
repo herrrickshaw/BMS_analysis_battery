@@ -204,7 +204,9 @@ async def analyse_file(
     if 'ticker' not in df.columns and 'name' not in df.columns:
         raise HTTPException(422, 'File does not appear to be a screener export (no ticker/name column).')
 
-    from scanners import darvas as _d, piotroski as _p, coffee_can as _cc
+    from scanners import coffee_can as _cc
+    from scanners import darvas as _d
+    from scanners import piotroski as _p
     SCANNER_FN = {'darvas': _d.scan, 'piotroski': _p.scan, 'coffee_can': _cc.scan}
 
     # Resolve which scan(s) to run

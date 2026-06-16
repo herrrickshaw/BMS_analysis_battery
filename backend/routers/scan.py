@@ -1,9 +1,12 @@
 from __future__ import annotations
+
 from typing import Optional
+
 from fastapi import APIRouter, HTTPException
 from fastapi.concurrency import run_in_threadpool
+
 from routers.upload import data_store
-from scanners import darvas, piotroski, coffee_can
+from scanners import coffee_can, darvas, piotroski
 
 router = APIRouter()
 

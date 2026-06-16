@@ -19,8 +19,8 @@ from fastapi import APIRouter, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from events.portfolio_monitor import monitor
 from events.news_enricher import get_alerts, subscribe_sse, unsubscribe_sse
+from events.portfolio_monitor import monitor
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix='/api/alerts', tags=['alerts'])
@@ -61,7 +61,7 @@ async def manual_trigger(ticker: str, market: str = Query(default='india')):
     Immediately fetch news for a ticker without waiting for a market event.
     Useful for on-demand enrichment or testing.
     """
-    from events.event_bus import bus, MarketEvent
+    from events.event_bus import MarketEvent, bus
     await bus.publish(
         MarketEvent(type='MANUAL', ticker=ticker.upper(), market=market, data={})
     )

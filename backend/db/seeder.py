@@ -82,7 +82,7 @@ def seed_market(market: str, force: bool = False) -> dict:
     # Build ISIN map for India (symbol → isin)
     isin_map: dict[str, str] = {}
     if market == 'india':
-        from parsers.symbol_db import _load, _BY_SYMBOL
+        from parsers.symbol_db import _BY_SYMBOL, _load
         _load()
         isin_map = {sym: v['isin'] for sym, v in _BY_SYMBOL.items() if v.get('isin')}
 

@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from typing import Optional
-from fastapi import APIRouter, HTTPException, UploadFile, File, Query
+
+from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel, field_validator
 
 from parsers.excel_parser import parse_excel
-from parsers.pdf_parser   import parse_pdf
-from parsers.market_db    import SUPPORTED_MARKETS, db_size
+from parsers.market_db import SUPPORTED_MARKETS, db_size
+from parsers.pdf_parser import parse_pdf
 
 router = APIRouter()
 

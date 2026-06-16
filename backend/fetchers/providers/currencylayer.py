@@ -14,8 +14,8 @@ from typing import Optional
 
 import requests
 
-from fetchers.providers.base import DataProvider, QuoteData
 from config.providers import cfg
+from fetchers.providers.base import DataProvider, QuoteData
 
 log = logging.getLogger(__name__)
 _SESSION  = requests.Session()

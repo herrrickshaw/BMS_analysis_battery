@@ -39,7 +39,6 @@ import math
 import numpy as np
 import pandas as pd
 
-
 # ── helpers ───────────────────────────────────────────────────────────────────
 
 def _col(df: pd.DataFrame, name: str) -> pd.Series:

@@ -1,16 +1,20 @@
 from __future__ import annotations
+
 from typing import Optional
+
+import pandas as pd
 from fastapi import APIRouter, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
-import pandas as pd
 
-from routers.upload import data_store
 from fetchers.live import (
-    fetch_live, get_nse_index_symbols, compare_dataframes,
     NSE_INDEX_URLS,
+    compare_dataframes,
+    fetch_live,
+    get_nse_index_symbols,
 )
-from scanners import darvas, piotroski, coffee_can
+from routers.upload import data_store
+from scanners import coffee_can, darvas, piotroski
 
 router = APIRouter()
 
@@ -103,6 +107,7 @@ async def fetch_live_data(market: str, req: FetchRequest = FetchRequest()):
     from db import cassandra_client as cass
     if cass.is_available():
         import asyncio
+
         from db.quote_updater import upsert_quotes
         _snapshot = live_df.copy()
         asyncio.get_running_loop().run_in_executor(None, upsert_quotes, market, _snapshot)

@@ -5,16 +5,16 @@ or API keys degrade gracefully (is_available() → False).
 """
 from __future__ import annotations
 
+from fetchers.providers.alpha_vantage import AlphaVantageProvider
 from fetchers.providers.base import DataProvider, QuoteData, compute_technicals
-from fetchers.providers.yahoo            import YahooProvider
-from fetchers.providers.alpha_vantage    import AlphaVantageProvider
-from fetchers.providers.polygon          import PolygonProvider
-from fetchers.providers.iex              import IEXProvider
-from fetchers.providers.tradier          import TradierProvider
-from fetchers.providers.quandl_ndl       import QuandlNDLProvider
-from fetchers.providers.currencylayer    import CurrencylayerProvider
+from fetchers.providers.currencylayer import CurrencylayerProvider
+from fetchers.providers.iex import IEXProvider
 from fetchers.providers.interactive_brokers import InteractiveBrokersProvider
-from fetchers.providers.tradingview      import TradingViewProvider
+from fetchers.providers.polygon import PolygonProvider
+from fetchers.providers.quandl_ndl import QuandlNDLProvider
+from fetchers.providers.tradier import TradierProvider
+from fetchers.providers.tradingview import TradingViewProvider
+from fetchers.providers.yahoo import YahooProvider
 
 # Singletons
 yahoo               = YahooProvider()

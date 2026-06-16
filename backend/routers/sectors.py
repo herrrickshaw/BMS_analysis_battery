@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from fastapi import APIRouter
-from damodaran import get_all_benchmarks, _REGION_SUFFIX
+
+from damodaran import _REGION_SUFFIX, get_all_benchmarks
 
 router = APIRouter()
 

@@ -12,8 +12,8 @@ from typing import Optional
 import pandas as pd
 import requests
 
-from fetchers.providers.base import DataProvider, QuoteData, compute_technicals
 from config.providers import cfg
+from fetchers.providers.base import DataProvider, QuoteData, compute_technicals
 
 log = logging.getLogger(__name__)
 _SESSION = requests.Session()

@@ -1,10 +1,12 @@
 import io
+
 import pandas as pd
 from fastapi import APIRouter, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import StreamingResponse
+
 from routers.upload import data_store
-from scanners import darvas, piotroski, coffee_can
+from scanners import coffee_can, darvas, piotroski
 
 router = APIRouter()
 

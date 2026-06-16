@@ -13,8 +13,8 @@ from typing import Optional
 
 import pandas as pd
 
-from fetchers.providers.base import DataProvider, QuoteData, compute_technicals
 from config.providers import cfg
+from fetchers.providers.base import DataProvider, QuoteData, compute_technicals
 
 log = logging.getLogger(__name__)
 

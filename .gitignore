@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node/npm
+node_modules/
+package-lock.json
+npm-debug.log
+
+# Data files
+*.csv
+*.xlsx
+*.xls
+*.db
+*.sqlite
+
+# Large files
+*.zip
+*.tar.gz
+*.7z
+
+# OS
+.DS_Store
+Thumbs.db

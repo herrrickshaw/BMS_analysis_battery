@@ -36,8 +36,11 @@ Integration (import):
     sig = interpret_symbol("RELIANCE")
     df_with_signals = interpret_dataframe(df)   # df has columns from nifty500_scan
 
-Dependencies:
+Dependencies (standard PyPI — no Claude, no Anthropic SDK required):
     pip3 install yfinance pandas numpy openpyxl
+
+Standalone execution (no Claude Code, no app server needed):
+    python3 darvas_interpreter.py RELIANCE TCS INFY
 """
 from __future__ import annotations
 

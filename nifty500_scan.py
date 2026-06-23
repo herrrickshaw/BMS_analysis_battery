@@ -22,8 +22,11 @@ Output:
       Sheet "Hidden Gems"  — BUY/WATCH stocks outside NIFTY 500   (replaced each run)
       Sheet "History"      — one summary row appended per run      (cumulative)
 
-Dependencies:
+Dependencies (standard PyPI — no Claude, no Anthropic SDK required):
     pip3 install yfinance pandas numpy openpyxl requests
+
+Standalone execution (no Claude Code, no app server needed):
+    python3 nifty500_scan.py --fast
 """
 from __future__ import annotations
 

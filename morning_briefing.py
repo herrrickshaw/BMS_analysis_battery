@@ -20,8 +20,11 @@ Usage:
     python3 morning_briefing.py --no-excel      # terminal only
     python3 morning_briefing.py --no-fundamentals  # faster, no PE/ROE
 
-Dependencies:
+Dependencies (standard PyPI — no Claude, no Anthropic SDK required):
     pip3 install yfinance pandas numpy openpyxl requests
+
+Standalone execution (no Claude Code, no app server needed):
+    python3 morning_briefing.py
 """
 from __future__ import annotations
 

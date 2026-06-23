@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India Fuel Station Gap Analysis — Where New Petrol Pumps Are Needed</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --accent2: #818cf8;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --green: #34d399;
+            --red: #f87171;
+            --orange: #fb923c;
+            --border: #334155;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; }
+
+        /* ── Header ── */
+        .header { background:var(--card); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+        .header h1 { font-size:1.35rem; font-weight:700; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; white-space:nowrap; }
+        .header .subtitle { color:var(--muted); font-size:.85rem; }
+        .badge { display:inline-block; background:var(--accent); color:var(--bg); font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:9999px; margin-left:8px; vertical-align:middle; }
+
+        /* ── Layout ── */
+        .app { display:grid; grid-template-columns:340px 1fr; grid-template-rows:1fr; height:calc(100vh - 60px); }
+        @media(max-width:900px){ .app { grid-template-columns:1fr; grid-template-rows:auto 50vh; } }
+
+        /* ── Sidebar ── */
+        .sidebar { background:var(--card); border-right:1px solid var(--border); overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:14px; }
+        .sidebar h2 { font-size:.95rem; color:var(--accent); text-transform:uppercase; letter-spacing:1px; }
+        .sidebar label { font-size:.8rem; color:var(--muted); display:block; margin-bottom:4px; }
+
+        select, input[type=range] { width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:8px 10px; font-size:.9rem; }
+        select:focus { outline:2px solid var(--accent); }
+
+        /* KPI row */
+        .kpi-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .kpi { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center; }
+        .kpi .val { font-size:1.5rem; font-weight:700; color:var(--accent); }
+        .kpi .lbl { font-size:.7rem; color:var(--muted); text-transform:uppercase; }
+
+        /* Legend */
+        .legend { display:flex; flex-direction:column; gap:4px; }
+        .legend-item { display:flex; align-items:center; gap:8px; font-size:.8rem; }
+        .legend-dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; }
+
+        /* Company filter chips */
+        .chip-group { display:flex; flex-wrap:wrap; gap:6px; }
+        .chip { padding:4px 10px; border-radius:9999px; font-size:.75rem; cursor:pointer; border:1px solid var(--border); background:var(--bg); color:var(--muted); transition:.15s; user-select:none; }
+        .chip.active { border-color:var(--accent); color:var(--accent); background:rgba(56,189,248,.12); }
+
+        /* Gap list */
+        .gap-list { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
+        .gap-card { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 12px; cursor:pointer; transition:.15s; }
+        .gap-card:hover { border-color:var(--accent); }
+        .gap-card .name { font-weight:600; font-size:.9rem; }
+        .gap-card .meta { font-size:.75rem; color:var(--muted); margin-top:2px; }
+        .gap-card .score { float:right; font-weight:700; padding:2px 8px; border-radius:4px; font-size:.8rem; }
+        .score-high { background:rgba(248,113,113,.15); color:var(--red); }
+        .score-med  { background:rgba(251,146,60,.15); color:var(--orange); }
+        .score-low  { background:rgba(52,211,153,.15); color:var(--green); }
+
+        /* ── Map ── */
+        #map { width:100%; height:100%; }
+
+        /* Info popup */
+        .leaflet-popup-content-wrapper { background:var(--card)!important; color:var(--text)!important; border-radius:8px!important; border:1px solid var(--border)!important; }
+        .leaflet-popup-tip { background:var(--card)!important; }
+        .leaflet-popup-content { font-size:.85rem; line-height:1.5; }
+        .leaflet-popup-content b { color:var(--accent); }
+
+        /* Heatmap legend overlay */
+        .heat-legend { position:absolute; bottom:24px; right:24px; z-index:999; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 16px; }
+        .heat-legend h4 { font-size:.75rem; color:var(--muted); margin-bottom:6px; text-transform:uppercase; }
+        .gradient-bar { width:160px; height:12px; border-radius:4px; background:linear-gradient(to right, #22d3ee, #facc15, #ef4444); }
+        .gradient-labels { display:flex; justify-content:space-between; font-size:.65rem; color:var(--muted); margin-top:2px; }
+
+        /* loading */
+        .loading-overlay { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; transition:opacity .4s; }
+        .loading-overlay.hidden { opacity:0; pointer-events:none; }
+        .spinner { width:40px; height:40px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loader">
+    <div class="spinner"></div>
+    <div style="color:var(--muted);font-size:.9rem;">Building fuel station map…</div>
+</div>
+
+<div class="header">
+    <h1>Fuel Station Gap Analysis</h1>
+    <span class="badge">INDIA</span>
+    <span class="subtitle">Identify clusters where new petrol stations are needed</span>
+</div>
+
+<div class="app">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div>
+            <h2>Filters</h2>
+        </div>
+
+        <div>
+            <label for="stateSelect">Select State / UT</label>
+            <select id="stateSelect"><option value="all">All India</option></select>
+        </div>
+
+        <div>
+            <label for="districtSelect">Select District</label>
+            <select id="districtSelect"><option value="all">All Districts</option></select>
+        </div>
+
+        <div>
+            <label>Show Companies</label>
+            <div class="chip-group" id="companyChips"></div>
+        </div>
+
+        <div>
+            <label>Heatmap Layer</label>
+            <select id="heatLayer">
+                <option value="gap">Gap Score (need for new stations)</option>
+                <option value="density">Station Density</option>
+                <option value="ev">EV Charger Density</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Heatmap Radius: <span id="radiusVal">25</span> km</label>
+            <input type="range" id="radiusSlider" min="10" max="60" value="25">
+        </div>
+
+        <div class="kpi-row">
+            <div class="kpi"><div class="val" id="kpiTotal">—</div><div class="lbl">Stations</div></div>
+            <div class="kpi"><div class="val" id="kpiEV">—</div><div class="lbl">EV Chargers</div></div>
+            <div class="kpi"><div class="val" id="kpiGaps">—</div><div class="lbl">Gap Zones</div></div>
+            <div class="kpi"><div class="val" id="kpiDensity">—</div><div class="lbl">Avg / 1000 km²</div></div>
+        </div>
+
+        <div>
+            <h2>Legend</h2>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> High Need — few stations, high population</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div> Moderate Need — some coverage gaps</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#22d3ee"></div> Well Served — adequate station density</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#a855f7"></div> EV Charging Station</div>
+            </div>
+        </div>
+
+        <div>
+            <h2>Top Gap Zones</h2>
+            <div class="gap-list" id="gapList"></div>
+        </div>
+    </div>
+
+    <!-- Map -->
+    <div style="position:relative;">
+        <div id="map"></div>
+        <div class="heat-legend">
+            <h4>Need for New Stations</h4>
+            <div class="gradient-bar"></div>
+            <div class="gradient-labels"><span>Low</span><span>Medium</span><span>High</span></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

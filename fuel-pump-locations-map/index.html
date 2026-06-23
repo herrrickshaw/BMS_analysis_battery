@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Pump & Retail Outlet Locations Map — India</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --red: #ef4444;
+            --orange: #fb923c;
+            --yellow: #eab308;
+            --blue: #3b82f6;
+            --cyan: #06b6d4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+
+        .header {
+            background: var(--card);
+            border-bottom: 1px solid #334155;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .header h1 { font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+        .header-info { font-size: 0.85rem; color: var(--muted); }
+
+        .container { display: grid; grid-template-columns: 280px 1fr; height: calc(100vh - 60px); }
+        @media(max-width: 768px) { .container { grid-template-columns: 1fr; grid-template-rows: auto 1fr; } }
+
+        .sidebar {
+            background: var(--card);
+            border-right: 1px solid #334155;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar-section { display: flex; flex-direction: column; gap: 8px; }
+        .sidebar-title { font-size: 0.8rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+
+        select, input[type=text] { width: 100%; background: var(--bg); color: var(--text); border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; font-size: 0.9rem; }
+        select:focus, input:focus { outline: 2px solid var(--accent); }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .stat-card { background: var(--bg); border: 1px solid #334155; border-radius: 6px; padding: 10px; text-align: center; }
+        .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+        .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; }
+
+        .company-filters { display: flex; flex-direction: column; gap: 6px; }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: var(--bg);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.15s;
+            user-select: none;
+        }
+        .filter-item:hover { border-color: var(--accent); }
+        .filter-item input[type=checkbox] { cursor: pointer; }
+        .filter-item.active { border-color: var(--accent); background: rgba(56,189,248,0.12); }
+
+        .color-legend { display: flex; flex-direction: column; gap: 6px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+        .outlet-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+        .outlet-card {
+            background: var(--bg);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 10px;
+            cursor: pointer;
+            transition: 0.15s;
+            font-size: 0.8rem;
+        }
+        .outlet-card:hover { border-color: var(--accent); }
+        .outlet-card .city { font-weight: 600; color: var(--text); }
+        .outlet-card .company { color: var(--muted); font-size: 0.75rem; }
+        .outlet-card .count { float: right; background: rgba(56,189,248,0.2); color: var(--accent); padding: 2px 6px; border-radius: 3px; }
+
+        #map { width: 100%; height: 100%; }
+
+        .map-info {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+            background: var(--card);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.8rem;
+        }
+
+        .leaflet-popup-content-wrapper { background: var(--card) !important; color: var(--text) !important; border-radius: 8px !important; border: 1px solid #334155 !important; }
+        .leaflet-popup-tip { background: var(--card) !important; }
+        .leaflet-popup-content { font-size: 0.85rem; line-height: 1.6; }
+        .leaflet-popup-content b { color: var(--accent); }
+
+        .loading { position: fixed; inset: 0; background: rgba(15,23,42,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid #334155; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="loading" id="loader">
+    <div class="spinner"></div>
+    <div style="color: var(--muted); font-size: 0.9rem;">Loading fuel pump locations…</div>
+</div>
+
+<div class="header">
+    <div>
+        <h1>⛽ Fuel Pump & Retail Outlet Locations</h1>
+        <div class="header-info">Interactive map of petrol/diesel pumps across India • Click markers for details</div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title">Filters</div>
+            <select id="stateSelect"><option value="all">All States</option></select>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Companies</div>
+            <div class="company-filters" id="companyFilters"></div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Search Location</div>
+            <input type="text" id="searchInput" placeholder="Search city or state...">
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Statistics</div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-value" id="statTotal">—</div><div class="stat-label">Total</div></div>
+                <div class="stat-card"><div class="stat-value" id="statShowing">—</div><div class="stat-label">Showing</div></div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Legend</div>
+            <div class="color-legend">
+                <div class="legend-item"><div class="legend-dot" style="background: var(--red)"></div> <span>IOCL</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--orange)"></div> <span>BPCL</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--yellow)"></div> <span>HPCL</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--blue)"></div> <span>Shell</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--cyan)"></div> <span>Nayara</span></div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Top Locations</div>
+            <div class="outlet-list" id="outletList"></div>
+        </div>
+    </div>
+
+    <!-- Map -->
+    <div style="position: relative;">
+        <div id="map"></div>
+        <div class="map-info">
+            <b>Zoom</b> to see individual pumps<br>
+            <b>Click</b> markers for details
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="locations-data.js"></script>
+<script src="locations-map.js"></script>
+
+</body>
+</html>

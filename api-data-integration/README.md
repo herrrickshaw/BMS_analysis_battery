@@ -2,55 +2,84 @@
 
 Multiple approaches to load comprehensive database of fuel retail outlets across India.
 
-## 🚀 Quick Start - Kaggle Dataset (RECOMMENDED - 15 min)
+## 🚀 Quick Start - Choose Your Approach
 
+### Option 1: SSR API with Authentication (NEW!)
+**Endpoint:** https://api.ssrinnovationlab.com/api/test/18/
+
+```bash
+# Interactive authentication
+python3 ssr_api_handler.py
+
+# Select auth method (Basic, API Key, Bearer Token, Custom)
+# Enter credentials
+# Script fetches and processes data
+```
+
+**Full instructions:** See `SSR_API_GUIDE.md`
+
+---
+
+### Option 2: Kaggle Dataset (FASTEST)
 **Dataset:** https://www.kaggle.com/datasets/adityaskarnik/indian-oil-retail-outlets-across-india-2025
 
 ```bash
-# 1. Download from Kaggle (click Download button)
+# 1. Download from Kaggle
 # 2. Extract CSV to this directory
 # 3. Load dataset
 python3 kaggle_loader.py
 
-# 4. Verify output
-ls outlet_data_kaggle/
-
-# 5. Integrate with maps
+# 4. Integrate with maps
 cp outlet_data_kaggle/kaggle_outlets_LATEST.js \
    ../fuel-pump-locations-map/locations-data.js
 
-# 6. Test
+# 5. Test
 cd ../fuel-pump-locations-map/
 python3 -m http.server 8000
-# Visit http://localhost:8000
 ```
 
 **Full instructions:** See `KAGGLE_QUICK_START.md`
 
 ---
 
-## Alternative Approaches
+## All Available Approaches
 
-### Option A: Kaggle Dataset (FASTEST)
-- ✅ **Time:** 15 minutes
+| Approach | Speed | Coverage | Effort | Cost | Status |
+|----------|-------|----------|--------|------|--------|
+| **SSR API** | ⚡ 5-10 min | Unknown | Low | Free | ✅ Ready (needs login) |
+| **Kaggle** | ⚡ 15 min | 10K-50K+ | Minimal | Free | ✅ Ready |
+| **Hybrid** | 2+ hrs | 100K+ | Medium | Free-$50 | ✅ Ready |
+| **PPAC Only** | 1-2 hrs | 95K+ | Medium | Free | ✅ Ready |
+| **OSM Only** | 30 min | 80K+ | Low | Free | ✅ Ready |
+
+### Option A: SSR API with Authentication (NEWEST)
+- ✅ **Direct from source:** Official API
+- ✅ **Fast:** 5-10 minutes
+- ✅ **Interactive:** Choose auth method
+- ✅ **Handles:** Multiple auth types (Basic, API Key, Bearer Token)
+- 📄 **Guide:** `SSR_API_GUIDE.md`
+- ⚙️ **Script:** `ssr_api_handler.py`
+
+### Option B: Kaggle Dataset (EASIEST)
 - ✅ **Pre-processed:** Already cleaned
+- ✅ **Time:** 15 minutes
 - ✅ **Coverage:** 10K-50K+ outlets
 - ✅ **Effort:** Minimal
 - ✅ **Cost:** Free
 - 📄 **Guide:** `KAGGLE_QUICK_START.md`
 
-### Option B: Hybrid Aggregation (MOST COMPREHENSIVE)
-- 🔧 **Time:** 2+ hours
-- 🔄 **Multi-source:** PPAC + OSM + Google
-- 📊 **Coverage:** 100,000+ outlets (potential)
-- 💪 **Effort:** Medium
-- 💵 **Cost:** Free-$50
+### Option C: Hybrid Aggregation (MOST COMPREHENSIVE)
+- ✅ **Multi-source:** PPAC + OSM + Google
+- ✅ **Coverage:** 100,000+ outlets (potential)
+- ✅ **Deduplication:** Automatic (0.5km radius)
+- ✅ **Time:** 2+ hours
+- ✅ **Cost:** Free-$50
 - 📄 **Guide:** `HYBRID_IMPLEMENTATION_GUIDE.md`
 
-### Option C: Single Sources (FLEXIBLE)
-- ⚡ **PPAC Official:** 95K outlets, free
-- 🗺️ **OpenStreetMap:** 80K outlets, free
-- 🌐 **Google Maps:** 95K outlets, $15-50
+### Option D: Single Sources (FLEXIBLE)
+- **PPAC:** 95K outlets, free, official ⭐
+- **OpenStreetMap:** 80K outlets, free, crowdsourced
+- **Google Maps:** 95K outlets, $15-50, commercial
 - 📄 **Guide:** `HYBRID_IMPLEMENTATION_GUIDE.md`
 
 ---

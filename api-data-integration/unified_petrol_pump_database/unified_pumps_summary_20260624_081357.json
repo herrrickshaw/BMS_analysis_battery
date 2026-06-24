@@ -1,0 +1,47 @@
+{
+  "timestamp": "20260624_081357",
+  "total_unique_pumps": 50384,
+  "unique_states": 50,
+  "unique_cities": 9183,
+  "unique_companies": 8,
+  "deduplication_stats": {
+    "total_records": 50384,
+    "duplicates_found": 0,
+    "unique_records": 50384,
+    "ssri_records": 50374,
+    "bpcl_records": 10,
+    "ppac_records": 0
+  },
+  "source_breakdown": {
+    "SSRI API": 50374,
+    "BPCL Official": 10,
+    "PPAC Reference": 0
+  },
+  "company_distribution": {
+    "BPCL": 16989,
+    "HPCL": 16722,
+    "IOCL": 13406,
+    "Unknown": 1716,
+    "Jio-bp": 841,
+    "Reliance": 505,
+    "Shell": 104,
+    "Nayara": 101
+  },
+  "top_states": {
+    "Uttar Pradesh": 6777,
+    "Maharashtra": 4320,
+    "Karnataka": 3983,
+    "Rajasthan": 3828,
+    "Madhya Pradesh": 3558,
+    "Gujarat": 3197,
+    "Tamil Nadu": 3177,
+    "Telangana": 2429,
+    "Punjab": 2351,
+    "Andhra Pradesh": 2332
+  },
+  "data_quality": {
+    "records_with_coordinates": 50383,
+    "records_with_address": 50384,
+    "records_with_customer_code": 10
+  }
+}

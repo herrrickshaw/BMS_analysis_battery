@@ -1,0 +1,43 @@
+{
+  "timestamp": "20260624_081532",
+  "total_dealerships": 10,
+  "unique_states": 1,
+  "unique_cities": 1,
+  "unique_regions": 1,
+  "region_breakdown": {
+    "North": {
+      "fetched": 10,
+      "added": 10
+    },
+    "South": {
+      "fetched": 10,
+      "added": 0
+    },
+    "East": {
+      "fetched": 10,
+      "added": 0
+    },
+    "West": {
+      "fetched": 10,
+      "added": 0
+    },
+    "Central": {
+      "fetched": 10,
+      "added": 0
+    },
+    "North East": {
+      "fetched": 10,
+      "added": 0
+    }
+  },
+  "state_distribution": {
+    "Chandigarh": 10
+  },
+  "region_distribution": {
+    "North": 10
+  },
+  "data_quality": {
+    "records_with_address": 10,
+    "records_with_customer_code": 10
+  }
+}

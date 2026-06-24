@@ -1,0 +1,14 @@
+{
+  "timestamp": "20260624_081300",
+  "total_dealerships": 10,
+  "unique_cities": 1,
+  "unique_states": 1,
+  "source": "BPCL Official Website",
+  "data_date": "2026-06-24 08:13:02",
+  "city_distribution": {
+    "CHANDIGARH": 10
+  },
+  "state_distribution": {
+    "Chandigarh": 10
+  }
+}

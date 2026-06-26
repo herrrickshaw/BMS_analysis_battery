@@ -46,13 +46,28 @@ DISCLAIMER = ("⚠️  Two independent views: mechanical fundamental screeners +
 # COMPONENT 1 — STOCK PICKS BASED ON FUNDAMENTALS
 # ══════════════════════════════════════════════════════════════════════════════
 
+# Map each screener sheet → the short tag shown in the report
+SCREENER_SHEETS = {
+    "Triple_Hits":       "TripleHit",
+    "Multi_Screen_Hits": "MultiScreen",
+    "Piotroski_Strong":  "Piotroski",
+    "Coffee_Can":        "CoffeeCan",
+    "Magic_Formula":     "MagicFormula",
+    "Bull_Cartel":       "BullCartel",
+    "Golden_Crossover":  "GoldenCross",
+    "Darvas_Signals":    "Darvas",
+}
+
+
 def get_fundamental_picks(market: str, run_fresh: bool = False) -> pd.DataFrame:
     """
-    Pull the fundamental shortlist: Triple Hits + Multi-Screen Hits from the
-    latest full scan (runs the scan fresh if --run-fresh or none exists).
-    Returns a DataFrame of high-conviction fundamental picks.
+    Build the COMBINED, DEDUPLICATED set of every stock that passed ANY screener
+    in the latest full scan — not just Triple/Multi-Screen hits. Each stock is
+    tagged with the list of screeners it appears in and a tier:
+        Triple Hit  > Multi-Screen (3+)  > Single-Screen
+    This is the universe on which Talk-on-the-Street sentiment is run.
     """
-    print("  [Component 1] Fundamental picks — loading latest full scan …")
+    print("  [Component 1] Fundamental picks — union of ALL screener sheets …")
     scan_dir = "indian_full_scan" if market == "IN" else "us_full_scan"
     pat = f"{scan_dir}/*_full_scan_*.xlsx"
     files = sorted(glob.glob(pat))
@@ -69,34 +84,80 @@ def get_fundamental_picks(market: str, run_fresh: bool = False) -> pd.DataFrame:
     if not files:
         return pd.DataFrame()
 
-    f = files[-1]
+    f  = files[-1]
     xl = pd.ExcelFile(f)
+    agg: dict = {}   # symbol → {screens:set, piotroski, ltp}
+
+    def _add(sym, tag, piotroski=None, ltp=None):
+        sym = str(sym or "").strip()
+        if not sym:
+            return
+        e = agg.setdefault(sym, {"screens": set(), "piotroski": None, "ltp": None})
+        e["screens"].add(tag)
+        if piotroski is not None and pd.notna(piotroski): e["piotroski"] = piotroski
+        if ltp is not None and pd.notna(ltp):             e["ltp"] = ltp
+
+    # Layout A — separate per-screener sheets (US scan)
+    for sheet, tag in SCREENER_SHEETS.items():
+        if sheet not in xl.sheet_names:
+            continue
+        df = pd.read_excel(f, sheet_name=sheet)
+        for _, r in df.iterrows():
+            if sheet == "Darvas_Signals" and \
+               str(r.get("Darvas_Signal","")).upper() != "BREAKOUT_BUY":
+                continue
+            _add(r.get("Symbol"), tag, r.get("Piotroski_Score"), r.get("LTP"))
+
+    # Layout B — single column-based "Fundamentals" sheet (Indian scan)
+    if "Fundamentals" in xl.sheet_names:
+        fd = pd.read_excel(f, sheet_name="Fundamentals")
+        for _, r in fd.iterrows():
+            sym, ltp, pio = r.get("Symbol"), r.get("LTP"), r.get("Piotroski_Score")
+            if str(r.get("Piotroski_Strong","")).upper() == "YES":
+                _add(sym, "Piotroski", pio, ltp)
+            if str(r.get("CoffeeCan","")).upper() == "PASS":
+                _add(sym, "CoffeeCan", pio, ltp)
+            if str(r.get("MagicFormula","")).upper() == "PASS":
+                _add(sym, "MagicFormula", pio, ltp)
+            if str(r.get("BullCartel","")).upper() == "PASS":
+                _add(sym, "BullCartel", pio, ltp)
+            if str(r.get("Darvas_Signal","")).upper() == "BREAKOUT_BUY":
+                _add(sym, "Darvas", pio, ltp)
+    # Golden Cross from All_Stocks (column-based, both layouts)
+    if "All_Stocks" in xl.sheet_names:
+        a = pd.read_excel(f, sheet_name="All_Stocks")
+        if "GC_Signal" in a.columns:
+            for _, r in a[a["GC_Signal"].astype(str).str.upper()=="GOLDEN_CROSS"].iterrows():
+                _add(r.get("Symbol"), "GoldenCross", r.get("Piotroski_Score"), r.get("LTP"))
+
     picks = []
-
-    # Triple Hits (highest conviction)
-    if "Triple_Hits" in xl.sheet_names:
-        th = pd.read_excel(f, sheet_name="Triple_Hits")
-        for _, r in th.iterrows():
-            picks.append({"Symbol": r.get("Symbol",""), "Tier": "Triple Hit",
-                          "Screens": "Darvas+Piotroski+CoffeeCan",
-                          "Piotroski": r.get("Piotroski_Score"),
-                          "LTP": r.get("LTP")})
-
-    # Multi-Screen Hits (3+ screeners)
-    if "Multi_Screen_Hits" in xl.sheet_names:
-        mh = pd.read_excel(f, sheet_name="Multi_Screen_Hits")
-        existing = {p["Symbol"] for p in picks}
-        for _, r in mh.iterrows():
-            sym = r.get("Symbol","")
-            if sym and sym not in existing:
-                picks.append({"Symbol": sym, "Tier": "Multi-Screen",
-                              "Screens": f"{r.get('Screens_Passed','?')} of 6",
-                              "Piotroski": r.get("Piotroski_Score"),
-                              "LTP": r.get("LTP")})
+    for sym, e in agg.items():
+        screens = e["screens"]
+        n = len([s for s in screens if s not in ("TripleHit","MultiScreen")])
+        if "TripleHit" in screens:
+            tier = "Triple Hit"
+        elif "MultiScreen" in screens or n >= 3:
+            tier = "Multi-Screen"
+        else:
+            tier = "Single-Screen"
+        picks.append({
+            "Symbol": sym, "Tier": tier,
+            "Screens": "+".join(sorted(s for s in screens
+                                       if s not in ("TripleHit","MultiScreen"))) or "—",
+            "N_Screens": n,
+            "Piotroski": e["piotroski"], "LTP": e["ltp"],
+        })
 
     df = pd.DataFrame(picks)
-    print(f"  [Component 1] {len(df)} fundamental picks "
-          f"({(df['Tier']=='Triple Hit').sum() if not df.empty else 0} triple hits)")
+    if not df.empty:
+        tier_rank = {"Triple Hit":0, "Multi-Screen":1, "Single-Screen":2}
+        df["_r"] = df["Tier"].map(tier_rank)
+        df = df.sort_values(["_r","N_Screens"], ascending=[True,False]).drop("_r",axis=1)
+    n_triple = int((df["Tier"]=="Triple Hit").sum()) if not df.empty else 0
+    n_multi  = int((df["Tier"]=="Multi-Screen").sum()) if not df.empty else 0
+    print(f"  [Component 1] {len(df)} UNIQUE fundamental picks across all screeners "
+          f"({n_triple} triple, {n_multi} multi-screen, "
+          f"{len(df)-n_triple-n_multi} single-screen)")
     return df
 
 

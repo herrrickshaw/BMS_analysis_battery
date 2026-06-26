@@ -7,6 +7,39 @@ All notable changes follow [Semantic Versioning](https://semver.org/):
 
 ---
 
+## [3.5.0] — 2026-06-26 — Two Separate Pipelines (Historical vs News)
+
+Splits all analysis into two clean, independent orchestrators with distinct
+entry points, data sources, and online/offline characteristics.
+
+### Added
+- **`pipeline_historical.py`** — PIPELINE 1: historical data analysis (OFFLINE).
+  Orchestrates price/fundamental stages over the 5-year Parquet cache:
+  scan → backtest → walk-forward → pattern discovery → sector clustering →
+  DL strategy → implied sentiment↔price proxy. `--stages` selects a subset;
+  `full` / `analytics` presets. No live network beyond cache warming.
+- **`pipeline_news.py`** — PIPELINE 2: news-based analysis (ONLINE/live text).
+  4 stages: market mood (regime gauge) → per-ticker sentiment → forward
+  monitor (logs at 1d/1wk/1mo/3mo cadence) → sentiment↔price join (builds the
+  true news-vs-price correlation dataset as the log matures).
+  Sources: RSS (Moneycontrol/ET/BusinessLine/LiveMint, no key) + 4 APIs.
+
+### Separation of concerns
+  Historical = offline, price/fundamentals, backtested patterns, 5-yr cache.
+  News       = online, live headlines, VADER/provider sentiment, forward-looking.
+  They share only stock_utils helpers; otherwise fully decoupled.
+
+---
+
+## [3.4.0] — 2026-06-26 — Indian News Sources (Moneycontrol/ET/BusinessLine)
+
+### Added
+- `IndianRSSProvider` in sentiment_pipeline.py — free RSS, no API key:
+  Moneycontrol, Economic Times, BusinessLine, LiveMint. Per-ticker matching +
+  market-mood regime gauge. Verified live (ADANIENT +0.64, market mood +0.43).
+
+---
+
 ## [3.3.0] — 2026-06-26 — News Sentiment Ingestion Pipeline
 
 Adds the textual-sentiment stream that turns the price-only screeners/ML into

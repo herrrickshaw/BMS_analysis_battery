@@ -7,6 +7,37 @@ All notable changes follow [Semantic Versioning](https://semver.org/):
 
 ---
 
+## [3.6.0] — 2026-06-26 — Two-Component Daily Report + Docker
+
+Surfaces the two pipelines as two labelled components in the daily mailer and
+packages everything into the Docker image.
+
+### Added
+- **`daily_combined_report.py`** — merges both pipelines into one report with:
+  - **"Stock Picks Based on Fundamentals"** (Component 1 — screener pipeline)
+  - **"Talk on the Street"** (Component 2 — live news sentiment + market mood)
+  - **Convergence** section: highlights stocks where BOTH agree
+    (✅ strong fundamentals AND positive news = high-conviction;
+     ⚠️ strong fundamentals BUT negative news = caution).
+  - Efficient: fundamentals run full-universe (offline); news runs only on the
+    fundamental shortlist + market-mood gauge (conserves news quota).
+  - Emits HTML fragment (`--html`) + JSON for the mailer.
+- Docker: 10 new modules copied into the image (stock_utils, pattern_discovery,
+  sector_analysis, dl_strategy_eval, sentiment_pipeline, sentiment_price_link,
+  pipeline_historical, pipeline_news, daily_combined_report, r_analysis).
+- entrypoint.sh commands: `report`, `historical`, `news`, `patterns`.
+- docker-compose services: `report`, `historical`, `news`.
+
+### Changed
+- Daily mailer (8:30 AM cron) restructured around the two named components,
+  leading with the Convergence highlight. Subject line shows fundamentals
+  count, street mood, and convergence count.
+
+### Verified
+- Combined report runs: 8 fundamental triple-hits + market mood +0.44 POSITIVE.
+
+---
+
 ## [3.5.0] — 2026-06-26 — Two Separate Pipelines (Historical vs News)
 
 Splits all analysis into two clean, independent orchestrators with distinct

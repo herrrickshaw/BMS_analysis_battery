@@ -7,6 +7,44 @@ All notable changes follow [Semantic Versioning](https://semver.org/):
 
 ---
 
+## [3.2.0] — 2026-06-26 — AI Pattern Discovery & Sector Analytics
+
+Adds an analytics suite that mines the 5-year Parquet cache (6,280 stocks across
+NSE + NASDAQ + NYSE) for structure, plus a literature-grounded strategy evaluator
+and a full glossary. Reuses the shared `stock_utils` helpers throughout.
+
+### Added
+- **`stock_utils.py`** — shared helpers eliminating duplication across 14 scripts
+  (`first_df`, `row`, `series`, `extract_ticker_df`, `bulk_download`,
+  `parallel_map`, `cagr`, `pct_change`, `normalise_debt_to_equity`).
+- **`pattern_discovery.py`** — 4-step unsupervised + supervised discovery:
+  cleansing → 24-feature extraction → KMeans/DBSCAN/PCA + GradientBoosting →
+  insight extraction (behavioural archetypes, anomalies, co-moving pairs).
+  Honest finding: out-of-sample forward-return R² ≈ 0 (semi-efficient markets);
+  value is structural (clusters, pairs), not predictive.
+- **`dl_strategy_eval.py`** — directional classification → mechanical long/flat
+  strategy → economic backtest vs buy-and-hold, grounded in 5 DL papers
+  (Fister 2019, Olorunnimbe 2022, Toichatturat 2024, Sharma 2025, Miao CS230).
+  Finding: ML earns no return alpha in efficient US, modest edge in India, but
+  consistently cuts drawdown 12–15pp in both — Fister's risk-adjusted thesis.
+- **`sector_analysis.py`** — sector classification (cached) → equal-weighted
+  sector return indices → KMeans on 10-feature fingerprints → rankings,
+  co-movement (diversification pairs), rotation. Rediscovered defensive vs
+  cyclical split; Utilities as best diversifier (US); Tech defensive in India.
+- **`GLOSSARY.md`** — ~180 terms across 12 sections (screeners, indicators,
+  fundamentals, regime, backtesting, ML, intraday, IPO, architecture, papers).
+
+### Fixed
+- Look-ahead leakage in `pattern_discovery` supervised model (as-of feature
+  cutoff): spurious R²=0.926 → honest R²=−0.063.
+
+### Research papers added (5)
+- Fister et al. (NNW 2019), Olorunnimbe & Viktor (AI Review 2022),
+  Toichatturat (SET 2024), Sharma et al. (IJIRTM 2025), Miao (Stanford CS230).
+  Total papers incorporated: 15.
+
+---
+
 ## [3.1.0] — 2026-06-26 — Domain-Driven Architecture
 
 Refactored the monolithic scan scripts into a clean 3-layer DDD architecture

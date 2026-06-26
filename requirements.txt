@@ -1,0 +1,30 @@
+# requirements.txt — pinned for v1.0.0 reproducibility
+# Generated: 26 Jun 2026
+
+# Core data
+pandas==2.3.3
+numpy==2.0.2
+pyarrow==21.0.0         # Parquet read/write (10× faster than CSV)
+
+# Market data
+yfinance==1.2.0
+nsepython==2.97         # Live NSE quotes, bulk deals, VIX, FII/DII
+nsepy==0.8              # NSE historical (SSL issues on macOS — fallback only)
+nse==3.1.0              # NSE library with bhavcopy support
+bse==3.3.0              # BSE library
+bseindia==1.1
+
+# Web / scraping
+requests==2.32.5
+markitdown==0.0.1a1     # HTML → markdown for screener.in pre-filtering
+
+# ML
+scikit-learn==1.6.1
+scipy==1.13.1
+
+# Output
+openpyxl==3.1.5
+
+# Utilities
+requests-oauthlib==2.0.0
+requests-file==3.0.1

@@ -361,18 +361,36 @@ class IndianRSSProvider(NewsProvider):
                     self._feed_cache[url] = []
         return [e for v in self._feed_cache.values() for e in v]
 
-    def fetch_news(self, ticker: str, market: str = "IN") -> List[Article]:
+    def fetch_news(self, ticker: str, market: str = "IN",
+                   company_name: str = "") -> List[Article]:
+        """
+        Match feed entries to a ticker using WORD-BOUNDARY matching to avoid
+        false positives (e.g. ticker 'DEN' must not match 'dent'). Requires the
+        ticker (or a supplied company-name token ≥4 chars) to appear as a whole
+        word. Tickers shorter than 3 chars are skipped unless a company name is
+        given, since they're too ambiguous for reliable headline matching.
+        """
+        import re
         if not self._fp_ok or market != "IN":
             return []
-        entries = self._all_entries()
-        tk = ticker.upper()
-        # match on symbol token or its first 4+ chars (company-name root)
-        root = tk[:5]
+        tk = ticker.upper().strip()
+        terms = []
+        if len(tk) >= 4:
+            terms.append(re.escape(tk))
+        # Company-name root token (e.g. "RELIANCE" from "Reliance Industries Ltd")
+        if company_name:
+            for tok in re.findall(r"[A-Za-z]{4,}", company_name.upper()):
+                if tok not in ("LIMITED","LTD","INDIA","CORPORATION","COMPANY",
+                               "INDUSTRIES","ENTERPRISES","FINANCE","BANK"):
+                    terms.append(re.escape(tok)); break  # first meaningful token
+        if not terms:
+            return []   # too-short/ambiguous ticker with no company name → skip
+        pattern = re.compile(r"\b(" + "|".join(terms) + r")\b")
+
         out = []
-        for e in entries:
-            text = f"{e['title']} {e['summary']}"
-            up   = text.upper()
-            if tk in up or (len(root) >= 4 and root in up):
+        for e in self._all_entries():
+            up = f"{e['title']} {e['summary']}".upper()
+            if pattern.search(up):
                 out.append(Article(
                     title=e["title"], source=f"{self.name}:{e['outlet']}",
                     published=e["published"],

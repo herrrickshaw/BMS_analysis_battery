@@ -7,6 +7,26 @@ All notable changes follow [Semantic Versioning](https://semver.org/):
 
 ---
 
+## [3.9.0] — 2026-06-26 — Extensibility Registry + Approach Docs
+
+### Added
+- **`tool_registry.py`** — decorator-based registry to add screeners, news
+  sources, and analyses with ONE function each (minimises code as the system
+  grows). `@screener / @news_source / @analysis` auto-register; pipelines can
+  iterate `run_all_screeners()` instead of hard-coding rules. The 6 built-in
+  screeners fold in via `register_builtin_screeners()` so old + new share one
+  source of truth. Verified: a new screener = ~5 lines.
+- **`APPROACHES.md`** — full write-up of the two analytical approaches
+  (fundamental/historical vs news/sentiment), their data, strengths, limits,
+  the convergence cross-check, and how to extend either with minimal code.
+- Two-approach comment header added to daily_combined_report.py.
+
+### Note
+- Gmail MCP in this environment exposes only `create_draft` (no send tool), so
+  the daily report is left as a Gmail draft for one-click manual send.
+
+---
+
 ## [3.8.0] — 2026-06-26 — US News Sources (CNBC + MarketWatch)
 
 ### Added

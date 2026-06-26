@@ -7,6 +7,35 @@ All notable changes follow [Semantic Versioning](https://semver.org/):
 
 ---
 
+## [3.3.0] — 2026-06-26 — News Sentiment Ingestion Pipeline
+
+Adds the textual-sentiment stream that turns the price-only screeners/ML into
+hybrid market+sentiment models — the configuration Sharma et al. (IJIRTM 2025)
+and the DL survey found consistently outperforms single-source models.
+
+### Added
+- **`sentiment_pipeline.py`** — multi-source news sentiment ingestion:
+  - 4 provider adapters (free tiers): **Marketaux** (100/day, global),
+    **Alpha Vantage** (25/day, native sentiment), **Finnhub** (60/min),
+    **NewsData.io** (1,000/month, multi-language)
+  - Provider abstraction with per-source rate-limit throttling
+  - Sentiment scoring: provider-native score when available, else VADER with a
+    finance-tuned lexicon (beat/upgrade/surge positive; plunge/fraud/downgrade negative)
+  - Quota-weighted aggregation → per-ticker score [-1,+1] + POSITIVE/NEUTRAL/NEGATIVE
+  - 6-hour result cache to conserve API quota; graceful degradation if a key is missing
+  - Demo mode (VADER on sample headlines) when no API keys are set
+- `vaderSentiment` added to requirements.txt
+
+### Setup
+  export MARKETAUX_KEY / ALPHAVANTAGE_KEY / FINNHUB_KEY / NEWSDATA_KEY
+- `warm_india_cache.py` — warms 5-yr Parquet cache for full NSE+BSE
+  (2,372 NSE + 2,133 BSE-only = 4,505 tickers)
+
+### Research papers added (1)
+- Sharma et al. (IJIRTM 2025) — hybrid market+sentiment beats price-only. (16 total)
+
+---
+
 ## [3.2.0] — 2026-06-26 — AI Pattern Discovery & Sector Analytics
 
 Adds an analytics suite that mines the 5-year Parquet cache (6,280 stocks across

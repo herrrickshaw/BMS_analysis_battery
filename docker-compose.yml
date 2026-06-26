@@ -39,6 +39,30 @@ services:
     labels:
       description: "Full daily scan — NSE+BSE+NASDAQ+NYSE × 6 screeners"
 
+  # ── Combined daily report (fundamentals + talk on the street) ─────────────────
+  report:
+    <<: *common
+    container_name: stockscan-report
+    command: report
+    labels:
+      description: "Two-component daily report: fundamental picks + street talk + convergence"
+
+  # ── Historical analysis pipeline (offline) ────────────────────────────────────
+  historical:
+    <<: *common
+    container_name: stockscan-historical
+    command: historical
+    labels:
+      description: "PIPELINE 1 — offline price/fundamental analysis over 5yr cache"
+
+  # ── News analysis pipeline (live) ─────────────────────────────────────────────
+  news:
+    <<: *common
+    container_name: stockscan-news
+    command: news --watchlist nifty50
+    labels:
+      description: "PIPELINE 2 — live news sentiment (RSS + APIs)"
+
   # ── IPO tracker ──────────────────────────────────────────────────────────────
   ipo:
     <<: *common

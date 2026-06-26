@@ -105,6 +105,16 @@ COPY Downloads/backtest_screeners.py     /app/scripts/
 COPY Downloads/walk_forward_backtest.py  /app/scripts/
 COPY Downloads/ipo_tracker.py            /app/scripts/
 COPY Downloads/intraday_monitor.py       /app/scripts/
+COPY Downloads/stock_utils.py            /app/scripts/
+COPY Downloads/pattern_discovery.py      /app/scripts/
+COPY Downloads/sector_analysis.py        /app/scripts/
+COPY Downloads/dl_strategy_eval.py       /app/scripts/
+COPY Downloads/sentiment_pipeline.py     /app/scripts/
+COPY Downloads/sentiment_price_link.py   /app/scripts/
+COPY Downloads/pipeline_historical.py    /app/scripts/
+COPY Downloads/pipeline_news.py          /app/scripts/
+COPY Downloads/daily_combined_report.py  /app/scripts/
+COPY Downloads/r_analysis.py             /app/scripts/
 
 # Metadata
 COPY VERSION    /app/VERSION

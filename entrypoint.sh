@@ -127,6 +127,40 @@ PYEOF
       2>&1 | tee "$OUTPUT/screener_$(date +%Y%m%d).log"
     ;;
 
+  # ── Combined daily report (fundamentals + street talk) ────────────────────────
+  report)
+    shift
+    log "=== DAILY COMBINED REPORT (fundamentals + talk on the street) ==="
+    python3 "$SCRIPTS/daily_combined_report.py" --market "${MARKET:-IN}" --html "$@" \
+      2>&1 | tee "$OUTPUT/combined_report_$(date +%Y%m%d).log"
+    ;;
+
+  # ── Historical analysis pipeline (offline) ────────────────────────────────────
+  historical)
+    shift
+    log "=== PIPELINE 1 — HISTORICAL DATA ANALYSIS ==="
+    python3 "$SCRIPTS/pipeline_historical.py" --market "${MARKET:-IN}" \
+      --workers "$WORKERS" "$@" \
+      2>&1 | tee "$OUTPUT/pipeline_historical_$(date +%Y%m%d).log"
+    ;;
+
+  # ── News analysis pipeline (live) ─────────────────────────────────────────────
+  news)
+    shift
+    log "=== PIPELINE 2 — NEWS-BASED ANALYSIS ==="
+    python3 "$SCRIPTS/pipeline_news.py" --market "${MARKET:-IN}" "$@" \
+      2>&1 | tee "$OUTPUT/pipeline_news_$(date +%Y%m%d).log"
+    ;;
+
+  # ── Pattern / sector / DL analytics ───────────────────────────────────────────
+  patterns)
+    shift
+    log "=== PATTERN + SECTOR + DL ANALYTICS ==="
+    python3 "$SCRIPTS/pattern_discovery.py" --market "${MARKET:-IN}" "$@"
+    python3 "$SCRIPTS/sector_analysis.py"   --market "${MARKET:-IN}" "$@"
+    python3 "$SCRIPTS/dl_strategy_eval.py"  --market "${MARKET:-IN}" --max 0
+    ;;
+
   # ── Live market context ───────────────────────────────────────────────────────
   live)
     log "=== LIVE MARKET CONTEXT ==="
@@ -158,6 +192,10 @@ Stock Analysis System v${VERSION}
 
 COMMANDS:
   scan          Full scan: all 6 screeners on NSE+BSE+NASDAQ+NYSE
+  report        Daily combined report: fundamental picks + street talk + convergence
+  historical    PIPELINE 1 — offline price/fundamental analysis
+  news          PIPELINE 2 — live news sentiment (RSS + APIs)
+  patterns      Pattern discovery + sector clustering + DL strategy
   ipo           IPO tracker: new listings + graduated screeners
   backtest      1-year walk-forward backtest
   walkforward   3y/5y/10y train/test/val research

@@ -7,6 +7,45 @@ All notable changes follow [Semantic Versioning](https://semver.org/):
 
 ---
 
+## [3.1.0] — 2026-06-26 — Domain-Driven Architecture
+
+Refactored the monolithic scan scripts into a clean 3-layer DDD architecture
+under `Downloads/stock_ddd/`. Existing v1.0 infrastructure (Parquet cache,
+nsepython fetcher) is wrapped as repository adapters — proven code reused, not
+rewritten.
+
+### Added
+- **Domain Layer** (`domain/`) — pure business logic, zero outer-layer imports
+  - `shared/value_objects.py` — `Ticker`, `Price`, `Percentage`, `DateRange`,
+    `ReturnHorizon`, `VIXLevel`, `Exchange`/`MarketRegime`/`PEZone` enums
+  - `shared/events.py` — domain events + `DomainEventBus` (pub/sub)
+  - `market_data/entities.py` — `Stock` aggregate root, `MarketIndex`,
+    `PriceBar`, `Sector`; `classify_regime()` as pure domain logic
+  - `market_data/repositories.py` — `IStockRepository`, `IMarketIndexRepository`,
+    `ILiveMarketDataService`, `IFundamentalsRepository` interfaces
+  - `screening/specifications.py` — Specification pattern: 6 screeners +
+    `TripleHitSpec` + `MultiScreenSpec`, composable via `.and_()`/`.or_()`/`.not_()`
+- **Application Layer** (`application/`) — orchestration, no business rules
+  - `commands/run_daily_scan.py` — `RunDailyScanCommand` + handler (CQRS)
+  - `ports/report_writer.py` — `IReportWriter`, `INotificationService` output ports
+- **Infrastructure Layer** (`infrastructure/`) — the only layer touching yfinance/Parquet/nsepython
+  - `market_data/composite_repository.py` — `CompositeStockRepository` (3-tier cache),
+    `ParquetIndexRepository`, `NSEPythonLiveService`, `YFinanceFundamentalsRepository`,
+    `create_stock_analysis_container()` DI factory
+- `stock_ddd/README.md` — architecture guide with layer diagram
+
+### Changed
+- Business rules (screener thresholds, regime classification, PE zones) moved
+  out of scripts into testable Domain objects
+- Dependency rule enforced: Domain ← Application ← Infrastructure (inward only)
+
+### Benefits
+- Screeners testable without network (in-memory `Stock` + `Specification`)
+- New data source = one new `IStockRepository` impl, zero Domain/App changes
+- Single source of truth for each rule (was duplicated across 3–4 scripts)
+
+---
+
 ## [2.0.0] — Planned
 
 ### Added

@@ -549,3 +549,7 @@ pip install markitdown  # For screener.in pre-filtering
 ---
 
 *⚠️ For educational and research purposes only. NOT investment advice.*
+
+## Screener & RSI Basis
+
+See [SCREENER_BASIS.md](SCREENER_BASIS.md) for the exact formulas, thresholds, and financial rationale behind RSI and all six screeners.

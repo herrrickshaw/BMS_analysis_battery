@@ -29,3 +29,4 @@ openpyxl==3.1.5
 requests-oauthlib==2.0.0
 requests-file==3.0.1
 vaderSentiment==3.3.2  # news sentiment scoring
+feedparser==6.0.12  # Indian RSS news feeds (Moneycontrol/ET/BusinessLine)

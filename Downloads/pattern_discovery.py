@@ -124,8 +124,24 @@ def load_and_clean(market: str = "ALL", max_stocks: int = 0,
 # STEP 2 — FEATURE EXTRACTION
 # ══════════════════════════════════════════════════════════════════════════════
 
-def extract_features(symbol: str, df: pd.DataFrame) -> dict:
-    """Engineer ~25 features capturing the stock's price/metric behaviour."""
+FWD = 21   # forward horizon for the supervised target (trading days)
+
+
+def extract_features(symbol: str, df_full: pd.DataFrame) -> dict:
+    """Engineer ~25 features capturing the stock's price/metric behaviour.
+
+    LEAKAGE FIX: features are computed ONLY on data up to the as-of cutoff
+    (df_full minus the last FWD bars). The supervised target is the genuinely
+    out-of-sample forward return over those held-out last FWD bars. No feature
+    window can see the target period.
+    """
+    if len(df_full) < 252 + FWD:
+        return {}
+
+    # As-of split: features see [:-FWD], target measures the held-out tail
+    df       = df_full.iloc[:-FWD]
+    fut_close = float(df_full["Close"].iloc[-1])    # price FWD days after as-of
+
     c = df["Close"].astype(float)
     h = df["High"].astype(float)
     l = df["Low"].astype(float)
@@ -201,13 +217,10 @@ def extract_features(symbol: str, df: pd.DataFrame) -> dict:
     # Mean reversion: negative lag-1 autocorrelation of returns
     feat["mean_reversion"] = safe(-rets.tail(120).autocorr() * 100) if len(rets) > 5 else 0
 
-    # Supervised target: forward 21-day return (computed from a held-out slice)
-    # Use the point 21 days before end as "now", actual end as "future"
-    if n > 273:
-        anchor = c.iloc[-22]
-        feat["_target_fwd21"] = safe((last - anchor) / anchor * 100)
-    else:
-        feat["_target_fwd21"] = np.nan
+    # Supervised target: TRUE out-of-sample forward return.
+    # `last` is the as-of close (end of feature window); `fut_close` is the
+    # price FWD trading days later (held out from ALL features above).
+    feat["_target_fwd21"] = safe((fut_close - last) / last * 100)
 
     return feat
 

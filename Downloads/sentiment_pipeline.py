@@ -292,6 +292,111 @@ class NewsDataProvider(NewsProvider):
             return []
 
 
+class IndianRSSProvider(NewsProvider):
+    """
+    Indian financial-news via free RSS feeds — NO API key required.
+    Sources: Moneycontrol, Economic Times (ET), BusinessLine / LiveMint.
+
+    Unlike the API providers, RSS feeds carry general market news rather than
+    per-ticker streams. We therefore:
+      - per ticker: keep entries whose title/summary mention the symbol or a
+        cleaned company-name token (e.g. "RELIANCE", "Reliance")
+      - score each matched headline with the finance-tuned VADER
+    Also exposes market-wide feed sentiment via fetch_market_mood().
+    """
+    name = "IndianRSS"
+    env_key = ""          # no key needed
+    min_interval = 0.5
+
+    FEEDS = {
+        "Moneycontrol": [
+            "https://www.moneycontrol.com/rss/business.xml",
+            "https://www.moneycontrol.com/rss/results.xml",
+            "https://www.moneycontrol.com/rss/marketreports.xml",
+        ],
+        "EconomicTimes": [
+            "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",
+            "https://economictimes.indiatimes.com/markets/stocks/rssfeeds/2146842.cms",
+        ],
+        "BusinessLine": [
+            "https://www.thehindubusinessline.com/markets/feeder/default.rss",
+        ],
+        "LiveMint": [
+            "https://www.livemint.com/rss/markets",
+        ],
+    }
+
+    def __init__(self):
+        super().__init__()
+        try:
+            import feedparser  # noqa
+            self._fp_ok = True
+        except ImportError:
+            self._fp_ok = False
+        self._feed_cache = {}   # url -> entries (within a run)
+
+    @property
+    def available(self) -> bool:
+        return self._fp_ok      # RSS needs no key, just feedparser
+
+    def _all_entries(self) -> list:
+        """Fetch + cache all feed entries once per run (market-wide pool)."""
+        if self._feed_cache:
+            return [e for v in self._feed_cache.values() for e in v]
+        import feedparser
+        for outlet, urls in self.FEEDS.items():
+            for url in urls:
+                try:
+                    self._throttle()
+                    d = feedparser.parse(url)
+                    self._feed_cache[url] = [
+                        {"title": e.get("title",""),
+                         "summary": e.get("summary", e.get("description","")),
+                         "link": e.get("link",""),
+                         "published": e.get("published",""),
+                         "outlet": outlet}
+                        for e in d.entries
+                    ]
+                except Exception:
+                    self._feed_cache[url] = []
+        return [e for v in self._feed_cache.values() for e in v]
+
+    def fetch_news(self, ticker: str, market: str = "IN") -> List[Article]:
+        if not self._fp_ok or market != "IN":
+            return []
+        entries = self._all_entries()
+        tk = ticker.upper()
+        # match on symbol token or its first 4+ chars (company-name root)
+        root = tk[:5]
+        out = []
+        for e in entries:
+            text = f"{e['title']} {e['summary']}"
+            up   = text.upper()
+            if tk in up or (len(root) >= 4 and root in up):
+                out.append(Article(
+                    title=e["title"], source=f"{self.name}:{e['outlet']}",
+                    published=e["published"],
+                    sentiment=score_text(f"{e['title']}. {e['summary']}"),
+                    url=e["link"], summary=e["summary"][:200]))
+        return out[:15]
+
+    def fetch_market_mood(self) -> dict:
+        """Overall sentiment of the whole Indian market news flow (regime gauge)."""
+        if not self._fp_ok:
+            return {}
+        entries = self._all_entries()
+        if not entries:
+            return {}
+        scores = [score_text(f"{e['title']}. {e['summary']}") for e in entries]
+        scores = [s for s in scores if s != 0]
+        if not scores:
+            return {"mood": "NEUTRAL", "score": 0.0, "n": len(entries)}
+        avg = sum(scores) / len(scores)
+        return {"mood": label_of(avg), "score": round(avg, 3),
+                "n_articles": len(entries),
+                "by_outlet": {o: len(self.FEEDS[o]) for o in self.FEEDS}}
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # PIPELINE ORCHESTRATOR
 # ══════════════════════════════════════════════════════════════════════════════
@@ -308,13 +413,22 @@ class SentimentPipeline:
         "AlphaVantage": 1.2,   # native sentiment
         "Finnhub": 1.0,        # headline-scored, generous quota
         "NewsData": 0.8,       # headline-scored, macro
+        "IndianRSS": 1.1,      # Moneycontrol/ET/BusinessLine — free, India-native
     }
 
     def __init__(self):
         self.providers = [MarketauxProvider(), AlphaVantageProvider(),
-                          FinnhubProvider(), NewsDataProvider()]
+                          FinnhubProvider(), NewsDataProvider(),
+                          IndianRSSProvider()]   # free, no key — India sources
         self.active = [p for p in self.providers if p.available]
         self._cache = self._load_cache()
+        # Keep a handle to the RSS provider for market-mood queries
+        self._rss = next((p for p in self.providers
+                          if isinstance(p, IndianRSSProvider) and p.available), None)
+
+    def get_market_mood(self) -> dict:
+        """Overall Indian market news sentiment (regime gauge) from RSS feeds."""
+        return self._rss.fetch_market_mood() if self._rss else {}
 
     def _load_cache(self) -> dict:
         if CACHE_FILE.exists():

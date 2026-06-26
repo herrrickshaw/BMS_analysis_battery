@@ -1,0 +1,14 @@
+# Jekyll config for the project website (docs/).
+# The site is a single self-contained static index.html — no theme needed.
+# Jekyll passes static files through unchanged; this config just keeps the
+# build clean and excludes non-site files.
+
+title: Stock Analysis System
+description: NSE/BSE/NASDAQ/NYSE quantitative screeners, backtesting, ML, news sentiment & portfolio construction
+theme: null            # no theme — index.html is fully self-styled
+
+include:
+  - index.html
+
+exclude:
+  - README.md

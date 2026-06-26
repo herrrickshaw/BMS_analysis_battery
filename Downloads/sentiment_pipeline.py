@@ -292,6 +292,17 @@ class NewsDataProvider(NewsProvider):
             return []
 
 
+# Tickers that are also common English/market words — matching them on the
+# ticker alone produces false positives (e.g. DOLLAR↔"dollar", STAR↔"star").
+# These require a company name to match a headline.
+_COMMON_WORD_TICKERS = {
+    "DOLLAR","STAR","WORTH","BENCHMARK","SMALLCAP","MARK","WHEELS","NATURAL",
+    "ICON","WORLD","POWER","ACE","GOLD","SILVER","ANG","BIL","TIL","MIL","SEL",
+    "DEN","RAL","NH","LAL","STEL","WEL","SETL","HIGH","ADVANCE","CONTROL","WORLD",
+    "EMERGENT","RESPONSE","DOLLAR","ALPHA","GLOBAL","VECTOR","BENCHMARK",
+}
+
+
 class IndianRSSProvider(NewsProvider):
     """
     Indian financial-news via free RSS feeds — NO API key required.
@@ -375,7 +386,9 @@ class IndianRSSProvider(NewsProvider):
             return []
         tk = ticker.upper().strip()
         terms = []
-        if len(tk) >= 4:
+        # Dictionary-word tickers (also common English words) are too ambiguous
+        # to match on the ticker alone — they need the company name.
+        if len(tk) >= 4 and tk not in _COMMON_WORD_TICKERS:
             terms.append(re.escape(tk))
         # Company-name root token (e.g. "RELIANCE" from "Reliance Industries Ltd")
         if company_name:

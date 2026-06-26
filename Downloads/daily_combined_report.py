@@ -257,10 +257,10 @@ def print_report(rep: dict):
     print(f"  🗞️  COMPONENT 2 — TALK ON THE STREET (live news sentiment)")
     print(f"{'='*74}")
     mood = rep["mood"]
+    src = "CNBC/MarketWatch" if market == "US" else "Moneycontrol/ET/BusinessLine/LiveMint"
     if mood:
         print(f"  Market mood: {mood.get('mood')} ({mood.get('score'):+.2f}) "
-              f"from {mood.get('n_articles')} articles "
-              f"(Moneycontrol/ET/BusinessLine/LiveMint)")
+              f"from {mood.get('n_articles')} articles ({src})")
     talk = rep["talk"]
     if talk:
         print(f"\n  {'Symbol':<14} {'Sentiment':<10} {'Score':>7} {'Articles':>9}")
@@ -306,9 +306,11 @@ def to_html(rep: dict) -> str:
     h.append('<h2>🗞️ Talk on the Street</h2>')
     if mood:
         col = {"POSITIVE":"#2e7d32","NEGATIVE":"#c62828"}.get(mood.get("mood"),"#f57f17")
+        src = ("CNBC · MarketWatch" if market == "US"
+               else "Moneycontrol · ET · BusinessLine · LiveMint")
         h.append(f'<p>Market mood: <b style="color:{col}">{mood.get("mood")} '
                  f'({mood.get("score"):+.2f})</b> from {mood.get("n_articles")} live articles '
-                 f'(Moneycontrol · ET · BusinessLine · LiveMint)</p>')
+                 f'({src})</p>')
     h.append('<table><tr><th>Symbol</th><th>Sentiment</th><th>Score</th><th>Articles</th></tr>')
     for sym, t in sorted(talk.items(), key=lambda x:-x[1]["score"]):
         if t["label"] == "NO_DATA": continue

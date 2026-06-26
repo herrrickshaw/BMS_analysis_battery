@@ -1,0 +1,113 @@
+{
+  "ohlc:RELIANCE.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:39:34.385407",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/RELIANCE.NS.parquet"
+  },
+  "ohlc:TCS.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:39:34.389286",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/TCS.NS.parquet"
+  },
+  "ohlc:HDFCBANK.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:39:34.392294",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/HDFCBANK.NS.parquet"
+  },
+  "ohlc:INFY.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:39:34.395502",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/INFY.NS.parquet"
+  },
+  "ohlc:ICICIBANK.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:39:34.397496",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/ICICIBANK.NS.parquet"
+  },
+  "ohlc:WIPRO.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:39:34.400247",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/WIPRO.NS.parquet"
+  },
+  "ohlc:AXISBANK.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:39:34.402265",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/AXISBANK.NS.parquet"
+  },
+  "ohlc:KOTAKBANK.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:39:34.404539",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/KOTAKBANK.NS.parquet"
+  },
+  "ohlc:LT.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:39:34.407045",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/LT.NS.parquet"
+  },
+  "ohlc:BAJFINANCE.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:39:34.410086",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/BAJFINANCE.NS.parquet"
+  },
+  "index:^NSEI": {
+    "updated": "2026-06-26T13:39:36.875271",
+    "rows": 2483,
+    "from": "2016-05-30",
+    "to": "2026-06-25"
+  },
+  "ohlc:MARUTI.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:41:26.074399",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/MARUTI.NS.parquet"
+  },
+  "ohlc:NESTLEIND.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:41:26.076788",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/NESTLEIND.NS.parquet"
+  },
+  "ohlc:TITAN.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:41:26.079590",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/TITAN.NS.parquet"
+  },
+  "ohlc:SUNPHARMA.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:41:26.082074",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/SUNPHARMA.NS.parquet"
+  },
+  "ohlc:BHARTIARTL.NS": {
+    "rows": 1258,
+    "from": "2021-05-28",
+    "to": "2026-06-25",
+    "updated": "2026-06-26T13:41:26.084572",
+    "file": "/Users/umashankar/Downloads/market_cache/ohlc/BHARTIARTL.NS.parquet"
+  }
+}

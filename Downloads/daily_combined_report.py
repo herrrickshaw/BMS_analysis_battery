@@ -177,7 +177,7 @@ def get_street_talk(symbols: list, market: str) -> tuple:
     except ImportError:
         return {}, {}
     sp = SentimentPipeline()
-    mood = sp.get_market_mood() if market == "IN" else {}
+    mood = sp.get_market_mood(market)   # IN → Moneycontrol/ET; US → CNBC/MarketWatch
     talk = {}
     if symbols:
         res = sp.get_batch(symbols, market)

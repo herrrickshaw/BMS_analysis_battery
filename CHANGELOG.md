@@ -7,6 +7,26 @@ All notable changes follow [Semantic Versioning](https://semver.org/):
 
 ---
 
+## [3.8.0] — 2026-06-26 — US News Sources (CNBC + MarketWatch)
+
+### Added
+- `USRSSProvider` in sentiment_pipeline.py — free RSS, no API key:
+  CNBC (top news, markets, finance) + MarketWatch (top stories, market pulse,
+  bulletins). Same company-name matching as the Indian provider (name looked up
+  from the symbol master). `get_market_mood('US')` gives a US regime gauge.
+
+### Fixed
+- symbol_master `_ensure_lookup` crashed on tickers listed on >1 exchange
+  (`DataFrame index must be unique`) — now dedups by symbol. This silently broke
+  US name lookups; now NVDA→NVIDIA, AAPL→Apple, TSLA→Tesla, MU→Micron all match
+  CNBC/MarketWatch headlines.
+
+### Changed
+- daily_combined_report passes market to get_market_mood (IN→Moneycontrol/ET,
+  US→CNBC/MarketWatch).
+
+---
+
 ## [3.7.0] — 2026-06-26 — Company-Name Sentiment + Symbol Master Parquet
 
 Switches news matching from tickers to COMPANY NAMES and persists a full

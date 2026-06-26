@@ -190,6 +190,9 @@ def _ensure_lookup():
     if not _LOOKUP:
         m = load_master()
         if not m.empty:
+            # A ticker can appear on >1 exchange (e.g. NSE & US). Keep first
+            # so the symbol index is unique.
+            m = m.drop_duplicates(subset=["symbol"], keep="first")
             _LOOKUP = m.set_index("symbol").to_dict("index")
 
 

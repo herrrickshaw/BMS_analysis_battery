@@ -15,9 +15,10 @@
 </div></nav>
 <div class="wrap">
   <section><h2>About</h2><p class="lead">Revenue and cost-recovery scenario models. Includes a DISCOM (electricity distribution company) debt-reduction calculator that shows how consumer power-billing levers — tariff hikes, AT&C loss reduction, collection efficiency, subsidy timeliness — close the ACS-ARR gap and pay down debt, with the consumer affordability trade-off made explicit; plus a Dirichlet off-month subscription-revenue simulation.</p>
-    <h3>Highlights</h3><ul><li>discom_debt_calculator.py — DISCOM debt-reduction scenarios + consumer-bill impact</li>
-<li>5 scenarios: status quo → aggressive turnaround, multi-year debt trajectory</li>
-<li>Core model: closing_debt = opening_debt − operating_gap + interest</li>
+    <h3>Highlights</h3><ul><li><a href="../discom-calculator.html"><b>▶ Interactive DISCOM token-charge calculator (live)</b></a></li>
+<li>discom_debt_calculator.py — DISCOM debt-reduction scenarios + consumer-bill impact</li>
+<li>Token-charge model: net = charge × connections × 12 × efficiency × (1−admin)</li>
+<li>Scenario table (₹1–₹100/mo) + charge×efficiency sensitivity heatmap</li>
 <li>random_numbers_using_dirichlet.py — Dirichlet revenue-share simulation</li></ul>
     <h3>Structure</h3><ul><li><code>discom_debt_calculator.py</code></li>
 <li><code>random_numbers_using_dirichlet.py</code></li>

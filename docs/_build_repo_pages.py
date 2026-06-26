@@ -75,12 +75,14 @@ REPOS = [
                  "pay down debt, with the consumer affordability trade-off made explicit; "
                  "plus a Dirichlet off-month subscription-revenue simulation.",
         "highlights": [
+            '<a href="../discom-calculator.html"><b>▶ Interactive DISCOM token-charge calculator (live)</b></a>',
             "discom_debt_calculator.py — DISCOM debt-reduction scenarios + consumer-bill impact",
-            "5 scenarios: status quo → aggressive turnaround, multi-year debt trajectory",
-            "Core model: closing_debt = opening_debt − operating_gap + interest",
+            "Token-charge model: net = charge × connections × 12 × efficiency × (1−admin)",
+            "Scenario table (₹1–₹100/mo) + charge×efficiency sensitivity heatmap",
             "random_numbers_using_dirichlet.py — Dirichlet revenue-share simulation",
         ],
         "structure": ["discom_debt_calculator.py", "random_numbers_using_dirichlet.py", "README.md"],
+        "live": "../discom-calculator.html",
     },
     {
         "slug": "colab-experiments", "name": "colab-experiments", "lang": "Python",

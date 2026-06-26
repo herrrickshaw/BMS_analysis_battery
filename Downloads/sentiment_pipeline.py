@@ -375,30 +375,48 @@ class IndianRSSProvider(NewsProvider):
     def fetch_news(self, ticker: str, market: str = "IN",
                    company_name: str = "") -> List[Article]:
         """
-        Match feed entries to a ticker using WORD-BOUNDARY matching to avoid
-        false positives (e.g. ticker 'DEN' must not match 'dent'). Requires the
-        ticker (or a supplied company-name token ≥4 chars) to appear as a whole
-        word. Tickers shorter than 3 chars are skipped unless a company name is
-        given, since they're too ambiguous for reliable headline matching.
+        Match feed entries by COMPANY NAME (preferred) rather than ticker.
+
+        If a company_name is supplied (from the symbol-master parquet), match the
+        full multi-word name root as a phrase — "ADANI ENTERPRISES" matches
+        "Adani Enterprises Q4…" but NOT "Adani Ports". This fixes both the
+        recall problem (tickers ≠ headline names) and precision (group companies).
+
+        Falls back to ticker word-boundary matching only when no name is given
+        and the ticker is neither too short nor a common English word.
         """
         import re
         if not self._fp_ok or market != "IN":
             return []
-        tk = ticker.upper().strip()
-        terms = []
-        # Dictionary-word tickers (also common English words) are too ambiguous
-        # to match on the ticker alone — they need the company name.
-        if len(tk) >= 4 and tk not in _COMMON_WORD_TICKERS:
-            terms.append(re.escape(tk))
-        # Company-name root token (e.g. "RELIANCE" from "Reliance Industries Ltd")
+
+        # If caller didn't pass a name, look it up from the symbol master.
+        if not company_name:
+            try:
+                from symbol_master import clean_name_for
+                company_name = clean_name_for(ticker)
+            except Exception:
+                company_name = ""
+
+        pattern = None
         if company_name:
-            for tok in re.findall(r"[A-Za-z]{4,}", company_name.upper()):
-                if tok not in ("LIMITED","LTD","INDIA","CORPORATION","COMPANY",
-                               "INDUSTRIES","ENTERPRISES","FINANCE","BANK"):
-                    terms.append(re.escape(tok)); break  # first meaningful token
-        if not terms:
-            return []   # too-short/ambiguous ticker with no company name → skip
-        pattern = re.compile(r"\b(" + "|".join(terms) + r")\b")
+            # Match the cleaned multi-word name as a phrase (allow flexible spacing).
+            toks = [re.escape(t) for t in company_name.upper().split() if len(t) >= 3]
+            if toks:
+                # Require the first ≥2 distinctive tokens adjacent (or the single
+                # token if that's all there is) — precise company-name phrase match.
+                if len(toks) >= 2:
+                    phrase = r"\b" + r"\s+".join(toks[:2]) + r"\b"
+                else:
+                    phrase = r"\b" + toks[0] + r"\b"
+                pattern = re.compile(phrase)
+
+        if pattern is None:
+            # Fallback: ticker word-boundary (skip short / common-word tickers)
+            tk = ticker.upper().strip()
+            if len(tk) >= 4 and tk not in _COMMON_WORD_TICKERS:
+                pattern = re.compile(r"\b" + re.escape(tk) + r"\b")
+            else:
+                return []
 
         out = []
         for e in self._all_entries():

@@ -8,6 +8,15 @@
 # and a CONVERGENCE section highlighting stocks where BOTH agree
 # (fundamentally strong AND positive in the news = highest conviction).
 #
+# THE TWO APPROACHES (see APPROACHES.md for the full write-up):
+#   • FUNDAMENTAL/HISTORICAL — objective screeners on 5yr price+financials
+#     (offline, deterministic, backtestable). Answers "is this structurally
+#     sound by its own numbers?". Backward-looking; misses catalysts.
+#   • NEWS/SENTIMENT — live headlines, company-name matched, VADER-scored
+#     (online, noisy, forward-looking). Answers "what is the market saying now?".
+#     Captures catalysts; provider-dependent and sometimes mis-signed.
+#   CONVERGENCE is a CROSS-CHECK (different failure modes), NOT a buy signal.
+#
 # Efficient design: the fundamental screeners run on the FULL universe (offline,
 # from cache); news sentiment then runs ONLY on the fundamental shortlist + a
 # market-mood gauge — so we never burn news quota on 7,000 stocks.

@@ -66,16 +66,21 @@ REPOS = [
     },
     {
         "slug": "subscription-model-revenue", "name": "subscription-model-revenue", "lang": "Python",
-        "status": "experiment", "url": f"{GH}/subscription-model-revenue",
-        "tagline": "Revenue modelling for subscription / off-month seasonality.",
-        "about": "Explores ways to evaluate revenue from off-peak months using a "
-                 "Dirichlet-distribution simulation to allocate revenue shares across "
-                 "periods — a probabilistic seasonality model.",
+        "status": "active", "url": f"{GH}/subscription-model-revenue",
+        "tagline": "Revenue & cost-recovery modelling — DISCOM debt + subscription seasonality.",
+        "about": "Revenue and cost-recovery scenario models. Includes a DISCOM "
+                 "(electricity distribution company) debt-reduction calculator that shows "
+                 "how consumer power-billing levers — tariff hikes, AT&C loss reduction, "
+                 "collection efficiency, subsidy timeliness — close the ACS-ARR gap and "
+                 "pay down debt, with the consumer affordability trade-off made explicit; "
+                 "plus a Dirichlet off-month subscription-revenue simulation.",
         "highlights": [
+            "discom_debt_calculator.py — DISCOM debt-reduction scenarios + consumer-bill impact",
+            "5 scenarios: status quo → aggressive turnaround, multi-year debt trajectory",
+            "Core model: closing_debt = opening_debt − operating_gap + interest",
             "random_numbers_using_dirichlet.py — Dirichlet revenue-share simulation",
-            "Models off-month revenue variability probabilistically",
         ],
-        "structure": ["random_numbers_using_dirichlet.py"],
+        "structure": ["discom_debt_calculator.py", "random_numbers_using_dirichlet.py", "README.md"],
     },
     {
         "slug": "colab-experiments", "name": "colab-experiments", "lang": "Python",

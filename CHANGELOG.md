@@ -7,6 +7,35 @@ All notable changes follow [Semantic Versioning](https://semver.org/):
 
 ---
 
+## [3.7.0] — 2026-06-26 — Company-Name Sentiment + Symbol Master Parquet
+
+Switches news matching from tickers to COMPANY NAMES and persists a full
+ticker↔name master as Parquet.
+
+### Added
+- **`symbol_master.py`** — builds/maintains `market_cache/symbol_master.parquet`:
+  every NSE+BSE+US stock with `symbol, name, name_clean, exchange, suffix,
+  yf_symbol` (11,707 stocks). Company names come free from NSE/BSE bhavcopy
+  `FinInstrmNm` and SEC EDGAR. Auto-refreshes when >24h stale.
+  - `clean_name()` strips only legal-form suffixes (LTD/LIMITED/PVT…), KEEPS
+    descriptive tokens so group companies stay distinct
+    ("ADANI ENTERPRISES" vs "ADANI PORTS" vs "ADANI POWER").
+  - `name_for()` / `clean_name_for()` lookups.
+- `symbol_master.parquet` shipped in nse_screener_reference/ and the Docker image.
+
+### Changed
+- `IndianRSSProvider.fetch_news` now matches the multi-word COMPANY NAME phrase
+  (auto-looked-up from the master) instead of the ticker — fixes both recall
+  (headlines say "Reliance Industries", not "RELIANCE") and precision
+  (no more DOLLAR↔"dollar", DEN↔"dent", or one headline hitting many tickers).
+  Falls back to ticker word-boundary only when no name is available.
+
+### Verified
+- Name-based matches: MANAPPURAM→"Manappuram Finance", DELHIVERY→"Delhivery",
+  RELIANCE→"Reliance Industries"; DOLLAR/DEN/STAR → 0 false matches.
+
+---
+
 ## [3.6.0] — 2026-06-26 — Two-Component Daily Report + Docker
 
 Surfaces the two pipelines as two labelled components in the daily mailer and

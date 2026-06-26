@@ -446,6 +446,43 @@ class IndianRSSProvider(NewsProvider):
                 "by_outlet": {o: len(self.FEEDS[o]) for o in self.FEEDS}}
 
 
+class USRSSProvider(IndianRSSProvider):
+    """
+    US financial-news via free RSS feeds — NO API key required.
+    Sources: CNBC (top news, markets, finance) + MarketWatch (top stories,
+    market pulse, real-time, bulletins). Same name-based matching as the Indian
+    provider (company name looked up from the symbol master).
+    """
+    name = "USRSS"
+    FEEDS = {
+        "CNBC": [
+            "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114",  # top news
+            "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258",   # markets
+            "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664",   # finance
+        ],
+        "MarketWatch": [
+            "https://feeds.content.dowjones.io/public/rss/mw_topstories",
+            "https://feeds.content.dowjones.io/public/rss/mw_marketpulse",
+            "https://feeds.content.dowjones.io/public/rss/mw_bulletins",
+        ],
+    }
+
+    def fetch_news(self, ticker: str, market: str = "US",
+                   company_name: str = "") -> List[Article]:
+        # Reuse the parent's name-based matching but for the US market/feeds.
+        if market != "US":
+            return []
+        # Temporarily treat as IN so the parent's market!="IN" guard passes,
+        # then run the same matching logic against the US feeds.
+        return super().fetch_news(ticker, market="IN", company_name=company_name)
+
+    def fetch_market_mood(self) -> dict:
+        m = super().fetch_market_mood()
+        if m:
+            m["market"] = "US"
+        return m
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # PIPELINE ORCHESTRATOR
 # ══════════════════════════════════════════════════════════════════════════════
@@ -463,21 +500,26 @@ class SentimentPipeline:
         "Finnhub": 1.0,        # headline-scored, generous quota
         "NewsData": 0.8,       # headline-scored, macro
         "IndianRSS": 1.1,      # Moneycontrol/ET/BusinessLine — free, India-native
+        "USRSS": 1.1,          # CNBC/MarketWatch — free, US-native
     }
 
     def __init__(self):
         self.providers = [MarketauxProvider(), AlphaVantageProvider(),
                           FinnhubProvider(), NewsDataProvider(),
-                          IndianRSSProvider()]   # free, no key — India sources
+                          IndianRSSProvider(),   # free, no key — India sources
+                          USRSSProvider()]       # free, no key — US sources (CNBC/MarketWatch)
         self.active = [p for p in self.providers if p.available]
         self._cache = self._load_cache()
-        # Keep a handle to the RSS provider for market-mood queries
-        self._rss = next((p for p in self.providers
-                          if isinstance(p, IndianRSSProvider) and p.available), None)
+        # Handles to the RSS providers for market-mood queries (by market)
+        self._rss_in = next((p for p in self.providers
+                             if type(p).__name__ == "IndianRSSProvider" and p.available), None)
+        self._rss_us = next((p for p in self.providers
+                             if type(p).__name__ == "USRSSProvider" and p.available), None)
 
-    def get_market_mood(self) -> dict:
-        """Overall Indian market news sentiment (regime gauge) from RSS feeds."""
-        return self._rss.fetch_market_mood() if self._rss else {}
+    def get_market_mood(self, market: str = "IN") -> dict:
+        """Overall market news sentiment (regime gauge) for the given market."""
+        rss = self._rss_us if market == "US" else self._rss_in
+        return rss.fetch_market_mood() if rss else {}
 
     def _load_cache(self) -> dict:
         if CACHE_FILE.exists():

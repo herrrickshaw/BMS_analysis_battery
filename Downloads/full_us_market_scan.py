@@ -478,25 +478,8 @@ def compute_golden_crossover(df: pd.DataFrame) -> dict:
 
 # ── Fundamental scan ───────────────────────────────────────────────────────────
 
-def _first_df(ticker, *attrs):
-    for attr in attrs:
-        df = getattr(ticker, attr, None)
-        if df is not None and isinstance(df, pd.DataFrame) and not df.empty:
-            return df
-    return None
-
-
-def _row(df, *row_names, col: int = 0):
-    if df is None or df.empty:
-        return None
-    for name in row_names:
-        if name in df.index:
-            try:
-                val = df.loc[name].iloc[col]
-                return float(val) if pd.notna(val) else None
-            except Exception:
-                pass
-    return None
+# Shared helpers (see stock_utils.py) — aliased to keep existing call sites.
+from stock_utils import first_df as _first_df, row as _row
 
 
 def fundamental_scan(symbol: str) -> dict:

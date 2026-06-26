@@ -186,27 +186,46 @@ def _port_perf(w, mu, cov, rf):
     return r, v, s
 
 
-def optimise(rets: pd.DataFrame, rf: float) -> dict:
-    """Max-Sharpe and min-variance long-only portfolios + frontier curve."""
-    # Keep columns with ≥90% coverage, then align dates (drop remaining NaN rows)
+def _expected_returns(R: pd.DataFrame, shrink: float = 0.5) -> np.ndarray:
+    """
+    Robust expected returns ("yield expectations") via James-Stein-style shrinkage:
+        E[r_i] = (1−λ)·historical_mean_i + λ·cross_sectional_mean
+    Raw historical means are noisy and make naive MPT chase the lucky outlier.
+    Shrinking each stock's mean toward the universe average (λ=0.5 default) gives
+    expectations the optimiser can trust, dampening overfitting.
+    """
+    hist = R.mean().values * TRADING_DAYS
+    grand = hist.mean()
+    return (1 - shrink) * hist + shrink * grand
+
+
+def optimise(rets: pd.DataFrame, rf: float, max_weight: float = 0.15,
+             target_return: float = None, shrink: float = 0.5) -> dict:
+    """
+    Long-only mean-variance optimisation with:
+      • shrinkage expected returns (robust yield expectations),
+      • a per-holding weight cap (diversification realism),
+      • Max-Sharpe, Min-Variance, AND a Target-Return portfolio that meets a
+        specified yield expectation at minimum risk.
+    """
     R = rets.loc[:, rets.notna().mean() >= 0.90].dropna()
     if R.shape[1] < 2 or len(R) < 60:
         return {}
-    mu  = R.mean().values * TRADING_DAYS
+    mu  = _expected_returns(R, shrink)          # shrunk expectations
     cov = R.cov().values * TRADING_DAYS
     n   = len(mu)
-    bounds = tuple((0, 1) for _ in range(n))
-    cons = ({"type":"eq","fun": lambda w: np.sum(w)-1},)
+    # Cap can't be below 1/n or the simplex is infeasible
+    cap = max(max_weight, 1.0 / n + 1e-9)
+    bounds = tuple((0, cap) for _ in range(n))
+    cons = ({"type": "eq", "fun": lambda w: np.sum(w) - 1},)
     w0  = np.repeat(1/n, n)
-
-    # Max Sharpe
-    neg_sharpe = lambda w: -_port_perf(w, mu, cov, rf)[2]
-    res_s = minimize(neg_sharpe, w0, method="SLSQP", bounds=bounds, constraints=cons)
-    # Min variance
     port_var = lambda w: w @ cov @ w
+
+    res_s = minimize(lambda w: -_port_perf(w, mu, cov, rf)[2], w0,
+                     method="SLSQP", bounds=bounds, constraints=cons)
     res_v = minimize(port_var, w0, method="SLSQP", bounds=bounds, constraints=cons)
 
-    # Frontier: minimise variance for a grid of target returns
+    # Frontier (capped)
     frontier = []
     for tr in np.linspace(mu.min(), mu.max(), 25):
         c2 = cons + ({"type":"eq","fun": lambda w, t=tr: w @ mu - t},)
@@ -220,21 +239,40 @@ def optimise(rets: pd.DataFrame, rf: float) -> dict:
     def wtable(w):
         return (pd.DataFrame({"Symbol": syms, "Weight%": (w*100).round(2)})
                 .query("`Weight%` > 0.5").sort_values("Weight%", ascending=False))
+    def pack(res):
+        r, v, s = _port_perf(res.x, mu, cov, rf)
+        return {"weights": wtable(res.x), "ret": r*100, "vol": v*100, "sharpe": s}
 
-    rs = _port_perf(res_s.x, mu, cov, rf)
-    rv = _port_perf(res_v.x, mu, cov, rf)
-    return {
-        "frontier": pd.DataFrame(frontier),
-        "max_sharpe": {"weights": wtable(res_s.x), "ret": rs[0]*100,
-                       "vol": rs[1]*100, "sharpe": rs[2]},
-        "min_var":    {"weights": wtable(res_v.x), "ret": rv[0]*100,
-                       "vol": rv[1]*100, "sharpe": rv[2]},
-    }
+    out = {"frontier": pd.DataFrame(frontier),
+           "max_sharpe": pack(res_s), "min_var": pack(res_v),
+           "exp_return_method": f"shrinkage λ={shrink}", "max_weight": cap}
+
+    # ── Target-return portfolio: meet the yield expectation at minimum risk ──
+    if target_return is not None:
+        # Max achievable return under the weight cap = take the cap on the
+        # highest-return names until weights sum to 1.
+        order = np.argsort(mu)[::-1]
+        w_max, remaining = np.zeros(n), 1.0
+        for i in order:
+            wi = min(cap, remaining); w_max[i] = wi; remaining -= wi
+            if remaining <= 0: break
+        max_achievable = float(w_max @ mu)
+        tgt = min(target_return, max_achievable)
+        c3 = cons + ({"type":"ineq","fun": lambda w: w @ mu - tgt},)
+        rt = minimize(port_var, w0, method="SLSQP", bounds=bounds, constraints=c3)
+        p = pack(rt if rt.success else type("o",(),{"x":w_max})())
+        p["requested%"]      = target_return * 100
+        p["max_achievable%"] = round(max_achievable * 100, 2)
+        p["feasible"]        = target_return <= max_achievable + 1e-6
+        out["target"]        = p
+    return out
 
 
 # ── Excel assembly ────────────────────────────────────────────────────────────
 
-def build(market: str, max_holdings: int, rf: float):
+def build(market: str, max_holdings: int, rf: float,
+          max_weight: float = 0.15, target_return: float = None,
+          shrink: float = 0.5):
     print(f"\n{'#'*70}\n  PORTFOLIO BUILDER — {market} | Rf={rf:.1%} | benchmark Nifty 50\n{'#'*70}\n  {DISCLAIMER}\n")
 
     picks = load_picks(market)
@@ -253,7 +291,8 @@ def build(market: str, max_holdings: int, rf: float):
         print("  Insufficient data for optimisation."); return
 
     rm = risk_metrics(rets, mkt, rf)
-    opt = optimise(rets[ [c for c in rets.columns if c in rm['Symbol'].values] ], rf)
+    opt = optimise(rets[ [c for c in rets.columns if c in rm['Symbol'].values] ],
+                   rf, max_weight=max_weight, target_return=target_return, shrink=shrink)
 
     # Ordered holding sheets with risk metrics attached
     def order_sheet(syms):
@@ -277,17 +316,26 @@ def build(market: str, max_holdings: int, rf: float):
             fr.to_excel(w, "5_Efficient_Frontier", index=False)
             # Optimal portfolios
             ms, mv = opt["max_sharpe"], opt["min_var"]
-            summ = pd.DataFrame([
+            summ_rows = [
                 {"Portfolio":"Max-Sharpe (growth fund)","Ann_Return%":round(ms['ret'],2),
                  "Vol%":round(ms['vol'],2),"Sharpe":round(ms['sharpe'],3),"Holdings":len(ms['weights'])},
                 {"Portfolio":"Min-Variance (conservative)","Ann_Return%":round(mv['ret'],2),
                  "Vol%":round(mv['vol'],2),"Sharpe":round(mv['sharpe'],3),"Holdings":len(mv['weights'])},
+            ]
+            tg = opt.get("target")
+            if tg:
+                summ_rows.append(
+                    {"Portfolio":f"Target {tg['requested%']:.0f}% (min-risk to meet yield)",
+                     "Ann_Return%":round(tg['ret'],2),"Vol%":round(tg['vol'],2),
+                     "Sharpe":round(tg['sharpe'],3),"Holdings":len(tg['weights'])})
+            summ_rows.append(
                 {"Portfolio":"Nifty 50 (benchmark)","Ann_Return%":round(ann_m,2),
-                 "Vol%":round(vol_m,2),"Sharpe":round((ann_m/100-rf)/(vol_m/100),3),"Holdings":50},
-            ])
+                 "Vol%":round(vol_m,2),"Sharpe":round((ann_m/100-rf)/(vol_m/100),3),"Holdings":50})
             ms["weights"].to_excel(w, "6_MaxSharpe_Weights", index=False)
             mv["weights"].to_excel(w, "7_MinVar_Weights", index=False)
-            summ.to_excel(w, "8_Portfolio_Summary", index=False)
+            if tg:
+                tg["weights"].to_excel(w, "8_Target_Return_Weights", index=False)
+            pd.DataFrame(summ_rows).to_excel(w, "9_Portfolio_Summary", index=False)
         pd.DataFrame({"DISCLAIMER":[DISCLAIMER]}).to_excel(w, "DISCLAIMER", index=False)
 
     print(f"\n  📊 → {path}")
@@ -298,8 +346,16 @@ def build(market: str, max_holdings: int, rf: float):
               f"Sharpe {ms['sharpe']:.2f}  ({len(ms['weights'])} holdings)")
         print(f"  Min-Variance 'fund': return {mv['ret']:.1f}%  vol {mv['vol']:.1f}%  "
               f"Sharpe {mv['sharpe']:.2f}  ({len(mv['weights'])} holdings)")
-        print(f"\n  Top max-Sharpe weights:")
-        for _, r in ms["weights"].head(8).iterrows():
+        print(f"  Expected returns: {opt.get('exp_return_method')} | "
+              f"max weight cap {opt.get('max_weight',0)*100:.0f}%")
+        tg = opt.get("target")
+        if tg:
+            ok = "✓ met" if tg.get("feasible") else "✗ not feasible (capped)"
+            print(f"  Target-yield 'fund': requested {tg['requested%']:.0f}% → "
+                  f"achieved {tg['ret']:.1f}% at {tg['vol']:.1f}% vol [{ok}], "
+                  f"{len(tg['weights'])} holdings")
+        print(f"\n  Top max-Sharpe weights (capped):")
+        for _, r in ms["weights"].head(10).iterrows():
             b = rm[rm["Symbol"]==r["Symbol"]]["Beta"].values
             print(f"    {r['Symbol']:<12} {r['Weight%']:>6.1f}%  beta={b[0] if len(b) else '—'}")
     print(f"\n  {DISCLAIMER}")
@@ -310,5 +366,12 @@ if __name__ == "__main__":
     p.add_argument("--market", choices=["IN","US"], default="IN")
     p.add_argument("--max-holdings", type=int, default=25)
     p.add_argument("--rf", type=float, default=0.065, help="Risk-free rate (annual)")
+    p.add_argument("--max-weight", type=float, default=0.15,
+                   help="Max weight per holding (diversification cap, default 15%)")
+    p.add_argument("--target-return", type=float, default=0.20,
+                   help="Yield expectation: min-risk weights to achieve this annual return (e.g. 0.20=20%)")
+    p.add_argument("--shrink", type=float, default=0.5,
+                   help="Expected-return shrinkage 0..1 toward universe mean (default 0.5)")
     a = p.parse_args()
-    build(a.market, a.max_holdings, a.rf)
+    build(a.market, a.max_holdings, a.rf,
+          max_weight=a.max_weight, target_return=a.target_return, shrink=a.shrink)

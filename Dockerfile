@@ -108,6 +108,7 @@ COPY Downloads/intraday_monitor.py       /app/scripts/
 COPY Downloads/stock_utils.py            /app/scripts/
 COPY Downloads/symbol_master.py          /app/scripts/
 COPY Downloads/tool_registry.py          /app/scripts/
+COPY Downloads/portfolio_builder.py      /app/scripts/
 COPY Downloads/pattern_discovery.py      /app/scripts/
 COPY Downloads/sector_analysis.py        /app/scripts/
 COPY Downloads/dl_strategy_eval.py       /app/scripts/

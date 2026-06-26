@@ -476,24 +476,8 @@ def screen_ipo(symbol: str, ohlc_df: pd.DataFrame, meta: dict) -> dict:
     return signals
 
 
-def _first_df(ticker, *attrs):
-    for a in attrs:
-        df = getattr(ticker, a, None)
-        if df is not None and isinstance(df, pd.DataFrame) and not df.empty:
-            return df
-    return None
-
-
-def _row(df, *names, col=0):
-    if df is None or df.empty: return None
-    for name in names:
-        if name in df.index:
-            try:
-                v = df.loc[name].iloc[col]
-                return float(v) if pd.notna(v) else None
-            except Exception:
-                pass
-    return None
+# Shared helpers (see stock_utils.py) — aliased to keep existing call sites.
+from stock_utils import first_df as _first_df, row as _row
 
 
 # ══════════════════════════════════════════════════════════════════════════════

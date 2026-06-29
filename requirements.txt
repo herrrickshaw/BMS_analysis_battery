@@ -30,3 +30,4 @@ requests-oauthlib==2.0.0
 requests-file==3.0.1
 vaderSentiment==3.3.2  # news sentiment scoring
 feedparser==6.0.12  # Indian RSS news feeds (Moneycontrol/ET/BusinessLine)
+lmdb==2.2.1  # embedded NoSQL key-value store for bhavcopy OHLCV cache

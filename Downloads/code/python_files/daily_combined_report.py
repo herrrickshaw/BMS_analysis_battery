@@ -238,7 +238,9 @@ def build_report(market: str, run_fresh: bool) -> dict:
     print(f"\n{'#'*72}\n  DAILY COMBINED REPORT — {market}\n{'#'*72}\n  {DISCLAIMER}\n")
 
     picks = get_fundamental_picks(market, run_fresh)
-    symbols = picks["Symbol"].tolist() if not picks.empty else []
+    # Street-talk only needs the symbols actually shown in the report (top 25,
+    # Triple Hits first). Scoring all 300 picks via keyless news APIs stalls.
+    symbols = picks.head(25)["Symbol"].tolist() if not picks.empty else []
     mood, talk = get_street_talk(symbols, market)
     convergence = find_convergence(picks, talk)
 

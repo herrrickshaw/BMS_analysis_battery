@@ -86,6 +86,44 @@ def _load_index() -> pd.DataFrame:
     return pd.read_parquet(INDEX_PATH) if INDEX_PATH.exists() else pd.DataFrame()
 
 
+# liquidity tiers by USD median daily turnover
+HIGH = 10_000_000      # ≥ $10M/day  → High
+MED = 1_000_000        # $1M–$10M/day → Medium  (< $1M → Low)
+
+
+def tier(turnover_usd: Optional[float]) -> str:
+    if turnover_usd is None:
+        return "Unknown"
+    if turnover_usd >= HIGH:
+        return "High"
+    if turnover_usd >= MED:
+        return "Medium"
+    return "Low"
+
+
+_CACHE_MAP = {}
+
+
+def _turnover_map() -> Dict[str, float]:
+    global _CACHE_MAP
+    if not _CACHE_MAP:
+        idx = _load_index()
+        if not idx.empty:
+            _CACHE_MAP = dict(zip(idx["Symbol"], idx["turnover_usd"]))
+    return _CACHE_MAP
+
+
+def annotate(df: pd.DataFrame, symbol_col: str = "Symbol") -> pd.DataFrame:
+    """Add Turnover_USD and Liquidity (High/Medium/Low) columns to a result frame."""
+    if df is None or df.empty or symbol_col not in df.columns:
+        return df
+    tmap = _turnover_map()
+    df = df.copy()
+    df["Turnover_USD"] = df[symbol_col].map(tmap).round(0)
+    df["Liquidity"] = df["Turnover_USD"].map(tier)
+    return df
+
+
 def turnover(symbol: str) -> Optional[float]:
     """USD median daily turnover for one symbol (from the cached index)."""
     idx = _load_index()

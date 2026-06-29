@@ -192,6 +192,7 @@ def screen(strategy_slug: str, market: str = "IN", top: Optional[int] = None,
     df = pd.DataFrame(rows)
     if not df.empty and "Score" in df.columns:
         df = df.sort_values("Score", ascending=False)
+    df = _add_liquidity(df)
     return df.head(top).reset_index(drop=True) if top else df.reset_index(drop=True)
 
 
@@ -199,8 +200,18 @@ def custom_screen(criteria, market: str = "IN", rank_by: Optional[str] = None,
                   top: Optional[int] = 50, ascending: bool = False,
                   show: Optional[List[str]] = None, min_turnover_usd: float = 0.0) -> pd.DataFrame:
     """Screen a market on YOUR parameters (see custom_screener for metric names)."""
-    return cs.screen(_stocks(market, min_turnover_usd), criteria, rank_by=rank_by, top=top,
-                     ascending=ascending, show=show)
+    out = cs.screen(_stocks(market, min_turnover_usd), criteria, rank_by=rank_by, top=top,
+                    ascending=ascending, show=show)
+    return _add_liquidity(out)
+
+
+def _add_liquidity(df):
+    """Append Turnover_USD + Liquidity (High/Medium/Low) columns to a result frame."""
+    try:
+        from liquidity import annotate
+        return annotate(df)
+    except Exception:
+        return df
 
 
 if __name__ == "__main__":

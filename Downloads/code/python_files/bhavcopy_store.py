@@ -70,14 +70,22 @@ def build(hist: Optional[Dict[str, pd.DataFrame]] = None, verbose: bool = True) 
     cleaned_long parquet. Returns the number of symbols written."""
     import lmdb
     if hist is None:
-        if not CLEANED.exists():
-            raise FileNotFoundError(f"{CLEANED} not found — run bhavcopy_history first")
-        long = pd.read_parquet(CLEANED)
-        long["Date"] = pd.to_datetime(long["Date"])
+        # ingest every market seed present (cleaned_long.parquet = IN bhavcopy,
+        # cleaned_long_US.parquet, cleaned_long_<MKT>.parquet …) into one store.
+        seeds = sorted(set([CLEANED] if CLEANED.exists() else [])
+                       | set(CACHE.glob("cleaned_long_*.parquet")))
+        if not seeds:
+            raise FileNotFoundError(f"no cleaned_long*.parquet in {CACHE}")
         hist = {}
-        for sym, g in long.groupby("Symbol"):
-            hist[str(sym)] = g.set_index("Date").sort_index()[
-                ["Open", "High", "Low", "Close", "Volume"]]
+        for sd in seeds:
+            long = pd.read_parquet(sd)
+            long["Date"] = pd.to_datetime(long["Date"])
+            for sym, g in long.groupby("Symbol"):
+                hist[str(sym)] = g.set_index("Date").sort_index()[
+                    ["Open", "High", "Low", "Close", "Volume"]]
+        if verbose:
+            print(f"  ingesting {len(seeds)} market seed(s): "
+                  f"{', '.join(s.name for s in seeds)}")
 
     # fresh rebuild: remove any prior store so deleted pages aren't carried as
     # free space (LMDB does not shrink its file in place).

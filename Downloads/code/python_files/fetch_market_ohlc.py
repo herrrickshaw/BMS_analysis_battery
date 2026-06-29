@@ -27,8 +27,11 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 
 from stock_utils import bulk_download, clean_ohlcv
+from universe_sources import get_universe, PROVIDERS
+from data_sources import fetch as multi_fetch
 
 SEED_DIR = Path(__file__).parent / "cache_seed"
+USE_FULL_UNIVERSE = True          # full official universes via universe_sources
 
 # ── China large-cap universe (Shanghai .SS / Shenzhen .SZ) ─────────────────────
 # Curated CSI-100-style set of the most liquid A-shares (no akshare/tushare here).
@@ -105,12 +108,12 @@ def run(markets: list[str]):
     for mkt in markets:
         print(f"\n{'='*60}\n  {mkt} — fetching universe + OHLC\n{'='*60}")
         try:
-            tickers = _tickers(mkt)
+            tickers = get_universe(mkt) if USE_FULL_UNIVERSE and mkt in PROVIDERS else _tickers(mkt)
         except Exception as e:
             print(f"  universe fetch failed: {e}"); continue
-        print(f"  {len(tickers)} tickers; downloading 1y OHLC …")
-        hist = bulk_download(tickers, period="1y", batch_size=80,
-                             min_bars=60, verbose=True)
+        print(f"  {len(tickers)} tickers; downloading 1y OHLC (multi-source) …")
+        hist = multi_fetch(tickers, order=("yahoo", "stooq"), period="1y",
+                           min_bars=60, verbose=True)
         summary[mkt] = _write_seed(mkt, hist)
         print(f"  → {summary[mkt]}")
     print("\nDONE:", summary)

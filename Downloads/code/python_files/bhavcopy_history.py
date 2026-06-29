@@ -37,7 +37,9 @@ try:
 except ImportError:
     clean_ohlcv = None
 
-CACHE = Path.home() / "Downloads" / "data" / "bhavcopy_cache"
+import os
+CACHE = Path(os.environ.get("BHAV_CACHE",
+                            Path.home() / "Downloads" / "data" / "bhavcopy_cache"))
 (NSE_DIR := CACHE / "nse").mkdir(parents=True, exist_ok=True)
 (BSE_DIR := CACHE / "bse").mkdir(parents=True, exist_ok=True)
 ASSEMBLED = CACHE / "assembled_long.parquet"   # consolidated raw (Date,Symbol,OHLCV)
@@ -144,6 +146,20 @@ def fetch_history(n_days: int = 400, workers: int = 8, exchanges=("NSE", "BSE"),
         try:
             cached = pd.read_parquet(ASSEMBLED)
             cached["Date"] = pd.to_datetime(cached["Date"])
+        except Exception:
+            cached = pd.DataFrame()
+    elif CLEANED.exists():
+        # fresh clone: only the committed cleaned cache is present. Seed the
+        # assembled frame from it (NSE precedence already resolved) so incremental
+        # date fetches work without re-downloading the whole year.
+        try:
+            cached = pd.read_parquet(CLEANED)
+            cached["Date"] = pd.to_datetime(cached["Date"])
+            if "_exch" not in cached.columns:
+                cached["_exch"] = "NSE"
+            cached.to_parquet(ASSEMBLED, compression="zstd", index=False)
+            if verbose:
+                print("  seeded assembled cache from committed cleaned_long.parquet")
         except Exception:
             cached = pd.DataFrame()
     have_dates = set(pd.to_datetime(cached["Date"].unique())) if not cached.empty else set()

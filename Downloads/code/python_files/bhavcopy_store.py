@@ -26,7 +26,9 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.feather as feather
 
-CACHE = Path.home() / "Downloads" / "data" / "bhavcopy_cache"
+import os
+CACHE = Path(os.environ.get("BHAV_CACHE",
+                            Path.home() / "Downloads" / "data" / "bhavcopy_cache"))
 STORE = CACHE / "ohlcv.lmdb"
 CLEANED = CACHE / "cleaned_long.parquet"
 _MAP_SIZE = 512 * 1024 * 1024          # 512 MB virtual cap (sparse; grows as used)

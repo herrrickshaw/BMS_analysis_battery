@@ -32,7 +32,9 @@ from strategies.base import StockData
 import strategies as st
 import custom_screener as cs
 
-MARKETS = ["IN", "US", "JP", "KR", "CN", "SG", "EU"]
+MARKETS = ["IN", "US", "JP", "KR", "CN", "SG", "EU",        # core official feeds
+           "HK", "TW", "CA", "AU", "UK", "DE", "SA",        # major exchanges added
+           "BR", "CH", "ZA", "SE", "FI", "DK"]              # (Wikipedia top-20)
 SEED_DIR = Path(__file__).parent / "cache_seed"
 CACHE = Path(os.environ.get("BHAV_CACHE",
                             Path.home() / "Downloads" / "data" / "bhavcopy_cache"))

@@ -199,9 +199,59 @@ def eu() -> List[str]:
     return sorted(tickers)
 
 
+# ── Damodaran-derived universes (for major exchanges without a free official feed) ─
+# His company master (indname.xls) carries Country + Exchange:Ticker for ~48k firms;
+# we map each exchange code to the yfinance suffix and reconstruct tickers.
+_DAMO_EXCH_SUFFIX = {
+    "SEHK": ".HK", "TWSE": ".TW", "TPEX": ".TWO", "TSX": ".TO", "TSXV": ".V",
+    "CNSX": ".CN", "ASX": ".AX", "BOVESPA": ".SA", "JSE": ".JO", "SASE": ".SR",
+    "LSE": ".L", "AIM": ".L", "XTRA": ".DE", "DB": ".F", "HMSE": ".F", "SWX": ".SW",
+}
+# Nordic exchange codes collide (all "OM"), so resolve those by country instead.
+_COUNTRY_SUFFIX = {"Sweden": ".ST", "Denmark": ".CO", "Finland": ".HE", "Norway": ".OL"}
+
+
+def from_damodaran(country: str, allowed_exch: Optional[set] = None) -> List[str]:
+    """Build a yfinance-ticker universe for a country from Damodaran's master."""
+    from reference_data import damodaran_companies
+    df = damodaran_companies()
+    if df is None:
+        return []
+    sub = df[df["Country"] == country]
+    csuf = _COUNTRY_SUFFIX.get(country)
+    out = []
+    for _, r in sub.iterrows():
+        exch, tkr = str(r.get("Exchange", "")).strip(), r.get("Ticker")
+        if not tkr or (allowed_exch and exch not in allowed_exch):
+            continue
+        suf = csuf or _DAMO_EXCH_SUFFIX.get(exch)
+        if not suf:
+            continue
+        t = str(tkr).strip()
+        if suf == ".HK":                          # HK codes are zero-padded to 4
+            t = t.zfill(4)
+        out.append(t + suf)
+    return sorted(set(out))
+
+
 PROVIDERS = {
+    # official / exchange feeds
     "US": us_sec, "IN": in_bhavcopy, "JP": jp_jpx, "KR": kr_krx,
     "SG": sg_sgx, "CN": cn_eastmoney, "EU": eu,
+    # major exchanges via Damodaran master (key factor: # listed companies)
+    "HK": lambda: from_damodaran("Hong Kong", {"SEHK"}),
+    "TW": lambda: from_damodaran("Taiwan", {"TWSE", "TPEX"}),
+    "CA": lambda: from_damodaran("Canada", {"TSX", "TSXV", "CNSX"}),
+    "AU": lambda: from_damodaran("Australia", {"ASX"}),
+    "BR": lambda: from_damodaran("Brazil", {"BOVESPA"}),
+    "ZA": lambda: from_damodaran("South Africa", {"JSE"}),
+    "SA": lambda: from_damodaran("Saudi Arabia", {"SASE"}),
+    "SE": lambda: from_damodaran("Sweden"),
+    "DK": lambda: from_damodaran("Denmark"),
+    "FI": lambda: from_damodaran("Finland"),
+    "UK": lambda: from_damodaran("United Kingdom", {"LSE", "AIM"}),
+    "DE": lambda: from_damodaran("Germany", {"XTRA", "DB", "HMSE"}),
+    "CH": lambda: from_damodaran("Switzerland", {"SWX"}),
 }
 
 

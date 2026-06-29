@@ -25,6 +25,31 @@ official end-of-day files (no Yahoo at all).
 
 ---
 
+## 1a. Simplest usage — `screener_kit` (start here)
+
+The committed seeds are a **starter kit**: after cloning, one call gives you ~1yr
+of OHLCV for every market, then you pull fresh data on top.
+
+```python
+import screener_kit as kit
+
+kit.bootstrap()                      # ONE TIME: committed seeds → cache + NoSQL store
+kit.update("IN")                     # real-time: pull new official bhavcopy days
+kit.update("US")                     # real-time: pull recent bars (yahoo→stooq)
+
+kit.get("RELIANCE")                  # OHLCV DataFrame (fast, O(1))
+kit.markets()                        # ['IN','US','JP','KR','CN','SG','EU']
+
+kit.screen("darvas", "IN", top=20)   # run a built-in strategy across a market
+kit.custom_screen(                   # YOUR OWN parameters (no coding a strategy)
+    {"above_200dma": ("==", True), "rsi14": ("<", 65), "dist_52w_high": ("<", 10)},
+    market="US", rank_by="ret_126", top=15)
+```
+
+That's the whole workflow. The sections below explain what's underneath.
+
+---
+
 ## 2. Where the data comes from
 
 ### 2.1 Universe — *which stocks exist in each market* (`universe_sources.py`)
@@ -89,6 +114,8 @@ tracked in **Git LFS**.
 
 | Module | One-line purpose |
 |--------|------------------|
+| `screener_kit.py` | **Start here.** Simple facade: `bootstrap/update/get/load/screen/custom_screen` |
+| `custom_screener.py` | Evaluate stocks on YOUR parameters (technical metrics computed from OHLCV) |
 | `universe_sources.py` | Full tradable universe per market from official sources |
 | `bhavcopy_history.py` | Build/refresh ~1yr OHLCV for India from NSE+BSE bhavcopy; multi-layer cache |
 | `data_sources.py` | Redundant OHLC fetch with `yahoo → stooq` fallback chain |

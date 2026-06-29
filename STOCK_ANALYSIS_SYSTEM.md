@@ -117,6 +117,50 @@ Used as a **speed optimisation**, not a primary data source:
 
 ---
 
+## 2A. Data Cleaning
+
+Raw market data from every source (Yahoo, NSE, bhavcopy) is dirty in predictable
+ways: stale/forward-filled bars, zero or negative prices, duplicate timestamps,
+unsorted indices, un-split-adjusted price jumps, and OHLC rows that violate
+`Low ≤ Open/Close ≤ High`. Backtests and screeners silently corrupt when fed
+this, so **every fetched price frame passes through one hygiene gate** before any
+metric is computed or any value is cached.
+
+### 2A.1 Single source of truth
+
+`stock_utils.clean_ohlcv()` is the one cleaner. It is wired into both fetch paths:
+
+| Path | Where cleaning happens |
+|---|---|
+| Scanners / backtests / pipelines | `stock_utils.extract_ticker_df()` → `clean_ohlcv()` (called by `bulk_download()`) |
+| Parquet cache (`market_data_cache.py`) | `MarketCache._clean_ohlc()` delegates to `clean_ohlcv()` **before** `to_parquet()` |
+
+So both the live scan path and the persisted 5-year cache store/return the
+identical hygiene. The function is **idempotent** — re-cleaning clean data is a
+no-op.
+
+### 2A.2 OHLCV cleaning steps (in order)
+
+1. **Column subset + numeric coercion** — keep only OHLCV; bad strings → `NaN`.
+2. **Chronological order + de-duplication** — sort by date, drop duplicate
+   timestamps keeping the **last** (most-restated) row.
+3. **Mandatory Close** — drop rows with no `Close` (everything depends on it).
+4. **Gap fill** — fill missing `Open/High/Low` from `Close`; missing `Volume` → 0.
+5. **Non-positive price drop** — remove rows where any price ≤ 0 (always bad data).
+6. **OHLC-integrity repair** — `High = max(O,H,L,C)`, `Low = min(O,H,L,C)`.
+7. **Bad-print / split neutralisation** — single-day move `> 60%` on near-zero
+   volume is treated as an un-adjusted split or bad tick: nulled then forward-filled.
+8. **Trim + minimum length** — drop all-NaN rows, enforce `min_bars`.
+
+### 2A.3 Financial-statement cleaning
+
+`stock_utils.clean_financials()` handles income-statement / balance-sheet /
+cash-flow frames: coerce to numeric, drop fully-empty period columns, and reorder
+so the **newest reporting period is column 0** (what `row()` / `fin_metric()`
+assume when reading `col=0`).
+
+---
+
 ## 3. Screeners
 
 ### 3.1 Darvas Box Breakout
@@ -413,6 +457,95 @@ Sharpe ratio decay = `(Sharpe_TRAIN − Sharpe_VAL) / Sharpe_TRAIN × 100`
 | T+63d | 63 | 1 calendar quarter |
 | T+126d | 126 | 1 half-year |
 | T+252d | 252 | 1 trading year |
+
+---
+
+## 8A. Stock Metrics Catalogue
+
+Every quantitative metric the system computes, grouped by family. All are derived
+from the cleaned data of §2A. (Counts in parentheses are how often the metric is
+referenced across the codebase — a rough usage signal, not a quality signal.)
+
+### 8A.1 Trend & moving-average metrics
+| Metric | Notes |
+|---|---|
+| SMA — Simple Moving Average | 20/50/200-day; basis for Golden Cross |
+| EMA — Exponential Moving Average | faster-reacting trend line |
+| Golden Cross / Death Cross | 50-SMA crossing 200-SMA up / down |
+| Darvas Box (Top/Bottom, Position-in-Box %, Upside-to-Top %) | breakout structure (§3.1) |
+| 52-week high / low + distance-from | proximity to range extremes |
+
+### 8A.2 Momentum & oscillator metrics
+| Metric | Notes |
+|---|---|
+| RSI — Relative Strength Index | 14-day default; overbought/oversold (see Screener & RSI Basis §) |
+| MACD (line, signal, histogram) | 12/26/9 trend-momentum |
+| Stochastic Oscillator | %K / %D range position |
+| ADX | trend-strength (directional) |
+| Price momentum / rate-of-change | multi-horizon return ranking |
+
+### 8A.3 Volatility & risk metrics
+| Metric | Notes |
+|---|---|
+| ATR — Average True Range | absolute volatility / stop sizing |
+| Bollinger Bands | SMA ± 2σ envelope |
+| Realised volatility (annualised σ) | std of daily returns × √252 |
+| Max drawdown | peak-to-trough decline |
+| Beta vs Nifty 50 | CAPM systematic risk (portfolio builder) |
+| India VIX | market-wide implied volatility (regime input) |
+
+### 8A.4 Volume metrics
+| Metric | Notes |
+|---|---|
+| Volume vs 20-day average | Darvas breakout confirmation (≥120%) |
+| OBV — On-Balance Volume | accumulation/distribution |
+| VWAP | volume-weighted average price (intraday) |
+| Bulk / block deals, FII/DII flows | institutional-activity confirmation (nsepython) |
+
+### 8A.5 Valuation metrics
+| Metric | Notes |
+|---|---|
+| P/E ratio | trailing price-to-earnings |
+| PEG ratio | P/E ÷ growth |
+| Earnings Yield (EBIT/EV) | Magic Formula component |
+| Book Value / P/B | balance-sheet value |
+| EPS | earnings per share |
+| Market cap (₹ crore) | size bucketing |
+| Dividend yield | income screen |
+
+### 8A.6 Profitability & quality metrics
+| Metric | Notes |
+|---|---|
+| ROE — Return on Equity | Coffee Can quality gate |
+| ROCE — Return on Capital Employed | capital efficiency |
+| ROA — Return on Assets | Piotroski component |
+| Return on Capital | Magic Formula component |
+| Gross / Operating / Net margins | margin trend analysis |
+| EBITDA | operating cash earnings |
+| Piotroski F-Score (0–9) | 9-point fundamental quality composite (§3) |
+
+### 8A.7 Financial-health & cash-flow metrics
+| Metric | Notes |
+|---|---|
+| Debt-to-Equity (normalised) | leverage; auto-corrected for yfinance %-format |
+| Current ratio / Quick ratio | short-term liquidity |
+| Interest coverage | debt-servicing capacity |
+| Free Cash Flow (FCF) | Coffee Can / quality criterion |
+| Accruals | earnings-quality (cash vs accrual) |
+| CAGR (revenue / earnings) | Coffee Can multi-year growth |
+
+### 8A.8 Portfolio & performance metrics (`portfolio_builder.py`)
+| Metric | Notes |
+|---|---|
+| Sharpe ratio | risk-adjusted return |
+| Sortino ratio | downside-risk-adjusted return |
+| Efficient frontier weights | MPT mean-variance optimisation |
+| Beta vs Nifty 50 | benchmark sensitivity |
+| Yield-target optimised weights | constrained weight solution |
+| Filing Trend Score | fundamentals-direction composite (§6) |
+
+> ⚠️ All metrics are mechanical calculations for research/education only — **not
+> buy/sell signals and not investment advice** (see top disclaimer).
 
 ---
 

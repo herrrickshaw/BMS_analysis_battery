@@ -95,11 +95,128 @@ def fin_metric(df, name_variants: tuple, col: int = 0,
 OHLCV_COLS = ["Open", "High", "Low", "Close", "Volume"]
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# DATA CLEANING  (single hygiene gate for every source: yfinance, nse, bhavcopy)
+# ══════════════════════════════════════════════════════════════════════════════
+# Raw market data is dirty: Yahoo returns stale/forward-filled bars, zero or
+# negative prices, duplicate timestamps, unsorted indices, un-split-adjusted
+# jumps, and OHLC rows that violate low<=open/close<=high. Backtests and
+# screeners silently corrupt when fed this. clean_ohlcv() is the ONE place every
+# fetched price frame passes through, so the rules are consistent everywhere.
+
+# Daily move beyond this (±) with no matching volume is treated as a bad print /
+# un-adjusted split artifact, not a real move. 0.60 = 60%.
+MAX_DAILY_MOVE = 0.60
+
+
+def clean_ohlcv(df: Optional[pd.DataFrame], ticker: str = "",
+                max_daily_move: float = MAX_DAILY_MOVE,
+                min_bars: int = 1, verbose: bool = False) -> Optional[pd.DataFrame]:
+    """Clean a single OHLCV frame. Returns None if nothing usable survives.
+
+    Steps (in order):
+      1. Keep only OHLCV columns; coerce all to numeric (bad strings -> NaN).
+      2. Sort by date; drop duplicate timestamps (keep last = most-restated).
+      3. Drop rows with no Close (the one column everything depends on).
+      4. Forward-fill OHLC gaps from Close; fill missing Volume with 0.
+      5. Drop rows with non-positive Close/High/Low (zero or negative prices).
+      6. Repair OHLC integrity: High = max(O,H,L,C), Low = min(O,H,L,C).
+      7. Flag & null out impossible single-day jumps (|ret| > max_daily_move
+         on near-zero volume) — un-adjusted splits / bad ticks — then ffill.
+      8. Drop leading/trailing all-NaN rows; enforce min_bars.
+
+    Idempotent: cleaning already-clean data is a no-op.
+    """
+    if df is None or df.empty:
+        return None
+    df = df.copy()
+
+    # 1. column subset + numeric coercion
+    keep = [c for c in OHLCV_COLS if c in df.columns]
+    df = df[keep] if keep else df
+    for c in df.columns:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    # 2. chronological order, de-duplicate timestamps
+    try:
+        df = df[~df.index.duplicated(keep="last")].sort_index()
+    except TypeError:
+        pass
+
+    # 3. Close is mandatory
+    if "Close" not in df.columns:
+        return None
+    before = len(df)
+    df = df[df["Close"].notna()]
+
+    # 4. fill OHLC gaps from Close; Volume gaps -> 0
+    for c in ("Open", "High", "Low"):
+        if c in df.columns:
+            df[c] = df[c].fillna(df["Close"])
+    if "Volume" in df.columns:
+        df["Volume"] = df["Volume"].fillna(0).clip(lower=0)
+
+    # 5. drop non-positive prices (zero/negative are always bad data)
+    price_cols = [c for c in ("Close", "High", "Low", "Open") if c in df.columns]
+    df = df[(df[price_cols] > 0).all(axis=1)]
+    if df.empty:
+        return None
+
+    # 6. repair OHLC integrity violations
+    if {"Open", "High", "Low", "Close"}.issubset(df.columns):
+        ohlc = df[["Open", "High", "Low", "Close"]]
+        df["High"] = ohlc.max(axis=1)
+        df["Low"] = ohlc.min(axis=1)
+
+    # 7. neutralise impossible jumps on no volume (un-adjusted split / bad tick)
+    ret = df["Close"].pct_change().abs()
+    vol = df["Volume"] if "Volume" in df.columns else pd.Series(1, index=df.index)
+    bad = (ret > max_daily_move) & (vol <= 0)
+    n_bad = int(bad.sum())
+    if n_bad:
+        df.loc[bad, price_cols] = np.nan
+        df[price_cols] = df[price_cols].ffill()
+        df = df[df["Close"].notna()]
+
+    # 8. trim + minimum length
+    df = df.dropna(how="all")
+    dropped = before - len(df)
+    if verbose and (dropped or n_bad):
+        print(f"    clean_ohlcv[{ticker or '?'}]: dropped {dropped} rows, "
+              f"neutralised {n_bad} bad-print bars -> {len(df)} clean bars")
+    if df.empty or len(df) < min_bars:
+        return None
+    return df
+
+
+def clean_financials(df: Optional[pd.DataFrame]) -> Optional[pd.DataFrame]:
+    """Light hygiene for income-statement / balance-sheet / cash-flow frames.
+
+    yfinance financials arrive with columns = reporting dates (newest first)
+    and occasional all-NaN duplicate period columns. Coerce to numeric, drop
+    fully-empty columns, and ensure newest period is column 0 (what row()/
+    fin_metric() assume when they read col=0).
+    """
+    if df is None or df.empty:
+        return None
+    df = df.apply(pd.to_numeric, errors="coerce")
+    df = df.dropna(axis=1, how="all")
+    if df.empty:
+        return None
+    try:                                  # newest reporting period first
+        if list(df.columns) != sorted(df.columns, reverse=True):
+            df = df.reindex(sorted(df.columns, reverse=True), axis=1)
+    except TypeError:
+        pass
+    return df
+
+
 def extract_ticker_df(raw: pd.DataFrame, ticker: str,
-                      min_bars: int = 1) -> Optional[pd.DataFrame]:
+                      min_bars: int = 1, clean: bool = True) -> Optional[pd.DataFrame]:
     """Pull one ticker's OHLCV frame out of a yfinance bulk-download result.
 
-    Handles both MultiIndex (bulk) and flat (single) column layouts.
+    Handles both MultiIndex (bulk) and flat (single) column layouts, then runs
+    the data-cleaning gate (clean_ohlcv) so every consumer gets hygienic bars.
     Replaces the repeated try/except xs() blocks across all scan scripts.
     """
     try:
@@ -107,7 +224,11 @@ def extract_ticker_df(raw: pd.DataFrame, ticker: str,
             df = raw.xs(ticker, axis=1, level=1).dropna(how="all")
         else:
             df = raw.dropna(how="all")
-        if df.empty or len(df) < min_bars:
+        if df.empty:
+            return None
+        if clean:
+            return clean_ohlcv(df, ticker=ticker, min_bars=min_bars)
+        if len(df) < min_bars:
             return None
         keep = [c for c in OHLCV_COLS if c in df.columns]
         return df[keep] if keep else df

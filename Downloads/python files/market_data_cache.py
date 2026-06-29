@@ -73,6 +73,11 @@ try:
 except ImportError:
     _YF_OK = False
 
+try:                                   # central data-cleaning gate (shared)
+    from stock_utils import clean_ohlcv as _clean_ohlcv_central
+except ImportError:
+    _clean_ohlcv_central = None
+
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 CACHE_ROOT   = Path.home() / "Downloads" / "market_cache"
@@ -568,22 +573,25 @@ class MarketCache:
 
     @staticmethod
     def _clean_ohlc(df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Clean OHLC data as per AlQahtani et al. (2025):
-        - Forward-fill missing values first, then backward-fill
-        - Remove duplicate index entries (keep last)
-        - Ensure DatetimeIndex (sorted ascending)
+        """Clean OHLC before caching — delegates to the central clean_ohlcv gate.
+
+        Cache-specific prep: coerce to a sorted DatetimeIndex and drop unparseable
+        dates first, then hand off to stock_utils.clean_ohlcv() so the cache stores
+        exactly the same hygiene (numeric coercion, dedup, non-positive-price drop,
+        OHLC-integrity repair, bad-print/split neutralisation) every consumer sees.
+        Falls back to the prior ffill/bfill behaviour if stock_utils is unavailable.
         """
         if df.empty:
             return df
         if not isinstance(df.index, pd.DatetimeIndex):
             df.index = pd.to_datetime(df.index, errors="coerce")
-        df = df[~df.index.isna()]
-        df = df.sort_index()
+        df = df[~df.index.isna()].sort_index()
+        if _clean_ohlcv_central is not None:
+            cleaned = _clean_ohlcv_central(df, min_bars=1)
+            return cleaned if cleaned is not None else df.iloc[0:0]
+        # fallback (stock_utils not importable)
         df = df[~df.index.duplicated(keep="last")]
-        # Forward-fill then backward-fill (paper recommendation)
-        df = df.ffill().bfill()
-        return df
+        return df.ffill().bfill()
 
     @staticmethod
     def _write_parquet(path: Path, df: pd.DataFrame):

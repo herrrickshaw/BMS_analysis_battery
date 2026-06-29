@@ -276,6 +276,14 @@ def fetch_history(n_days: int = 400, workers: int = 8, exchanges=("NSE", "BSE"),
         if verbose:
             print(f"  (could not persist cleaned cache: {e})")
 
+    # sync the LMDB NoSQL store (fast keyed retrieval layer) with the fresh data
+    try:
+        from bhavcopy_store import build as _build_store
+        _build_store(out_all, verbose=verbose)
+    except Exception as e:
+        if verbose:
+            print(f"  (LMDB store not synced: {e})")
+
     out = {s: g for s, g in out_all.items() if len(g) >= min_bars}
     if verbose:
         print(f"  fetch_history complete: {len(out)} symbols with ≥{min_bars} bars")

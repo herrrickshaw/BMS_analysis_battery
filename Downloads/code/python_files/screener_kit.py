@@ -77,13 +77,26 @@ def markets() -> List[str]:
 
 
 # ── data access ─────────────────────────────────────────────────────────────────
-def load(market: str) -> Dict[str, pd.DataFrame]:
-    """{symbol: OHLCV} for a market, from the live cache or committed seed."""
+def load(market: str, min_turnover_usd: float = 0.0) -> Dict[str, pd.DataFrame]:
+    """{symbol: OHLCV} for a market, from the live cache or committed seed.
+
+    min_turnover_usd > 0 applies the liquidity pre-filter (keeps only names trading
+    at least that many USD/day) BEFORE building frames — much faster screening on
+    markets with long illiquid tails (e.g. India 8,931 → a few hundred)."""
     p = _live_path(market)
     if not p.exists():
         return {}
+    keep = None
+    if min_turnover_usd and min_turnover_usd > 0:
+        try:
+            from liquidity import liquid_symbols
+            keep = set(liquid_symbols(market, min_usd=min_turnover_usd))
+        except Exception:
+            keep = None
     long = pd.read_parquet(p)
     long["Date"] = pd.to_datetime(long["Date"])
+    if keep is not None:
+        long = long[long["Symbol"].isin(keep)]
     out = {}
     for sym, g in long.groupby("Symbol"):
         out[str(sym)] = g.set_index("Date").sort_index()[
@@ -158,17 +171,18 @@ def update(market: str, verbose: bool = True) -> dict:
 
 
 # ── screening ────────────────────────────────────────────────────────────────────
-def _stocks(market: str) -> List[StockData]:
-    return [StockData(s, market, ohlcv=d) for s, d in load(market).items()]
+def _stocks(market: str, min_turnover_usd: float = 0.0) -> List[StockData]:
+    return [StockData(s, market, ohlcv=d) for s, d in load(market, min_turnover_usd).items()]
 
 
-def screen(strategy_slug: str, market: str = "IN", top: Optional[int] = None) -> pd.DataFrame:
+def screen(strategy_slug: str, market: str = "IN", top: Optional[int] = None,
+           min_turnover_usd: float = 0.0) -> pd.DataFrame:
     """Run one of the 10 built-in strategies across a market's cached stocks."""
     if strategy_slug not in st.STRATEGIES:
         raise ValueError(f"unknown strategy; choose from {list(st.STRATEGIES)}")
     mod = st.STRATEGIES[strategy_slug]
     rows = []
-    for sd in _stocks(market):
+    for sd in _stocks(market, min_turnover_usd):
         try:
             r = mod.screen(sd)
         except Exception:
@@ -183,9 +197,9 @@ def screen(strategy_slug: str, market: str = "IN", top: Optional[int] = None) ->
 
 def custom_screen(criteria, market: str = "IN", rank_by: Optional[str] = None,
                   top: Optional[int] = 50, ascending: bool = False,
-                  show: Optional[List[str]] = None) -> pd.DataFrame:
+                  show: Optional[List[str]] = None, min_turnover_usd: float = 0.0) -> pd.DataFrame:
     """Screen a market on YOUR parameters (see custom_screener for metric names)."""
-    return cs.screen(_stocks(market), criteria, rank_by=rank_by, top=top,
+    return cs.screen(_stocks(market, min_turnover_usd), criteria, rank_by=rank_by, top=top,
                      ascending=ascending, show=show)
 
 

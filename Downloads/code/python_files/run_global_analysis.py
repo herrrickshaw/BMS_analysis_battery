@@ -35,7 +35,10 @@ MOMENTUM = {"above_200dma": ("==", True), "dist_52w_high": ("<", 8),
 SHOW = ["ltp", "ret_126", "ret_252", "rsi14", "dist_52w_high"]
 
 
-def analyse(markets=None, top_per_market: int = 5, verbose: bool = True) -> dict:
+def analyse(markets=None, top_per_market: int = 5, verbose: bool = True,
+            min_turnover_usd: float = 1_000_000) -> dict:
+    """min_turnover_usd>0 pre-filters to liquid names — far faster and surfaces
+    only tradable stocks (default $1M/day)."""
     markets = markets or kit.markets()
     per_market, global_rows = {}, []
     if verbose:
@@ -44,12 +47,12 @@ def analyse(markets=None, top_per_market: int = 5, verbose: bool = True) -> dict
         print("=" * 64)
         print("  Educational/research only. NOT investment advice.\n")
     for m in markets:
-        data = kit.load(m)
+        data = kit.load(m, min_turnover_usd)
         if not data:
             continue
         stocks = [StockData(s, m, ohlcv=d) for s, d in data.items()]
-        darvas = kit.screen("darvas", m)
-        gcross = kit.screen("golden_crossover", m)
+        darvas = kit.screen("darvas", m, min_turnover_usd=min_turnover_usd)
+        gcross = kit.screen("golden_crossover", m, min_turnover_usd=min_turnover_usd)
         mom = cs.screen(stocks, MOMENTUM, rank_by="ret_126",
                         top=top_per_market, show=SHOW)
         per_market[m] = mom

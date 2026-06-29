@@ -52,6 +52,24 @@ npm-debug.log
 *.tar.gz
 *.7z
 
+# Sensitive & Personal Data
+*.txt
+Downloads/code/python_files/
+.env
+.env.local
+*.key
+*.pem
+credentials.json
+secrets.json
+.claude.json
+.claude.json.backup
+.claude/
+.gitconfig
+.ssh/
+.aws/
+.azure/
+.gcp/
+
 # OS
 .DS_Store
 Thumbs.db

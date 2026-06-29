@@ -79,9 +79,22 @@ def analyse(markets=None, top_per_market: int = 5, verbose: bool = True) -> dict
         for m, df in per_market.items():
             if not df.empty:
                 df.to_excel(xw, m, index=False)
+    # df-referenceable artifact for later: tidy long parquet + dated stamp
+    if not g.empty:
+        g = g.copy()
+        g["as_of"] = pd.Timestamp.today().normalize()
+        g.to_parquet(HIGHLIGHTS_PARQUET, compression="zstd", index=False)
     if verbose:
-        print("\nsaved → global_highlights.xlsx")
+        print(f"\nsaved → global_highlights.xlsx and {HIGHLIGHTS_PARQUET.name}")
     return {"per_market": per_market, "global": g}
+
+
+HIGHLIGHTS_PARQUET = __import__("pathlib").Path(__file__).parent / "cache_seed" / "global_highlights.parquet"
+
+
+def load_highlights() -> pd.DataFrame:
+    """Load the most recent global highlights as a DataFrame (for later reference)."""
+    return pd.read_parquet(HIGHLIGHTS_PARQUET) if HIGHLIGHTS_PARQUET.exists() else pd.DataFrame()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,125 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.wrap { padding: 1rem 0; }
+.months { display: flex; flex-direction: column; gap: 0; }
+.month-row { display: grid; grid-template-columns: 80px 1fr; border-top: 0.5px solid var(--color-border-tertiary); }
+.month-row:last-child { border-bottom: 0.5px solid var(--color-border-tertiary); }
+.month-label { padding: 14px 12px 14px 0; font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; border-right: 0.5px solid var(--color-border-tertiary); display: flex; align-items: flex-start; }
+.events-col { padding: 10px 0 10px 16px; display: flex; flex-direction: column; gap: 8px; }
+.event-card { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); cursor: pointer; transition: border-color 0.15s; }
+.event-card:hover { border-color: var(--color-border-secondary); }
+.event-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.dot-sugar { background: #1D9E75; }
+.dot-bioenergy { background: #7F77DD; }
+.dot-ethanol { background: #EF9F27; }
+.dot-multi { background: #D85A30; }
+.event-body { flex: 1; min-width: 0; }
+.event-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); line-height: 1.4; }
+.event-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; align-items: center; }
+.event-loc { font-size: 12px; color: var(--color-text-secondary); }
+.event-tag { font-size: 11px; padding: 2px 7px; border-radius: 20px; font-weight: 500; }
+.tag-sugar { background: #E1F5EE; color: #0F6E56; }
+.tag-bioenergy { background: #EEEDFE; color: #3C3489; }
+.tag-ethanol { background: #FAEEDA; color: #633806; }
+.tag-multi { background: #FAECE7; color: #993C1D; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 1.5rem; align-items: center; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); }
+.legend-dot { width: 9px; height: 9px; border-radius: 50%; }
+.filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
+.filter-btn { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+.filter-btn.active { border-color: transparent; }
+.filter-btn.active.f-all { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.filter-btn.active.f-sugar { background: #E1F5EE; color: #0F6E56; border-color: #9FE1CB; }
+.filter-btn.active.f-bioenergy { background: #EEEDFE; color: #3C3489; border-color: #CECBF6; }
+.filter-btn.active.f-ethanol { background: #FAEEDA; color: #633806; border-color: #FAC775; }
+.filter-btn.active.f-multi { background: #FAECE7; color: #993C1D; border-color: #F5C4B3; }
+.month-row.empty { display: none; }
+.past-badge { font-size: 10px; color: var(--color-text-tertiary); border: 0.5px solid var(--color-border-tertiary); border-radius: 20px; padding: 1px 6px; }
+</style>
+<div class="wrap">
+  <div class="filter-bar" id="filters">
+    <button class="filter-btn active f-all" onclick="setFilter('all',this)">All events</button>
+    <button class="filter-btn f-sugar" onclick="setFilter('sugar',this)">Sugar</button>
+    <button class="filter-btn f-bioenergy" onclick="setFilter('bioenergy',this)">Bioenergy</button>
+    <button class="filter-btn f-ethanol" onclick="setFilter('ethanol',this)">Ethanol</button>
+    <button class="filter-btn f-multi" onclick="setFilter('multi',this)">Multi-sector</button>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div> Sugar</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7F77DD"></div> Bioenergy</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div> Ethanol</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div> Multi-sector</div>
+  </div>
+  <div class="months" id="calendar"></div>
+</div>
+
+<script>
+const events = [
+  { month: "Feb", order: 2, name: "Sugar – Ethanol & Bioenergy India Conference (SEIC)", loc: "New Delhi, India", tag: "multi", past: true },
+  { month: "Feb", order: 2, name: "International Sweetener Colloquium", loc: "Washington D.C., USA", tag: "sugar", past: true },
+  { month: "Feb", order: 2, name: "26th Carbo Solutions International Sugar Conference", loc: "Marrakesh, Morocco", tag: "sugar", past: true },
+  { month: "Apr", order: 4, name: "Africa Sugar Conference", loc: "Nairobi, Kenya", tag: "sugar", past: false },
+  { month: "Apr", order: 4, name: "47th ASSCT Conference", loc: "Mackay, Australia", tag: "sugar", past: false },
+  { month: "Apr", order: 4, name: "15th Annual Geneva Sugar Conference", loc: "Geneva, Switzerland", tag: "sugar", past: false },
+  { month: "May", order: 5, name: "34th European Biomass Conference & Exhibition (EUBCE)", loc: "The Hague, Netherlands", tag: "bioenergy", past: false },
+  { month: "Jun", order: 6, name: "SEIC 2nd Edition", loc: "India", tag: "multi", past: false },
+  { month: "Jul", order: 7, name: "80th IIRB Congress", loc: "Cambridge, UK", tag: "sugar", past: false },
+  { month: "Aug", order: 8, name: "Fenasucro & Agrocana 2026", loc: "Sertãozinho, Brazil", tag: "multi", past: false },
+  { month: "Aug", order: 8, name: "98th SASTA Congress", loc: "Durban, South Africa", tag: "sugar", past: false },
+  { month: "Sep", order: 9, name: "SugarBeet Expo 2026", loc: "Springe, Germany", tag: "sugar", past: false },
+  { month: "Sep", order: 9, name: "3rd Global Conference on Biofuels & Bioenergy", loc: "Rome, Italy (hybrid)", tag: "bioenergy", past: false },
+  { month: "Nov", order: 11, name: "World Biofuels, Ethanol & Feedstocks Conference", loc: "Barcelona, Spain", tag: "ethanol", past: false },
+  { month: "TBC", order: 13, name: "Dubai Sugar Conference", loc: "Dubai, UAE", tag: "multi", past: false },
+  { month: "TBC", order: 13, name: "Thailand Sugar Conference & Sugarex 2026", loc: "Khon Kaen, Thailand", tag: "multi", past: false },
+  { month: "TBC", order: 13, name: "ISO Annual Seminar", loc: "London, UK", tag: "sugar", past: false },
+];
+
+const tagLabel = { sugar: "Sugar", bioenergy: "Bioenergy", ethanol: "Ethanol", multi: "Multi-sector" };
+const monthOrder = ["Feb","Apr","May","Jun","Jul","Aug","Sep","Nov","TBC"];
+let activeFilter = "all";
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  render();
+}
+
+function render() {
+  const cal = document.getElementById("calendar");
+  cal.innerHTML = "";
+  const filtered = activeFilter === "all" ? events : events.filter(e => e.tag === activeFilter);
+  monthOrder.forEach(m => {
+    const mes = filtered.filter(e => e.month === m);
+    if (!mes.length) return;
+    const row = document.createElement("div");
+    row.className = "month-row";
+    const label = document.createElement("div");
+    label.className = "month-label";
+    label.textContent = m === "TBC" ? "TBC" : m;
+    const col = document.createElement("div");
+    col.className = "events-col";
+    mes.forEach(ev => {
+      const card = document.createElement("div");
+      card.className = "event-card";
+      card.innerHTML = `
+        <div class="event-dot dot-${ev.tag}"></div>
+        <div class="event-body">
+          <div class="event-name">${ev.name}${ev.past ? ' <span class="past-badge">past</span>' : ''}</div>
+          <div class="event-meta">
+            <span class="event-loc">📍 ${ev.loc}</span>
+            <span class="event-tag tag-${ev.tag}">${tagLabel[ev.tag]}</span>
+          </div>
+        </div>
+      `;
+      col.appendChild(card);
+    });
+    row.appendChild(label);
+    row.appendChild(col);
+    cal.appendChild(row);
+  });
+}
+render();
+</script>

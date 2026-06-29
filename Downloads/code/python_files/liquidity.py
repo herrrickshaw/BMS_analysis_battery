@@ -86,17 +86,33 @@ def _load_index() -> pd.DataFrame:
     return pd.read_parquet(INDEX_PATH) if INDEX_PATH.exists() else pd.DataFrame()
 
 
-# liquidity tiers by USD median daily turnover
+# liquidity tiers by USD median daily turnover (global defaults)
 HIGH = 10_000_000      # ≥ $10M/day  → High
 MED = 1_000_000        # $1M–$10M/day → Medium  (< $1M → Low)
 
+# Per-market overrides (high, medium) — smaller/thinner markets use lower bars so
+# "High/Medium/Low" is meaningful *within* each market. Tune freely.
+MARKET_TIERS = {
+    "US": (20_000_000, 2_000_000), "CN": (20_000_000, 2_000_000),
+    "JP": (10_000_000, 1_000_000), "EU": (10_000_000, 1_000_000),
+    "HK": (5_000_000, 500_000),    "TW": (5_000_000, 500_000),
+    "KR": (5_000_000, 500_000),    "UK": (5_000_000, 500_000),
+    "DE": (5_000_000, 500_000),    "CA": (3_000_000, 300_000),
+    "AU": (3_000_000, 300_000),    "IN": (5_000_000, 500_000),
+    "BR": (3_000_000, 300_000),    "SA": (3_000_000, 300_000),
+    "CH": (3_000_000, 300_000),    "SG": (2_000_000, 200_000),
+    "ZA": (2_000_000, 200_000),    "SE": (2_000_000, 200_000),
+    "FI": (1_000_000, 100_000),    "DK": (1_000_000, 100_000),
+}
 
-def tier(turnover_usd: Optional[float]) -> str:
+
+def tier(turnover_usd: Optional[float], market: Optional[str] = None) -> str:
     if turnover_usd is None:
         return "Unknown"
-    if turnover_usd >= HIGH:
+    hi, med = MARKET_TIERS.get(market, (HIGH, MED))
+    if turnover_usd >= hi:
         return "High"
-    if turnover_usd >= MED:
+    if turnover_usd >= med:
         return "Medium"
     return "Low"
 
@@ -120,7 +136,10 @@ def annotate(df: pd.DataFrame, symbol_col: str = "Symbol") -> pd.DataFrame:
     tmap = _turnover_map()
     df = df.copy()
     df["Turnover_USD"] = df[symbol_col].map(tmap).round(0)
-    df["Liquidity"] = df["Turnover_USD"].map(tier)
+    if "Market" in df.columns:
+        df["Liquidity"] = [tier(t, m) for t, m in zip(df["Turnover_USD"], df["Market"])]
+    else:
+        df["Liquidity"] = df["Turnover_USD"].map(tier)
     return df
 
 

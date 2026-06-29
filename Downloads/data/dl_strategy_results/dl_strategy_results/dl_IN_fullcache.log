@@ -1,0 +1,68 @@
+
+##############################################################################
+  DL-INFORMED STRATEGY EVALUATION — IN | horizon=21d | long-threshold P(up)≥0.55
+  Framing: directional classification → mechanical long/flat strategy
+  Benchmark: buy-and-hold (Fister 2019; Olorunnimbe 2022; Toichatturat 2024)
+##############################################################################
+⚠️  Backtested trading strategy. Survivorship + look-ahead risk. Economic results are historical, need not persist. NOT advice.
+
+STEP 1 — Load data
+  1931 stocks with ≥600 bars
+
+STEP 2 — Walk-forward train + strategy backtest (GradientBoosting)
+    100/1931 stocks processed, 96 results
+    200/1931 stocks processed, 194 results
+    300/1931 stocks processed, 292 results
+    400/1931 stocks processed, 380 results
+    500/1931 stocks processed, 477 results
+    600/1931 stocks processed, 570 results
+    700/1931 stocks processed, 668 results
+    800/1931 stocks processed, 765 results
+    900/1931 stocks processed, 860 results
+    1000/1931 stocks processed, 954 results
+    1100/1931 stocks processed, 1049 results
+    1200/1931 stocks processed, 1144 results
+    1300/1931 stocks processed, 1240 results
+    1400/1931 stocks processed, 1334 results
+    1500/1931 stocks processed, 1429 results
+    1600/1931 stocks processed, 1521 results
+    1700/1931 stocks processed, 1619 results
+    1800/1931 stocks processed, 1717 results
+    1900/1931 stocks processed, 1806 results
+    1931/1931 stocks processed, 1836 results
+
+STEP 3 — Economic Evaluation (1836 stocks)
+==============================================================================
+
+  📊 STRATEGY vs BUY-AND-HOLD (out-of-sample, last 30% of history):
+  Metric                           Strategy     Buy&Hold       Edge
+  ────────────────────────────────────────────────────────────────
+  Mean cumulative return%             4.94        -2.76     +7.70
+  Median cumulative return%           0.01       -10.77    +10.78
+  Mean Sharpe                        0.100       -0.091    +0.191
+  Mean max drawdown%                -19.87       -31.98    +12.10
+
+  % of stocks where strategy BEAT buy-and-hold: 66.6%
+
+  ── VERDICT ──
+  Strategy shows a return edge (+7.7% avg alpha, beats BH 67% of the time).
+
+  🏆 Top 10 by out-of-sample alpha vs buy-and-hold:
+  Symbol            Strat%       BH%    Alpha%   Sharpe    MaxDD%
+  ──────────────────────────────────────────────────────────────
+  LASA.NS            60.9     -61.0   +121.9     1.10    -16.4
+  GAYAHWS.NS        113.4       2.7   +110.7     1.46     -9.7
+  RAJESHEXPO.NS      61.6     -48.5   +110.1     1.25     -9.5
+  CYBERTECH.NS      100.9      -6.8   +107.7     1.48     -8.4
+  GUJRAFFIA.NS      113.0       6.5   +106.5     1.03     -6.1
+  KIRLOSENG.NS      220.4     120.2   +100.1     3.04     -8.5
+  BAFNAPH.NS        199.5     101.8    +97.7     1.97      0.0
+  TIJARIA.NS         28.7     -67.5    +96.1     1.14      0.0
+  SILVERTUC.NS       18.3     -77.1    +95.3     0.76     -9.6
+  GABRIEL.NS        216.3     125.3    +91.0     1.84    -15.8
+
+  📊 → dl_strategy_results/dl_strategy_IN_20260626_1818.xlsx
+
+==============================================================================
+  ⚠️  Backtested trading strategy. Survivorship + look-ahead risk. Economic results are historical, need not persist. NOT advice.
+==============================================================================

@@ -1,0 +1,49 @@
+
+##############################################################################
+  DL-INFORMED STRATEGY EVALUATION — IN | horizon=21d | long-threshold P(up)≥0.55
+  Framing: directional classification → mechanical long/flat strategy
+  Benchmark: buy-and-hold (Fister 2019; Olorunnimbe 2022; Toichatturat 2024)
+##############################################################################
+⚠️  Backtested trading strategy. Survivorship + look-ahead risk. Economic results are historical, need not persist. NOT advice.
+
+STEP 1 — Load data
+  77 stocks with ≥600 bars
+
+STEP 2 — Walk-forward train + strategy backtest (GradientBoosting)
+    77/77 stocks processed, 67 results
+
+STEP 3 — Economic Evaluation (67 stocks)
+==============================================================================
+
+  📊 STRATEGY vs BUY-AND-HOLD (out-of-sample, last 30% of history):
+  Metric                           Strategy     Buy&Hold       Edge
+  ────────────────────────────────────────────────────────────────
+  Mean cumulative return%             7.97         7.65     +0.32
+  Median cumulative return%           3.05        -4.57     +7.62
+  Mean Sharpe                        0.085        0.017    +0.067
+  Mean max drawdown%                -19.91       -32.33    +12.42
+
+  % of stocks where strategy BEAT buy-and-hold: 56.7%
+
+  ── VERDICT ──
+  Strategy shows a return edge (+0.3% avg alpha, beats BH 57% of the time).
+
+  🏆 Top 10 by out-of-sample alpha vs buy-and-hold:
+  Symbol            Strat%       BH%    Alpha%   Sharpe    MaxDD%
+  ──────────────────────────────────────────────────────────────
+  TIJARIA.NS         28.7     -67.5    +96.1     1.14      0.0
+  SUPREMEINF.NS      86.7       2.6    +84.1     1.93     -4.7
+  MANAKALUCO.NS     202.9     138.7    +64.2     1.04    -19.6
+  VIPULLTD.NS        28.5     -24.6    +53.1     0.62    -16.7
+  GOYALALUM.NS       40.9      -6.8    +47.8     1.34     -1.5
+  FIBERWEB.NS        -2.9     -47.1    +44.2     0.12    -34.6
+  FAZE3Q.NS          31.1      -8.1    +39.2     1.27    -18.7
+  BESTAGRO.NS        34.7      -4.3    +39.0     1.11      0.0
+  LEXUS.NS           -8.7     -47.6    +38.8    -0.57    -17.4
+  ZEEMEDIA.NS       -15.0     -52.0    +37.0    -0.85    -20.6
+
+  📊 → dl_strategy_results/dl_strategy_IN_20260626_1756.xlsx
+
+==============================================================================
+  ⚠️  Backtested trading strategy. Survivorship + look-ahead risk. Economic results are historical, need not persist. NOT advice.
+==============================================================================

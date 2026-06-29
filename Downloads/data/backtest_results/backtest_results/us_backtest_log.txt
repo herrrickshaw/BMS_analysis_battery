@@ -1,0 +1,57 @@
+/Users/umashankar/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+
+######################################################################
+  SCREENER BACKTEST — US MARKET
+  Started: 26 Jun 2026  13:54:37
+  Lookback: 252 trading days | Horizons: ['T+1d', 'T+3d', 'T+1wk', 'T+1mo', 'T+3mo']
+######################################################################
+
+⚠️  BACKTESTING DISCLAIMER: Results are based on historical data and are subject to survivorship bias, look-ahead bias (fundamental screeners), and data limitations. Past performance does NOT guarantee future results. For educational/research use only — NOT investment advice.
+
+Step 1 — Market index for regime classification …
+  Downloading ^GSPC index (2y) for regime classification … OK (501 bars)
+
+Step 2 — Symbol universe …
+  0 symbols loaded
+
+Step 3 — Bulk OHLC download (14mo window for 0 symbols) …
+  0 tickers with usable OHLC data
+  0 symbols ready for backtesting
+
+Step 4 — Backtest: Darvas Box Breakout …
+  → No signals detected
+
+Step 4 — Backtest: Golden Crossover …
+  → No signals detected
+
+Step 4 — Backtest: Piotroski F-Score ≥7 …
+  → No signals detected
+
+Step 4 — Backtest: Coffee Can …
+  → No signals detected
+
+Step 4 — Backtest: Magic Formula …
+  → No signals detected
+
+Step 4 — Backtest: Bull Cartel …
+  → No signals detected
+
+Step 5 — Statistical analysis …
+
+Step 6 — Saving results …
+
+  📊  Backtest Excel → backtest_results/backtest_US_20260626_1355.xlsx
+
+======================================================================
+  BACKTEST RESULTS SUMMARY
+  ⚠️  BACKTESTING DISCLAIMER: Results are based on historical data and are subject…
+======================================================================
+
+  ────────────────────────────────────────────────────────────────────
+  KEY INTERPRETATIONS
+  ────────────────────────────────────────────────────────────────────
+
+  ⚠️  ⚠️  BACKTESTING DISCLAIMER: Results are based on historical data and are subject to survivorship bias, look-ahead bias (fundamental screeners), and data limitations. Past performance does NOT guarantee future results. For educational/research use only — NOT investment advice.
+======================================================================
+

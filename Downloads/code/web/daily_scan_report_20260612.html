@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Market Scan — 12 Jun 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a1a2e; }
+
+  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 32px 40px; }
+  .header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .header .date { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+  .header .tagline { font-size: 14px; opacity: 0.85; margin-top: 8px; }
+
+  .summary-bar { display: flex; gap: 0; background: #fff; border-bottom: 1px solid #e0e0e0; }
+  .summary-item { flex: 1; padding: 18px 24px; text-align: center; border-right: 1px solid #e8e8e8; }
+  .summary-item:last-child { border-right: none; }
+  .summary-item .val { font-size: 28px; font-weight: 800; color: #0f3460; }
+  .summary-item .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-top: 2px; }
+  .summary-item.green .val { color: #16a34a; }
+  .summary-item.red .val { color: #dc2626; }
+  .summary-item.gold .val { color: #d97706; }
+
+  .body { max-width: 900px; margin: 0 auto; padding: 28px 20px; }
+
+  .section { margin-bottom: 28px; }
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .section-header h2 { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+  .flag { font-size: 18px; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .badge-india { background: #fef3c7; color: #92400e; }
+  .badge-us { background: #dbeafe; color: #1e40af; }
+  .badge-hit { background: #fce7f3; color: #9d174d; }
+
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07); font-size: 13px; }
+  thead th { background: #1a1a2e; color: #fff; padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; }
+  tbody tr { border-bottom: 1px solid #f0f0f0; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f8f9ff; }
+  td { padding: 10px 14px; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.mono { font-family: 'SF Mono', 'Fira Code', monospace; }
+
+  .chg-pos { color: #16a34a; font-weight: 600; }
+  .chg-neg { color: #dc2626; font-weight: 600; }
+  .chg-neu { color: #6b7280; }
+
+  .signal-buy  { background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .signal-sell { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+
+  .score-bar { display: inline-flex; gap: 2px; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-filled { background: #7c3aed; }
+  .dot-empty  { background: #e5e7eb; }
+
+  .cc-pass { color: #16a34a; font-weight: 700; }
+  .cc-fail { color: #dc2626; }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .stat-card h3 { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row .val { font-weight: 700; }
+
+  .alert { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 16px; font-size: 12.5px; color: #78350f; margin-bottom: 16px; line-height: 1.5; }
+  .alert b { color: #92400e; }
+
+  .divider { border: none; border-top: 2px solid #e8eaef; margin: 32px 0; }
+
+  .footer { text-align: center; font-size: 11px; color: #aaa; padding: 20px; }
+  .footer a { color: #888; }
+
+  @media (max-width: 600px) {
+    .summary-bar { flex-wrap: wrap; }
+    .summary-item { min-width: 50%; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .header { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Daily Market Scan — 12 Jun 2026</h1>
+  <div class="date">Generated 12 Jun 2026 · 12:08 IST</div>
+  <div class="tagline">Darvas Box Breakout &nbsp;·&nbsp; Piotroski F-Score &nbsp;·&nbsp; Coffee Can Quality Filter</div>
+</div>
+
+<!-- ───────── SUMMARY BAR ───────── -->
+<div class="summary-bar">
+  <div class="summary-item">
+    <div class="val">4,587</div><div class="lbl">🇮🇳 IN Stocks Scanned</div>
+  </div>
+  <div class="summary-item green">
+    <div class="val">757</div><div class="lbl">🇮🇳 IN Breakouts</div>
+  </div>
+  <div class="summary-item red">
+    <div class="val">255</div><div class="lbl">🇮🇳 IN Breakdowns</div>
+  </div>
+  <div class="summary-item gold">
+    <div class="val">14</div><div class="lbl">🇮🇳 IN Triple Hits ★</div>
+  </div>
+  <div class="summary-item">
+    <div class="val">5,406</div><div class="lbl">🇺🇸 US Stocks Scanned</div>
+  </div>
+  <div class="summary-item green">
+    <div class="val">1,818</div><div class="lbl">🇺🇸 US Breakouts</div>
+  </div>
+  <div class="summary-item red">
+    <div class="val">242</div><div class="lbl">🇺🇸 US Breakdowns</div>
+  </div>
+  <div class="summary-item">
+    <div class="val" style="color:#9ca3af;">0</div><div class="lbl">🇺🇸 US Triple Hits ★</div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- ──────── ALERTS ──────── -->
+  <div class="alert">
+    <b>⚠ US Triple Hits = 0:</b> Yahoo Finance returned HTTP 401 (Invalid Crumb) during the fundamentals stage — session expired after ~2 hours of continuous OHLC downloads. Darvas Breakout signals for US are valid; Piotroski / Coffee Can scores could not be computed for most stocks. Re-run the scan fresh to get US fundamental rankings.
+  </div>
+
+  <!-- ──────── STATS ──────── -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>🇮🇳 India Universe</h3>
+      <div class="stat-row"><span>NSE EQ symbols</span><span class="val">2,433</span></div>
+      <div class="stat-row"><span>BSE-only Active EQ</span><span class="val">2,441</span></div>
+      <div class="stat-row"><span>With 3-month OHLC data</span><span class="val">4,587</span></div>
+      <div class="stat-row"><span>Darvas Breakout BUY</span><span class="val" style="color:#16a34a">757</span></div>
+      <div class="stat-row"><span>Darvas Breakdown SELL</span><span class="val" style="color:#dc2626">255</span></div>
+      <div class="stat-row"><span>Fundamentals scanned</span><span class="val">757</span></div>
+      <div class="stat-row"><span>★ Triple Hits</span><span class="val" style="color:#d97706">14</span></div>
+    </div>
+    <div class="stat-card">
+      <h3>🇺🇸 US Universe</h3>
+      <div class="stat-row"><span>NASDAQ (SEC EDGAR)</span><span class="val">4,307</span></div>
+      <div class="stat-row"><span>NYSE/Other (SEC EDGAR)</span><span class="val">3,303</span></div>
+      <div class="stat-row"><span>With 3-month OHLC data</span><span class="val">5,406*</span></div>
+      <div class="stat-row"><span>Darvas Breakout BUY</span><span class="val" style="color:#16a34a">1,818</span></div>
+      <div class="stat-row"><span>Darvas Breakdown SELL</span><span class="val" style="color:#dc2626">242</span></div>
+      <div class="stat-row"><span>Fundamentals scanned</span><span class="val" style="color:#6b7280">1,818 (401 errors)</span></div>
+      <div class="stat-row"><span>★ Triple Hits</span><span class="val" style="color:#9ca3af">0 (session expired)</span></div>
+    </div>
+  </div>
+
+  <!-- ──────── INDIA TRIPLE HITS ──────── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="flag">🇮🇳</span>
+      <h2>India — Triple Hits (14)</h2>
+      <span class="badge badge-hit">Darvas BREAKOUT + Piotroski ≥7 + Coffee Can PASS</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Symbol</th>
+          <th>LTP (₹)</th>
+          <th>Change%</th>
+          <th>Signal</th>
+          <th>Piotroski</th>
+          <th>Coffee Can</th>
+          <th>Upside to Top%</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td><td class="mono">APCOTEXIND</td><td class="num">538.45</td>
+          <td class="num chg-pos">+4.30%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            &nbsp;9/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">7.75%</td>
+        </tr>
+        <tr>
+          <td>2</td><td class="mono">KOVAI</td><td class="num">5,783.00</td>
+          <td class="num chg-neg">-0.20%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            &nbsp;9/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">5.60%</td>
+        </tr>
+        <tr>
+          <td>3</td><td class="mono">PRIVISCL</td><td class="num">3,330.00</td>
+          <td class="num chg-pos">+2.68%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            &nbsp;9/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">1.36%</td>
+        </tr>
+        <tr>
+          <td>4</td><td class="mono">BELRISE</td><td class="num">224.50</td>
+          <td class="num chg-pos">+1.86%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-empty"></span>
+            &nbsp;8/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">0.78%</td>
+        </tr>
+        <tr>
+          <td>5</td><td class="mono">CCL</td><td class="num">1,137.90</td>
+          <td class="num chg-pos">+0.42%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-empty"></span>
+            &nbsp;8/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">4.92%</td>
+        </tr>
+        <tr>
+          <td>6</td><td class="mono">APOLLOHOSP</td><td class="num">8,485.00</td>
+          <td class="num chg-neg">-0.09%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+            &nbsp;7/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">1.89%</td>
+        </tr>
+        <tr>
+          <td>7</td><td class="mono">BCLIND</td><td class="num">38.07</td>
+          <td class="num chg-neg">-0.18%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+            &nbsp;7/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">12.14%</td>
+        </tr>
+        <tr>
+          <td>8</td><td class="mono">CEMPRO</td><td class="num">1,127.70</td>
+          <td class="num chg-neg">-3.80%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+            &nbsp;7/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">3.60%</td>
+        </tr>
+        <tr>
+          <td>9</td><td class="mono">DATAPATTNS</td><td class="num">4,527.00</td>
+          <td class="num chg-pos">+7.66%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+            &nbsp;7/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">6.14%</td>
+        </tr>
+        <tr>
+          <td>10</td><td class="mono">DOMS</td><td class="num">2,280.30</td>
+          <td class="num chg-pos">+1.10%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+            &nbsp;7/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">3.97%</td>
+        </tr>
+        <tr>
+          <td>11</td><td class="mono">MANORAMA</td><td class="num">1,557.90</td>
+          <td class="num chg-pos">+1.54%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+            &nbsp;7/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">1.15%</td>
+        </tr>
+        <tr>
+          <td>12</td><td class="mono">MENONBE</td><td class="num">168.68</td>
+          <td class="num chg-pos">+1.46%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+            &nbsp;7/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">13.75%</td>
+        </tr>
+        <tr>
+          <td>13</td><td class="mono">SEDEMAC</td><td class="num">2,820.00</td>
+          <td class="num chg-pos">+6.72%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+            &nbsp;7/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">22.87%</td>
+        </tr>
+        <tr>
+          <td>14</td><td class="mono">SILVERTUC</td><td class="num">198.57</td>
+          <td class="num chg-pos">+4.86%</td>
+          <td><span class="signal-buy">BREAKOUT BUY</span></td>
+          <td><span class="score-bar">
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-filled"></span><span class="dot dot-filled"></span>
+            <span class="dot dot-filled"></span><span class="dot dot-empty"></span><span class="dot dot-empty"></span>
+            &nbsp;7/9</span></td>
+          <td class="cc-pass">PASS 5/5</td><td class="num">7.34%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ──────── INDIA TOP BREAKOUTS ──────── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="flag">🇮🇳</span>
+      <h2>India — Top 10 Breakouts by Day Change%</h2>
+      <span class="badge badge-india">757 total breakouts</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Symbol</th><th>LTP (₹)</th><th>Change%</th><th>Upside to Box Top</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td class="mono">EXXARO</td><td class="num">7.67</td><td class="num chg-pos">+19.84%</td><td class="num">12.65%</td></tr>
+        <tr><td>2</td><td class="mono">BETA</td><td class="num">1,755.60</td><td class="num chg-pos">+18.94%</td><td class="num">17.35%</td></tr>
+        <tr><td>3</td><td class="mono">GETALONG</td><td class="num">6.50</td><td class="num chg-pos">+18.18%</td><td class="num">20.92%</td></tr>
+        <tr><td>4</td><td class="mono">IFCI</td><td class="num">82.05</td><td class="num chg-pos">+16.42%</td><td class="num">3.64%</td></tr>
+        <tr><td>5</td><td class="mono">WENDT</td><td class="num">7,781.00</td><td class="num chg-pos">+14.71%</td><td class="num">11.01%</td></tr>
+        <tr><td>6</td><td class="mono">ROTO</td><td class="num">66.05</td><td class="num chg-pos">+13.57%</td><td class="num">3.56%</td></tr>
+        <tr><td>7</td><td class="mono">CLSEL</td><td class="num">299.00</td><td class="num chg-pos">+12.79%</td><td class="num">7.34%</td></tr>
+        <tr><td>8</td><td class="mono">AIIL</td><td class="num">517.15</td><td class="num chg-pos">+12.44%</td><td class="num">9.54%</td></tr>
+        <tr><td>9</td><td class="mono">HINDWAREAP</td><td class="num">239.01</td><td class="num chg-pos">+12.21%</td><td class="num">6.47%</td></tr>
+        <tr><td>10</td><td class="mono">DATAPATTNS</td><td class="num">4,527.00</td><td class="num chg-pos">+7.66%</td><td class="num">6.14%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ──────── INDIA TOP BREAKDOWNS ──────── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="flag">🇮🇳</span>
+      <h2>India — Top 10 Breakdowns (Worst Change%)</h2>
+      <span class="badge badge-india">255 total breakdowns</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Symbol</th><th>LTP (₹)</th><th>Change%</th><th>Upside to Box Top</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td class="mono">AAPLUSTRAD</td><td class="num">0.76</td><td class="num chg-neg">-15.56%</td><td class="num">65.79%</td></tr>
+        <tr><td>2</td><td class="mono">DECIPHER</td><td class="num">6.25</td><td class="num chg-neg">-8.76%</td><td class="num">14.08%</td></tr>
+        <tr><td>3</td><td class="mono">FERVENTSYN</td><td class="num">14.16</td><td class="num chg-neg">-8.05%</td><td class="num">22.18%</td></tr>
+        <tr><td>4</td><td class="mono">ARAVALIS</td><td class="num">3.50</td><td class="num chg-neg">-6.67%</td><td class="num">28.29%</td></tr>
+        <tr><td>5</td><td class="mono">PASARI</td><td class="num">6.74</td><td class="num chg-neg">-6.39%</td><td class="num">18.40%</td></tr>
+        <tr><td>6</td><td class="mono">MARBU</td><td class="num">42.60</td><td class="num chg-neg">-6.37%</td><td class="num">16.10%</td></tr>
+        <tr><td>7</td><td class="mono">MPDL</td><td class="num">32.50</td><td class="num chg-neg">-6.07%</td><td class="num">25.26%</td></tr>
+        <tr><td>8</td><td class="mono">GBLOGISTIC</td><td class="num">31.60</td><td class="num chg-neg">-5.90%</td><td class="num">20.25%</td></tr>
+        <tr><td>9</td><td class="mono">ESHAMEDIA</td><td class="num">23.07</td><td class="num chg-neg">-5.84%</td><td class="num">17.60%</td></tr>
+        <tr><td>10</td><td class="mono">UNJHAFOR</td><td class="num">18.55</td><td class="num chg-neg">-5.84%</td><td class="num">14.29%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ──────── US TOP BREAKOUTS ──────── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="flag">🇺🇸</span>
+      <h2>US — Top 10 Breakouts by Day Change%</h2>
+      <span class="badge badge-us">1,818 total breakouts</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Symbol</th><th>LTP ($)</th><th>Change%</th><th>Upside to Box Top</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td class="mono">QH</td><td class="num">7.41</td><td class="num chg-pos">+128.00%</td><td class="num">47.37%</td></tr>
+        <tr><td>2</td><td class="mono">EDHL</td><td class="num">5.98</td><td class="num chg-pos">+70.86%</td><td class="num">17.73%</td></tr>
+        <tr><td>3</td><td class="mono">VELO</td><td class="num">30.61</td><td class="num chg-pos">+34.96%</td><td class="num">30.57%</td></tr>
+        <tr><td>4</td><td class="mono">HTCO</td><td class="num">5.79</td><td class="num chg-pos">+26.14%</td><td class="num">5.01%</td></tr>
+        <tr><td>5</td><td class="mono">HOFT</td><td class="num">15.55</td><td class="num chg-pos">+26.12%</td><td class="num">15.76%</td></tr>
+        <tr><td>6</td><td class="mono">ATEX</td><td class="num">81.44</td><td class="num chg-pos">+25.72%</td><td class="num">46.65%</td></tr>
+        <tr><td>7</td><td class="mono">ASTI</td><td class="num">8.71</td><td class="num chg-pos">+24.61%</td><td class="num">0.69%</td></tr>
+        <tr><td>8</td><td class="mono">SPKLU</td><td class="num">15.33</td><td class="num chg-pos">+24.53%</td><td class="num">13.57%</td></tr>
+        <tr><td>9</td><td class="mono">MHH</td><td class="num">7.94</td><td class="num chg-pos">+22.15%</td><td class="num">16.25%</td></tr>
+        <tr><td>10</td><td class="mono">YSS</td><td class="num">33.72</td><td class="num chg-pos">+22.09%</td><td class="num">1.60%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ──────── US TOP BREAKDOWNS ──────── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="flag">🇺🇸</span>
+      <h2>US — Top 10 Breakdowns (Worst Change%)</h2>
+      <span class="badge badge-us">242 total breakdowns</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Symbol</th><th>LTP ($)</th><th>Change%</th><th>Upside to Box Top</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td class="mono">OXM</td><td class="num">35.92</td><td class="num chg-neg">-17.01%</td><td class="num">29.98%</td></tr>
+        <tr><td>2</td><td class="mono">FJET</td><td class="num">6.75</td><td class="num chg-neg">-16.67%</td><td class="num">44.43%</td></tr>
+        <tr><td>3</td><td class="mono">DAN</td><td class="num">30.11</td><td class="num chg-neg">-15.11%</td><td class="num">24.68%</td></tr>
+        <tr><td>4</td><td class="mono">NYC</td><td class="num">7.45</td><td class="num chg-neg">-13.37%</td><td class="num">17.45%</td></tr>
+        <tr><td>5</td><td class="mono">VCX</td><td class="num">122.34</td><td class="num chg-neg">-12.61%</td><td class="num">35.85%</td></tr>
+        <tr><td>6</td><td class="mono">PTC</td><td class="num">118.39</td><td class="num chg-neg">-12.36%</td><td class="num">19.52%</td></tr>
+        <tr><td>7</td><td class="mono">NRC</td><td class="num">18.79</td><td class="num chg-neg">-11.70%</td><td class="num">9.15%</td></tr>
+        <tr><td>8</td><td class="mono">INR</td><td class="num">12.51</td><td class="num chg-neg">-9.74%</td><td class="num">13.27%</td></tr>
+        <tr><td>9</td><td class="mono">WHLRP</td><td class="num">7.70</td><td class="num chg-neg">-9.41%</td><td class="num">16.88%</td></tr>
+        <tr><td>10</td><td class="mono">PCT</td><td class="num">9.02</td><td class="num chg-neg">-8.80%</td><td class="num">53.10%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ──────── NOTES ──────── -->
+  <div class="section">
+    <div class="section-header"><h2>Scan Notes</h2></div>
+    <div class="stat-card" style="font-size:13px;line-height:1.7;color:#444;">
+      <ul style="padding-left:18px;">
+        <li><b>Symbol sources:</b> India — nsepython bhavcopy (NSE EQ) + bseindia API (BSE Active Equity). US — SEC EDGAR company_tickers_exchange.json (NASDAQ FTP SSL failed on LibreSSL 2.8.3).</li>
+        <li><b>OHLC window:</b> 3 months (yfinance bulk download, 200-ticker batches).</li>
+        <li><b>Darvas Box:</b> Confirmed boxes require 3 bars; current bar always excluded from box formation.</li>
+        <li><b>Piotroski F-Score:</b> 9 criteria (profitability F1–F3, leverage F4–F6, efficiency F7–F9). ≥ 7 = Strong.</li>
+        <li><b>Coffee Can (India):</b> Revenue CAGR &gt; 10% · avg ROCE &gt; 15% · D/E &lt; 1 · Mkt Cap ≥ ₹500 Cr · all-positive net income (5 criteria).</li>
+        <li><b>US 401 errors:</b> yfinance session expired during fundamentals stage after ~2h of OHLC downloads. US Darvas signals are valid. Re-run with a fresh session for fundamental ranks.</li>
+        <li><b>BSE bond failures:</b> ~500–800 G-Secs, MLDs, and bonds appear as "possibly delisted" in yfinance — expected and ignored.</li>
+        <li><b>NV20 anomaly:</b> Excluded from top-10 breakouts list (85,491% apparent change — data artifact).</li>
+        <li><b>Excel files:</b> ~/Downloads/indian_full_scan/indian_full_scan_20260612_1156.xlsx · ~/Downloads/us_full_scan/us_full_scan_20260612_1208.xlsx</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Daily Market Scan · 12 Jun 2026 · Automated by Claude Code<br>
+  India: <a href="#">indian_full_scan_20260612_1156.xlsx</a> &nbsp;|&nbsp; US: <a href="#">us_full_scan_20260612_1208.xlsx</a>
+</div>
+
+</body>
+</html>

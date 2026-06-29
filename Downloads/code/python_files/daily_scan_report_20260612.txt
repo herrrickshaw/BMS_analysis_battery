@@ -1,0 +1,74 @@
+Daily Market Scan — 12 Jun 2026
+Generated: 12:08 IST
+================================================================
+
+SUMMARY
+-------
+  India  : 4,587 stocks | 757 breakouts | 255 breakdowns | 14 TRIPLE HITS
+  US     : 5,406 stocks | 1,818 breakouts | 242 breakdowns | 0 triple hits*
+
+* US triple hits = 0: Yahoo Finance 401 "Invalid Crumb" in Stage 4 (session
+  expired after ~2h continuous run). Darvas signals are valid.
+
+================================================================
+INDIA — 14 TRIPLE HITS (Darvas BREAKOUT_BUY + Piotroski ≥7 + Coffee Can 5/5)
+----------------------------------------------------------------
+Symbol          LTP (₹)    Chg%   F-Score  CC    Box upside%
+APCOTEXIND       538.45  +4.30%   F=9/9   5/5     -7.75%
+KOVAI           5783.00  -0.20%   F=9/9   5/5     -5.60%
+PRIVISCL        3330.00  +2.68%   F=9/9   5/5     -1.36%
+BELRISE          224.50  +1.86%   F=8/9   5/5     -0.78%
+CCL             1137.90  +0.42%   F=8/9   5/5     -4.92%
+APOLLOHOSP      8485.00  -0.09%   F=7/9   5/5     -1.89%
+BCLIND            38.07  -0.18%   F=7/9   5/5    -12.14%
+CEMPRO          1127.70  -3.80%   F=7/9   5/5     -3.60%
+DATAPATTNS      4527.00  +7.66%   F=7/9   5/5     -6.14%
+DOMS            2280.30  +1.10%   F=7/9   5/5     -3.97%
+MANORAMA        1557.90  +1.54%   F=7/9   5/5     -1.15%
+MENONBE          168.68  +1.46%   F=7/9   5/5    -13.75%
+SEDEMAC         2820.00  +6.72%   F=7/9   5/5    -22.87%
+SILVERTUC        198.57  +4.86%   F=7/9   5/5     -7.34%
+
+================================================================
+INDIA — TOP 10 DARVAS BREAKOUTS (by today's move)
+EXXARO    7.67  +19.84%  |  BETA    1755.60  +18.94%
+GETALONG  6.50  +18.18%  |  IFCI      82.05  +16.42%
+WENDT  7781.00  +14.71%  |  ROTO      66.05  +13.57%
+CLSEL   299.00  +12.79%  |  AIIL     517.15  +12.44%
+HINDWAREAP 239.01 +12.21% | PRIMEURB   8.98  +12.11%
+
+INDIA — TOP 10 DARVAS BREAKDOWNS (by today's move)
+AAPLUSTRAD  0.76 -15.56%  |  DECIPHER   6.25  -8.76%
+FERVENTSYN 14.16  -8.05%  |  ARAVALIS   3.50  -6.67%
+PASARI      6.74  -6.39%  |  MARBU     42.60  -6.37%
+MPDL       32.50  -6.07%  |  GBLOGISTIC 31.60 -5.90%
+ESHAMEDIA  23.07  -5.84%  |  UNJHAFOR  18.55  -5.84%
+
+================================================================
+US — 0 TRIPLE HITS (fundamentals impacted by yfinance 401 errors)
+
+TOP 10 US BREAKOUTS (by today's move)
+EDHL   5.98 +70.86%  |  VELO  30.61 +34.96%
+HTCO   5.79 +26.14%  |  HOFT  15.55 +26.12%
+ATEX  81.44 +25.72%  |  ASTI   8.71 +24.61%
+SPKLU 15.33 +24.53%  |  MHH    7.94 +22.15%
+YSS   33.72 +22.09%  |  SPCE   5.73 +21.66%
+
+TOP 10 US BREAKDOWNS (by today's move)
+OXM   35.92 -17.01%  |  FJET   6.75 -16.67%
+DAN   30.11 -15.11%  |  NYC    7.45 -13.37%
+VCX  122.34 -12.61%  |  PTC  118.39 -12.36%
+NRC   18.79 -11.70%  |  INR   12.51  -9.74%
+WHLRP  7.70  -9.41%  |  PCT    9.02  -8.80%
+
+================================================================
+NOTES
+  - NASDAQ FTP unreachable (LibreSSL SSLEOFError); used SEC EDGAR fallback (7,610 symbols)
+  - BSE bhavcopy includes G-secs/bonds → expected ~500-800 "delisted" failures in Stage 2
+  - US Stage 4 401 errors: session expired after IN scan's 2h run; re-run tomorrow will fix
+  - Gmail draft ID: r-3156368782461596719 (to: umashankartd1991@gmail.com)
+
+Output files:
+  India : ~/Downloads/indian_full_scan/indian_full_scan_20260612_1156.xlsx
+  US    : ~/Downloads/us_full_scan/us_full_scan_20260612_1208.xlsx
+================================================================

@@ -163,6 +163,42 @@ def french_factors() -> Optional[pd.DataFrame]:
         return None
 
 
+def damodaran_companies(refresh: bool = False) -> Optional[pd.DataFrame]:
+    """Full list of every company in Damodaran's universe (indname.xls): name,
+    Exchange:Ticker, Industry Group, Primary Sector, SIC, Country, Broad/Sub group.
+    ~48k firms globally. Downloaded once, cached as a compact parquet."""
+    pq = CACHE / "damodaran_companies.parquet"
+    if pq.exists() and not refresh:
+        return pd.read_parquet(pq)
+    try:
+        raw = _cached_get(f"{DAMODARAN}/indname.xls", "indname.xls")
+        df = pd.read_excel(io.BytesIO(raw), sheet_name="By company name")
+    except Exception:
+        return None
+    df.columns = [str(c).strip() for c in df.columns]
+    if "Exchange:Ticker" in df.columns:                      # split into exch + ticker
+        et = df["Exchange:Ticker"].astype(str).str.split(":", n=1, expand=True)
+        df["Exchange"] = et[0].str.strip()
+        df["Ticker"] = et[1].str.strip() if et.shape[1] > 1 else None
+    df = df[df.get("Company Name").notna()]
+    df.to_parquet(pq, compression="zstd", index=False)
+    return df
+
+
+def company_industry(name_or_ticker: str) -> Optional[str]:
+    """Resolve a company name or ticker to its Damodaran Industry Group."""
+    df = damodaran_companies()
+    if df is None:
+        return None
+    q = str(name_or_ticker).strip().lower()
+    for col in ("Ticker", "Company Name"):
+        if col in df.columns:
+            hit = df[df[col].astype(str).str.lower() == q]
+            if not hit.empty:
+                return hit.iloc[0].get("Industry Group")
+    return None
+
+
 def aqr_links() -> list[str]:
     """List the downloadable AQR dataset (Excel) links from their datasets page.
     AQR publishes each factor set as a separate .xlsx; this surfaces the current

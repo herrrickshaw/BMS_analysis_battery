@@ -32,3 +32,4 @@ vaderSentiment==3.3.2  # news sentiment scoring
 feedparser==6.0.12  # Indian RSS news feeds (Moneycontrol/ET/BusinessLine)
 lmdb==2.2.1  # embedded NoSQL key-value store for bhavcopy OHLCV cache
 xlrd==2.0.2  # read Damodaran .xls industry datasets (reference_data)
+investpy==1.0.8  # European stock universe discovery (Investing.com lists; price API blocked)

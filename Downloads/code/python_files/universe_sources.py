@@ -19,6 +19,7 @@ from __future__ import annotations
 import warnings
 from typing import List
 
+import pandas as pd
 import requests
 
 warnings.filterwarnings("ignore")
@@ -113,9 +114,60 @@ def in_bhavcopy() -> List[str]:
     return sorted(fetch_history(verbose=False).keys())
 
 
-# EU is fragmented across LSE/Euronext/Xetra/SIX with no single free official
-# all-share feed; ship a broad multi-venue large/mid-cap set (STOXX-50 + DAX +
-# CAC + AEX + FTSE majors). Expand by appending more constituents here.
+# Euronext live (official) → yfinance suffix by listing venue.
+_EURONEXT_SUFFIX = {
+    "Euronext Paris": ".PA", "Euronext Amsterdam": ".AS", "Euronext Brussels": ".BR",
+    "Euronext Lisbon": ".LS", "Euronext Dublin": ".IR", "Oslo Børs": ".OL",
+    "Euronext Milan": ".MI", "Borsa Italiana": ".MI",
+}
+
+
+def euronext_equities(mics: str = "XPAR,XAMS,XBRU,XLIS,XMSM,XDUB,XOSL,XMIL") -> List[str]:
+    """Full Euronext equity list from live.euronext.com (official CSV export),
+    mapped to yfinance tickers (Symbol + venue suffix). Covers Paris, Amsterdam,
+    Brussels, Lisbon, Dublin, Oslo and Milan."""
+    import io as _io
+    url = f"https://live.euronext.com/en/pd_es/data/stocks/download?mics={mics}"
+    h = {**_UA, "Referer": "https://live.euronext.com/en/products/equities/list"}
+    r = requests.get(url, headers=h, timeout=40)
+    r.raise_for_status()
+    df = pd.read_csv(_io.BytesIO(r.content), sep=";", encoding="utf-8-sig")
+    df = df[df["ISIN"].notna() & df["Symbol"].notna()]
+    out = []
+    for _, row in df.iterrows():
+        venue = str(row["Market"]).split(",")[0].strip()      # primary listing
+        suf = _EURONEXT_SUFFIX.get(venue)
+        if suf:
+            out.append(f"{str(row['Symbol']).strip()}{suf}")
+    return sorted(set(out))
+
+
+def investpy_universe(countries=("france", "germany", "united kingdom", "italy",
+                                 "spain", "netherlands", "switzerland", "sweden",
+                                 "belgium", "norway", "denmark", "finland",
+                                 "portugal", "ireland", "austria", "poland")):
+    """European stock LISTINGS via investpy (Investing.com bundled lists): returns
+    a DataFrame of name / full_name / isin / symbol / currency / country.
+
+    NOTE: investpy's *price* endpoint is 403-blocked by Investing.com and its
+    symbols are Investing.com codes (not yfinance), so this is a DISCOVERY /
+    cross-reference source — prices are still fetched via yfinance/Euronext."""
+    try:
+        import investpy
+    except ImportError:
+        return None
+    frames = []
+    for c in countries:
+        try:
+            frames.append(investpy.get_stocks(country=c))
+        except Exception:
+            continue
+    import pandas as _pd
+    return _pd.concat(frames, ignore_index=True) if frames else None
+
+
+# EU venues outside Euronext (London/Xetra/SIX) have no single free official feed;
+# Euronext is pulled live, the rest are curated large/mid-caps.
 def eu_curated() -> List[str]:
     from full_european_market_scan import EURO_STOXX_50_META
     extra = [
@@ -136,9 +188,20 @@ def eu_curated() -> List[str]:
     return sorted(set(EURO_STOXX_50_META.keys()) | set(extra))
 
 
+def eu() -> List[str]:
+    """Full EU universe = live Euronext (official) ∪ curated non-Euronext majors
+    (London .L, Xetra .DE, SIX .SW)."""
+    tickers = set(eu_curated())
+    try:
+        tickers |= set(euronext_equities())
+    except Exception:
+        pass
+    return sorted(tickers)
+
+
 PROVIDERS = {
     "US": us_sec, "IN": in_bhavcopy, "JP": jp_jpx, "KR": kr_krx,
-    "SG": sg_sgx, "CN": cn_eastmoney, "EU": eu_curated,
+    "SG": sg_sgx, "CN": cn_eastmoney, "EU": eu,
 }
 
 

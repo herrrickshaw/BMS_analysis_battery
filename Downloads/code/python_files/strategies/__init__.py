@@ -9,12 +9,13 @@ from __future__ import annotations
 
 from . import (piotroski, coffee_can, magic_formula, bluest_blue_chips,
                debt_reduction, dividend_yield, golden_crossover,
-               loss_to_profit, garp, darvas)
+               loss_to_profit, garp, darvas, cash_conversion_cycle)
 from .base import StockData, Result
 
-# ordered as the user listed them (top-10)
+# ordered as the user listed them (top-10) + cash conversion cycle
 _MODULES = [piotroski, coffee_can, magic_formula, bluest_blue_chips, debt_reduction,
-            dividend_yield, golden_crossover, loss_to_profit, garp, darvas]
+            dividend_yield, golden_crossover, loss_to_profit, garp, darvas,
+            cash_conversion_cycle]
 
 STRATEGIES = {m.META["slug"]: m for m in _MODULES}
 META = {slug: m.META for slug, m in STRATEGIES.items()}

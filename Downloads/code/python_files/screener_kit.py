@@ -171,8 +171,24 @@ def update(market: str, verbose: bool = True) -> dict:
 
 
 # ── screening ────────────────────────────────────────────────────────────────────
+def _india_ccc() -> dict:
+    """{symbol: CCC days} from the screener.in India CCC screen (cached best-effort)."""
+    try:
+        from screener_in import ccc_map
+        return {k: v for k, v in ccc_map().items() if v == v}   # drop NaN
+    except Exception:
+        return {}
+
+
 def _stocks(market: str, min_turnover_usd: float = 0.0) -> List[StockData]:
-    return [StockData(s, market, ohlcv=d) for s, d in load(market, min_turnover_usd).items()]
+    # India fundamentals (CCC) come from screener.in; attach so the CCC strategy
+    # and the `ccc` custom metric work for Indian names too.
+    ccc = _india_ccc() if market == "IN" else {}
+    out = []
+    for s, d in load(market, min_turnover_usd).items():
+        f = {"ccc": ccc[s]} if s in ccc else {}
+        out.append(StockData(s, market, ohlcv=d, fundamentals=f))
+    return out
 
 
 def screen(strategy_slug: str, market: str = "IN", top: Optional[int] = None,

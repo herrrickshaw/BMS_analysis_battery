@@ -1,197 +1,105 @@
-# Global Multi-Market Stock Analysis System
+# Retail-outlet-data
 
-> **Quantitative screeners for NSE/BSE/NASDAQ/NYSE/EU/JP** with fundamental analysis, backtesting, and MPT portfolio optimization.
+> A combined research monorepo with two halves:
+> **(1)** a multi-market **quantitative stock-analysis system**, and
+> **(2)** **India petroleum / fuel retail-outlet + toll-plaza geospatial data** and trade-export analysis.
 
 [![Security Scan](https://github.com/herrrickshaw/Retail-outlet-data/actions/workflows/security-scan.yml/badge.svg)](https://github.com/herrrickshaw/Retail-outlet-data/actions/workflows/security-scan.yml)
 
-## 📊 System Overview
+---
 
-Comprehensive quantitative stock analysis framework supporting:
-- **20 major exchanges** (NSE, BSE, NASDAQ, NYSE, Euronext, Tokyo Stock Exchange, Singapore Exchange, etc.)
-- **10+ screening strategies** (Piotroski, Coffee Can, Magic Formula, GARP, Debt Reduction, Darvas Box)
-- **Fundamental & technical analysis** via SEC EDGAR, Bloomberg-equivalent sources, and exchange feeds
-- **Backtesting engine** with walk-forward validation
-- **ML-enhanced signals** and sentiment analysis
-- **Mean-variance portfolio construction** (MPT)
+## 📁 Repository layout
 
-## 🚀 Quick Start
+| Path | What's in it |
+|---|---|
+| `Downloads/code/python_files/` | The stock-analysis engine — 60+ Python modules (screeners, backtesting, ML, sentiment, MPT) + `strategies/` |
+| `Downloads/code/notebooks/` | Colab/Jupyter notebooks (`Stock_Analysis_Colab.ipynb`, `US_Market_Screener_Colab.ipynb`, daily scan reports) |
+| `Downloads/code/native/` | C-accelerated Darvas Box (`darvas_fast.c` / `.so` + Python wrapper) |
+| `Downloads/code/backtesting/` | Backtesting research papers (PDF) |
+| `nse_screener_reference/` | Reference OHLC cache (Nifty parquets), `symbol_master.parquet`, latest scan/backtest results |
+| `api-data-integration/` | **Fuel retail outlet feeds** — BPCL dealerships, CashAtPOS fuel stations, SSRI pumps (geojson/json/csv, state-wise) |
+| `outlet_data_bpcl_complete/` | Complete BPCL dealership dumps (geojson + summaries) |
+| `fuel-pump-locations-map/` | Interactive web map of fuel pump / retail outlet locations |
+| `fuel-station-gap-analysis/` | Fuel-station coverage **gap-analysis heatmap** dashboard |
+| `toll-plaza-visualization/` | Toll-plaza dashboards + toll↔retail-outlet distance analysis (highways) |
+| `export-analysis/` | India import/export trade analysis 2020–2026 (RBI reserves, fiscal, opportunities) |
+| `data-sources/` | Retail-outlet & market data-source references |
+| `docs/` | Jekyll GitHub Pages site (repo showcase, DISCOM calculator) |
+| root `*.md` | System docs (`STOCK_ANALYSIS_SYSTEM.md`, `SCREENER_BASIS.md`, `TOLL_RETAIL_*`, `SSRI_*`, glossary, profile) |
+| `Dockerfile`, `docker-compose.yml`, `requirements.txt`, `entrypoint.sh` | Containerised execution |
 
-### Installation
+---
+
+## 📊 Part 1 — Quantitative stock analysis
+
+Multi-market equity screening across **NSE/BSE, NASDAQ/NYSE, Europe, Japan, Korea, Singapore**, with fundamentals, backtesting, ML signals, news sentiment, and mean-variance portfolio construction.
+
+### Install
 ```bash
 git clone https://github.com/herrrickshaw/Retail-outlet-data.git
 cd Retail-outlet-data
 pip install -r requirements.txt
 ```
 
-### Run Screener
+### Run the scanners
 ```bash
-# NSE/BSE batch analysis (305 stocks)
-python Downloads/code/python_files/batch_analysis.py --excel
+cd Downloads/code/python_files
 
-# All NSE+BSE (2,681 stocks)
-python Downloads/code/python_files/batch_analysis.py --all-nse-bse
-
-# US stocks (Dow30 + NASDAQ50)
-python Downloads/code/python_files/us_stock_daily_report.py
-
-# Global analysis
-python Downloads/code/python_files/global_analysis_runner.py
+python full_indian_market_scan.py        # India (NSE + BSE)
+python full_us_market_scan.py            # USA (NYSE + NASDAQ)
+python full_european_market_scan.py      # Europe
+python full_japan_market_scan.py         # Japan
+python full_korea_market_scan.py         # South Korea
+python run_global_analysis.py            # multi-market runner
 ```
 
-### Daily Reports
-- **Indian:** `Downloads/code/python_files/stock_daily_report_improved.py`
-- **US:** `Downloads/code/python_files/us_stock_daily_report.py`
-- **Global:** Multi-market runner with exchange-specific optimizations
-
----
-
-## 📁 Architecture
-
-```
-Downloads/
-├── code/python_files/
-│   ├── batch_analysis.py              # 305-stock NSE/BSE screener
-│   ├── stock_daily_report_improved.py # Nifty 50 batch reporter
-│   ├── us_stock_daily_report.py       # NASDAQ/NYSE analysis
-│   ├── global_analysis_runner.py      # 20-exchange multi-market
-│   ├── sec_fundamentals.py            # SEC EDGAR data fetch
-│   └── [screening_strategies]/        # Modular strategy implementations
-├── data/
-│   ├── stock_scan/                    # NSE/BSE scan results
-│   ├── us_stocks/                     # NASDAQ/NYSE reports
-│   ├── backtest/                      # Walk-forward analysis
-│   ├── portfolio/                     # MPT optimization
-│   └── cache/                         # OHLCV reference data
-└── notebooks/
-    └── analysis_templates/            # Jupyter notebooks (Colab-ready)
-```
-
----
-
-## 🎯 Screening Strategies
-
-| Strategy | Criteria | Best For |
-|----------|----------|----------|
-| **Piotroski F-Score** | Profitability + quality | Quality growth |
-| **Coffee Can** | ROE + $1B cap + FCF | Low-risk compounding |
-| **Magic Formula** | EBIT/EV + ROC | Value + quality blend |
-| **GARP** | Growth + reasonable P/E | Growth at reasonable price |
-| **Debt Reduction** | Falling leverage + profit | Turnarounds |
-| **Darvas Box** | Breakout + pullback | Momentum plays |
-| **Technical Momentum** | RSI + MACD + trend | Short-term trends |
-| **ML Signals** | Ensemble learners | Pattern recognition |
-
----
-
-## 📚 Data Sources
-
-### Indian Markets (NSE/BSE)
-- **Exchange:** Official NSE/BSE equity universe feeds
-- **OHLC:** yfinance, nsepython
-- **Fundamentals:** BSE API, company websites
-- **Cache:** LMDB + parquet for 2,681 stocks
-
-### US Markets (NASDAQ/NYSE)
-- **Universe:** 500 Dow30 + NASDAQ50 stocks
-- **OHLC:** yfinance
-- **Fundamentals:** SEC EDGAR XBRL (official regulatory filings)
-- **Macro:** FRED (Federal Reserve Economic Data)
-
-### Global Markets
-- **EU:** Euronext (STOXX 600 seed)
-- **Japan:** Tokyo Stock Exchange
-- **Singapore/HK:** Regional exchanges
-- **FX Rates:** ECB/Bank of England/FRED
-
-### Reference Datasets
-- **Damodaran Master List:** 48,156+ global companies
-- **Ken French Factors:** 6 Fama-French factors
-- **Industry Comps:** Sector-level benchmarks
-
----
-
-## 🔒 Security & Quality
-
-✅ **Weekly automated security scans** (secrets, vulnerabilities, credentials)  
-✅ **Branch protection** on main (PR required, 1 review min)  
-✅ **Force pushes disabled** on production branches  
-✅ **Sensitive data excluded** via strict .gitignore  
-✅ **Type hints & docstrings** (production-ready code)
-
----
-
-## 📊 Sample Output
-
-### Coffee Can (NSE 2024)
-```
-SCHNEIDER    PRICE: ₹172.50  ROE: 28.2%  FCF: 2.4B  CONFIDENCE: ★★★★★
-VBL          PRICE: ₹1,280   ROE: 34.1%  FCF: 890M  CONFIDENCE: ★★★★★
-MASTEK       PRICE: ₹3,420   ROE: 26.8%  FCF: 412M  CONFIDENCE: ★★★★★
-```
-
-### Magic Formula (NASDAQ Q3)
-```
-AAPL         EBIT/EV: 0.18   ROC: 0.42   RANK: #1
-MSFT         EBIT/EV: 0.19   ROC: 0.38   RANK: #2
-```
-
----
-
-## 🛠️ Development
-
-### Local Setup
+### Reports, backtest, portfolio
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Run tests
-pytest Downloads/code/python_files/tests/
-
-# Type checking
-mypy Downloads/code/python_files/
+python stock_daily_report_improved.py    # India daily report
+python us_stock_daily_report.py          # US daily report
+python daily_combined_report.py          # combined multi-market report
+python backtest_screeners.py             # screener backtests
+python walk_forward_backtest.py          # walk-forward validation
+python portfolio_builder.py              # MPT / max-Sharpe portfolio
+python ml_signal_engine.py               # ML-enhanced signals
+python sentiment_pipeline.py             # news sentiment
+python build_mailer.py && python send_mailer.py   # email digest
 ```
 
-### Notebooks (Colab-Ready)
-```python
-# In Google Colab
-!git clone https://github.com/herrrickshaw/Retail-outlet-data.git
-%cd Retail-outlet-data
-exec(open('Downloads/code/notebooks/setup.py').read())
-```
+### Screening strategies (`strategies/`)
+
+| Strategy | Module |
+|---|---|
+| Piotroski F-Score | `piotroski.py` |
+| Coffee Can | `coffee_can.py` |
+| Magic Formula | `magic_formula.py` |
+| GARP | `garp.py` |
+| Debt Reduction | `debt_reduction.py` |
+| Darvas Box | `darvas.py` |
+| Golden Crossover | `golden_crossover.py` |
+| Dividend Yield | `dividend_yield.py` |
+| Cash Conversion Cycle | `cash_conversion_cycle.py` |
+| Loss-to-Profit | `loss_to_profit.py` |
+| Bluest Blue Chips | `bluest_blue_chips.py` |
 
 ---
 
-## 📖 Documentation
+## ⛽ Part 2 — Retail outlet, toll & trade data
 
-- **[Data & Modules](./Downloads/code/python_files/DATA_AND_MODULES.md)** — Detailed module reference
-- **[Bloomberg Equivalents](./Downloads/code/python_files/BLOOMBERG_SOURCES.md)** — Free data source mapping
-- **[Exchange Universe](./EXCHANGE_UNIVERSE.md)** — Live NSE/BSE/global symbols
-- **[nsepython API](./MEMORY.md#nsepython)** — Indian market data API reference
+India petroleum retail-network and highway infrastructure data, plus trade-export analysis.
 
----
-
-## 🤝 Contributing
-
-Issues and PRs welcome! Security reports: → GitHub Security tab
+- **Fuel retail outlets** (`api-data-integration/`, `outlet_data_bpcl_complete/`) — BPCL dealerships, CashAtPOS fuel stations, and SSRI pump data pulled and normalised to geojson/json/csv with state-wise summaries. Source notes in `data-sources/RETAIL_OUTLETS_DATA_SOURCES.md`.
+- **Maps & gap analysis** (`fuel-pump-locations-map/`, `fuel-station-gap-analysis/`) — self-contained static web apps. Run with `python3 -m http.server` from each folder.
+- **Toll plazas / highways** (`toll-plaza-visualization/`) — `toll_plaza_dashboard.py` and visualisation scripts; toll↔retail-outlet distance work documented in `TOLL_RETAIL_DISTANCE_ANALYSIS_SUMMARY.md`.
+- **Export analysis** (`export-analysis/`) — India import/export 2020–2026, RBI reserves vs trade deficit, high-opportunity export projections (`export_analysis.py`, `export_extended_analysis.py`, CSV/MD outputs).
 
 ---
 
-## 📄 License
+## 🔗 Related repositories
 
-MIT License — See LICENSE file
+- [`global-market-scanners`](https://github.com/herrrickshaw/global-market-scanners) — the focused 5-market scanner + industry/peer parquet dataset
+- [`retail-outlet-monitoring`](https://github.com/herrrickshaw/retail-outlet-monitoring) — standalone fuel-station gap-analysis + locations map
 
----
-
-## 📞 Contact
-
-**Author:** Umashankar  
-**Email:** umashankartd1991@gmail.com  
-**GitHub:** [@herrrickshaw](https://github.com/herrrickshaw)
-
----
-
-## 📋 Changelog
-
-See [CHANGELOG.md](./CHANGELOG.md) for release history.
-
-**Latest:** Global multi-market analysis (20 exchanges) + SEC EDGAR fundamentals for US + Bloomberg-equivalent sources map
+## 📄 Notes
+- Outlet/toll datasets are sourced from public OMC / petroleum-retail listings; treat as indicative for planning and visualisation, not an official registry.
+- Not investment advice. Screener output is for research only.

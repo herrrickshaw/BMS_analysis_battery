@@ -3,11 +3,11 @@
 > Multi-market equity screening across **NSE/BSE, NASDAQ/NYSE, Europe, Japan, Korea, Singapore** —
 > fundamentals, backtesting, ML signals, news sentiment, and mean-variance portfolio construction.
 
-[![Security Scan](https://github.com/herrrickshaw/Retail-outlet-data/actions/workflows/security-scan.yml/badge.svg)](https://github.com/herrrickshaw/Retail-outlet-data/actions/workflows/security-scan.yml)
+[![Security Scan](https://github.com/herrrickshaw/quant-stock-analysis/actions/workflows/security-scan.yml/badge.svg)](https://github.com/herrrickshaw/quant-stock-analysis/actions/workflows/security-scan.yml)
 
 > **Note:** the fuel-retail / toll / export-trade material that previously lived here has
 > been split into dedicated repos (see [Related repositories](#-related-repositories)).
-> This repo is now **stock analysis only**. (Repo name retained for URL stability.)
+> This repo is now **stock analysis only** — renamed from `Retail-outlet-data` (the old URL redirects).
 
 ---
 
@@ -28,8 +28,8 @@
 
 ## 🚀 Quick start
 ```bash
-git clone https://github.com/herrrickshaw/Retail-outlet-data.git
-cd Retail-outlet-data
+git clone https://github.com/herrrickshaw/quant-stock-analysis.git
+cd quant-stock-analysis
 pip install -r requirements.txt
 cd Downloads/code/python_files
 ```

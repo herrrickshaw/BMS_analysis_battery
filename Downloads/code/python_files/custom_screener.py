@@ -66,9 +66,23 @@ def _ret(close: pd.Series, n: int) -> Optional[float]:
     return float((close.iloc[-1] / close.iloc[-1 - n] - 1) * 100)
 
 
+def _ccc(f: dict):
+    """Cash Conversion Cycle (days) = DIO + DSO - DPO, if inputs present."""
+    inv, rec, pay = f.get("inventory"), f.get("receivables"), f.get("payables")
+    cogs, rev = f.get("cogs"), f.get("revenue")
+    def d(n, dn):
+        return (n / dn * 365.0) if (n is not None and dn not in (None, 0)) else 0
+    if all(x is None for x in (inv, rec, pay)):
+        return f.get("ccc")
+    return d(inv, cogs) + d(rec, rev) - d(pay, cogs)
+
+
 def compute_metrics(stock: StockData) -> Dict[str, float]:
     """All technical metrics from OHLCV + the stock's fundamentals merged in."""
     m: Dict[str, float] = dict(stock.fundamentals)   # fundamentals first
+    ccc = _ccc(stock.fundamentals)                   # expose CCC as a metric
+    if ccc is not None:
+        m["ccc"] = round(ccc, 1)
     df = stock.ohlcv
     if df is None or df.empty:
         return m

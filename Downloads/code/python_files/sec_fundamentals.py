@@ -104,6 +104,10 @@ def fundamentals(ticker: str) -> Dict:
     debt = _first(f, "LongTermDebtNoncurrent", "LongTermDebt", "DebtCurrent")
     capex = _first(f, "PaymentsToAcquirePropertyPlantAndEquipment")
     div = _first(f, "PaymentsOfDividendsCommonStock", "PaymentsOfDividends")
+    inv = _first(f, "InventoryNet", "InventoryFinishedGoodsNetOfReserves")
+    recv = _first(f, "AccountsReceivableNetCurrent", "ReceivablesNetCurrent")
+    pay = _first(f, "AccountsPayableCurrent", "AccountsPayableTradeCurrent")
+    cogs = _first(f, "CostOfGoodsAndServicesSold", "CostOfRevenue", "CostOfGoodsSold")
 
     def g(lst, i=0):
         return lst[i] if len(lst) > i else None
@@ -133,6 +137,9 @@ def fundamentals(ticker: str) -> Dict:
         "capex_history": [v for v in capex] or None,
         "roe_history": _roe_history(ni, equity),
         "dividend_history": [v for v in div] or None,
+        # cash-conversion-cycle inputs (used by the CCC strategy)
+        "inventory": g(inv), "receivables": g(recv), "payables": g(pay),
+        "cogs": g(cogs),
     }
     return {k: v for k, v in out.items() if v is not None}
 

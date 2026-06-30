@@ -25,6 +25,26 @@ official end-of-day files (no Yahoo at all).
 
 ---
 
+## 0. Google Colab (zero setup)
+
+Open **`colab_quickstart.ipynb`** in Colab and run top-to-bottom. It installs deps,
+clones the repo *with the cached data* (Git LFS), bootstraps the store, and runs
+example screens. Minimal cells:
+
+```python
+!pip install -q lmdb xlrd yfinance nsepython bseindia nse feedparser vaderSentiment investpy
+!git lfs install && git clone --depth 1 https://github.com/herrrickshaw/Retail-outlet-data.git
+%cd Retail-outlet-data/Downloads/code/python_files
+!git lfs pull
+import os; os.environ['BHAV_CACHE'] = '/content/cache'
+import screener_kit as kit; kit.bootstrap()
+kit.screen('darvas', 'IN', top=15, min_turnover_usd=1_000_000)
+```
+
+Local install: `pip install -r requirements.txt`.
+
+---
+
 ## 1a. Simplest usage — `screener_kit` (start here)
 
 The committed seeds are a **starter kit**: after cloning, one call gives you ~1yr

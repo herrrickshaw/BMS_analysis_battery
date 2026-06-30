@@ -70,10 +70,30 @@ def build():
     except Exception:
         pass
 
-    # 3. Global momentum
-    g = rga.load_highlights().head(15)
+    # 3. Global momentum (top 15 overall)
+    allh = rga.load_highlights()
+    g = allh.head(15)
     g_rows = [f"<tr><td style='padding:4px 8px'>{r.Market}</td><td>{r.Symbol}</td>"
               f"<td>{r.ret_126:+.0f}</td><td>{r.rsi14}</td></tr>" for _, r in g.iterrows()]
+
+    # 3b. Other markets — top tradable mover per market (world tour, ex-IN/US)
+    other_rows = []
+    try:
+        h = liq.annotate(allh.copy())
+        names = {"TW": "Taiwan", "KR": "Korea", "JP": "Japan", "CN": "China", "HK": "Hong Kong",
+                 "CA": "Canada", "AU": "Australia", "UK": "UK", "DE": "Germany", "CH": "Switzerland",
+                 "SE": "Sweden", "FI": "Finland", "DK": "Denmark", "SG": "Singapore", "EU": "Euronext",
+                 "BR": "Brazil", "SA": "Saudi", "ZA": "S.Africa"}
+        for m in [x for x in names if x in set(h.Market)]:
+            sub = h[h.Market == m].sort_values("ret_126", ascending=False).head(1)
+            if sub.empty:
+                continue
+            r = sub.iloc[0]
+            other_rows.append(f"<tr><td style='padding:4px 8px'>{names[m]}</td>"
+                              f"<td><b>{r.Symbol}</b></td><td>{r.ret_126:+.0f}%</td>"
+                              f"<td style='color:{_COL.get(r.Liquidity,'#777')};font-weight:600'>{r.Liquidity}</td></tr>")
+    except Exception:
+        pass
 
     # 4. 5y scoreboard
     p5 = mp.load()
@@ -92,6 +112,9 @@ def build():
 {_table(["Symbol","Name","CCC days","ROCE","Liquidity"], ccc_rows) if ccc_rows else "<p>n/a</p>"}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🌍 Global Momentum — Top 15 (20 markets)</h2>
 {_table(["Mkt","Symbol","6mo %","RSI"], g_rows)}
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🗺️ Other Markets — top tradable mover each</h2>
+<p style="font-size:12px;color:#555">Best liquid (≥$1M/day) 6-month performer per market.</p>
+{_table(["Market","Symbol","6mo %","Liquidity"], other_rows) if other_rows else "<p>n/a</p>"}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🗓️ 20-Market 5-Year Scoreboard</h2>
 {_table(["Mkt","Index","5y CAGR%","1y %","Sharpe"], p_rows)}
 <p style="font-size:11px;color:#bf360c;border-top:1px solid #eee;padding-top:10px;margin-top:18px">⚠️ Educational/research only. NOT investment advice. Screener results are mechanical filters, not buy/sell signals. Liquidity/CCC are estimates; index figures price-only, local currency. Past performance does not guarantee future returns. Consult a SEBI-registered investment advisor.</p>

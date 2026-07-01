@@ -2,36 +2,35 @@
 
 ## Quick Setup (5 minutes)
 
-### 1️⃣ FRED API Key (Optional but Recommended)
+### 1️⃣ FRED API Key ✅ (You Have It!)
 
-**Get your free API key:**
-```
-https://fred.stlouisfed.org/docs/api/
-1. Click "Request API Key"
-2. Sign up with email
-3. Copy your API key from the dashboard
-```
+**Your API key is registered:** `REDACTED_FRED_API_KEY`
 
 **Add to environment:**
 
-**Option A: Local .env file**
+**Option A: Local .env file (Secure)**
 ```bash
-# Create ~/.claude_bhavcopy.env
-echo "FRED_API_KEY=your_api_key_here" >> ~/.claude_bhavcopy.env
-echo "SCREENER_EMAIL=your_email@example.com" >> ~/.claude_bhavcopy.env
-echo "SCREENER_PASSWORD=your_password" >> ~/.claude_bhavcopy.env
-```
-
-**Option B: Add to shell profile (permanent)**
-```bash
-# Add to ~/.zshrc or ~/.bashrc
-export FRED_API_KEY="your_api_key_here"
+# Create ~/.zshrc_bhavcopy (add to .zshrc to load it)
+export FRED_API_KEY="REDACTED_FRED_API_KEY"
 export SCREENER_EMAIL="your_email@example.com"
 export SCREENER_PASSWORD="your_password"
+
+# Load it:
+source ~/.zshrc_bhavcopy
+```
+
+**Option B: Add to shell profile (Permanent)**
+```bash
+# Add to ~/.zshrc or ~/.bashrc
+echo 'export FRED_API_KEY="REDACTED_FRED_API_KEY"' >> ~/.zshrc
+echo 'export SCREENER_EMAIL="your_email@example.com"' >> ~/.zshrc
+echo 'export SCREENER_PASSWORD="your_password"' >> ~/.zshrc
 
 # Then reload:
 source ~/.zshrc
 ```
+
+**⚠️ Security Note:** Don't commit your API key to git. If sharing code, use environment variables or secrets manager.
 
 **Option C: Google Colab (recommended)**
 ```python

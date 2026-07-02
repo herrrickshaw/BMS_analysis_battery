@@ -14,8 +14,10 @@ thermal           PWM fan / heater thermal management controller
 chemistries       LFP / Lead-Acid / NMC / Na-Ion / LMFP / LTO / Li-S / SS-NMC profiles
 vehicles          Vehicle presets (2W, 4W, BUS) + factory function
 driving_profiles  Real-world driving conditions + degradation stress model
+manufacturer_profiles  Ather / Ola / Tesla / BYD real-world tuned profiles
 bms_controller    Top-level pack controller (integrates all modules)
 simulation        Multi-vehicle, degradation, cold-temp, and driving simulations
+datasets          Kaggle dataset integration: synthetic generators + validation
 """
 
 from .bms_controller import BMSController, BMSPackState

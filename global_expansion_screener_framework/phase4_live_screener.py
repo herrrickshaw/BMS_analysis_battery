@@ -43,6 +43,27 @@ class ExpansionScreener:
             'TITAN': 'regional', 'NESTLEIND': 'regional', 'ITC': 'regional',
         }
 
+        # Stock-to-sector mapping with premiums
+        self.stock_sectors = {
+            # Tech: +6pp capex weighting premium
+            'INFY': 'tech', 'TCS': 'tech', 'WIPRO': 'tech', 'TECHM': 'tech',
+            'OFSS': 'tech', 'MPHASIS': 'tech', 'PERSISTENT': 'tech',
+            # Pharma: +4pp capex weighting premium
+            'SUNPHARMA': 'pharma', 'DRREDDY': 'pharma', 'LUPIN': 'pharma',
+            'CIPLA': 'pharma', 'AJANTPHARM': 'pharma', 'TORRENTPHARM': 'pharma',
+            # Autos: +8pp capex weighting premium (highest)
+            'MARUTI': 'autos', 'TATAMOTORS': 'autos', 'HEROMOTOCO': 'autos',
+            'BAJAJFINANCE': 'autos', 'EICHERMOT': 'autos',
+            # Default: no premium (0pp)
+        }
+
+        # Sector premiums (basis points added to expansion score)
+        self.sector_premiums = {
+            'tech': 0.06,      # +6pp capex weighting
+            'pharma': 0.04,    # +4pp capex weighting
+            'autos': 0.08,     # +8pp capex weighting (highest)
+        }
+
     def load_latest_prices(self):
         """Load all available price data"""
         try:
@@ -110,10 +131,15 @@ class ExpansionScreener:
             # Apply regional multiplier
             region = self.stock_regions.get(symbol, 'global')
             regional_mult = self.regional_multipliers.get(region, 1.0)
-            adjusted_score = base_score * regional_mult
+            regional_adjusted = base_score * regional_mult
+
+            # Apply sector premium (Tech +6pp, Pharma +4pp, Autos +8pp)
+            sector = self.stock_sectors.get(symbol, 'other')
+            sector_premium = self.sector_premiums.get(sector, 0.0)
+            sector_adjusted = regional_adjusted + sector_premium
 
             # Normalize to 0-100 scale (ensure valid number)
-            final_score = max(0, min(100, 50 + (adjusted_score * 10)))
+            final_score = max(0, min(100, 50 + (sector_adjusted * 10)))
             if pd.isna(final_score):
                 final_score = 50.0
 
@@ -121,7 +147,9 @@ class ExpansionScreener:
                 'symbol': symbol,
                 'base_score': base_score,
                 'region': region,
+                'sector': sector,
                 'regional_mult': regional_mult,
+                'sector_premium': sector_premium,
                 'final_score': final_score,
                 'momentum_3m': metrics['momentum_3m'],
                 'expansion_metric': metrics['expansion_metric']
@@ -168,18 +196,20 @@ class ExpansionScreener:
 
         # Print results
         print("\n" + "=" * 80)
-        print("📊 TOP 20 EXPANSION CANDIDATES")
+        print("📊 TOP 20 EXPANSION CANDIDATES (Sector-Weighted Geographic Model)")
         print("=" * 80)
-        print(f"{'Rank':<5} {'Symbol':<10} {'Score':<8} {'Region':<12} {'Momentum':<10} {'Expansion':<10}")
-        print("-" * 80)
+        print(f"{'Rank':<5} {'Symbol':<10} {'Score':<8} {'Sector':<8} {'Region':<12} {'S.Prem':<7} {'Momentum':<10}")
+        print("-" * 100)
 
         for idx, (_, row) in enumerate(scores_df.head(20).iterrows(), 1):
-            print(f"{idx:<5} {row['symbol']:<10} {row['final_score']:<8.1f} "
-                  f"{row['region']:<12} {row['momentum_3m']:<10.2%} {row['expansion_metric']:<10.3f}")
+            sector = row['sector'].upper() if row['sector'] != 'other' else '—'
+            s_prem = f"+{row['sector_premium']*100:.0f}pp" if row['sector_premium'] > 0 else "—"
+            print(f"{idx:<5} {row['symbol']:<10} {row['final_score']:<8.1f} {sector:<8} "
+                  f"{row['region']:<12} {s_prem:<7} {row['momentum_3m']:<10.2%}")
 
-        # Regional breakdown
+        # Regional + Sector breakdown
         print("\n" + "=" * 80)
-        print("🌍 REGIONAL OPPORTUNITIES")
+        print("🌍 REGIONAL OPPORTUNITIES WITH SECTOR PREMIUMS")
         print("=" * 80)
 
         for region in ['global', 'domestic', 'regional']:
@@ -187,7 +217,8 @@ class ExpansionScreener:
             if len(region_stocks) > 0:
                 print(f"\n{region.upper()}:")
                 for _, row in region_stocks.iterrows():
-                    print(f"  {row['symbol']:10s} (Score: {row['final_score']:>6.1f})")
+                    sector_label = f"({row['sector'].upper()}, +{row['sector_premium']*100:.0f}pp)" if row['sector_premium'] > 0 else ""
+                    print(f"  {row['symbol']:10s} (Score: {row['final_score']:>6.1f}) {sector_label}")
 
         # Investment recommendation
         print("\n" + "=" * 80)

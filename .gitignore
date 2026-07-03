@@ -7,6 +7,8 @@ nse_bse_data/
 !package.json
 !data/global_universe.json
 !data/us_tickers_full.json
+!data/jp_tickers_full.json
+!data/kr_tickers_full.json
 
 # NSE/BSE extractor runtime artifacts
 *.log

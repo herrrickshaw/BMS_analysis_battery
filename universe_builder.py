@@ -2,9 +2,10 @@
 universe_builder.py
 ===================
 Builds data/global_universe.json from the best available sources:
-  - IN  : data/india_tickers_full.csv  (4,805 NSE+BSE stocks from scan)
-  - US  : data/us_tickers_full.json    (6,758 NYSE+NASDAQ+AMEX, fetched from
-           github.com/rreichel3/US-Stock-Symbols; run fetch_us_tickers.py to refresh)
+  - IN  : data/india_tickers_full.csv  (5,140 NSE+BSE stocks)
+  - US  : data/us_tickers_full.json    (7,726 NYSE+NASDAQ+AMEX)
+  - JP  : data/jp_tickers_full.json    (3,566 TSE stocks from symbols_cache)
+  - KR  : data/kr_tickers_full.json    (2,606 KOSPI+KOSDAQ from symbols_cache)
   - Others: static verified index constituents (expand by adding to each list below)
 
 Run:
@@ -55,6 +56,28 @@ def _load_us() -> list[str]:
         "JPM","BAC","WFC","GS","MS","UNH","JNJ","ABBV","MRK","PFE",
         "WMT","PG","KO","PEP","COST","XOM","CVX","V","MA","ORCL",
     ]
+
+
+# ── Japan ─────────────────────────────────────────────────────────────────────
+
+def _load_jp() -> list[str]:
+    path = DATA / "jp_tickers_full.json"
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return _dedup([t["yf_ticker"] for t in data])
+    return [f"{t}.T" for t in JP_TICKERS]
+
+
+# ── South Korea ────────────────────────────────────────────────────────────────
+
+def _load_kr() -> list[str]:
+    path = DATA / "kr_tickers_full.json"
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return _dedup([t["yf_ticker"] for t in data])
+    return [f"{t}.KS" for t in KR_TICKERS]
 
 
 # ── Static lists for other markets ────────────────────────────────────────────
@@ -411,27 +434,45 @@ def _dedup(lst):
 def build_universe() -> dict:
     universe = {}
 
-    # IN — from CSV
+    # IN — from CSV (5,140 NSE+BSE tickers)
     india = _load_india()
     universe["IN"] = {
         "name": "India", "exchange": "NSE/BSE",
         "yf_symbols": india, "count": len(india),
-        "source": "india_tickers_full.csv",
+        "source": "india_tickers_full.csv (NSE+BSE from scan + symbols_cache)",
     }
     print(f"  IN  : {len(india):>6,}")
 
-    # US — from downloaded JSON (6,758 tickers)
+    # US — from downloaded JSON (7,726 tickers)
     us = _load_us()
     universe["US"] = {
         "name": "United States", "exchange": "NYSE/NASDAQ/AMEX",
         "yf_symbols": us, "count": len(us),
-        "source": "rreichel3/US-Stock-Symbols (NASDAQ+NYSE+AMEX)",
+        "source": "us_tickers_full.json (rreichel3 + symbols_cache + screener_universe)",
     }
     print(f"  US  : {len(us):>6,}")
 
-    # All other markets
+    # JP — from full TSE symbols_cache (3,566 tickers)
+    jp = _load_jp()
+    universe["JP"] = {
+        "name": "Japan", "exchange": "TSE",
+        "yf_symbols": jp, "count": len(jp),
+        "source": "jp_tickers_full.json (TSE full via symbols_cache)",
+    }
+    print(f"  JP  : {len(jp):>6,}")
+
+    # KR — from full KOSPI+KOSDAQ symbols_cache (2,606 tickers)
+    kr = _load_kr()
+    universe["KR"] = {
+        "name": "South Korea", "exchange": "KRX",
+        "yf_symbols": kr, "count": len(kr),
+        "source": "kr_tickers_full.json (KOSPI+KOSDAQ via symbols_cache)",
+    }
+    print(f"  KR  : {len(kr):>6,}")
+
+    # All other markets (static lists)
     for code, meta in MARKETS.items():
-        if code in ("IN", "US"):
+        if code in ("IN", "US", "JP", "KR"):
             continue
         sfx = meta.get("suffix", "")
         tickers = _dedup(meta["tickers"])

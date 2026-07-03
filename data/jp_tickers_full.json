@@ -17828,5 +17828,369 @@
     "yf_ticker": "9997.T",
     "name": "ベルーナ",
     "sector": "小売業"
+  },
+  {
+    "code": "1805",
+    "yf_ticker": "1805.T",
+    "name": "TOBISHIMA CORPORATION",
+    "sector": "Construction",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "1821",
+    "yf_ticker": "1821.T",
+    "name": "Sumitomo Mitsui Construction Co., Ltd.",
+    "sector": "Construction",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "1890",
+    "yf_ticker": "1890.T",
+    "name": "TOYO CONSTRUCTION CO.,LTD.",
+    "sector": "Construction",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "1439",
+    "yf_ticker": "1439.T",
+    "name": "YASUE CORPORATION",
+    "sector": "Construction",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "1451",
+    "yf_ticker": "1451.T",
+    "name": "KHC Ltd.",
+    "sector": "Construction",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "1712",
+    "yf_ticker": "1712.T",
+    "name": "Daiseki Eco.Solution Co.,Ltd.",
+    "sector": "Construction",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "1743",
+    "yf_ticker": "1743.T",
+    "name": "KOATSU KOGYO CO.,LTD.",
+    "sector": "Construction",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "2899",
+    "yf_ticker": "2899.T",
+    "name": "NAGATANIEN HOLDINGS CO.,LTD.",
+    "sector": "Foods",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "3593",
+    "yf_ticker": "3593.T",
+    "name": "HOGY MEDICAL CO.,LTD.",
+    "sector": "Textiles and Apparels",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "3604",
+    "yf_ticker": "3604.T",
+    "name": "KAWAMOTO CORPORATION",
+    "sector": "Textiles and Apparels",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "4917",
+    "yf_ticker": "4917.T",
+    "name": "MANDOM CORPORATION",
+    "sector": "Chemicals",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "4921",
+    "yf_ticker": "4921.T",
+    "name": "FANCL CORPORATION",
+    "sector": "Chemicals",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "7925",
+    "yf_ticker": "7925.T",
+    "name": "MAEZAWA KASEI INDUSTRIES CO.,LTD.",
+    "sector": "Chemicals",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "7958",
+    "yf_ticker": "7958.T",
+    "name": "TENMA CORPORATION",
+    "sector": "Chemicals",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "4551",
+    "yf_ticker": "4551.T",
+    "name": "TORII PHARMACEUTICAL CO.,LTD.",
+    "sector": "Pharmaceutical",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "5191",
+    "yf_ticker": "5191.T",
+    "name": "Sumitomo Riko Company Limited",
+    "sector": "Rubber Products",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "5217",
+    "yf_ticker": "5217.T",
+    "name": "Techno Quartz Inc.",
+    "sector": "Glass and Ceramics Products",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "5481",
+    "yf_ticker": "5481.T",
+    "name": "Sanyo Special Steel Co.,Ltd.",
+    "sector": "Iron and Steel",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "6362",
+    "yf_ticker": "6362.T",
+    "name": "Ishii Iron Works Co.,Ltd.",
+    "sector": "Machinery",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "6704",
+    "yf_ticker": "6704.T",
+    "name": "IWATSU ELECTRIC CO.,LTD.",
+    "sector": "Electric Appliances",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "6930",
+    "yf_ticker": "6930.T",
+    "name": "NIPPON ANTENNA CO.,LTD.",
+    "sector": "Electric Appliances",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "7705",
+    "yf_ticker": "7705.T",
+    "name": "GL Sciences Inc.",
+    "sector": "Precision Instruments",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "9055",
+    "yf_ticker": "9055.T",
+    "name": "ALPS LOGISTICS CO.,LTD.",
+    "sector": "Land Transportation",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "9099",
+    "yf_ticker": "9099.T",
+    "name": "Chilled & Frozen Logistics Holdings Co.,Ltd.",
+    "sector": "Land Transportation",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "9232",
+    "yf_ticker": "9232.T",
+    "name": "PASCO CORPORATION",
+    "sector": "Air Transportation",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "9058",
+    "yf_ticker": "9058.T",
+    "name": "TRANCOM CO.,LTD.",
+    "sector": "Warehousing and Harbor Transportation Service",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "4298",
+    "yf_ticker": "4298.T",
+    "name": "PROTO CORPORATION",
+    "sector": "Information & Communication",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "4384",
+    "yf_ticker": "4384.T",
+    "name": "RAKSUL INC.",
+    "sector": "Information & Communication",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "6879",
+    "yf_ticker": "6879.T",
+    "name": "IMAGICA GROUP Inc.",
+    "sector": "Information & Communication",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "7518",
+    "yf_ticker": "7518.T",
+    "name": "Net One Systems Co.,Ltd.",
+    "sector": "Information & Communication",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "9600",
+    "yf_ticker": "9600.T",
+    "name": "I-NET CORP.",
+    "sector": "Information & Communication",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "9613",
+    "yf_ticker": "9613.T",
+    "name": "NTT DATA GROUP CORPORATION",
+    "sector": "Information & Communication",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "9719",
+    "yf_ticker": "9719.T",
+    "name": "SCSK Corporation",
+    "sector": "Information & Communication",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "3847",
+    "yf_ticker": "3847.T",
+    "name": "PACIFIC SYSTEMS CORPORATION",
+    "sector": "Information & Communication",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "9479",
+    "yf_ticker": "9479.T",
+    "name": "Impress Holdings, Inc.",
+    "sector": "Information & Communication",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "7420",
+    "yf_ticker": "7420.T",
+    "name": "SATORI ELECTRIC CO.,LTD.",
+    "sector": "Wholesale Trade",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "7467",
+    "yf_ticker": "7467.T",
+    "name": "HAGIWARA ELECTRIC HOLDINGS CO.,LTD.",
+    "sector": "Wholesale Trade",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "3322",
+    "yf_ticker": "3322.T",
+    "name": "Alpha Group Inc.",
+    "sector": "Wholesale Trade",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "3341",
+    "yf_ticker": "3341.T",
+    "name": "NIHON CHOUZAI Co.,Ltd.",
+    "sector": "Retail Trade",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "7455",
+    "yf_ticker": "7455.T",
+    "name": "PARIS MIKI HOLDINGS Inc.",
+    "sector": "Retail Trade",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "7623",
+    "yf_ticker": "7623.T",
+    "name": "SUNAUTAS CO.,LTD.",
+    "sector": "Retail Trade",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "8209",
+    "yf_ticker": "8209.T",
+    "name": "FRIENDLY CORPORATION",
+    "sector": "Retail Trade",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "8732",
+    "yf_ticker": "8732.T",
+    "name": "MONEY PARTNERS GROUP CO.,LTD.",
+    "sector": "Securities and Commodities Futures",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "3458",
+    "yf_ticker": "3458.T",
+    "name": "CRE,Inc.",
+    "sector": "Real Estate",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "8905",
+    "yf_ticker": "8905.T",
+    "name": "AEON Mall Co.,Ltd.",
+    "sector": "Real Estate",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "6028",
+    "yf_ticker": "6028.T",
+    "name": "TechnoPro Holdings,Inc.",
+    "sector": "Services",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "7088",
+    "yf_ticker": "7088.T",
+    "name": "Forum Engineering Inc.",
+    "sector": "Services",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "7092",
+    "yf_ticker": "7092.T",
+    "name": "Fast Fitness Japan Incorporated",
+    "sector": "Services",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "9161",
+    "yf_ticker": "9161.T",
+    "name": "Integrated Design & Engineering Holdings Co.,Ltd.",
+    "sector": "Services",
+    "market_segment": "Prime"
+  },
+  {
+    "code": "4319",
+    "yf_ticker": "4319.T",
+    "name": "TAC CO.,LTD.",
+    "sector": "Services",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "6048",
+    "yf_ticker": "6048.T",
+    "name": "DesignOne Japan,Inc.",
+    "sector": "Services",
+    "market_segment": "Standard"
+  },
+  {
+    "code": "6542",
+    "yf_ticker": "6542.T",
+    "name": "Founder's Consultants Holdings Inc.",
+    "sector": "Services",
+    "market_segment": "Standard"
   }
 ]

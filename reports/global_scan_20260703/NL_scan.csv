@@ -1,0 +1,21 @@
+symbol,suffix,last_price,Prev_Close,change_pct,darvas_signal,Box_Top,Box_Bottom,Upside_to_Top%,Position_in_Box%,Data_Points,Piotroski_Score,Piotroski_Strong,CoffeeCan,CC_Score,market,yf_symbol,exchange,currency,pegu_score,pegu_grade,sarvas_score,sarvas_signal,data_source,scan_date
+ASML,.AS,,,,,,,,,,,,,,NL,ASML.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+HEIA,.AS,,,,,,,,,,,,,,NL,HEIA.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+PHIA,.AS,,,,,,,,,,,,,,NL,PHIA.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+NN,.AS,,,,,,,,,,,,,,NL,NN.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+ABN,.AS,,,,,,,,,,,,,,NL,ABN.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+AKZA,.AS,,,,,,,,,,,,,,NL,AKZA.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+WKL,.AS,,,,,,,,,,,,,,NL,WKL.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+AD,.AS,,,,,,,,,,,,,,NL,AD.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+RAND,.AS,,,,,,,,,,,,,,NL,RAND.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+INGA,.AS,,,,,,,,,,,,,,NL,INGA.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+AGN,.AS,,,,,,,,,,,,,,NL,AGN.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+URW,.AS,,,,,,,,,,,,,,NL,URW.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+BESI,.AS,,,,,,,,,,,,,,NL,BESI.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+IMCD,.AS,,,,,,,,,,,,,,NL,IMCD.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+LIGHT,.AS,,,,,,,,,,,,,,NL,LIGHT.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+MT,.AS,,,,,,,,,,,,,,NL,MT.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+OCI,.AS,,,,,,,,,,,,,,NL,OCI.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+TKWY,.AS,,,,,,,,,,,,,,NL,TKWY.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+DSM,.AS,,,,,,,,,,,,,,NL,DSM.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03
+SBMO,.AS,,,,,,,,,,,,,,NL,SBMO.AS,Euronext Amsterdam,EUR,70,A,5,SELL,local,2026-07-03

@@ -1,0 +1,21 @@
+symbol,suffix,last_price,Prev_Close,change_pct,darvas_signal,Box_Top,Box_Bottom,Upside_to_Top%,Position_in_Box%,Data_Points,Piotroski_Score,Piotroski_Strong,CoffeeCan,CC_Score,market,yf_symbol,exchange,currency,pegu_score,pegu_grade,sarvas_score,sarvas_signal,data_source,scan_date
+ENI,.MI,,,,,,,,,,,,,,IT,ENI.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+ENEL,.MI,,,,,,,,,,,,,,IT,ENEL.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+ISP,.MI,,,,,,,,,,,,,,IT,ISP.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+UCG,.MI,,,,,,,,,,,,,,IT,UCG.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+TIT,.MI,,,,,,,,,,,,,,IT,TIT.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+LDO,.MI,,,,,,,,,,,,,,IT,LDO.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+RACE,.MI,,,,,,,,,,,,,,IT,RACE.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+STM,.MI,,,,,,,,,,,,,,IT,STM.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+CPR,.MI,,,,,,,,,,,,,,IT,CPR.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+PRY,.MI,,,,,,,,,,,,,,IT,PRY.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+G,.MI,,,,,,,,,,,,,,IT,G.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+BAMI,.MI,,,,,,,,,,,,,,IT,BAMI.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+MB,.MI,,,,,,,,,,,,,,IT,MB.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+BGN,.MI,,,,,,,,,,,,,,IT,BGN.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+SRG,.MI,,,,,,,,,,,,,,IT,SRG.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+A2A,.MI,,,,,,,,,,,,,,IT,A2A.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+PIRC,.MI,,,,,,,,,,,,,,IT,PIRC.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+AMP,.MI,,,,,,,,,,,,,,IT,AMP.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+BPSO,.MI,,,,,,,,,,,,,,IT,BPSO.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03
+CNH,.MI,,,,,,,,,,,,,,IT,CNH.MI,Borsa Italiana,EUR,70,A,5,SELL,local,2026-07-03

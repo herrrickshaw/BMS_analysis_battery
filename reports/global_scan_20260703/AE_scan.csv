@@ -1,0 +1,16 @@
+symbol,suffix,last_price,Prev_Close,change_pct,darvas_signal,Box_Top,Box_Bottom,Upside_to_Top%,Position_in_Box%,Data_Points,Piotroski_Score,Piotroski_Strong,CoffeeCan,CC_Score,market,yf_symbol,exchange,currency,pegu_score,pegu_grade,sarvas_score,sarvas_signal,data_source,scan_date
+FAB,.AE,,,,,,,,,,,,,,AE,FAB.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+ADCB,.AE,,,,,,,,,,,,,,AE,ADCB.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+ADNOC,.AE,,,,,,,,,,,,,,AE,ADNOC.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+ADNOCDIST,.AE,,,,,,,,,,,,,,AE,ADNOCDIST.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+ALDAR,.AE,,,,,,,,,,,,,,AE,ALDAR.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+EMAAR,.AE,,,,,,,,,,,,,,AE,EMAAR.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+DIB,.AE,,,,,,,,,,,,,,AE,DIB.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+ENBD,.AE,,,,,,,,,,,,,,AE,ENBD.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+TAQA,.AE,,,,,,,,,,,,,,AE,TAQA.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+IHC,.AE,,,,,,,,,,,,,,AE,IHC.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+EMIRATES,.AE,,,,,,,,,,,,,,AE,EMIRATES.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+ETISALAT,.AE,,,,,,,,,,,,,,AE,ETISALAT.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+DU,.AE,,,,,,,,,,,,,,AE,DU.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+AMANAT,.AE,,,,,,,,,,,,,,AE,AMANAT.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03
+GFH,.AE,,,,,,,,,,,,,,AE,GFH.AE,ADX/DFM,AED,70,A,5,SELL,local,2026-07-03

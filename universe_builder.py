@@ -9,6 +9,7 @@ Builds data/global_universe.json from the best available sources:
   - AU  : data/au_tickers_full.json    (1,834 ASX stocks from official ASX directory)
   - CN  : data/cn_sse_tickers_full.json (1,856 SSE securities) + static SZSE fallback
   - SG  : data/sg_tickers_full.json    (171 SGX securities from full-market scan)
+  - EU  : data/europe_tickers_full.json (966+ tickers: 10 new markets + expanded UK/DE/IT/FR/ES/NL/CH)
   - Others: static verified index constituents (expand by adding to each list below)
 
 Run:
@@ -92,6 +93,58 @@ def _load_au() -> list[str]:
             data = json.load(f)
         return _dedup([t["yf_ticker"] for t in data])
     return [f"{t}.AX" for t in AU_TICKERS]
+
+
+# ── Europe (multi-market loader) ──────────────────────────────────────────────
+
+_EUROPE_EXCHANGE_MAP = {
+    "London Stock Exchange":     ("UK", ".L"),
+    "Deutsche Boerse Frankfurt": ("DE", ".F"),
+    "Borsa Italiana":            ("IT", ".MI"),
+    "Euronext Paris":            ("FR", ".PA"),
+    "BME Madrid":                ("ES", ".MC"),
+    "Nasdaq Stockholm":          ("SE", ".ST"),
+    "Athens Stock Exchange":     ("GR", ".AT"),
+    "Euronext Amsterdam":        ("NL", ".AS"),
+    "Nasdaq Copenhagen":         ("DK", ".CO"),
+    "Nasdaq Helsinki":           ("FI", ".HE"),
+    "Oslo Bors":                 ("NO", ".OL"),
+    "Euronext Brussels":         ("BE", ".BR"),
+    "Euronext Dublin":           ("IE", ".IR"),
+    "SIX Swiss":                 ("CH", ".SW"),
+    "Vienna":                    ("AT", ".VI"),
+    "Warsaw GPW":                ("PL", ".WA"),
+    "Euronext Lisbon":           ("PT", ".LS"),
+}
+
+_EUROPE_NEW_MARKETS = {
+    "GR": ("Greece",      "Athens Stock Exchange"),
+    "SE": ("Sweden",      "Nasdaq Stockholm"),
+    "DK": ("Denmark",     "Nasdaq Copenhagen"),
+    "FI": ("Finland",     "Nasdaq Helsinki"),
+    "NO": ("Norway",      "Oslo Bors"),
+    "BE": ("Belgium",     "Euronext Brussels"),
+    "IE": ("Ireland",     "Euronext Dublin"),
+    "AT": ("Austria",     "Vienna Stock Exchange"),
+    "PL": ("Poland",      "Warsaw GPW"),
+    "PT": ("Portugal",    "Euronext Lisbon"),
+}
+
+
+def _load_europe_csv() -> dict[str, list[str]]:
+    """Load europe_tickers_full.json → {market_code: [yf_tickers]}"""
+    path = DATA / "europe_tickers_full.json"
+    if path.exists():
+        with open(path) as f:
+            data = json.load(f)
+        result: dict[str, list[str]] = {}
+        for entry in data:
+            code = entry.get("market_code", "")
+            yf = entry.get("yf_ticker", "")
+            if code and yf:
+                result.setdefault(code, []).append(yf)
+        return result
+    return {}
 
 
 # ── Singapore ─────────────────────────────────────────────────────────────────
@@ -535,7 +588,10 @@ def build_universe() -> dict:
     }
     print(f"  CN  : {len(cn):>6,}")
 
-    # All other markets (static lists)
+    # European markets — load from europe_tickers_full.json (merges with static)
+    eu_by_market = _load_europe_csv()
+
+    # Static markets from MARKETS registry
     for code, meta in MARKETS.items():
         if code in ("IN", "US", "JP", "KR", "AU", "CN", "SG"):
             continue
@@ -545,13 +601,28 @@ def build_universe() -> dict:
         if "extra" in meta:
             ex = meta["extra"]
             yf_syms += [f"{t}{ex['suffix']}" for t in _dedup(ex["tickers"])]
-        yf_syms = _dedup(yf_syms)
+        # Merge with europe CSV data
+        yf_syms = _dedup(yf_syms + eu_by_market.get(code, []))
         universe[code] = {
             "name": meta["name"], "exchange": meta["exchange"],
             "yf_symbols": yf_syms, "count": len(yf_syms),
-            "source": "static",
+            "source": "static + europe_tickers_full.json",
         }
         print(f"  {code:<4}: {len(yf_syms):>6,}")
+
+    # New European markets not in MARKETS registry
+    for code, (name, exchange) in _EUROPE_NEW_MARKETS.items():
+        if code in universe:
+            continue
+        yf_syms = _dedup(eu_by_market.get(code, []))
+        if not yf_syms:
+            continue
+        universe[code] = {
+            "name": name, "exchange": exchange,
+            "yf_symbols": yf_syms, "count": len(yf_syms),
+            "source": "europe_tickers_full.json",
+        }
+        print(f"  {code:<4}: {len(yf_syms):>6,}  (NEW)")
 
     return universe
 

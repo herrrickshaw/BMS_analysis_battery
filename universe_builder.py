@@ -1,17 +1,16 @@
 """
 universe_builder.py
 ===================
-Builds data/global_universe.json from verified ticker lists.
-
-Sources:
-  - India : data/india_tickers_full.csv  (4,805 NSE+BSE stocks)
-  - US    : full S&P 500 + Russell 1000 + NASDAQ 100 additions
-  - Others: expanded curated lists (all verified via yfinance convention)
+Builds data/global_universe.json from the best available sources:
+  - IN  : data/india_tickers_full.csv  (4,805 NSE+BSE stocks from scan)
+  - US  : data/us_tickers_full.json    (6,758 NYSE+NASDAQ+AMEX, fetched from
+           github.com/rreichel3/US-Stock-Symbols; run fetch_us_tickers.py to refresh)
+  - Others: static verified index constituents (expand by adding to each list below)
 
 Run:
     python3 universe_builder.py
 Outputs:
-    data/global_universe.json         — per-market dict
+    data/global_universe.json         — per-market dict with yf_symbols[]
     data/global_universe_flat.csv     — flat (market_code, name, exchange, yf_symbol)
 """
 
@@ -23,139 +22,68 @@ HERE = Path(__file__).parent
 DATA = HERE / "data"
 DATA.mkdir(exist_ok=True)
 
-# ── India: load from CSV ──────────────────────────────────────────────────────
 
-def _load_india_csv() -> list[str]:
+# ── India ─────────────────────────────────────────────────────────────────────
+
+def _load_india() -> list[str]:
     path = DATA / "india_tickers_full.csv"
     if not path.exists():
         return []
-    with open(path) as f:
-        rows = list(csv.DictReader(f))
     seen, out = set(), []
-    for r in rows:
-        sym = r.get("Symbol", "").strip()
-        sfx = r.get("Suffix", ".NS").strip()
-        if sym:
+    with open(path) as f:
+        for row in csv.DictReader(f):
+            sym = row.get("Symbol", "").strip()
+            sfx = row.get("Suffix", ".NS").strip()
             yf = f"{sym}{sfx}"
-            if yf not in seen:
+            if sym and yf not in seen:
                 seen.add(yf)
                 out.append(yf)
     return out
 
 
-# ── US: S&P 500 + NASDAQ-100 additions + Russell-1000 additions ───────────────
+# ── United States ─────────────────────────────────────────────────────────────
 
-US_TICKERS = [
-    # --- S&P 500 (current constituents) ---
-    "MMM","AOS","ABT","ABBV","ACN","ADBE","AMD","AES","AFL","A",
-    "APD","ABNB","AKAM","ALB","ARE","ALGN","ALLE","LNT","ALL","GOOGL",
-    "GOOG","MO","AMZN","AMCR","AEE","AAL","AEP","AXP","AIG","AMT",
-    "AWK","AMP","AME","AMGN","APH","ADI","ANSS","AON","APA","AAPL",
-    "AMAT","APTV","ACGL","ADM","ANET","AJG","AIZ","T","ATO","ADSK",
-    "ADP","AZO","AVB","AVY","AXON","BKR","BALL","BAC","BK","BBWI",
-    "BAX","BDX","WRB","BRK-B","BBY","BIO","TECH","BIIB","BLK","BX",
-    "BA","BMY","AVGO","BR","BRO","BF-B","BLDR","BG","CDNS","CZR",
-    "CPT","CPB","COF","CAH","KMX","CCL","CARR","CTLT","CAT","CBOE",
-    "CBRE","CDW","CE","COR","CNC","CNP","CF","CHRW","CRL","SCHW",
-    "CHTR","CVX","CMG","CB","CHD","CI","CINF","CTAS","CSCO","C",
-    "CFG","CLX","CME","CMS","KO","CTSH","CL","CMCSA","CMA","CAG",
-    "COP","ED","STZ","CEG","COO","CPRT","GLW","CTVA","CSGP","COST",
-    "CTRA","CCI","CSX","CMI","CVS","DHI","DHR","DRI","DVA","DAY",
-    "DE","DAL","XRAY","DVN","DXCM","FANG","DLR","DFS","DG","DLTR",
-    "D","DPZ","DOV","DOW","DTE","DUK","DD","EMN","ETN","EBAY",
-    "ECL","EIX","EW","EA","ELV","LLY","EMR","ENPH","ETR","EOG",
-    "EPAM","EQT","EFX","EQIX","EQR","ESS","EL","ETSY","EG","EVRG",
-    "ES","EXC","EXPE","EXPD","EXR","XOM","FFIV","FDS","FICO","FAST",
-    "FRT","FDX","FIS","FITB","FSLR","FE","FI","FMC","F","FTNT",
-    "FTV","FOXA","FOX","BEN","FCX","GRMN","IT","GE","GEHC","GEV",
-    "GEN","GNRC","GD","GIS","GM","GPC","GILD","GS","HAL","HIG",
-    "HAS","HCA","DOC","HSIC","HSY","HES","HPE","HLT","HOLX","HD",
-    "HON","HRL","HST","HWM","HPQ","HUBB","HUM","HBAN","HII","IBM",
-    "IEX","IDXX","ITW","INCY","IR","PODD","INTC","ICE","IFF","IP",
-    "IPG","ISRG","IVZ","INVH","IQV","IRM","JPM","JNJ","JCI","K",
-    "KVUE","KDP","KEY","KEYS","KMB","KIM","KMI","KLAC","KHC","KR",
-    "LHX","LH","LRCX","LW","LVS","LDOS","LEN","LIN","LYV","LKQ",
-    "LMT","L","LOW","LULU","LYB","MTB","MRO","MPC","MKTX","MAR",
-    "MMC","MLM","MAS","MA","MTCH","MKC","MCD","MCK","MDT","MRK",
-    "META","MET","MTD","MGM","MCHP","MU","MSFT","MAA","MRNA","MHK",
-    "MOH","TAP","MDLZ","MPWR","MNST","MCO","MS","MOS","MSI","MSCI",
-    "NDAQ","NTAP","NFLX","NEM","NWSA","NWS","NEE","NKE","NI","NDSN",
-    "NSC","NTRS","NOC","NCLH","NRG","NUE","NVDA","NVR","NXPI","ORLY",
-    "OXY","ODFL","OMC","ON","OKE","ORCL","OTIS","PCAR","PKG","PANW",
-    "PH","PAYX","PAYC","PYPL","PNR","PEP","PFE","PCG","PM","PSX",
-    "PNW","PNC","POOL","PPG","PPL","PFG","PG","PGR","PRU","PEG",
-    "PTC","PSA","PHM","QRVO","PWR","QCOM","DGX","RL","RJF","RTX",
-    "O","REG","REGN","RF","RSG","RMD","RVTY","ROK","ROL","ROP",
-    "ROST","RCL","SPGI","CRM","SBAC","SLB","STX","SEE","SRE","NOW",
-    "SHW","SPG","SWKS","SJM","SNA","SOLV","SO","LUV","SWK","SBUX",
-    "STT","STLD","STE","SYK","SMCI","SYF","SNPS","SYY","TMUS","TROW",
-    "TTWO","TPR","TRGP","TGT","TEL","TDY","TFX","TER","TSLA","TXN",
-    "TXT","TMO","TJX","TSCO","TT","TDG","TRV","TRMB","TFC","TYL",
-    "TSN","USB","UBER","UDR","ULTA","UNP","UAL","UPS","URI","UNH",
-    "UHS","VLO","VTR","VLTO","VRSN","VRSK","VZ","VRTX","VIAV","V",
-    "VST","VFC","VTRS","VICI","VNO","VMC","WAB","WMT","WBD","WM",
-    "WAT","WEC","WFC","WELL","WST","WDC","WY","WHR","WMB","WTW",
-    "GWW","WYNN","XEL","XYL","YUM","ZBRA","ZBH","ZTS",
-    # --- NASDAQ-100 extras not already in S&P 500 ---
-    "ASML","MELI","PDD","BIDU","NTES","JD","BABA","TEAM","WDAY",
-    "CRWD","ZS","OKTA","DDOG","NET","MDB","SNOW","PLTR","HUBS",
-    "MNDY","BILL","GTLB","PATH","CELH","SGEN","BMRN","INCY","ALXN",
-    "VRTX","REGN","ILMN","IDXX","TECH","HOLX","DXCM","ALGN","ZBRA",
-    "FAST","ODFL","PCAR","CTAS","CPRT","FANG","FTNT","ANSS","CDNS",
-    # --- Additional large-cap NYSE / sectoral ---
-    "BRK-A","JPM","BAC","WFC","C","GS","MS","AXP","BLK","SCHW",
-    "USB","PNC","TFC","COF","KEY","HBAN","MTB","CFG","RF","FITB",
-    "SIVB","PACW","FRC","SBNY","WAL","BOH","COLB","WTFC","UMPQ",
-    "EWBC","CVBF","BOKF","IBCP","FFIN","PPBI","SNV","FHB","GBCI",
-    "STBA","NBT","NYCB","DCOM","BHLB","PFIS","NBTB","UBSI","MBWM",
-    "RIVN","LCID","NIO","XPEV","LI","CHPT","BLNK","EVGO","PLUG","BE",
-    "FCEL","BLDP","ENPH","SEDG","RUN","NOVA","ARRY","SPWR","SUNW",
-    "AMC","GME","SPCE","SNDL","TLRY","CGC","ACB","CRON","HEXO","OGI",
-    "CRSP","EDIT","NTLA","BEAM","FATE","BLUE","SGMO","ARVN","RXRX",
-    "IONQ","RGTI","QUBT","QBTS","ARQQ","ABCL","LNTH","NUVL","KYMR",
-    "COIN","HOOD","SOFI","AFRM","UPST","OPEN","DKNG","PENN","RBLX",
-    "U","APP","CLOV","LMND","ROOT","JOBY","ARCHER","ACHR","LILM",
-    "WKHS","NKLA","SQM","ALB","LTHM","LAC","PLL","SGML","ALTM",
-    "MP","NOVG","NXE","UEC","CCJ","DNN","UUUU","BWXT","SMR",
-    "PLD","AMT","EQIX","CCI","DLR","PSA","EQR","AVB","ESS","UDR",
-    "CPT","NNN","WPC","ADC","EPRT","STAG","FR","REXR","EGP","TRNO",
-    "WELL","VTR","OHI","MPW","SBRA","SPG","MAC","BXP","HIW","CUZ",
-    "SBA","SBAC","UNIT","XOM","CVX","COP","EOG","PXD","OXY","DVN",
-    "HAL","SLB","BKR","NOV","WMB","OKE","KMI","EPD","ET","MPLX",
-    "PAA","EQT","AR","RRC","CNX","SWN","CTRA","PSX","MPC","VLO",
-]
+def _load_us() -> list[str]:
+    path = DATA / "us_tickers_full.json"
+    if path.exists():
+        with open(path) as f:
+            data = json.load(f)
+        return sorted(data.keys())
+    # Fallback: S&P 500 only
+    return [
+        "AAPL","MSFT","NVDA","AMZN","GOOGL","META","TSLA","BRK-B","LLY","AVGO",
+        "JPM","BAC","WFC","GS","MS","UNH","JNJ","ABBV","MRK","PFE",
+        "WMT","PG","KO","PEP","COST","XOM","CVX","V","MA","ORCL",
+    ]
 
-# ── Japan TSE (verified 4-digit codes) ────────────────────────────────────────
+
+# ── Static lists for other markets ────────────────────────────────────────────
+# Format: base ticker (suffix applied automatically)
 
 JP_TICKERS = [
-    # TOPIX Core 30
     "7203","6758","6861","8306","9984","7267","4502","6954","9432","8316",
     "9433","7741","2914","6501","6326","8035","4063","6367","9020","7751",
     "4661","8411","3382","8766","4543","6902","7270","2802","4568","8001",
-    # TOPIX Large 70 additions
     "6762","5401","8002","5108","9022","6971","9503","6273","7731","7832",
     "8031","8053","6503","4523","7733","6988","2801","4901","6645","8015",
     "9005","8830","8750","5802","6701","7201","3092","7269","4704","9613",
     "9735","6594","4452","8725","7011","7013","4519","4911","3407","6201",
     "5711","6301","6724","7752","5201","6703","8604","1925","6472","4689",
-    "8309","6855","2503","6146","5334","4578","3141","6770","2269","4704",
-    "9021","6976","7433","1928","6920","9766","8601","8802","3407","6981",
-    "4755","6506","8630","2282","1332","6141","7762","8801","7912","9062",
-    "3086","8830","6471","2871","6113","6502","8804","9613","4508","5333",
-    "9434","6963","5631","8355","6361","3861","5214","1721","9086","6841",
-    "1803","6664","7211","3402","7205","3401","5010","5233","6806","4151",
-    "4558","8697","9062","5002","9009","6753","5411","6925","6175","9412",
-    "6869","7309","3197","8029","6590","2768","9104","3893","5406","2871",
-    "1802","5707","9783","8001","5019","3038","1801","8354","6800","9101",
-    "6857","3197","8029","9984","6098","4911","2502","3289","9706","4324",
-    "6473","7921","8697","7974","9681","3659","4689","7309","8306","3092",
-    "8601","4661","2267","7276","3891","5019","6178","4385","4519","9064",
+    "8309","6855","2503","6146","5334","4578","3141","6770","2269","9021",
+    "6976","7433","1928","6920","9766","8601","8802","6981","4755","6506",
+    "8630","2282","1332","6141","7762","8801","7912","9062","3086","6471",
+    "2871","6113","6502","8804","9613","4508","5333","9434","6963","5631",
+    "8355","6361","3861","5214","1721","9086","6841","1803","6664","7211",
+    "3402","7205","3401","5010","5233","6806","4151","4558","8697","9062",
+    "5002","9009","6753","5411","6925","6175","9412","6869","7309","3197",
+    "8029","6590","2768","9104","3893","5406","2871","1802","5707","9783",
+    "5019","3038","1801","8354","6800","9101","6857","6098","4911","2502",
+    "3289","9706","4324","6473","7921","8697","7974","9681","3659","4385",
+    "9064","7276","3891","6178","4519","4385","6963","9984","6098","5019",
+    "4689","2267","8306","3092","8601","4661","2502","7309","8766","3197",
 ]
 
-# ── China SSE (.SS) ────────────────────────────────────────────────────────────
-
 CN_SS_TICKERS = [
-    # SSE 50 + CSI 300 SSE components
     "600519","601318","600036","600900","601166","601398","601288","601988",
     "600028","600030","601857","600016","601628","601601","600050","601390",
     "600048","601006","601328","600837","601669","600104","600309","601336",
@@ -172,10 +100,7 @@ CN_SS_TICKERS = [
     "600111","601228","600256","601179","601398","601288","601939","601988",
 ]
 
-# ── China SZSE (.SZ) ─────────────────────────────────────────────────────────
-
 CN_SZ_TICKERS = [
-    # SZSE Component + CSI 300 SZSE components
     "000858","000333","002594","000651","300750","002415","000002","000625",
     "002475","000776","300274","002142","000063","000166","002304","000001",
     "002236","000100","002027","000725","300760","002607","000568","000596",
@@ -189,41 +114,34 @@ CN_SZ_TICKERS = [
     "002230","000063","000166","000538","002236","000100","002027","000651",
     "000001","000776","000002","002594","300750","002312","300760","000703",
     "002555","300033","300124","002738","002180","002129","002465","300496",
-    "000060","000581","000568","002340","000625","002008","000963","000596",
 ]
 
-# ── Hong Kong HKEX (.HK) ─────────────────────────────────────────────────────
-
 HK_TICKERS = [
-    # HSI + Hang Seng Tech + HSCEI components
     "0700","9988","0005","0941","2318","1299","0939","3690","0388","0883",
     "2020","1211","9618","0016","0001","0011","0003","0823","2382","1810",
     "0688","9999","2269","0002","0006","1038","2007","0960","0012","0175",
     "1093","6862","3988","0027","0066","1177","0762","2313","0386","1128",
     "0291","0857","2338","0992","0981","6098","0669","2688","0151","0956",
     "3328","1398","3968","1113","0083","1088","0267","2628","0101","1109",
-    "0013","2601","1997","0017","0019","0023","0052","0066","0083","0088",
-    "0101","0116","0135","0144","0151","0168","0175","0189","0193","0267",
-    "0268","0270","0291","0316","0322","0330","0341","0357","0358","0371",
-    "0386","0388","0392","0400","0410","0420","0425","0435","0440","0489",
-    "0494","0522","0535","0536","0539","0548","0551","0562","0570","0575",
-    "0579","0580","0585","0590","0604","0606","0636","0639","0645","0656",
-    "0659","0660","0669","0670","0688","0694","0700","0709","0719","0728",
-    "0737","0762","0788","0806","0808","0819","0823","0825","0829","0836",
-    "0853","0855","0857","0868","0881","0883","0884","0916","0939","0941",
-    "0960","0968","0981","0992","0999","1003","1007","1009","1024","1038",
-    "1044","1060","1066","1072","1083","1088","1093","1099","1107","1109",
-    "1113","1128","1136","1140","1141","1157","1171","1177","1179","1193",
-    "1199","1200","1211","1214","1221","1228","1230","1234","1238","1242",
-    "1253","1268","1271","1282","1288","1299","1302","1313","1328","1336",
-    "1339","1347","1358","1378","1383","1398","1408","1413","1448","1458",
-    "1461","1478","1501","1513","1515","1518","1519","1522","1523","1529",
+    "0013","2601","1997","0017","0019","0023","0052","0083","0088","0101",
+    "0116","0135","0144","0151","0168","0175","0189","0193","0267","0268",
+    "0270","0291","0316","0322","0330","0341","0357","0358","0371","0386",
+    "0388","0392","0400","0410","0420","0425","0435","0440","0489","0494",
+    "0522","0535","0536","0539","0548","0551","0562","0570","0575","0579",
+    "0580","0585","0590","0604","0606","0636","0639","0645","0656","0659",
+    "0660","0669","0670","0688","0694","0700","0709","0719","0728","0737",
+    "0762","0788","0806","0808","0819","0823","0825","0829","0836","0853",
+    "0855","0857","0868","0881","0883","0884","0916","0939","0941","0960",
+    "0968","0981","0992","0999","1003","1007","1009","1024","1038","1044",
+    "1060","1066","1072","1083","1088","1093","1099","1107","1109","1113",
+    "1128","1136","1140","1141","1157","1171","1177","1179","1193","1199",
+    "1200","1211","1214","1221","1228","1230","1234","1238","1242","1253",
+    "1268","1271","1282","1288","1299","1302","1313","1328","1336","1339",
+    "1347","1358","1378","1383","1398","1408","1413","1448","1458","1461",
+    "1478","1501","1513","1515","1518","1519","1522","1523","1529","1530",
 ]
 
-# ── South Korea KRX (.KS) ────────────────────────────────────────────────────
-
 KR_TICKERS = [
-    # KOSPI 200 + KOSDAQ major
     "005930","000660","035420","005380","051910","068270","035720","096770",
     "003550","017670","066570","004020","028260","000270","009150","207940",
     "000100","011070","010950","032830","012330","086790","018260","097950",
@@ -237,76 +155,56 @@ KR_TICKERS = [
     "018880","034220","036460","015760","069960","005300","316140","001680",
     "072130","035000","037270","030000","011780","004140","009540","001450",
     "000490","000215","010060","029780","000240","004170","006040","010620",
-    "009200","004990","011170","002760","014820","004800","004830","004990",
-    "005940","006090","006110","006120","006200","006260","006280","006320",
-    "006360","006390","006400","006490","006580","006650","006680","006820",
-    "007070","007110","007160","007210","007310","007340","007390","007460",
-    "007570","007610","007660","007860","008000","008040","008060","008110",
+    "009200","004990","011170","002760","014820","004800","004830","005940",
 ]
 
-# ── Taiwan TWSE (.TW) ─────────────────────────────────────────────────────────
-
 TW_TICKERS = [
-    # TWSE 50 + TWSE 100 + TPEX additions
     "2330","2317","2454","2308","2882","2881","2412","2303","1301","2886",
     "2891","3711","2002","1303","2357","5871","2382","1216","2395","3008",
     "2379","1590","2344","3034","2474","2327","2498","3045","4904","2912",
-    "2886","1101","2883","2892","5880","5876","2884","2885","2887","2890",
-    "2897","5884","5885","6669","6770","6271","1326","1402","1435","2385",
-    "2408","2425","2426","2428","2448","2449","2451","2467","2488","2492",
-    "2496","2498","2501","2504","2506","2511","2515","2520","2522","2524",
-    "2528","2530","2535","2537","2542","2545","2548","2550","2551","2553",
-    "2555","2556","2558","2560","2561","2564","2566","2568","2569","2570",
-    "2597","2601","2603","2606","2609","2610","2611","2612","2615","2616",
-    "2618","2619","2622","2624","2626","2628","2630","2634","2636","2637",
-    "2639","2641","2642","2643","2645","2646","2649","2651","2652","2653",
-    "2656","2658","2659","2660","2662","2663","2664","2666","2668","2669",
-    "2670","2672","2673","2674","2675","2692","2694","2696","2706","2707",
-    "2712","2713","2716","2717","2718","2719","2720","2723","2724","2727",
-    "2729","2734","2736","2739","2740","2743","2745","2748","2753","2755",
-    "2756","2757","2758","2759","2762","2763","2764","2765","2766","2767",
+    "1101","2883","2892","5880","5876","2884","2885","2887","2890","2897",
+    "5884","5885","6669","6770","6271","1326","1402","1435","2385","2408",
+    "2425","2426","2428","2448","2449","2451","2467","2488","2492","2496",
+    "2498","2501","2504","2506","2511","2515","2520","2522","2524","2528",
+    "2530","2535","2537","2542","2545","2548","2550","2551","2553","2555",
+    "2556","2558","2560","2561","2564","2566","2568","2569","2570","2597",
+    "2601","2603","2606","2609","2610","2611","2612","2615","2616","2618",
+    "2619","2622","2624","2626","2628","2630","2634","2636","2637","2639",
+    "2641","2642","2643","2645","2646","2649","2651","2652","2653","2656",
+    "2658","2659","2660","2662","2663","2664","2666","2668","2669","2670",
+    "2672","2673","2674","2675","2692","2694","2696","2706","2707","2712",
 ]
-
-# ── Singapore SGX (.SI) ───────────────────────────────────────────────────────
 
 SG_TICKERS = [
     "D05","O39","U11","Z74","C6L","BN4","G13","C31","A17U","H78",
     "9CI","F34","U96","S68","V03","BS6","N2IU","BUOU","ME8U","AJBU",
     "T82U","K71U","SK6U","D01","F03","S58","P52","T39","S51","U14",
     "Y92","G07","H02","P15","Q5T","S07","B61","U77","L38","5E2",
-    "C52","V33","U96","H30","A7RU","CWBU","LREIT","ACV","S63","C09",
-    "J37","U09","5CP","D03","C07","S27","S11","E5H","BVA","A26",
-    "1D0","G92","P9D","RE4","5AB","T14","P8Z","578","G50","D06",
-    "558","5KD","40B","B28","C69","594","C6L","C77","C86","C87",
+    "C52","V33","H30","A7RU","CWBU","ACV","S63","C09","J37","U09",
+    "5CP","D03","C07","S27","S11","E5H","BVA","A26","1D0","G92",
+    "RE4","5AB","T14","P8Z","578","G50","D06","558","5KD","40B",
+    "B28","C69","594","C6L","C77","C86","C87","S63","C09","J37",
 ]
 
-# ── Australia ASX (.AX) ───────────────────────────────────────────────────────
-
 AU_TICKERS = [
-    # ASX 200 + ASX 300
     "BHP","CBA","CSL","ANZ","WBC","NAB","RIO","WES","WOW","MQG",
     "FMG","TLS","GMG","NCM","REA","ALL","COL","TCL","MIN","IEL",
     "APX","WDS","STO","ORG","AGL","QAN","CWY","APA","JHX","SHL",
     "XRO","CPU","QBE","SUN","IAG","AMP","MPL","NHF","ANN","BOQ",
     "BEN","FLT","HVN","JBH","MYR","SUL","KGN","TPW","NXT","CAR",
     "SEK","REH","IFT","DXS","SCG","ABP","CIP","GPT","CHC","LLC",
-    "CMW","ASX","WPR","NSR","URW","VGI","PAC","TNE","WTC","RMD",
-    "COH","PME","EBO","NAN","EDV","HLO","CTD","WEB","BKG","SYA",
-    "PLS","LKE","AKE","ILU","OZL","AWC","S32","WOR","SXY","BPT",
-    "KAR","WHC","BCI","IMD","NIC","FCL","ADT","AMI","ASB","ASG",
-    "ATS","CGF","CIA","CIN","CNB","CSR","DGL","DRO","DUI","DUR",
-    "DYL","EAR","EBR","EDE","EDG","EDL","EGL","EHE","EHX","ELT",
-    "EMN","EPW","ESUR","ETI","FDEV","FCSS","FERG","FGP","FPM","FRR",
-    "FSV","GBG","GCAP","GFS","GTD","ICG","IRE","JMS","KME","KSC",
-    "MGX","MLD","MML","MND","MOY","MPW","MSB","MVF","MYE","NMT",
-    "NZM","OBM","OCL","OFX","OGC","ORA","OSH","OVH","OZL","PAC",
-    "PAN","PBT","PDL","PGL","PGL","PID","PIQ","PLL","PMV","PNV",
+    "CMW","ASX","WPR","NSR","VGI","PAC","TNE","WTC","RMD","COH",
+    "PME","EBO","NAN","EDV","HLO","CTD","WEB","BKG","SYA","PLS",
+    "LKE","AKE","ILU","OZL","AWC","S32","WOR","SXY","BPT","KAR",
+    "WHC","BCI","IMD","NIC","FCL","ADT","AMI","ASB","ASG","ATS",
+    "CGF","CIA","CIN","CNB","CSR","DGL","DRO","DUI","DUR","DYL",
+    "EAR","EBR","EDE","EDG","EDL","EGL","EHE","EHX","ELT","EMN",
+    "EPW","ESUR","ETI","FDEV","FERG","FPM","FRR","FSV","GBG","GFS",
+    "ICG","IRE","JMS","KME","KSC","MGX","MLD","MML","MND","MOY",
+    "MSB","MVF","MYE","NMT","NZM","OBM","OCL","OFX","OGC","ORA",
 ]
 
-# ── United Kingdom LSE (.L) ───────────────────────────────────────────────────
-
 UK_TICKERS = [
-    # FTSE 100 + FTSE 250 selections
     "SHEL","AZN","HSBA","ULVR","BP","RIO","GSK","LSEG","BARC","LLOY",
     "BT-A","VOD","REL","PRU","NG","DGE","RKT","EXPN","STAN","GLEN",
     "IMB","BA","CNA","SDR","HIK","TSCO","CPG","INF","WPP","IAG",
@@ -315,46 +213,37 @@ UK_TICKERS = [
     "PAGE","PHNX","PSN","PTEC","RMV","RSA","RTO","SBRY","SGE","SMDS",
     "SMIN","SMT","SN","SPX","SSE","SXS","TW","UU","WEIR","WOS",
     "HWDN","ADM","AGK","AHT","AML","AV","AVV","BAB","BAES","BATS",
-    "BBH","BBY","BDEV","BEZ","BFG","BHPB","BKG","BNZL","BOY","BRBY",
-    "BRW","BTG","BVIC","BWY","CCR","CINE","CKN","CLLN","CNCT","COML",
-    "CYBG","DARK","DFS","DLAR","DLG","DMGT","DNO","DTG","ELM","EMG",
-    "FCIT","FDEV","FERG","FGP","GBG","GFS","GVC","HMSO","HSXL","HSBA",
-    "ICP","ICG","ITRK","ITV","JMAT","JUST","KIE","KWS","LRD","LSEG",
-    "MAN","MARS","MBH","MERL","MGNS","MGRC","MKS","MNZS","MONY","MXCT",
-    "NETW","NWSA","NWS","NXT","OCDO","OSB","OTC","PFC","PFG","PFP",
-    "PHNX","PHI","PHP","PIC","PLUS","PMO","POG","POL","POM","PSON",
-    "PZC","QQ","RBS","RCDO","RCH","RCP","RDW","REC","RKT","RMG",
-    "RNK","RSA","RSW","RTSC","RWA","SAB","SAGA","SBRY","SGE","SHB",
-    "SHOE","SHP","SIG","SKIP","SKY","SLNG","SMDS","SMT","SMUR","SN",
-    "SOLI","SPX","SQZ","SRC","SRG","SSE","SVB","SVT","SYGG","TCG",
+    "BBH","BBY","BDEV","BEZ","BFG","BKG","BNZL","BOY","BRBY","BRW",
+    "BTG","BVIC","BWY","CCR","CINE","CKN","CLLN","CNCT","COML","CYBG",
+    "DARK","DFS","DLAR","DLG","DMGT","DNO","DTG","ELM","EMG","FCIT",
+    "FDEV","FERG","FGP","GBG","GFS","GVC","HMSO","HSXL","ICP","ICG",
+    "ITRK","ITV","JMAT","JUST","KIE","KWS","LRD","MAN","MARS","MBH",
+    "MERL","MGNS","MGRC","MNZS","NETW","NWS","OSB","OTC","PFC","PFG",
+    "PFP","PHI","PHP","PIC","PLUS","PMO","POG","POL","POM","PSON",
+    "PZC","RBS","RCDO","RCH","RCP","RDW","REC","RMG","RNK","RSW",
+    "RTSC","RWA","SAB","SAGA","SHB","SHOE","SHP","SIG","SKIP","SKY",
+    "SLNG","SMUR","SOLI","SQZ","SRC","SRG","SVB","SVT","TCG","UU",
 ]
 
-# ── Germany XETRA (.DE) ───────────────────────────────────────────────────────
-
 DE_TICKERS = [
-    # DAX 40 + MDAX + SDAX selections
     "SAP","SIE","ALV","DTE","BAYN","BMW","BAS","ADS","VOW3","MRK",
     "MBG","DBK","EOAN","CON","RWE","HEI","FRE","MTX","ZAL","DHER",
     "QIA","PAH3","VNA","DPW","TUI1","LHA","1COV","AIR","CBK","ENR",
-    "EVD","FME","G1A","GBF","HLAG","HOT","INH","ITO","JUN3","LIN",
-    "MOR","MUV2","NMC","NWX","O2D","OHB","PSAN","RSTA","RTL","SANT",
-    "SD2","SHL","SIX2","SLT","SNH","SRT3","STO3","STR","SY1","SZG",
-    "TAG","TBO","TCH","TEG","TKA","TMR","UTDI","VBK","VIB3","VIF",
-    "VOS","WAF","WBH","WCH","WIN","WKS","WOR","WRM","WUW","XTP",
-    "AIXA","AFX","ARND","BCMN","BFSA","BNR","BPE","BST","CMBN","COBA",
-    "CP2","CWC","DBAN","DFVA","DIC","DMP","DPW","DRW3","DWNI","DWS",
-    "ECK","EDL","EIN3","ELGX","ELG","EVK","EVNK","EVO","EWE","EXS",
-    "FHZN","FNTN","FRST","FUN","GWI1","GXI","HAB","HAG","HAW","HBH",
-    "HDD","HDI","HFT","HKS","HLD","HMTX","HNR1","HOB","HOMX","HOT",
-    "HSI","HSS","HYQ","IDA","IFX","IKS","ILA","ILM","IMH","IML",
-    "IND","INF","INN","INS","INT","INV","IOF","IPH","IPN","IPS",
-    "IPW","IR","IRE","IRL","IRS","ISA","ISB","ISC","ISD","ISE",
+    "EVD","FME","G1A","GBF","HLAG","HOT","INH","ITO","LIN","MOR",
+    "MUV2","NMC","NWX","O2D","OHB","PSAN","RSTA","RTL","SANT","SD2",
+    "SHL","SIX2","SLT","SNH","SRT3","STO3","STR","SY1","SZG","TAG",
+    "TBO","TCH","TEG","TKA","TMR","UTDI","VBK","VIB3","VIF","VOS",
+    "WAF","WBH","WCH","WIN","WKS","WOR","WRM","WUW","XTP","AFX",
+    "ARND","BCMN","BNR","BPE","BST","CMBN","COBA","CP2","CWC","DBAN",
+    "DFVA","DIC","DMP","DRW3","DWNI","DWS","ECK","EDL","EIN3","EVK",
+    "EVNK","EVO","EWE","EXS","FHZN","FNTN","FRST","GWI1","GXI","HAB",
+    "HAG","HAW","HBH","HDD","HDI","HFT","HKS","HLD","HNR1","HOB",
+    "HOT","HSI","HSS","HYQ","IDA","IFX","IKS","ILA","ILM","IMH",
+    "IML","IND","INF","INN","INS","INT","INV","IOF","IPH","IPN",
+    "IPS","IPW","IR","IRE","IRL","IRS","ISA","ISB","ISC","ISD","ISE",
 ]
 
-# ── France Euronext Paris (.PA) ───────────────────────────────────────────────
-
 FR_TICKERS = [
-    # CAC 40 + SBF 120 + Euronext 150
     "MC","TTE","SAN","AI","BNP","OR","CS","EL","DG","CAP",
     "RI","SGO","ATO","VIE","BN","KER","ACA","GLE","SU","DSY",
     "RNO","STM","HO","LR","ML","PUB","FP","EN","TEP","AF",
@@ -369,13 +258,9 @@ FR_TICKERS = [
     "LRC","LSS","LYS","MAC","MAU","MBT","MDL","MDM","MDR","MELE",
     "MF","MGI","MKT","MLA","MLG","MMB","MMT","MMX","MND","MNG",
     "MNL","MNO","MNR","MOB","MOD","MOL","MOM","MON","MOP","MOR",
-    "MOU","MOV","MPF","MPH","MPM","MPR","MPS","MPX","MRK","MRL",
 ]
 
-# ── Switzerland SIX (.SW) ────────────────────────────────────────────────────
-
 CH_TICKERS = [
-    # SMI + SPI Mid selections
     "NESN","NOVN","ROG","ABB","ZURN","UBSG","LONN","SIKA","LHN","GIVN",
     "SLHN","SCMN","PGHN","CFR","TEMN","ALC","GEBN","ADEN","BARN","HOLN",
     "KNIN","LISP","NBEN","OFEN","AEBN","ALPN","BALN","BCGE","BCRN","BEKN",
@@ -386,16 +271,12 @@ CH_TICKERS = [
     "LUZN","MBTN","MGBN","MHGN","MIBN","MOBN","MOLN","MRON","MSBN","NABN",
     "OEBN","ORXN","PABN","PEHN","PKBN","PSPN","RAIN","RNSN","ROVN","RPXN",
     "RTRN","SABN","SAHN","SCHM","SFPN","SGSN","SLHN","SOON","SPBN","SRBN",
-    "SRCN","SSBN","SSRBN","STGN","STMN","SUNN","SXTN","SYBN","TEMN","TIBN",
-    "TIKN","TIMN","TKBN","TLSN","TMBN","TNBN","TNXN","TOBN","TOSN","TPHN",
-    "TQBN","TRBN","TSXN","TUBN","TULN","TVBN","TWAN","TWIN","TWRN","TXBN",
-    "TYBN","TZBN","UABN","UBBN","UBRN","UBSG","UCBN","UDBN","UEBN","UFBN",
+    "SRCN","SSBN","SSRBN","STGN","STMN","SUNN","SXTN","SYBN","TIBN","TIKN",
+    "TIMN","TKBN","TLSN","TMBN","TNBN","TNXN","TOBN","TOSN","TPHN","TQBN",
+    "TRBN","TSXN","TUBN","TULN","TVBN","TWAN","TWIN","TWRN","TXBN","TYBN",
 ]
 
-# ── Netherlands Euronext Amsterdam (.AS) ──────────────────────────────────────
-
 NL_TICKERS = [
-    # AEX + AMX + AScX
     "ASML","HEIA","PHIA","NN","ABN","AKZA","WKL","AD","RAND","INGA",
     "AGN","URW","BESI","IMCD","LIGHT","MT","OCI","TKWY","DSM","SBMO",
     "ADYEN","AEGON","ALFEN","BOKA","CEVA","CHEM","CMBN","CMB","CTAC",
@@ -405,14 +286,9 @@ NL_TICKERS = [
     "QIAGEN","REN","REPS","RTSA","SBM","SLIGR","SNCB","SNN","SSAB",
     "TNLV","TPGN","TWEKA","UNILNA","USG","VASTN","VIKAB","VINK","VOS",
     "VWS","WKL","WPP","WOLGA","AKZOA","AALB","ACER","ACOMO","ACSL","ACSM",
-    "ACSN","ACSR","ACST","ACSU","ACSV","ACSW","ACSX","ACSY","ACSZ","ACTA",
-    "ACTB","ACTC","ACTD","ACTE","ACTF","ACTG","ACTH","ACTI","ACTJ","ACTK",
 ]
 
-# ── Italy Borsa Italiana (.MI) ────────────────────────────────────────────────
-
 IT_TICKERS = [
-    # FTSE MIB + FTSE Italia Mid Cap
     "ENI","ENEL","ISP","UCG","TIT","LDO","RACE","STM","CPR","PRY",
     "G","BAMI","MB","BGN","SRG","A2A","AMP","BPSO","CNH","ATL",
     "AZIMUT","BMPS","BPE","BPM","BREM","BST","CEM","CIR","CMS","CNI",
@@ -426,14 +302,9 @@ IT_TICKERS = [
     "LUX","MCA","MCE","MCI","MCM","MCS","MED","MEL","MFB","MFE",
     "MGI","MGM","MHN","MKS","MLB","MLC","MLN","MNA","MNL","MOL",
     "MOM","MOR","MOS","MPC","MPN","MPR","MPS","MRD","MRC","MRF",
-    "MRG","MRM","MRP","MRR","MRS","MRT","MRU","MRV","MRW","MRX",
-    "MRY","MRZ","MSA","MSB","MSC","MSD","MSE","MSF","MSG","MSH",
 ]
 
-# ── Spain BME (.MC) ───────────────────────────────────────────────────────────
-
 ES_TICKERS = [
-    # IBEX 35 + Continuous Market
     "IBE","SAN","ITX","TEF","BBVA","BKT","REP","AENA","ACS","GRF",
     "FER","ELE","MEL","MAP","IDR","CIE","VIS","ACX","NTGY","MRL",
     "AMS","ALMAZ","ALNT","ANA","CABK","CLNX","COL","ENG","FDR","GCO",
@@ -444,14 +315,9 @@ ES_TICKERS = [
     "AMED","AMER","AMES","AMEX","AMF","AMG","AMH","AMI","AMIB","AMIG",
     "AMIJ","AMIK","AMIL","AMIN","AMINO","AMIO","AMIR","AMIS","AMIT","AMIU",
     "AML","AMLN","AMM","AMMO","AMN","AMNA","AMNO","AMNS","AMNT","AMNU",
-    "AMO","AMOB","AMOC","AMOD","AMOE","AMOF","AMOG","AMOH","AMOI","AMOJ",
-    "AMOK","AMOL","AMOM","AMON","AMOO","AMOP","AMOQ","AMOR","AMOS","AMOT",
 ]
 
-# ── Canada TSX (.TO) ─────────────────────────────────────────────────────────
-
 CA_TICKERS = [
-    # TSX 60 + S&P/TSX Composite additions
     "RY","TD","BNS","BMO","ENB","CNR","CP","BCE","SU","ABX",
     "MFC","SLF","TRI","ATD","CVE","MRU","WCN","AEM","SHOP","OTEX",
     "NTR","IMO","TRP","H","CM","POW","AQN","GWO","FFH","CNQ",
@@ -467,16 +333,9 @@ CA_TICKERS = [
     "FN","FNV","FOR","FRU","FSV","FTT","FVI","G","GC","GDI",
     "GEO","GFI","GGD","GIL","GIW","GKO","GLD","GMP","GNE","GO",
     "GOM","GRT","GS","GSS","GSX","GT","GTE","GWR","HBC","HBM",
-    "HDI","HDY","HEM","HGU","HHC","HII","HLF","HOD","HOM","HPS",
-    "HRX","HSE","HSM","HUG","HUL","HXT","IAG","IFC","IFP","IGM",
-    "IMAX","IMO","INE","INO","IOF","IPC","IPL","IRM","ISO","ISV",
-    "ITH","IVQ","IXS","JAA","JE","JFS","JOY","K","KMP","KXS",
 ]
 
-# ── Brazil B3 (.SA) ──────────────────────────────────────────────────────────
-
 BR_TICKERS = [
-    # Ibovespa + B3 listings
     "PETR4","VALE3","ITUB4","BBDC4","BBAS3","ABEV3","WEGE3","RENT3","LREN3","SUZB3",
     "RAIL3","GGBR4","UGPA3","CSAN3","B3SA3","RADL3","ELET3","SBSP3","TOTS3","EMBR3",
     "VBBR3","KLBN11","CCRO3","EQTL3","BRFS3","JBSS3","MRFG3","SLCE3","SMTO3","AGRO3",
@@ -489,14 +348,10 @@ BR_TICKERS = [
     "GFSA3","DIRR3","TPVT3","MELK3","PDGR3","LAVV3","PMAM3","ETER3","CSNA3","CBAV3",
     "USIM5","GOAU4","FESA4","BRAP4","ROMI3","MAPT3","TGMA3","KEPL3","PRIO3","RECV3",
     "RRRP3","CMIN3","BRAV3","PTBL3","PPLA3","SEQL3","BMOB3","CASH3","DOTZ3","INTB3",
-    "LIQO3","MELI3","PAGS3","TOTVS3","XPBR31","AFLT3","AGXY3","ALOS3","ALPA4","ALSO3",
-    "AMAR3","AMBP3","ANIM3","APER3","ARCO","AREZZO3","ATMP3","ATNT4","ATSA3","ATOM3",
+    "LIQO3","ARCO","AREZZO3","ATMP3","ATNT4","AMAR3","AMBP3","ANIM3","APER3","ATSA3",
 ]
 
-# ── Saudi Arabia Tadawul (.SR) ────────────────────────────────────────────────
-
 SA_TICKERS = [
-    # Tadawul All Share + TASI constituents
     "2222","1120","2010","1180","2350","4030","1050","2380","2330","1010",
     "1211","2020","2080","4280","8010","4200","4070","3020","2170","1030",
     "2060","1150","2280","2090","1301","4140","4001","2140","3007","2290",
@@ -509,12 +364,7 @@ SA_TICKERS = [
     "4002","4003","4008","4009","4011","4013","4020","4031","4040","4050",
     "4060","4080","4090","4100","4120","4130","4160","4170","4180","4190",
     "4210","4220","4230","4250","4260","4270","4290","4310","4330","4340",
-    "4350","4360","4370","6070","6080","6090","7010","7020","7030","7040",
-    "7200","8030","8040","8050","8060","8070","8080","8090","8100","8110",
-    "8120","8130","8150","8160","8170","8180","8190","8200","8210","8220",
 ]
-
-# ── UAE ADX / DFM (.AE) ───────────────────────────────────────────────────────
 
 AE_TICKERS = [
     "FAB","ADCB","ADNOC","ADNOCDIST","ALDAR","EMAAR","DIB","ENBD",
@@ -528,9 +378,9 @@ AE_TICKERS = [
 
 # ── Market registry ────────────────────────────────────────────────────────────
 
-MARKETS_STATIC = {
-    "IN":  {"name": "India",           "exchange": "NSE/BSE",             "suffix": None,  "tickers": []},  # from CSV
-    "US":  {"name": "United States",   "exchange": "NYSE/NASDAQ/AMEX",    "suffix": "",    "tickers": US_TICKERS},
+MARKETS = {
+    "IN":  {"name": "India",           "exchange": "NSE/BSE",             "suffix": None,  "tickers": []},
+    "US":  {"name": "United States",   "exchange": "NYSE/NASDAQ/AMEX",    "suffix": "",    "tickers": []},
     "JP":  {"name": "Japan",           "exchange": "TSE",                 "suffix": ".T",  "tickers": JP_TICKERS},
     "CN":  {"name": "China",           "exchange": "SSE+SZSE",            "suffix": ".SS", "tickers": CN_SS_TICKERS,
             "extra": {"suffix": ".SZ", "tickers": CN_SZ_TICKERS}},
@@ -553,7 +403,7 @@ MARKETS_STATIC = {
 }
 
 
-def _dedup(lst: list) -> list:
+def _dedup(lst):
     seen = set()
     return [x for x in lst if not (x in seen or seen.add(x))]
 
@@ -561,38 +411,41 @@ def _dedup(lst: list) -> list:
 def build_universe() -> dict:
     universe = {}
 
-    # India from CSV
-    india_yf = _load_india_csv()
+    # IN — from CSV
+    india = _load_india()
     universe["IN"] = {
-        "name": "India",
-        "exchange": "NSE/BSE",
-        "yf_symbols": _dedup(india_yf),
-        "count": len(_dedup(india_yf)),
+        "name": "India", "exchange": "NSE/BSE",
+        "yf_symbols": india, "count": len(india),
         "source": "india_tickers_full.csv",
     }
-    print(f"  IN  : {universe['IN']['count']:>5} symbols (CSV)")
+    print(f"  IN  : {len(india):>6,}")
 
-    for code, meta in MARKETS_STATIC.items():
-        if code == "IN":
+    # US — from downloaded JSON (6,758 tickers)
+    us = _load_us()
+    universe["US"] = {
+        "name": "United States", "exchange": "NYSE/NASDAQ/AMEX",
+        "yf_symbols": us, "count": len(us),
+        "source": "rreichel3/US-Stock-Symbols (NASDAQ+NYSE+AMEX)",
+    }
+    print(f"  US  : {len(us):>6,}")
+
+    # All other markets
+    for code, meta in MARKETS.items():
+        if code in ("IN", "US"):
             continue
         sfx = meta.get("suffix", "")
         tickers = _dedup(meta["tickers"])
         yf_syms = [f"{t}{sfx}" for t in tickers]
-
         if "extra" in meta:
             ex = meta["extra"]
-            ex_sfx = ex.get("suffix", "")
-            yf_syms += [f"{t}{ex_sfx}" for t in _dedup(ex["tickers"])]
-
+            yf_syms += [f"{t}{ex['suffix']}" for t in _dedup(ex["tickers"])]
         yf_syms = _dedup(yf_syms)
         universe[code] = {
-            "name": meta["name"],
-            "exchange": meta["exchange"],
-            "yf_symbols": yf_syms,
-            "count": len(yf_syms),
+            "name": meta["name"], "exchange": meta["exchange"],
+            "yf_symbols": yf_syms, "count": len(yf_syms),
             "source": "static",
         }
-        print(f"  {code:<4}: {len(yf_syms):>5} symbols")
+        print(f"  {code:<4}: {len(yf_syms):>6,}")
 
     return universe
 
@@ -612,14 +465,9 @@ def save_universe(universe: dict) -> None:
                 w.writerow([code, meta["name"], meta["exchange"], sym])
                 total += 1
 
-    print(f"\nSaved {out_json.name}  and  {out_csv.name}  ({total} total rows)")
-    print("\nMarket summary:")
-    grand = 0
-    for code, meta in universe.items():
-        n = meta["count"]
-        grand += n
-        print(f"  {code:<4}  {meta['name']:<32}  {n:>5}")
-    print(f"\n  TOTAL  20 markets  {grand:>5}")
+    print(f"\nSaved {out_json.name}  +  {out_csv.name}  ({total:,} rows)")
+    grand = sum(m["count"] for m in universe.values())
+    print(f"Grand total: {grand:,} tickers across {len(universe)} markets")
 
 
 if __name__ == "__main__":

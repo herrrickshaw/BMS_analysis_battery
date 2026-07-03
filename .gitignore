@@ -5,6 +5,7 @@ __pycache__/
 nse_bse_data/
 *.json
 !package.json
+!data/global_universe.json
 
 # NSE/BSE extractor runtime artifacts
 *.log

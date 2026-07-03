@@ -6,6 +6,8 @@ Builds data/global_universe.json from the best available sources:
   - US  : data/us_tickers_full.json    (7,726 NYSE+NASDAQ+AMEX)
   - JP  : data/jp_tickers_full.json    (3,566 TSE stocks from symbols_cache)
   - KR  : data/kr_tickers_full.json    (2,606 KOSPI+KOSDAQ from symbols_cache)
+  - AU  : data/au_tickers_full.json    (1,834 ASX stocks from official ASX directory)
+  - CN  : data/cn_sse_tickers_full.json (1,856 SSE securities) + static SZSE fallback
   - Others: static verified index constituents (expand by adding to each list below)
 
 Run:
@@ -78,6 +80,28 @@ def _load_kr() -> list[str]:
             data = json.load(f)
         return _dedup([t["yf_ticker"] for t in data])
     return [f"{t}.KS" for t in KR_TICKERS]
+
+
+# ── Australia ──────────────────────────────────────────────────────────────────
+
+def _load_au() -> list[str]:
+    path = DATA / "au_tickers_full.json"
+    if path.exists():
+        with open(path) as f:
+            data = json.load(f)
+        return _dedup([t["yf_ticker"] for t in data])
+    return [f"{t}.AX" for t in AU_TICKERS]
+
+
+# ── China (SSE) ────────────────────────────────────────────────────────────────
+
+def _load_cn_sse() -> list[str]:
+    path = DATA / "cn_sse_tickers_full.json"
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return _dedup([t["yf_ticker"] for t in data])
+    return [f"{t}.SS" for t in CN_SS_TICKERS]
 
 
 # ── Static lists for other markets ────────────────────────────────────────────
@@ -470,9 +494,29 @@ def build_universe() -> dict:
     }
     print(f"  KR  : {len(kr):>6,}")
 
+    # AU — from official ASX directory (1,834 tickers)
+    au = _load_au()
+    universe["AU"] = {
+        "name": "Australia", "exchange": "ASX",
+        "yf_symbols": au, "count": len(au),
+        "source": "au_tickers_full.json (ASX official directory)",
+    }
+    print(f"  AU  : {len(au):>6,}")
+
+    # CN — SSE from official list + static SZSE
+    cn_ss = _load_cn_sse()
+    cn_sz = [f"{t}.SZ" for t in _dedup(CN_SZ_TICKERS)]
+    cn = _dedup(cn_ss + cn_sz)
+    universe["CN"] = {
+        "name": "China", "exchange": "SSE+SZSE",
+        "yf_symbols": cn, "count": len(cn),
+        "source": "cn_sse_tickers_full.json (SSE official) + static SZSE",
+    }
+    print(f"  CN  : {len(cn):>6,}")
+
     # All other markets (static lists)
     for code, meta in MARKETS.items():
-        if code in ("IN", "US", "JP", "KR"):
+        if code in ("IN", "US", "JP", "KR", "AU", "CN"):
             continue
         sfx = meta.get("suffix", "")
         tickers = _dedup(meta["tickers"])

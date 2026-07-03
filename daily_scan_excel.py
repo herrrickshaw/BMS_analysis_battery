@@ -437,8 +437,57 @@ def load_or_generate_data(data_dir: str, use_mock: bool) -> pd.DataFrame:
 
         print("[DATA] Live fetch returned no data (network blocked). Falling back to sample data.")
 
-    # ── 3. Sample fallback ───────────────────────────────────
+    # ── 3. Parquet cache (Git LFS checkout or local Downloads) ──
+    if not use_mock:
+        try:
+            from market_data_cache import load_nifty_stocks_from_cache, MarketCache
+            cache = MarketCache(verbose=False)
+            avail = cache.available_symbols()
+            if avail:
+                print(f"[DATA] Loading {len(avail)} symbols from parquet cache (LFS)…")
+                cache_df = load_nifty_stocks_from_cache(verbose=True)
+                if not cache_df.empty:
+                    # Merge cache technicals into sample fundamentals where symbol matches
+                    sample_df = _build_sample_df()
+                    merged = sample_df.merge(
+                        cache_df[["symbol","last_price","rsi_14","macd","volume_ratio",
+                                  "pct_above_50dma","pct_above_200dma","pct_from_52w_high",
+                                  "ret_1m","ret_3m","ret_6m","week52_high","week52_low",
+                                  "ma50","ma200"]],
+                        on="symbol", how="left", suffixes=("", "_cache")
+                    )
+                    # Override sample price + technicals with cache values where available
+                    for col in ("last_price","rsi_14","macd","volume_ratio",
+                                "pct_above_50dma","pct_above_200dma","pct_from_52w_high",
+                                "ret_1m","ret_3m","ret_6m"):
+                        cache_col = f"{col}_cache"
+                        if cache_col in merged.columns:
+                            mask = merged[cache_col].notna()
+                            merged.loc[mask, col] = merged.loc[mask, cache_col]
+                            merged.drop(columns=[cache_col], inplace=True, errors="ignore")
+                    for pair in (("week52_high","w52_high"),("week52_low","w52_low"),
+                                 ("ma50","ma_50"),("ma200","ma_200")):
+                        cache_col, orig_col = pair
+                        if cache_col in merged.columns:
+                            mask = merged[cache_col].notna()
+                            merged.loc[mask, orig_col] = merged.loc[mask, cache_col]
+                            merged.drop(columns=[cache_col], inplace=True, errors="ignore")
+                    merged["fetch_date"] = TODAY
+                    merged["data_source"] = "parquet_cache"
+                    print(f"[DATA] Parquet cache enriched {mask.sum()} of {len(merged)} stocks")
+                    return merged
+        except ImportError:
+            pass
+        except Exception as e:
+            print(f"[DATA] Parquet cache error: {e}")
+
+    # ── 4. Sample fallback ───────────────────────────────────
     print("[DATA] Using representative NIFTY500 sample data (--mock or no network)")
+    return _build_sample_df()
+
+
+def _build_sample_df() -> pd.DataFrame:
+    """Build the representative sample DataFrame from _SAMPLE_STOCKS."""
     rows = []
     for row in _SAMPLE_STOCKS:
         d = dict(zip(COLUMNS, row))
@@ -464,6 +513,7 @@ def load_or_generate_data(data_dir: str, use_mock: bool) -> pd.DataFrame:
     df["pct_from_52w_high"]= ((df["last_price"] / df["w52_high"] - 1) * 100).round(2)
     df["upside_pct"]       = ((df["target_price"] / df["last_price"] - 1) * 100).round(2)
     df["fetch_date"]       = TODAY
+    df["data_source"]      = "sample"
     return df
 
 

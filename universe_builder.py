@@ -8,6 +8,7 @@ Builds data/global_universe.json from the best available sources:
   - KR  : data/kr_tickers_full.json    (2,606 KOSPI+KOSDAQ from symbols_cache)
   - AU  : data/au_tickers_full.json    (1,834 ASX stocks from official ASX directory)
   - CN  : data/cn_sse_tickers_full.json (1,856 SSE securities) + static SZSE fallback
+  - SG  : data/sg_tickers_full.json    (171 SGX securities from full-market scan)
   - Others: static verified index constituents (expand by adding to each list below)
 
 Run:
@@ -91,6 +92,17 @@ def _load_au() -> list[str]:
             data = json.load(f)
         return _dedup([t["yf_ticker"] for t in data])
     return [f"{t}.AX" for t in AU_TICKERS]
+
+
+# ── Singapore ─────────────────────────────────────────────────────────────────
+
+def _load_sg() -> list[str]:
+    path = DATA / "sg_tickers_full.json"
+    if path.exists():
+        with open(path) as f:
+            data = json.load(f)
+        return _dedup([t["yf_ticker"] for t in data])
+    return [f"{t}.SI" for t in SG_TICKERS]
 
 
 # ── China (SSE) ────────────────────────────────────────────────────────────────
@@ -503,6 +515,15 @@ def build_universe() -> dict:
     }
     print(f"  AU  : {len(au):>6,}")
 
+    # SG — from full SGX scan (171 securities)
+    sg = _load_sg()
+    universe["SG"] = {
+        "name": "Singapore", "exchange": "SGX",
+        "yf_symbols": sg, "count": len(sg),
+        "source": "sg_tickers_full.json (SGX full scan, June 2026)",
+    }
+    print(f"  SG  : {len(sg):>6,}")
+
     # CN — SSE from official list + static SZSE
     cn_ss = _load_cn_sse()
     cn_sz = [f"{t}.SZ" for t in _dedup(CN_SZ_TICKERS)]
@@ -516,7 +537,7 @@ def build_universe() -> dict:
 
     # All other markets (static lists)
     for code, meta in MARKETS.items():
-        if code in ("IN", "US", "JP", "KR", "AU", "CN"):
+        if code in ("IN", "US", "JP", "KR", "AU", "CN", "SG"):
             continue
         sfx = meta.get("suffix", "")
         tickers = _dedup(meta["tickers"])

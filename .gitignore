@@ -11,6 +11,7 @@ nse_bse_data/
 !data/kr_tickers_full.json
 !data/au_tickers_full.json
 !data/cn_sse_tickers_full.json
+!data/sg_tickers_full.json
 
 # NSE/BSE extractor runtime artifacts
 *.log

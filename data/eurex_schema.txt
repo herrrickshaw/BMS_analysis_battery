@@ -1,0 +1,18 @@
+[Eurex GraphQL] Available API fields (introspection)...
+
+  Query                          Description
+  ────────────────────────────────────────────────────────────
+  VendorCodes                    VendorCodes query provides vendor specif
+  TESProfiles                    TESProfiles query provides information a
+  Contracts                      Contracts query provides basic informati
+  DeliverableBonds               The table provides essential data on the
+  Enlight                        Enlight query provides product configura
+  EnlightResponders              EnlightResponders query provides list of
+  Holidays                       Holidays query provides product specific
+  ProductInfos                   ProductInfos query provides basic inform
+  Changelog                      Changelog query provides an overview of 
+  TickRules                      TickRules query provides information abo
+  TradingHours                   TradingHours query provides information 
+  Expirations                    Expirations query provides expirations i
+  FlexibleContracts              Table provides an overview of all contra
+  SettlementPrices               The table provides a set of settlement p

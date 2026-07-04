@@ -63,5 +63,4 @@ jobs:
           git add -f data/movers/ news_analysis/
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "chore: update market movers and news analysis [skip ci]"
-          git pull --rebase --autostash origin claude/event-driven-stock-news-msv0cq
           git push origin claude/event-driven-stock-news-msv0cq

@@ -1,0 +1,59 @@
+name: Market Movers & News
+
+on:
+  schedule:
+    # India (NSE) close: 10:30 UTC = 4:00 PM IST
+    - cron: '30 10 * * 1-5'
+    # US (NYSE/NASDAQ) close: 21:30 UTC = 4:30 PM ET (summer/EDT)
+    - cron: '30 21 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      markets:
+        description: 'Markets to fetch (india,us or all)'
+        default: 'all'
+        required: false
+      top:
+        description: 'Top N movers'
+        default: '10'
+        required: false
+
+jobs:
+  fetch-movers:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/event-driven-stock-news-msv0cq
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install yfinance requests pandas
+
+      - name: Fetch movers and news
+        env:
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          MARKETS:     ${{ github.event.inputs.markets || 'all' }}
+          TOP_N:       ${{ github.event.inputs.top || '10' }}
+        run: |
+          python3 scripts/market_movers_news.py \
+            --markets "$MARKETS" \
+            --top "$TOP_N" \
+            --news 5 \
+            --output data/movers/movers_news.json \
+            --split
+
+      - name: Commit results
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/movers/
+          git diff --cached --quiet || \
+            git commit -m "chore: update market movers [skip ci]" && \
+            git push

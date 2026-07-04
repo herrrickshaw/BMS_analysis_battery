@@ -1,0 +1,772 @@
+[
+  {
+    "yf_ticker": "ABG.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "AFX.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "AGL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "AMS.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "BAW.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "BHP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "BID.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "BTI.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CPI.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "DRD.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "DSY.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "EMI.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "EXX.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "FSR.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GRT.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HAR.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HYP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "IMP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "INL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "KIO.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "LHC.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "MCG.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "MEI.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "MNP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "MRP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "MTN.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "NED.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "NPH.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "NPN.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "NTC.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "PIK.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "PPH.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "PSG.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "RDF.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "REM.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "RMH.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "SAB.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "SBK.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "SGL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "SHP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "SNH.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "SOL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "SPP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "TFG.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "TKG.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "VOD.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "WBO.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "WHL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "APN.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ANG.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "BIL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "BVT.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CFR.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CLS.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GFI.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "INP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "PRX.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ACL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "AEL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "AFE.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "AGM.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "AIP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "AKR.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ALT.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ANH.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ANS.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "APF.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ARI.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ARN.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ART.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ATT.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "AUI.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "AVL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "AXL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "BAT.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "BCX.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "BLU.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "BSR.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "BTH.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CAT.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CCO.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CEL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CFP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CHP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CMH.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CNL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "COH.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CRI.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CSB.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "CTA.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "DCP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "DET.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "DFM.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "DIS.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "DNG.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "DON.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "DRW.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "DSR.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ECO.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "EDI.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "EHP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "EIA.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ELD.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "EOH.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "EPP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "EPW.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "EQS.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ESR.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ETB.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ETI.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "FBR.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "FDG.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "FFA.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "FIF.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "FPT.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "FRE.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "FTH.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GAP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GDO.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GFO.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GIL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GKF.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GLN.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GLO.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GND.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GOL.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GRF.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GRP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GRO.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GRV.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GRM.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "GSH.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HAN.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HCI.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HDC.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HET.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HFT.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HLM.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HMN.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HPB.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HUG.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "HWN.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "IAP.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ICT.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "IDQ.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "IHS.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ILV.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "INA.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "IPF.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "IRE.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "ITU.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "IVT.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "IYG.JO",
+    "name": "",
+    "exchange": "JSE"
+  },
+  {
+    "yf_ticker": "JSE.JO",
+    "name": "",
+    "exchange": "JSE"
+  }
+]

@@ -1,0 +1,2502 @@
+[
+  {
+    "yf_ticker": "000001.SZ",
+    "name": "平安银行",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000002.SZ",
+    "name": "万  科Ａ",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000009.SZ",
+    "name": "中国宝安",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000021.SZ",
+    "name": "深科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000027.SZ",
+    "name": "深圳能源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000028.SZ",
+    "name": "国药一致",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000032.SZ",
+    "name": "深桑达Ａ",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000034.SZ",
+    "name": "神州数码",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000035.SZ",
+    "name": "中国天楹",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000039.SZ",
+    "name": "中集集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000050.SZ",
+    "name": "深天马Ａ",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000060.SZ",
+    "name": "中金岭南",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000062.SZ",
+    "name": "深圳华强",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000063.SZ",
+    "name": "中兴通讯",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000066.SZ",
+    "name": "中国长城",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000069.SZ",
+    "name": "华侨城Ａ",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000088.SZ",
+    "name": "盐 田 港",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000089.SZ",
+    "name": "深圳机场",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000099.SZ",
+    "name": "中信海直",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000100.SZ",
+    "name": "TCL科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000155.SZ",
+    "name": "川能动力",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000156.SZ",
+    "name": "华数传媒",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000157.SZ",
+    "name": "中联重科",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000166.SZ",
+    "name": "申万宏源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000301.SZ",
+    "name": "东方盛虹",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000333.SZ",
+    "name": "美的集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000338.SZ",
+    "name": "潍柴动力",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000400.SZ",
+    "name": "许继电气",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000401.SZ",
+    "name": "金隅冀东",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000403.SZ",
+    "name": "派林生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000408.SZ",
+    "name": "藏格矿业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000415.SZ",
+    "name": "渤海租赁",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000422.SZ",
+    "name": "湖北宜化",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000423.SZ",
+    "name": "东阿阿胶",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000425.SZ",
+    "name": "徐工机械",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000426.SZ",
+    "name": "兴业银锡",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000429.SZ",
+    "name": "粤高速Ａ",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000513.SZ",
+    "name": "丽珠集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000519.SZ",
+    "name": "中兵红箭",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000528.SZ",
+    "name": "柳    工",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000537.SZ",
+    "name": "中绿电",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000538.SZ",
+    "name": "云南白药",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000539.SZ",
+    "name": "粤电力Ａ",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000543.SZ",
+    "name": "皖能电力",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000547.SZ",
+    "name": "航天发展",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000552.SZ",
+    "name": "甘肃能化",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000555.SZ",
+    "name": "神州信息",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000559.SZ",
+    "name": "万向钱潮",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000563.SZ",
+    "name": "陕国投Ａ",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000567.SZ",
+    "name": "海德股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000568.SZ",
+    "name": "泸州老窖",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000581.SZ",
+    "name": "威孚高科",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000582.SZ",
+    "name": "北部湾港",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000591.SZ",
+    "name": "太阳能",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000596.SZ",
+    "name": "古井贡酒",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000598.SZ",
+    "name": "兴蓉环境",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000617.SZ",
+    "name": "中油资本",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000623.SZ",
+    "name": "吉林敖东",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000625.SZ",
+    "name": "长安汽车",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000628.SZ",
+    "name": "高新发展",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000629.SZ",
+    "name": "钒钛股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000630.SZ",
+    "name": "铜陵有色",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000636.SZ",
+    "name": "风华高科",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000651.SZ",
+    "name": "格力电器",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000657.SZ",
+    "name": "中钨高新",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000661.SZ",
+    "name": "长春高新",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000682.SZ",
+    "name": "东方电子",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000683.SZ",
+    "name": "博源化工",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000686.SZ",
+    "name": "东北证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000688.SZ",
+    "name": "国城矿业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000703.SZ",
+    "name": "恒逸石化",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000708.SZ",
+    "name": "中信特钢",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000709.SZ",
+    "name": "河钢股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000723.SZ",
+    "name": "美锦能源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000725.SZ",
+    "name": "京东方Ａ",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000728.SZ",
+    "name": "国元证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000729.SZ",
+    "name": "燕京啤酒",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000733.SZ",
+    "name": "振华科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000737.SZ",
+    "name": "北方铜业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000738.SZ",
+    "name": "航发控制",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000739.SZ",
+    "name": "普洛药业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000750.SZ",
+    "name": "国海证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000762.SZ",
+    "name": "西藏矿业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000766.SZ",
+    "name": "通化金马",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000768.SZ",
+    "name": "中航西飞",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000776.SZ",
+    "name": "广发证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000778.SZ",
+    "name": "新兴铸管",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000783.SZ",
+    "name": "长江证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000785.SZ",
+    "name": "居然智家",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000786.SZ",
+    "name": "北新建材",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000791.SZ",
+    "name": "甘肃能源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000792.SZ",
+    "name": "盐湖股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000799.SZ",
+    "name": "酒鬼酒",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000800.SZ",
+    "name": "一汽解放",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000801.SZ",
+    "name": "四川九洲",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000807.SZ",
+    "name": "云铝股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000810.SZ",
+    "name": "创维数字",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000818.SZ",
+    "name": "航锦科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000825.SZ",
+    "name": "太钢不锈",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000830.SZ",
+    "name": "鲁西化工",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000831.SZ",
+    "name": "中国稀土",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000858.SZ",
+    "name": "五 粮 液",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000875.SZ",
+    "name": "吉电股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000876.SZ",
+    "name": "新 希 望",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000877.SZ",
+    "name": "天山股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000878.SZ",
+    "name": "云南铜业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000883.SZ",
+    "name": "湖北能源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000887.SZ",
+    "name": "中鼎股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000893.SZ",
+    "name": "亚钾国际",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000895.SZ",
+    "name": "双汇发展",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000898.SZ",
+    "name": "鞍钢股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000902.SZ",
+    "name": "新洋丰",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000921.SZ",
+    "name": "海信家电",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000927.SZ",
+    "name": "中国铁物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000932.SZ",
+    "name": "华菱钢铁",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000933.SZ",
+    "name": "神火股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000935.SZ",
+    "name": "四川双马",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000937.SZ",
+    "name": "冀中能源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000938.SZ",
+    "name": "紫光股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000951.SZ",
+    "name": "中国重汽",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000958.SZ",
+    "name": "电投产融",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000959.SZ",
+    "name": "首钢股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000960.SZ",
+    "name": "锡业股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000963.SZ",
+    "name": "华东医药",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000966.SZ",
+    "name": "长源电力",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000967.SZ",
+    "name": "盈峰环境",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000970.SZ",
+    "name": "中科三环",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000975.SZ",
+    "name": "山金国际",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000977.SZ",
+    "name": "浪潮信息",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000983.SZ",
+    "name": "山西焦煤",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000987.SZ",
+    "name": "越秀资本",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000988.SZ",
+    "name": "华工科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000997.SZ",
+    "name": "新 大 陆",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000998.SZ",
+    "name": "隆平高科",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "000999.SZ",
+    "name": "华润三九",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001203.SZ",
+    "name": "大中矿业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001213.SZ",
+    "name": "中铁特货",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001227.SZ",
+    "name": "兰州银行",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001286.SZ",
+    "name": "陕西能源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001287.SZ",
+    "name": "中电港",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001289.SZ",
+    "name": "龙源电力",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001308.SZ",
+    "name": "康冠科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001389.SZ",
+    "name": "广合科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001696.SZ",
+    "name": "宗申动力",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001872.SZ",
+    "name": "招商港口",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001914.SZ",
+    "name": "招商积余",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001965.SZ",
+    "name": "招商公路",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "001979.SZ",
+    "name": "招商蛇口",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002001.SZ",
+    "name": "新 和 成",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002003.SZ",
+    "name": "伟星股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002007.SZ",
+    "name": "华兰生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002008.SZ",
+    "name": "大族激光",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002010.SZ",
+    "name": "传化智联",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002015.SZ",
+    "name": "协鑫能科",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002019.SZ",
+    "name": "亿帆医药",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002025.SZ",
+    "name": "航天电器",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002027.SZ",
+    "name": "分众传媒",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002028.SZ",
+    "name": "思源电气",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002032.SZ",
+    "name": "苏 泊 尔",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002044.SZ",
+    "name": "美年健康",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002048.SZ",
+    "name": "宁波华翔",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002049.SZ",
+    "name": "紫光国微",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002050.SZ",
+    "name": "三花智控",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002056.SZ",
+    "name": "横店东磁",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002060.SZ",
+    "name": "广东建工",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002064.SZ",
+    "name": "华峰化学",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002065.SZ",
+    "name": "东华软件",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002074.SZ",
+    "name": "国轩高科",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002078.SZ",
+    "name": "太阳纸业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002080.SZ",
+    "name": "中材科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002085.SZ",
+    "name": "万丰奥威",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002091.SZ",
+    "name": "江苏国泰",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002096.SZ",
+    "name": "易普力",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002120.SZ",
+    "name": "韵达股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002126.SZ",
+    "name": "银轮股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002128.SZ",
+    "name": "电投能源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002129.SZ",
+    "name": "TCL中环",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002131.SZ",
+    "name": "利欧股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002138.SZ",
+    "name": "顺络电子",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002139.SZ",
+    "name": "拓邦股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002142.SZ",
+    "name": "宁波银行",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002145.SZ",
+    "name": "钛能化学",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002151.SZ",
+    "name": "北斗星通",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002152.SZ",
+    "name": "广电运通",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002153.SZ",
+    "name": "石基信息",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002155.SZ",
+    "name": "湖南黄金",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002156.SZ",
+    "name": "通富微电",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002157.SZ",
+    "name": "正邦科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002176.SZ",
+    "name": "江特电机",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002179.SZ",
+    "name": "中航光电",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002180.SZ",
+    "name": "纳思达",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002183.SZ",
+    "name": "怡 亚 通",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002185.SZ",
+    "name": "华天科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002195.SZ",
+    "name": "岩山科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002202.SZ",
+    "name": "金风科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002203.SZ",
+    "name": "海亮股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002221.SZ",
+    "name": "东华能源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002222.SZ",
+    "name": "福晶科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002223.SZ",
+    "name": "鱼跃医疗",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002230.SZ",
+    "name": "科大讯飞",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002236.SZ",
+    "name": "大华股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002237.SZ",
+    "name": "恒邦股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002240.SZ",
+    "name": "盛新锂能",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002241.SZ",
+    "name": "歌尔股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002244.SZ",
+    "name": "滨江集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002245.SZ",
+    "name": "蔚蓝锂芯",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002249.SZ",
+    "name": "大洋电机",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002252.SZ",
+    "name": "上海莱士",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002262.SZ",
+    "name": "恩华药业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002265.SZ",
+    "name": "建设工业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002266.SZ",
+    "name": "浙富控股",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002268.SZ",
+    "name": "电科网安",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002270.SZ",
+    "name": "华明装备",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002271.SZ",
+    "name": "东方雨虹",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002273.SZ",
+    "name": "水晶光电",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002281.SZ",
+    "name": "光迅科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002294.SZ",
+    "name": "信立泰",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002299.SZ",
+    "name": "圣农发展",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002304.SZ",
+    "name": "洋河股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002311.SZ",
+    "name": "海大集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002312.SZ",
+    "name": "川发龙蟒",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002318.SZ",
+    "name": "久立特材",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002320.SZ",
+    "name": "海峡股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002335.SZ",
+    "name": "科华数据",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002340.SZ",
+    "name": "格林美",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002352.SZ",
+    "name": "顺丰控股",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002353.SZ",
+    "name": "杰瑞股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002368.SZ",
+    "name": "太极股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002371.SZ",
+    "name": "北方华创",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002372.SZ",
+    "name": "伟星新材",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002373.SZ",
+    "name": "千方科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002384.SZ",
+    "name": "东山精密",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002385.SZ",
+    "name": "大北农",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002389.SZ",
+    "name": "航天彩虹",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002402.SZ",
+    "name": "和而泰",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002405.SZ",
+    "name": "四维图新",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002407.SZ",
+    "name": "多氟多",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002408.SZ",
+    "name": "齐翔腾达",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002409.SZ",
+    "name": "雅克科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002410.SZ",
+    "name": "广联达",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002414.SZ",
+    "name": "高德红外",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002415.SZ",
+    "name": "海康威视",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002416.SZ",
+    "name": "爱施德",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002422.SZ",
+    "name": "科伦药业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002423.SZ",
+    "name": "中粮资本",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002429.SZ",
+    "name": "兆驰股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002430.SZ",
+    "name": "杭氧股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002432.SZ",
+    "name": "九安医疗",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002436.SZ",
+    "name": "兴森科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002439.SZ",
+    "name": "启明星辰",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002444.SZ",
+    "name": "巨星科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002456.SZ",
+    "name": "欧菲光",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002459.SZ",
+    "name": "晶澳科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002460.SZ",
+    "name": "赣锋锂业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002461.SZ",
+    "name": "珠江啤酒",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002463.SZ",
+    "name": "沪电股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002465.SZ",
+    "name": "海格通信",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002466.SZ",
+    "name": "天齐锂业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002468.SZ",
+    "name": "申通快递",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002472.SZ",
+    "name": "双环传动",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002475.SZ",
+    "name": "立讯精密",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002484.SZ",
+    "name": "江海股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002487.SZ",
+    "name": "大金重工",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002493.SZ",
+    "name": "荣盛石化",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002497.SZ",
+    "name": "雅化集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002498.SZ",
+    "name": "汉缆股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002500.SZ",
+    "name": "山西证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002506.SZ",
+    "name": "协鑫集成",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002507.SZ",
+    "name": "涪陵榨菜",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002508.SZ",
+    "name": "老板电器",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002517.SZ",
+    "name": "恺英网络",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002518.SZ",
+    "name": "科士达",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002531.SZ",
+    "name": "天顺风能",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002532.SZ",
+    "name": "天山铝业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002541.SZ",
+    "name": "鸿路钢构",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002544.SZ",
+    "name": "普天科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002555.SZ",
+    "name": "三七互娱",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002557.SZ",
+    "name": "洽洽食品",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002558.SZ",
+    "name": "巨人网络",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002563.SZ",
+    "name": "森马服饰",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002568.SZ",
+    "name": "百润股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002572.SZ",
+    "name": "索菲亚",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002594.SZ",
+    "name": "比亚迪",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002595.SZ",
+    "name": "豪迈科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002597.SZ",
+    "name": "金禾实业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002600.SZ",
+    "name": "领益智造",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002601.SZ",
+    "name": "龙佰集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002603.SZ",
+    "name": "以岭药业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002607.SZ",
+    "name": "中公教育",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002608.SZ",
+    "name": "江苏国信",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002617.SZ",
+    "name": "露笑科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002624.SZ",
+    "name": "完美世界",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002625.SZ",
+    "name": "光启技术",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002648.SZ",
+    "name": "卫星化学",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002653.SZ",
+    "name": "海思科",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002670.SZ",
+    "name": "国盛证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002673.SZ",
+    "name": "西部证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002675.SZ",
+    "name": "东诚药业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002683.SZ",
+    "name": "广东宏大",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002690.SZ",
+    "name": "美亚光电",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002698.SZ",
+    "name": "博实股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002701.SZ",
+    "name": "奥瑞金",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002705.SZ",
+    "name": "新宝股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002709.SZ",
+    "name": "天赐材料",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002714.SZ",
+    "name": "牧原股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002736.SZ",
+    "name": "国信证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002737.SZ",
+    "name": "葵花药业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002738.SZ",
+    "name": "中矿资源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002739.SZ",
+    "name": "万达电影",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002745.SZ",
+    "name": "木林森",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002747.SZ",
+    "name": "埃斯顿",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002756.SZ",
+    "name": "永兴材料",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002773.SZ",
+    "name": "康弘药业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002797.SZ",
+    "name": "第一创业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002812.SZ",
+    "name": "恩捷股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002821.SZ",
+    "name": "凯莱英",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002831.SZ",
+    "name": "裕同科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002832.SZ",
+    "name": "比音勒芬",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002837.SZ",
+    "name": "英维克",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002841.SZ",
+    "name": "视源股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002847.SZ",
+    "name": "盐津铺子",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002850.SZ",
+    "name": "科达利",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002851.SZ",
+    "name": "麦格米特",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002865.SZ",
+    "name": "钧达股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002867.SZ",
+    "name": "周大生",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002901.SZ",
+    "name": "大博医疗",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002906.SZ",
+    "name": "华阳集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002916.SZ",
+    "name": "深南电路",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002920.SZ",
+    "name": "德赛西威",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002925.SZ",
+    "name": "盈趣科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002926.SZ",
+    "name": "华西证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002936.SZ",
+    "name": "郑州银行",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002938.SZ",
+    "name": "鹏鼎控股",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002939.SZ",
+    "name": "长城证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002945.SZ",
+    "name": "华林证券",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002948.SZ",
+    "name": "青岛银行",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002958.SZ",
+    "name": "青农商行",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002966.SZ",
+    "name": "苏州银行",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002978.SZ",
+    "name": "安宁股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "002984.SZ",
+    "name": "森麒麟",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "003021.SZ",
+    "name": "兆威机电",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "003022.SZ",
+    "name": "联泓新科",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "003031.SZ",
+    "name": "中瓷电子",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "003035.SZ",
+    "name": "南网能源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "003816.SZ",
+    "name": "中国广核",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300001.SZ",
+    "name": "特锐德",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300002.SZ",
+    "name": "神州泰岳",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300003.SZ",
+    "name": "乐普医疗",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300009.SZ",
+    "name": "安科生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300012.SZ",
+    "name": "华测检测",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300014.SZ",
+    "name": "亿纬锂能",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300015.SZ",
+    "name": "爱尔眼科",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300017.SZ",
+    "name": "网宿科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300024.SZ",
+    "name": "机器人",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300026.SZ",
+    "name": "红日药业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300033.SZ",
+    "name": "同花顺",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300034.SZ",
+    "name": "钢研高纳",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300037.SZ",
+    "name": "新宙邦",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300054.SZ",
+    "name": "鼎龙股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300058.SZ",
+    "name": "蓝色光标",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300059.SZ",
+    "name": "东方财富",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300070.SZ",
+    "name": "碧水源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300073.SZ",
+    "name": "当升科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300088.SZ",
+    "name": "长信科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300100.SZ",
+    "name": "双林股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300115.SZ",
+    "name": "长盈精密",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300118.SZ",
+    "name": "东方日升",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300122.SZ",
+    "name": "智飞生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300124.SZ",
+    "name": "汇川技术",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300136.SZ",
+    "name": "信维通信",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300140.SZ",
+    "name": "节能环境",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300142.SZ",
+    "name": "沃森生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300144.SZ",
+    "name": "宋城演艺",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300146.SZ",
+    "name": "汤臣倍健",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300182.SZ",
+    "name": "捷成股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300207.SZ",
+    "name": "欣旺达",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300212.SZ",
+    "name": "易华录",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300223.SZ",
+    "name": "北京君正",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300229.SZ",
+    "name": "拓尔思",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300251.SZ",
+    "name": "光线传媒",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300253.SZ",
+    "name": "卫宁健康",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300255.SZ",
+    "name": "常山药业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300274.SZ",
+    "name": "阳光电源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300285.SZ",
+    "name": "国瓷材料",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300294.SZ",
+    "name": "博雅生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300296.SZ",
+    "name": "利亚德",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300298.SZ",
+    "name": "三诺生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300308.SZ",
+    "name": "中际旭创",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300316.SZ",
+    "name": "晶盛机电",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300339.SZ",
+    "name": "润和软件",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300346.SZ",
+    "name": "南大光电",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300347.SZ",
+    "name": "泰格医药",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300357.SZ",
+    "name": "我武生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300364.SZ",
+    "name": "中文在线",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300373.SZ",
+    "name": "扬杰科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300383.SZ",
+    "name": "光环新网",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300390.SZ",
+    "name": "天华新能",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300394.SZ",
+    "name": "天孚通信",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300395.SZ",
+    "name": "菲利华",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300408.SZ",
+    "name": "三环集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300413.SZ",
+    "name": "芒果超媒",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300418.SZ",
+    "name": "昆仑万维",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300428.SZ",
+    "name": "立中集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300432.SZ",
+    "name": "富临精工",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300433.SZ",
+    "name": "蓝思科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300438.SZ",
+    "name": "鹏辉能源",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300442.SZ",
+    "name": "润泽科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300450.SZ",
+    "name": "先导智能",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300454.SZ",
+    "name": "深信服",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300456.SZ",
+    "name": "赛微电子",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300457.SZ",
+    "name": "赢合科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300458.SZ",
+    "name": "全志科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300459.SZ",
+    "name": "汤姆猫",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300474.SZ",
+    "name": "景嘉微",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300475.SZ",
+    "name": "香农芯创",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300476.SZ",
+    "name": "胜宏科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300482.SZ",
+    "name": "万孚生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300487.SZ",
+    "name": "蓝晓科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300496.SZ",
+    "name": "中科创达",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300498.SZ",
+    "name": "温氏股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300502.SZ",
+    "name": "新易盛",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300529.SZ",
+    "name": "健帆生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300558.SZ",
+    "name": "贝达药业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300567.SZ",
+    "name": "精测电子",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300568.SZ",
+    "name": "星源材质",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300570.SZ",
+    "name": "太辰光",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300573.SZ",
+    "name": "兴齐眼药",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300595.SZ",
+    "name": "欧普康视",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300601.SZ",
+    "name": "康泰生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300604.SZ",
+    "name": "长川科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300623.SZ",
+    "name": "捷捷微电",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300627.SZ",
+    "name": "华测导航",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300628.SZ",
+    "name": "亿联网络",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300633.SZ",
+    "name": "开立医疗",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300638.SZ",
+    "name": "广和通",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300661.SZ",
+    "name": "圣邦股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300666.SZ",
+    "name": "江丰电子",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300672.SZ",
+    "name": "国科微",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300674.SZ",
+    "name": "宇信科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300676.SZ",
+    "name": "华大基因",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300677.SZ",
+    "name": "英科医疗",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300679.SZ",
+    "name": "电连技术",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300682.SZ",
+    "name": "朗新集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300699.SZ",
+    "name": "光威复材",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300718.SZ",
+    "name": "长盛轴承",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300724.SZ",
+    "name": "捷佳伟创",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300726.SZ",
+    "name": "宏达电子",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300735.SZ",
+    "name": "光弘科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300747.SZ",
+    "name": "锐科激光",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300748.SZ",
+    "name": "金力永磁",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300750.SZ",
+    "name": "宁德时代",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300751.SZ",
+    "name": "迈为股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300757.SZ",
+    "name": "罗博特科",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300759.SZ",
+    "name": "康龙化成",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300760.SZ",
+    "name": "迈瑞医疗",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300761.SZ",
+    "name": "立华股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300763.SZ",
+    "name": "锦浪科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300765.SZ",
+    "name": "新诺威",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300773.SZ",
+    "name": "拉卡拉",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300775.SZ",
+    "name": "三角防务",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300776.SZ",
+    "name": "帝尔激光",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300777.SZ",
+    "name": "中简科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300779.SZ",
+    "name": "惠城环保",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300782.SZ",
+    "name": "卓胜微",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300803.SZ",
+    "name": "指南针",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300832.SZ",
+    "name": "新产业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300857.SZ",
+    "name": "协创数据",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300866.SZ",
+    "name": "安克创新",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300888.SZ",
+    "name": "稳健医疗",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300896.SZ",
+    "name": "爱美客",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300910.SZ",
+    "name": "瑞丰新材",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300919.SZ",
+    "name": "中伟股份",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300957.SZ",
+    "name": "贝泰妮",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300979.SZ",
+    "name": "华利集团",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "300999.SZ",
+    "name": "金龙鱼",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301015.SZ",
+    "name": "百洋医药",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301029.SZ",
+    "name": "怡合达",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301039.SZ",
+    "name": "中集车辆",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301050.SZ",
+    "name": "雷电微力",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301078.SZ",
+    "name": "孩子王",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301091.SZ",
+    "name": "深城交",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301095.SZ",
+    "name": "广立微",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301155.SZ",
+    "name": "海力风电",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301165.SZ",
+    "name": "锐捷网络",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301207.SZ",
+    "name": "华兰疫苗",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301219.SZ",
+    "name": "腾远钴业",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301236.SZ",
+    "name": "软通动力",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301238.SZ",
+    "name": "瑞泰新材",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301267.SZ",
+    "name": "华厦眼科",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301269.SZ",
+    "name": "华大九天",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301301.SZ",
+    "name": "川宁生物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301308.SZ",
+    "name": "江波龙",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301358.SZ",
+    "name": "湖南裕能",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301498.SZ",
+    "name": "乖宝宠物",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301536.SZ",
+    "name": "星宸科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301551.SZ",
+    "name": "无线传媒",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301589.SZ",
+    "name": "诺瓦星云",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301606.SZ",
+    "name": "绿联科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "301611.SZ",
+    "name": "珂玛科技",
+    "exchange": "SZSE"
+  },
+  {
+    "yf_ticker": "302132.SZ",
+    "name": "中航成飞",
+    "exchange": "SZSE"
+  }
+]

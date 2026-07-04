@@ -2,14 +2,19 @@
 universe_builder.py
 ===================
 Builds data/global_universe.json from the best available sources:
-  - IN  : data/india_tickers_full.csv  (5,140 NSE+BSE stocks)
-  - US  : data/us_tickers_full.json    (7,726 NYSE+NASDAQ+AMEX)
-  - JP  : data/jp_tickers_full.json    (3,566 TSE stocks from symbols_cache)
-  - KR  : data/kr_tickers_full.json    (2,606 KOSPI+KOSDAQ from symbols_cache)
-  - AU  : data/au_tickers_full.json    (1,834 ASX stocks from official ASX directory)
-  - CN  : data/cn_sse_tickers_full.json (1,856 SSE securities) + static SZSE fallback
-  - SG  : data/sg_tickers_full.json    (171 SGX securities from full-market scan)
-  - EU  : data/europe_tickers_full.json (966+ tickers: 10 new markets + expanded UK/DE/IT/FR/ES/NL/CH)
+  - IN  : data/india_tickers_full.csv      (5,140+ NSE+BSE stocks)
+  - US  : data/us_tickers_full.json        (7,726 NYSE+NASDAQ+AMEX)
+  - JP  : data/jp_tickers_full.json        (3,618 TSE stocks)
+  - KR  : data/kr_tickers_full.json        (2,606 KOSPI+KOSDAQ)
+  - AU  : data/au_tickers_full.json        (1,834 ASX from official directory)
+  - CN  : data/cn_sse_tickers_full.json    (1,856 SSE) + data/cn_sz_tickers_full.json (500 SZSE)
+  - HK  : data/hk_tickers_full.json        (2,701 HKEX official equities)
+  - TW  : data/tw_tickers_full.json        (1,065 TWSE)
+  - CA  : data/ca_tickers_full.json        (1,039 TSX)
+  - BR  : data/br_tickers_full.json        (2,755 B3 equities)
+  - ZA  : data/za_tickers_full.json        (154 JSE)
+  - SG  : data/sg_tickers_full.json        (171 SGX full-market scan)
+  - EU  : data/europe_tickers_full.json    (966+ tickers: 10 new markets + expanded)
   - Others: static verified index constituents (expand by adding to each list below)
 
 Run:
@@ -158,7 +163,7 @@ def _load_sg() -> list[str]:
     return [f"{t}.SI" for t in SG_TICKERS]
 
 
-# ── China (SSE) ────────────────────────────────────────────────────────────────
+# ── China (SSE + SZSE) ─────────────────────────────────────────────────────────
 
 def _load_cn_sse() -> list[str]:
     path = DATA / "cn_sse_tickers_full.json"
@@ -167,6 +172,70 @@ def _load_cn_sse() -> list[str]:
             data = json.load(f)
         return _dedup([t["yf_ticker"] for t in data])
     return [f"{t}.SS" for t in CN_SS_TICKERS]
+
+
+def _load_cn_sz() -> list[str]:
+    path = DATA / "cn_sz_tickers_full.json"
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return _dedup([t["yf_ticker"] for t in data])
+    return [f"{t}.SZ" for t in CN_SZ_TICKERS]
+
+
+# ── Hong Kong ──────────────────────────────────────────────────────────────────
+
+def _load_hk() -> list[str]:
+    path = DATA / "hk_tickers_full.json"
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return _dedup([t["yf_ticker"] for t in data])
+    return [f"{t}.HK" for t in HK_TICKERS]
+
+
+# ── Taiwan ─────────────────────────────────────────────────────────────────────
+
+def _load_tw() -> list[str]:
+    path = DATA / "tw_tickers_full.json"
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return _dedup([t["yf_ticker"] for t in data])
+    return [f"{t}.TW" for t in TW_TICKERS]
+
+
+# ── Canada ─────────────────────────────────────────────────────────────────────
+
+def _load_ca() -> list[str]:
+    path = DATA / "ca_tickers_full.json"
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return _dedup([t["yf_ticker"] for t in data])
+    return [f"{t}.TO" for t in CA_TICKERS]
+
+
+# ── Brazil ─────────────────────────────────────────────────────────────────────
+
+def _load_br() -> list[str]:
+    path = DATA / "br_tickers_full.json"
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return _dedup([t["yf_ticker"] for t in data])
+    return [f"{t}.SA" for t in BR_TICKERS]
+
+
+# ── South Africa ───────────────────────────────────────────────────────────────
+
+def _load_za() -> list[str]:
+    path = DATA / "za_tickers_full.json"
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return _dedup([t["yf_ticker"] for t in data])
+    return []
 
 
 # ── Static lists for other markets ────────────────────────────────────────────
@@ -577,23 +646,69 @@ def build_universe() -> dict:
     }
     print(f"  SG  : {len(sg):>6,}")
 
-    # CN — SSE from official list + static SZSE
+    # CN — SSE official + SZSE (index constituents)
     cn_ss = _load_cn_sse()
-    cn_sz = [f"{t}.SZ" for t in _dedup(CN_SZ_TICKERS)]
+    cn_sz = _load_cn_sz()
     cn = _dedup(cn_ss + cn_sz)
     universe["CN"] = {
         "name": "China", "exchange": "SSE+SZSE",
         "yf_symbols": cn, "count": len(cn),
-        "source": "cn_sse_tickers_full.json (SSE official) + static SZSE",
+        "source": "cn_sse_tickers_full.json (SSE official) + cn_sz_tickers_full.json (SZSE)",
     }
     print(f"  CN  : {len(cn):>6,}")
+
+    # HK — HKEX official equity list
+    hk = _load_hk()
+    universe["HK"] = {
+        "name": "Hong Kong", "exchange": "HKEX",
+        "yf_symbols": hk, "count": len(hk),
+        "source": "hk_tickers_full.json (HKEX official ListOfSecurities, Jun 2025)",
+    }
+    print(f"  HK  : {len(hk):>6,}")
+
+    # TW — TWSE full list
+    tw = _load_tw()
+    universe["TW"] = {
+        "name": "Taiwan", "exchange": "TWSE",
+        "yf_symbols": tw, "count": len(tw),
+        "source": "tw_tickers_full.json (TWSE official list)",
+    }
+    print(f"  TW  : {len(tw):>6,}")
+
+    # CA — TSX full list
+    ca = _load_ca()
+    universe["CA"] = {
+        "name": "Canada", "exchange": "TSX",
+        "yf_symbols": ca, "count": len(ca),
+        "source": "ca_tickers_full.json (TSX via GitHub sources)",
+    }
+    print(f"  CA  : {len(ca):>6,}")
+
+    # BR — B3 equities
+    br = _load_br()
+    universe["BR"] = {
+        "name": "Brazil", "exchange": "B3",
+        "yf_symbols": br, "count": len(br),
+        "source": "br_tickers_full.json (B3 InstrumentsConsolidatedFile Nov 2024)",
+    }
+    print(f"  BR  : {len(br):>6,}")
+
+    # ZA — JSE South Africa
+    za = _load_za()
+    if za:
+        universe["ZA"] = {
+            "name": "South Africa", "exchange": "JSE",
+            "yf_symbols": za, "count": len(za),
+            "source": "za_tickers_full.json (JSE curated list)",
+        }
+        print(f"  ZA  : {len(za):>6,}")
 
     # European markets — load from europe_tickers_full.json (merges with static)
     eu_by_market = _load_europe_csv()
 
     # Static markets from MARKETS registry
     for code, meta in MARKETS.items():
-        if code in ("IN", "US", "JP", "KR", "AU", "CN", "SG"):
+        if code in ("IN", "US", "JP", "KR", "AU", "CN", "SG", "HK", "TW", "CA", "BR"):
             continue
         sfx = meta.get("suffix", "")
         tickers = _dedup(meta["tickers"])

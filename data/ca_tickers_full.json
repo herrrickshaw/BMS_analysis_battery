@@ -1,0 +1,5197 @@
+[
+  {
+    "yf_ticker": "AAB.TO",
+    "name": "Aberdeen International Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ADN.TO",
+    "name": "Acadian Timber Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ACD.TO",
+    "name": "Accord Financial Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ARA.TO",
+    "name": "Aclara Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ADCO.TO",
+    "name": "Adcore Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ADEN.TO",
+    "name": "ADENTRA Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DRX.TO",
+    "name": "ADF Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AAV.TO",
+    "name": "Advantage Energy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ARE.TO",
+    "name": "Aecon Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AEG.TO",
+    "name": "Aegis Brands Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AEZS.TO",
+    "name": "AEterna Zentaris Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AOI.TO",
+    "name": "Africa Oil Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AFN.TO",
+    "name": "Ag Growth International Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AGF-B.TO",
+    "name": "AGF Management Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AEM.TO",
+    "name": "Agnico Eagle Mines Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AGRI-U.TO",
+    "name": "Agrinam Acquisition Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AIM.TO",
+    "name": "Aimia Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AC.TO",
+    "name": "Air Canada",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BOS.TO",
+    "name": "AirBoss of America Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AKT-A.TO",
+    "name": "Akita Drilling Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AKU.TO",
+    "name": "Akumin Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AGI.TO",
+    "name": "Alamos Gold Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ALC.TO",
+    "name": "Algoma Central Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ASTL.TO",
+    "name": "Algoma Steel Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AQN.TO",
+    "name": "Algonquin Power & Utilities Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ATD.TO",
+    "name": "Alimentation Couche-Tard Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ALYA.TO",
+    "name": "Alithya Group inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AAUC.TO",
+    "name": "Allied Gold Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AMM.TO",
+    "name": "Almaden Minerals Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AII.TO",
+    "name": "Almonty Industries Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ATCU.TO",
+    "name": "Alta Copper Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ALA.TO",
+    "name": "AltaGas Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ALS.TO",
+    "name": "Altius Minerals Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ARR.TO",
+    "name": "Altius Renewable Royalties Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AIF.TO",
+    "name": "Altus Group Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HOT-UN.TO",
+    "name": "American Hotel Income Properties REIT LP",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "USA.TO",
+    "name": "Americas Gold and Silver Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ARG.TO",
+    "name": "Amerigo Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ANRG.TO",
+    "name": "Anaergia Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AND.TO",
+    "name": "Andlauer Healthcare Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ADW-A.TO",
+    "name": "Andrew Peller Limited/Andrew Peller Limitee",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ATE.TO",
+    "name": "Antibe Therapeutics Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "APLI.TO",
+    "name": "Appili Therapeutics Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "APS.TO",
+    "name": "Aptose Biosciences Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ARX.TO",
+    "name": "ARC Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AR.TO",
+    "name": "Argonaut Gold Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ARIS.TO",
+    "name": "Aris Mining Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ATZ.TO",
+    "name": "Aritzia Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AMC.TO",
+    "name": "Arizona Metals Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ASCU.TO",
+    "name": "Arizona Sonoran Copper Company Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ACAA.TO",
+    "name": "Arrow Long/Short Alternative Class",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ASND.TO",
+    "name": "Ascendant Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AOT.TO",
+    "name": "Ascot Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ACO-X.TO",
+    "name": "ATCO Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ATH.TO",
+    "name": "Athabasca Oil Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AI.TO",
+    "name": "Atrium Mortgage Investment Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ATS.TO",
+    "name": "ATS Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "G.TO",
+    "name": "Augusta Gold Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ORA.TO",
+    "name": "Aura Minerals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ACB.TO",
+    "name": "Aurora Cannabis Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ACQ.TO",
+    "name": "AutoCanada Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "XLY.TO",
+    "name": "Auxly Cannabis Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AVL.TO",
+    "name": "Avalon Advanced Materials Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AVNT.TO",
+    "name": "Avant Brands Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AVCN.TO",
+    "name": "Avicanna Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ASM.TO",
+    "name": "Avino Silver & Gold Mines Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AXIS.TO",
+    "name": "Axis Auto Finance Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AYA.TO",
+    "name": "Aya Gold & Silver Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ABX.TO",
+    "name": "Barrick Gold Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AUMN.TO",
+    "name": "Golden Minerals Company",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AIDX.TO",
+    "name": "HealWELL AI Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ATRL.TO",
+    "name": "SNC-Lavalin Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BTO.TO",
+    "name": "B2Gold Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BDGI.TO",
+    "name": "Badger Infrastructure Solutions Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BLDP.TO",
+    "name": "Ballard Power Systems Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BMO.TO",
+    "name": "Bank of Montreal",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BNS.TO",
+    "name": "Bank of Nova Scotia (The)",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BLCO.TO",
+    "name": "Bausch + Lomb Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BHC.TO",
+    "name": "Bausch Health Companies Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BYL.TO",
+    "name": "Baylin Technologies Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BTE.TO",
+    "name": "Baytex Energy Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BCE.TO",
+    "name": "BCE Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BEK-B.TO",
+    "name": "Becker Milk Company Ltd- (The)",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BSX.TO",
+    "name": "Belo Sun Mining Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BNG.TO",
+    "name": "Bengal Energy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BNK.TO",
+    "name": "Big Banc Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PRM.TO",
+    "name": "Big Pharma Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BR.TO",
+    "name": "Big Rock Brewery Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BIK-PA.TO",
+    "name": "BIP Investment Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BIR.TO",
+    "name": "Birchcliff Energy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BDT.TO",
+    "name": "Bird Construction Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BITF.TO",
+    "name": "Bitfarms Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BDI.TO",
+    "name": "Black Diamond Group Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BKI.TO",
+    "name": "Black Iron Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BB.TO",
+    "name": "BlackBerry Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BLN.TO",
+    "name": "Blackline Safety Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GBT.TO",
+    "name": "BMTC Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BRMI.TO",
+    "name": "Boat Rocker Media Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BBD-B.TO",
+    "name": "Bombardier Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BNE.TO",
+    "name": "Bonterra Energy Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BLX.TO",
+    "name": "Boralex Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BYD.TO",
+    "name": "Boyd Group Services Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BRAG.TO",
+    "name": "Bragg Gaming Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BRY.TO",
+    "name": "Bri-Chem Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BCT.TO",
+    "name": "BriaCell Therapeutics Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BRE.TO",
+    "name": "Bridgemarq Real Estate Services Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ESP.TO",
+    "name": "Brompton Energy Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LCS.TO",
+    "name": "Brompton Lifeco Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SBC.TO",
+    "name": "Brompton Split Banc Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BAM.TO",
+    "name": "Brookfield Asset Management Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BBUC.TO",
+    "name": "Brookfield Business Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BBU-UN.TO",
+    "name": "Brookfield Business Partners L-P",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BN.TO",
+    "name": "Brookfield Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BIPC.TO",
+    "name": "Brookfield Infrastructure Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BIP-UN.TO",
+    "name": "Brookfield Infrastructure Partners L-P",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BPO-PX.TO",
+    "name": "Brookfield Office Properties Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BPYP-PA.TO",
+    "name": "Brookfield Property Preferred L-P",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BEPC.TO",
+    "name": "Brookfield Renewable Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BEP-UN.TO",
+    "name": "Brookfield Renewable Partners L-P",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BRF-PC.TO",
+    "name": "Brookfield Renewable Power Preferred Equity Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DOO.TO",
+    "name": "BRP Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BUI.TO",
+    "name": "Buhler Industries Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BU.TO",
+    "name": "Burcon Nutrascience Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BK.TO",
+    "name": "Canadian Banc Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BABY.TO",
+    "name": "Else Nutrition Holdings Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CAE.TO",
+    "name": "CAE Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CWL.TO",
+    "name": "Caldwell Partners International Inc- (The)",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CFW.TO",
+    "name": "Calfrac Well Services Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CGY.TO",
+    "name": "Calian Group Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CXB.TO",
+    "name": "Calibre Mining Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CCO.TO",
+    "name": "Cameco Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CF.TO",
+    "name": "Canaccord Genuity Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CNE.TO",
+    "name": "Canacol Energy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GOOS.TO",
+    "name": "Canada Goose Holdings Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CGI.TO",
+    "name": "Canadian General Investments, Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CM.TO",
+    "name": "Canadian Imperial Bank Of Commerce",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LFE.TO",
+    "name": "Canadian Life Companies Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CNR.TO",
+    "name": "Canadian National Railway Company",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CNQ.TO",
+    "name": "Canadian Natural Resources Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CP.TO",
+    "name": "Canadian Pacific Kansas City Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CTC-A.TO",
+    "name": "Canadian Tire Corporation, Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CU.TO",
+    "name": "Canadian Utilities Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CWB.TO",
+    "name": "Canadian Western Bank",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CCM.TO",
+    "name": "Canagold Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CFP.TO",
+    "name": "Canfor Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CFX.TO",
+    "name": "Canfor Pulp Products Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ICE.TO",
+    "name": "Canlan Ice Sports Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WEED.TO",
+    "name": "Canopy Growth Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CPX.TO",
+    "name": "Capital Power Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CS.TO",
+    "name": "Capstone Copper Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CSE-PA.TO",
+    "name": "Capstone Infrastructure Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CJ.TO",
+    "name": "Cardinal Energy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CRDL.TO",
+    "name": "Cardiol Therapeutics Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CRRX.TO",
+    "name": "CareRx Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CJT.TO",
+    "name": "Cargojet Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CUP-U.TO",
+    "name": "Caribbean Utilities Company, Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CAS.TO",
+    "name": "Cascades Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CET.TO",
+    "name": "Cathedral Energy Services Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CCL-B.TO",
+    "name": "CCL Industries Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CLS.TO",
+    "name": "Celestica Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CVE.TO",
+    "name": "Cenovus Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CEE.TO",
+    "name": "Centamin plc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CG.TO",
+    "name": "Centerra Gold Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CNT.TO",
+    "name": "Century Global Commodities Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CRP.TO",
+    "name": "Ceres Global Ag Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CDAY.TO",
+    "name": "Ceridian HCM Holding Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CEU.TO",
+    "name": "CES Energy Solutions Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GIB-A.TO",
+    "name": "CGI Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CIA.TO",
+    "name": "Champion Iron Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CWEB.TO",
+    "name": "Charlotte's Web Holdings, Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CSH-UN.TO",
+    "name": "Chartwell Retirement Residences",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CHW.TO",
+    "name": "Chesswood Group Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CGG.TO",
+    "name": "China Gold International Resources Corp- Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CHR.TO",
+    "name": "Chorus Aviation Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CIX.TO",
+    "name": "CI Financial Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CGAA.TO",
+    "name": "CI Global Asset Allocation Private Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CGHY.TO",
+    "name": "CI Global High Yield Credit Private Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CINF.TO",
+    "name": "CI Global Infrastructure Private Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CGRA.TO",
+    "name": "CI Global Real Asset Private Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CGRE.TO",
+    "name": "CI Global REIT Private Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "0P0001IMXJ.TO",
+    "name": "CIBC Conservative Fixed Income Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CCRE.TO",
+    "name": "CIBC Core Fixed Income Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "0P0001IMXR.TO",
+    "name": "CIBC Core Plus Fixed Income Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CGX.TO",
+    "name": "Cineplex Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CPH.TO",
+    "name": "Cipher Pharmaceuticals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CVG.TO",
+    "name": "Clairvest Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CKI.TO",
+    "name": "Clarke Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CCS-PC.TO",
+    "name": "Co-operators General Insurance Company",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CCA.TO",
+    "name": "Cogeco Communications Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GCL.TO",
+    "name": "Colabor Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CNL.TO",
+    "name": "Collective Mining Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CIGI.TO",
+    "name": "Colliers International Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "YCM-PA.TO",
+    "name": "Commerce Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CMG.TO",
+    "name": "Computer Modelling Group Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CDR.TO",
+    "name": "Condor Energies Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "COG.TO",
+    "name": "Condor Gold plc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CFF.TO",
+    "name": "Conifex Timber Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CSU.TO",
+    "name": "Constellation Software Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CTS.TO",
+    "name": "Converge Technology Solutions Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CPLF.TO",
+    "name": "Copperleaf Technologies Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CSW-A.TO",
+    "name": "Corby Spirit and Wine Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CJR-B.TO",
+    "name": "Corus Entertainment Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CVO.TO",
+    "name": "Coveo Solutions Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CPG.TO",
+    "name": "Crescent Point Energy Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CTX.TO",
+    "name": "Crescita Therapeutics Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CR.TO",
+    "name": "Crew Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CRON.TO",
+    "name": "Cronos Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CRWN.TO",
+    "name": "Crown Capital Partners Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CIU-PC.TO",
+    "name": "CU Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CXI.TO",
+    "name": "Currency Exchange International, Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CYB.TO",
+    "name": "Cymbria Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DBO.TO",
+    "name": "D-Box Technologies Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DTOL.TO",
+    "name": "D2L Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DCM.TO",
+    "name": "Data Communications Management Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DFY.TO",
+    "name": "Definity Financial Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DN.TO",
+    "name": "Delta 9 Cannabis Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DML.TO",
+    "name": "Denison Mines Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DNTL.TO",
+    "name": "dentalcorp Holdings Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DSG.TO",
+    "name": "Descartes Systems Group Inc- (The)",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DXT.TO",
+    "name": "Dexterra Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DRT.TO",
+    "name": "DIRTT Environmental Solutions Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DSV.TO",
+    "name": "Discovery Silver Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DIV.TO",
+    "name": "Diversified Royalty Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DFN.TO",
+    "name": "Dividend 15 Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DF.TO",
+    "name": "Dividend 15 Split Corp- II",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DGS.TO",
+    "name": "Dividend Growth Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DS.TO",
+    "name": "Dividend Select 15 Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DCBO.TO",
+    "name": "Docebo Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DOL.TO",
+    "name": "Dollarama Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DBM.TO",
+    "name": "Doman Building Materials Group Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DLCG.TO",
+    "name": "Dominion Lending Centres Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DII-B.TO",
+    "name": "Dorel Industries Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DRM.TO",
+    "name": "DREAM Unlimited Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DC-A.TO",
+    "name": "Dundee Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DPM.TO",
+    "name": "Dundee Precious Metals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DND.TO",
+    "name": "Dye & Durham Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DYA.TO",
+    "name": "dynaCERT Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DNG.TO",
+    "name": "Dynacor Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DR.TO",
+    "name": "Medical Facilities Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DIAM.TO",
+    "name": "Star Diamond Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ENS.TO",
+    "name": "E Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ELF.TO",
+    "name": "E-L Financial Corporation Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EAGR.TO",
+    "name": "East Side Games Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ELR.TO",
+    "name": "Eastern Platinum Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ECN.TO",
+    "name": "ECN Capital Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ECO.TO",
+    "name": "EcoSynthetix Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ELD.TO",
+    "name": "Eldorado Gold Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ELVA.TO",
+    "name": "Electrovaya Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EFN.TO",
+    "name": "Element Fleet Management Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ELO.TO",
+    "name": "Eloro Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EMA.TO",
+    "name": "Emera Incorporated",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EMP-A.TO",
+    "name": "Empire Company Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ENB.TO",
+    "name": "Enbridge Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EDV.TO",
+    "name": "Endeavour Mining plc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EDR.TO",
+    "name": "Endeavour Silver Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EFX.TO",
+    "name": "Enerflex Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EFR.TO",
+    "name": "Energy Fuels Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ERF.TO",
+    "name": "Enerplus Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ENGH.TO",
+    "name": "Enghouse Systems Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ESI.TO",
+    "name": "Ensign Energy Services Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "E.TO",
+    "name": "Enterprise Group, Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EGLX.TO",
+    "name": "Enthusiast Gaming Holdings Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ETG.TO",
+    "name": "Entree Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EQB.TO",
+    "name": "EQB Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EQX.TO",
+    "name": "Equinox Gold Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ERD.TO",
+    "name": "Erdene Resource Development Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ERO.TO",
+    "name": "Ero Copper Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EPRX.TO",
+    "name": "Eupraxia Pharmaceuticals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ESM.TO",
+    "name": "Euro Sun Mining Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ET.TO",
+    "name": "Evertz Technologies Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EXN.TO",
+    "name": "Excellon Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MIN.TO",
+    "name": "Excelsior Mining Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EIF.TO",
+    "name": "Exchange Income Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "XTC.TO",
+    "name": "Exco Technologies Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EXRO.TO",
+    "name": "Exro Technologies Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EXE.TO",
+    "name": "Extendicare Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ELEF.TO",
+    "name": "Silver Elephant Mining Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EDT.TO",
+    "name": "Spectral Medical Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FFH.TO",
+    "name": "Fairfax Financial Holdings Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FIH-U.TO",
+    "name": "Fairfax India Holdings Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FANS.TO",
+    "name": "FansUnite Entertainment Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FDY.TO",
+    "name": "Faraday Copper Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FDGE.TO",
+    "name": "Farmers Edge Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FGAA-U.TO",
+    "name": "FG Acquisition Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FSZ.TO",
+    "name": "Fiera Capital Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FIL.TO",
+    "name": "Filo Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FTN.TO",
+    "name": "Financial 15 Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FTT.TO",
+    "name": "Finning International Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FTG.TO",
+    "name": "Firan Technology Group Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FC.TO",
+    "name": "Firm Capital Mortgage Investment Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FR.TO",
+    "name": "First Majestic Silver Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FF.TO",
+    "name": "First Mining Gold Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FN.TO",
+    "name": "First National Financial Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FM.TO",
+    "name": "First Quantum Minerals Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FSV.TO",
+    "name": "FirstService Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FCU.TO",
+    "name": "Fission Uranium Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FLNT.TO",
+    "name": "FLINT Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FLOW.TO",
+    "name": "Flow Beverage Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FAR.TO",
+    "name": "Foraco International SA",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FOM.TO",
+    "name": "Foran Mining Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FSY.TO",
+    "name": "Forsys Metals Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FTS.TO",
+    "name": "Fortis Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FVI.TO",
+    "name": "Fortuna Silver Mines Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FT.TO",
+    "name": "Fortune Minerals Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FORZ.TO",
+    "name": "Forza Petroleum Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FNV.TO",
+    "name": "Franco-Nevada Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FVL.TO",
+    "name": "Freegold Ventures Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FRU.TO",
+    "name": "Freehold Royalties Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FEC.TO",
+    "name": "Frontera Energy Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FURY.TO",
+    "name": "Fury Gold Mines Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FOOD.TO",
+    "name": "Goodfood Market Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FFN.TO",
+    "name": "North American Financial 15 Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FTU.TO",
+    "name": "US Financial 15 Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FORA.TO",
+    "name": "VerticalScope Holdings Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GLXY.TO",
+    "name": "Galaxy Digital Holdings Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GAU.TO",
+    "name": "Galiano Gold Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GH.TO",
+    "name": "Gamehost Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GATO.TO",
+    "name": "Gatos Silver, Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GDI.TO",
+    "name": "GDI Integrated Facility Services Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GXE.TO",
+    "name": "Gear Energy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GENM.TO",
+    "name": "Generation Mining Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GDC.TO",
+    "name": "Genesis Land Development Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GEO.TO",
+    "name": "Geodrill Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WN.TO",
+    "name": "George Weston Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GFL.TO",
+    "name": "GFL Environmental Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GEI.TO",
+    "name": "Gibson Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GIL.TO",
+    "name": "Gildan Activewear Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GIVX.TO",
+    "name": "Givex Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GVC.TO",
+    "name": "Glacier Media Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GLG.TO",
+    "name": "GLG Life Tech Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GLO.TO",
+    "name": "Global Atomic Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GDV.TO",
+    "name": "Global Dividend Growth Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GEC.TO",
+    "name": "Global Education Communities Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GMX.TO",
+    "name": "Globex Mining Enterprises Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GSY.TO",
+    "name": "goeasy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GGD.TO",
+    "name": "GoGold Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GMTN.TO",
+    "name": "Gold Mountain Mining Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GRC.TO",
+    "name": "Gold Springs Resource Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GGA.TO",
+    "name": "Goldgroup Mining Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GOLD.TO",
+    "name": "GoldMining Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "XAU.TO",
+    "name": "GoldMoney Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GDL.TO",
+    "name": "Goodfellow Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GTE.TO",
+    "name": "Gran Tierra Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GWO.TO",
+    "name": "Great-West Lifeco Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GFP.TO",
+    "name": "GreenFirst Forest Products Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GRN.TO",
+    "name": "Greenlane Renewables Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GCG-A.TO",
+    "name": "Guardian Capital Group Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GDEP.TO",
+    "name": "Guardian Directed Equity Path Portfolio",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GDPY.TO",
+    "name": "Guardian Directed Premium Yield Portfolio",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GURU.TO",
+    "name": "GURU Organic Energy Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GUD.TO",
+    "name": "Knight Therapeutics Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GRA.TO",
+    "name": "NanoXplore Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GRID.TO",
+    "name": "Tantalus Systems Holding Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HAI.TO",
+    "name": "Haivision Systems Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HTL.TO",
+    "name": "Hamilton Thorne Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HMM-A.TO",
+    "name": "Hammond Manufacturing Company Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HPS-A.TO",
+    "name": "Hammond Power Solutions Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HWX.TO",
+    "name": "Headwater Exploration Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HFPC-U.TO",
+    "name": "Helios Fairfax Partners Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HBP.TO",
+    "name": "Helix BioPharma Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HRX.TO",
+    "name": "Heroux-Devtek Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HWO.TO",
+    "name": "High Arctic Energy Services Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HLF.TO",
+    "name": "High Liner Foods Incorporated",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HLS.TO",
+    "name": "HLS Therapeutics Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HZM.TO",
+    "name": "Horizonte Minerals Plc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HBM.TO",
+    "name": "Hudbay Minerals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HUT.TO",
+    "name": "Hut 8 Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "H.TO",
+    "name": "Hydro One Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IAU.TO",
+    "name": "i-80 Gold Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ITE.TO",
+    "name": "i3 Energy plc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IAG.TO",
+    "name": "iA Financial Corporation Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IWEB.TO",
+    "name": "IA Wealth Enhanced Bond Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IMG.TO",
+    "name": "IAMGOLD Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IFA.TO",
+    "name": "iFabric Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IGM.TO",
+    "name": "IGM Financial Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ILLM.TO",
+    "name": "illumin Holdings Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "III.TO",
+    "name": "Imperial Metals Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IMO.TO",
+    "name": "Imperial Oil Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IDG.TO",
+    "name": "Indigo Books & Music Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ISV.TO",
+    "name": "Information Services Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "INE.TO",
+    "name": "Innergex Renewable Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IPO.TO",
+    "name": "InPlay Oil Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IFC.TO",
+    "name": "Intact Financial Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IGX.TO",
+    "name": "IntelGenx Technologies Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IPCI.TO",
+    "name": "IntelliPharmaCeutics International Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IFP.TO",
+    "name": "Interfor Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IMP.TO",
+    "name": "Intermap Technologies Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IPCO.TO",
+    "name": "International Petroleum Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ITH.TO",
+    "name": "International Tower Hill Mines Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IVQ.TO",
+    "name": "Invesque Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IE.TO",
+    "name": "Ivanhoe Electric Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IVN.TO",
+    "name": "Ivanhoe Mines Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IGB.TO",
+    "name": "Purpose Global Bond Class",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "JAG.TO",
+    "name": "Jaguar Mining Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "JWEL.TO",
+    "name": "Jamieson Wellness Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "JOY.TO",
+    "name": "Journey Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KBL.TO",
+    "name": "K-Bro Linen Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KNT.TO",
+    "name": "K92 Mining Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KRN.TO",
+    "name": "Karnalyte Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KRR.TO",
+    "name": "Karora Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KLS.TO",
+    "name": "Kelso Technologies Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KEL.TO",
+    "name": "Kelt Exploration Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KEY.TO",
+    "name": "Keyera Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KXS.TO",
+    "name": "Kinaxis Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "K.TO",
+    "name": "Kinross Gold Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KITS.TO",
+    "name": "Kits Eyecare Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KEC.TO",
+    "name": "Kiwetinohk Energy Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KSI.TO",
+    "name": "kneat-com, inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KEI.TO",
+    "name": "Kolibri Global Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KPT.TO",
+    "name": "KP Tissue Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LIF.TO",
+    "name": "Labrador Iron Ore Royalty Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LAM.TO",
+    "name": "Laramide Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LGO.TO",
+    "name": "Largo Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LAS-A.TO",
+    "name": "Lassonde Industries Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LB.TO",
+    "name": "Laurentian Bank of Canada",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LNF.TO",
+    "name": "Leon's Furniture Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LGD.TO",
+    "name": "Liberty Gold Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LBS.TO",
+    "name": "Life & Banc Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LSPK.TO",
+    "name": "LifeSpeak Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LSPD.TO",
+    "name": "Lightspeed Commerce Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LNR.TO",
+    "name": "Linamar Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LEV.TO",
+    "name": "Lion Electric Company (The)",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LAAC.TO",
+    "name": "Lithium Americas (Argentina) Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LAC.TO",
+    "name": "Lithium Americas Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LIRC.TO",
+    "name": "Lithium Royalty Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "L.TO",
+    "name": "Loblaw Companies Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LN.TO",
+    "name": "Loncor Gold Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LPEN.TO",
+    "name": "Loop Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LUC.TO",
+    "name": "Lucara Diamond Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LUG.TO",
+    "name": "Lundin Gold Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LUN.TO",
+    "name": "Lundin Mining Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LABS.TO",
+    "name": "MediPharm Labs Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LCFS.TO",
+    "name": "Tidewater Renewables Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "XMF-A.TO",
+    "name": "M Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MKZ-UN.TO",
+    "name": "Mackenzie Master Limited Partnership",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MPC-C.TO",
+    "name": "Madison Pacific Properties Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MAG.TO",
+    "name": "MAG Silver Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MAL.TO",
+    "name": "Magellan Aerospace Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MG.TO",
+    "name": "Magna International Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MEQ.TO",
+    "name": "Mainstreet Equity Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MDI.TO",
+    "name": "Major Drilling Group International Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MND.TO",
+    "name": "Mandalay Resources Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MFC.TO",
+    "name": "Manulife Financial Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MFI.TO",
+    "name": "Maple Leaf Foods Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MARI.TO",
+    "name": "Marimaca Copper Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MRE.TO",
+    "name": "Martinrea International Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MATR.TO",
+    "name": "Mattr Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MXG.TO",
+    "name": "Maxim Power Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MKP.TO",
+    "name": "MCAN Mortgage Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MCB.TO",
+    "name": "McCoy Global Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MUX.TO",
+    "name": "McEwen Mining Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MDA.TO",
+    "name": "MDA Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MDF.TO",
+    "name": "mdf commerce inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MDP.TO",
+    "name": "Medexus Pharmaceuticals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MVP.TO",
+    "name": "MediaValet Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MDNA.TO",
+    "name": "Medicenna Therapeutics Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MEG.TO",
+    "name": "MEG Energy Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MGA.TO",
+    "name": "Mega Uranium Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MRD.TO",
+    "name": "Melcor Developments Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MNO.TO",
+    "name": "Meridian Mining UK Societas",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MX.TO",
+    "name": "Methanex Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MRU.TO",
+    "name": "Metro Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MBX.TO",
+    "name": "Microbix Biosystems Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MSV.TO",
+    "name": "Minco Silver Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MOGO.TO",
+    "name": "Mogo Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TPX-B.TO",
+    "name": "Molson Coors Canada Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ME.TO",
+    "name": "Moneta Gold Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MRC.TO",
+    "name": "Morguard Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MPVD.TO",
+    "name": "Mountain Province Diamonds Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MTY.TO",
+    "name": "MTY Food Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MTL.TO",
+    "name": "Mullen Group Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MNT.TO",
+    "name": "Royal Canadian Mint - Canadian Gold Reserves",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MNS.TO",
+    "name": "Royal Canadian Mint - Canadian Silver Reserves",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MIC-PA.TO",
+    "name": "Sagen MI Canada Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NANO.TO",
+    "name": "Nano One Materials Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NBLY.TO",
+    "name": "Neighbourly Pharmacy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NEO.TO",
+    "name": "Neo Performance Materials Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NCU.TO",
+    "name": "Nevada Copper Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NGD.TO",
+    "name": "New Gold Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NUAG.TO",
+    "name": "New Pacific Metals Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NGT.TO",
+    "name": "Newmont Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NXE.TO",
+    "name": "NexGen Energy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NEXT.TO",
+    "name": "NextSource Materials Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NXR-UN.TO",
+    "name": "Nexus Industrial REIT",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NFI.TO",
+    "name": "NFI Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NCP.TO",
+    "name": "Nickel Creek Platinum Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NHK.TO",
+    "name": "Nighthawk Gold Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NB.TO",
+    "name": "NioCorp Developments Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NOA.TO",
+    "name": "North American Construction Group Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NWC.TO",
+    "name": "North West Company Inc- (The)",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NCF.TO",
+    "name": "Northcliff Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NDM.TO",
+    "name": "Northern Dynasty Minerals Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NPI.TO",
+    "name": "Northland Power Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NRR-UN.TO",
+    "name": "Northview Residential REIT",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NOVC.TO",
+    "name": "Nova Cannabis Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NG.TO",
+    "name": "NovaGold Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NVO.TO",
+    "name": "Novo Resources Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NUMI.TO",
+    "name": "Numinus Wellness Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NTR.TO",
+    "name": "Nutrien Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NVEI.TO",
+    "name": "Nuvei Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NVA.TO",
+    "name": "NuVista Energy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SFD.TO",
+    "name": "NXT Energy Solutions Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NPK.TO",
+    "name": "Verde Agritech Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OBE.TO",
+    "name": "Obsidian Energy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OGC.TO",
+    "name": "OceanaGold Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OLY.TO",
+    "name": "Olympia Financial Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ONC.TO",
+    "name": "Oncolytics Biotech Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ONEX.TO",
+    "name": "ONEX Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OTEX.TO",
+    "name": "Open Text Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OPT.TO",
+    "name": "Optiva Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OGD.TO",
+    "name": "Orbit Garant Drilling Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OREA.TO",
+    "name": "Orea Mining Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ORE.TO",
+    "name": "Orezone Gold Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OGI.TO",
+    "name": "Organigram Holdings Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OLA.TO",
+    "name": "Orla Mining Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ORV.TO",
+    "name": "Orvana Minerals Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OR.TO",
+    "name": "Osisko Gold Royalties Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OSK.TO",
+    "name": "Osisko Mining Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OVV.TO",
+    "name": "Ovintiv Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PAAS.TO",
+    "name": "Pan American Silver Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "POU.TO",
+    "name": "Paramount Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PXT.TO",
+    "name": "Parex Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PLC.TO",
+    "name": "Park Lawn Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PKI.TO",
+    "name": "Parkland Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PVS-PG.TO",
+    "name": "Partners Value Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PSI.TO",
+    "name": "Pason Systems Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PAY.TO",
+    "name": "Payfare Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PPL.TO",
+    "name": "Pembina Pipeline Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PMT.TO",
+    "name": "Perpetual Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PRU.TO",
+    "name": "Perseus Mining Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PET.TO",
+    "name": "Pet Valu Holdings Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TAL.TO",
+    "name": "PetroTal Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PRQ.TO",
+    "name": "Petrus Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PEY.TO",
+    "name": "Peyto Exploration & Development Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PHX.TO",
+    "name": "PHX Energy Services Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PEA.TO",
+    "name": "Pieridae Energy Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PCON.TO",
+    "name": "PIMCO Managed Conservative Bond Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PCOR.TO",
+    "name": "PIMCO Managed Core Bond Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PNE.TO",
+    "name": "Pine Cliff Energy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PNP.TO",
+    "name": "Pinetree Capital Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PZA.TO",
+    "name": "Pizza Pizza Royalty Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PTM.TO",
+    "name": "Platinum Group Metals Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PLZ-UN.TO",
+    "name": "Plaza Retail REIT",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PIF.TO",
+    "name": "Polaris Renewable Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PBL.TO",
+    "name": "Pollard Banknote Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PNC-B.TO",
+    "name": "Postmedia Network Canada Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "POW.TO",
+    "name": "Power Corporation of Canada",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PWF-PT.TO",
+    "name": "Power Financial Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PPR.TO",
+    "name": "Prairie Provident Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PSK.TO",
+    "name": "PrairieSky Royalty Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PD.TO",
+    "name": "Precision Drilling Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PBH.TO",
+    "name": "Premium Brands Holdings Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PIC-A.TO",
+    "name": "Premium Income Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PDV.TO",
+    "name": "Prime Dividend Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PRYM.TO",
+    "name": "Prime Mining Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PRMW.TO",
+    "name": "Primo Water Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PRB.TO",
+    "name": "Probe Gold Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PRN.TO",
+    "name": "Profound Medical Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PRL.TO",
+    "name": "Propel Holdings Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PSD.TO",
+    "name": "Pulse Seismic Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PYR.TO",
+    "name": "PyroGenesis Canada Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PME.TO",
+    "name": "Sentry Select Primary Metals Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PWI.TO",
+    "name": "Sustainable Power & Infrastructure Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "QFOR.TO",
+    "name": "Q4 Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "QTRH.TO",
+    "name": "Quarterhill Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "QBR-B.TO",
+    "name": "Quebecor Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "QEC.TO",
+    "name": "Questerre Energy Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "QSR.TO",
+    "name": "Restaurant Brands International Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RS.TO",
+    "name": "Real Estate Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "REAL.TO",
+    "name": "Real Matters Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RVX.TO",
+    "name": "Resverlogix Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RCG.TO",
+    "name": "RF Capital Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RCH.TO",
+    "name": "Richelieu Hardware Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RCI-B.TO",
+    "name": "Rogers Communications Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RSI.TO",
+    "name": "Rogers Sugar Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ROOT.TO",
+    "name": "Roots Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RY.TO",
+    "name": "Royal Bank of Canada",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RTG.TO",
+    "name": "RTG Mining Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RBY.TO",
+    "name": "Rubellite Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RUP.TO",
+    "name": "Rupert Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RUS.TO",
+    "name": "Russel Metals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RIFI.TO",
+    "name": "Russell Investments Fixed Income Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RIIN.TO",
+    "name": "Russell Investments Global Infrastructure Pool",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RIRA.TO",
+    "name": "Russell Investments Real Assets",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RAY-A.TO",
+    "name": "Stingray Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SBN.TO",
+    "name": "S Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SGLD.TO",
+    "name": "Sabre Gold Mines Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SFC.TO",
+    "name": "Sagicor Financial Company Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SSL.TO",
+    "name": "Sandstorm Gold Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "STC.TO",
+    "name": "Sangoma Technologies Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SAP.TO",
+    "name": "Saputo Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SOIL.TO",
+    "name": "Saturn Oil & Gas Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SIS.TO",
+    "name": "Savaria Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SCY.TO",
+    "name": "Scandium International Mining Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SEA.TO",
+    "name": "Seabridge Gold Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SES.TO",
+    "name": "Secure Energy Services Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SEC.TO",
+    "name": "Senvest Capital Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SVA.TO",
+    "name": "Sernova Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "S.TO",
+    "name": "Sherritt International Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SHOP.TO",
+    "name": "Shopify Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SIA.TO",
+    "name": "Sienna Senior Living Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SMT.TO",
+    "name": "Sierra Metals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SGNL.TO",
+    "name": "Signal Gold Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SBR.TO",
+    "name": "Silver Bear Resources plc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SVB.TO",
+    "name": "Silver Bull Resources, Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SVM.TO",
+    "name": "Silvercorp Metals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SIL.TO",
+    "name": "SilverCrest Metals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SKE.TO",
+    "name": "Skeena Resources Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SGR-UN.TO",
+    "name": "Slate Grocery REIT",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SOT-UN.TO",
+    "name": "Slate Office REIT",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ZZZ.TO",
+    "name": "Sleep Country Canada Holdings Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SFTC.TO",
+    "name": "Softchoice Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SLS.TO",
+    "name": "Solaris Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SOLG.TO",
+    "name": "SolGold plc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SLR.TO",
+    "name": "Solitario Resources Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SFI.TO",
+    "name": "Solution Financial Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SHLE.TO",
+    "name": "Source Energy Services Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SDE.TO",
+    "name": "Spartan Delta Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TOY.TO",
+    "name": "Spin Master Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SII.TO",
+    "name": "Sprott Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SSRM.TO",
+    "name": "SSR Mining Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SAU.TO",
+    "name": "St- Augustine Gold and Copper Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "STCK.TO",
+    "name": "Stack Capital Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SZLS.TO",
+    "name": "StageZero Life Sciences Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "STN.TO",
+    "name": "Stantec Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SAM.TO",
+    "name": "Starcore International Mines Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "STLC.TO",
+    "name": "Stelco Holdings Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SJ.TO",
+    "name": "Stella-Jones Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "STEP.TO",
+    "name": "STEP Energy Services Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "STGO.TO",
+    "name": "Steppe Gold Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SVI.TO",
+    "name": "StorageVault Canada Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SCR.TO",
+    "name": "Strathcona Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SMC.TO",
+    "name": "Sulliden Mining Capital Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SLF.TO",
+    "name": "Sun Life Financial Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SU.TO",
+    "name": "Suncor Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SOY.TO",
+    "name": "SunOpta, Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SPB.TO",
+    "name": "Superior Plus Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SXP.TO",
+    "name": "Supremex Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SGY.TO",
+    "name": "Surge Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SWP.TO",
+    "name": "Swiss Water Decaffeinated Coffee Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SYZ.TO",
+    "name": "Sylogist Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SXI.TO",
+    "name": "Synex Renewable Energy Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TBL.TO",
+    "name": "Taiga Building Products Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TAIG.TO",
+    "name": "Taiga Motors Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TSK.TO",
+    "name": "Talisker Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TLO.TO",
+    "name": "Talon Metals Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TVE.TO",
+    "name": "Tamarack Valley Energy Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TKO.TO",
+    "name": "Taseko Mines Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TRP.TO",
+    "name": "TC Energy Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "XTD.TO",
+    "name": "TDb Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TECK-B.TO",
+    "name": "Teck Resources Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TCS.TO",
+    "name": "TECSYS Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TSAT.TO",
+    "name": "Telesat Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "T.TO",
+    "name": "TELUS Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TIXT.TO",
+    "name": "TELUS International (Cda) Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TNZ.TO",
+    "name": "Tenaz Energy Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TGO.TO",
+    "name": "TeraGo Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TSND.TO",
+    "name": "TerrAscend Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TVK.TO",
+    "name": "TerraVest Industries Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TFII.TO",
+    "name": "TFI International Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TH.TO",
+    "name": "Theratechnologies Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "THNC.TO",
+    "name": "Thinkific Labs Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TRI.TO",
+    "name": "Thomson Reuters Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TWM.TO",
+    "name": "Tidewater Midstream and Infrastructure Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TF.TO",
+    "name": "Timbercreek Financial Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TMD.TO",
+    "name": "Titan Medical Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TI.TO",
+    "name": "Titan Mining Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "X.TO",
+    "name": "TMX Group Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TPZ.TO",
+    "name": "Topaz Energy Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TXG.TO",
+    "name": "Torex Gold Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TIH.TO",
+    "name": "Toromont Industries Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TD.TO",
+    "name": "Toronto-Dominion Bank (The)",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TOT.TO",
+    "name": "Total Energy Services Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TXP.TO",
+    "name": "Touchstone Exploration Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TOU.TO",
+    "name": "Tourmaline Oil Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TA.TO",
+    "name": "TransAlta Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TRZ.TO",
+    "name": "Transat A-T- Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TCL-A.TO",
+    "name": "Transcontinental Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TML.TO",
+    "name": "Treasury Metals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TSL.TO",
+    "name": "Tree Island Steel Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TCW.TO",
+    "name": "Trican Well Service Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TCN.TO",
+    "name": "Tricon Residential Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TMQ.TO",
+    "name": "Trilogy Metals Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TFPM.TO",
+    "name": "Triple Flag Precious Metals Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TSU.TO",
+    "name": "Trisura Group Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TLG.TO",
+    "name": "Troilus Gold Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TC.TO",
+    "name": "Tucows Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TVA-B.TO",
+    "name": "TVA Group Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TWC.TO",
+    "name": "TWC Enterprises Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "UNI.TO",
+    "name": "Unisync Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "UNC.TO",
+    "name": "United Corporations Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "URE.TO",
+    "name": "Ur-Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "URC.TO",
+    "name": "Uranium Royalty Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "URB.TO",
+    "name": "Urbana Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VNP.TO",
+    "name": "5N Plus Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VPH.TO",
+    "name": "Valeo Pharma Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VLE.TO",
+    "name": "Valeura Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VCM.TO",
+    "name": "Vecima Networks Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VLN.TO",
+    "name": "Velan Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VET.TO",
+    "name": "Vermilion Energy Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VBNK.TO",
+    "name": "VersaBank",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VGCX.TO",
+    "name": "Victoria Gold Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VQS.TO",
+    "name": "VIQ Solutions Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VGZ.TO",
+    "name": "Vista Gold Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VHI.TO",
+    "name": "Vitalhub Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VMH-U.TO",
+    "name": "VM Hotel Acquisition Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WJX.TO",
+    "name": "Wajax Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WFC.TO",
+    "name": "Wall Financial Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WM.TO",
+    "name": "Wallbridge Mining Company Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WCN.TO",
+    "name": "Waste Connections, Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WELL.TO",
+    "name": "WELL Health Technologies Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WDO.TO",
+    "name": "Wesdome Gold Mines Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WFG.TO",
+    "name": "West Fraser Timber Co- Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WRN.TO",
+    "name": "Western Copper and Gold Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WRG.TO",
+    "name": "Western Energy Services Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WEF.TO",
+    "name": "Western Forest Products Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WRX.TO",
+    "name": "Western Resources Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WPRT.TO",
+    "name": "Westport Fuel Systems Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WTE.TO",
+    "name": "Westshore Terminals Investment Corporation",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WPM.TO",
+    "name": "Wheaton Precious Metals Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WCP.TO",
+    "name": "Whitecap Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WILD.TO",
+    "name": "WildBrain Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WLLW.TO",
+    "name": "Willow Biosciences Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WCM-B.TO",
+    "name": "Wilmington Capital Management Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WPK.TO",
+    "name": "Winpak Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WNDR.TO",
+    "name": "WonderFi Technologies Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WFS.TO",
+    "name": "World Financial Split Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WSP.TO",
+    "name": "WSP Global Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "XAM.TO",
+    "name": "Xanadu Mines Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "XTG.TO",
+    "name": "Xtra-Gold Resources Corp",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "XTRA.TO",
+    "name": "Xtract One Technologies Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "YGR.TO",
+    "name": "Yangarra Resources Ltd",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "Y.TO",
+    "name": "Yellow Pages Limited",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "YRB.TO",
+    "name": "Yorbeau Resources Inc",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GSV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OPS.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MMP-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NZC.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CNU.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DIR-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CRH.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PFB.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NCM.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WCM-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MR-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TNX.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "QSP-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ETX.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MDC-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WIR-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CTF-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LGT-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GCG.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FRX.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AH.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TNT-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ZENA.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CDD-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NIF-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CHE-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MRG-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "YCM.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TBP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "APR-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VMD.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RBA.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IVQ-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FAF.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TPX-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EIT-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SGR-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AX-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CWEB-WR.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "QBTC-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TEV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VFF.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AZZ.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ESN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BLB-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PIPE-WT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CGO.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TOG.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PHO.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PMB-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AVP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DYA-WT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TV-WT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SIH-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KRR-WT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FFH-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "UEX.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EOX.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IMV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IPL.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TRIL.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CTC.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PVG.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KOR.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PGI-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SWH.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CCL-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NWH-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CSW-B.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BEI-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "UNS.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CLIQ.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RPI-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NSR.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GCM.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MSI.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IBG.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SRU-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KMP-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AUP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ELR-RT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SPPP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PHYS.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BPY-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BAD.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NEPT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HBL-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FXC.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BLU.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CHP-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RIB-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EFL.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PTS.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SMU-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HSE.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FAP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "INC-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VIVO.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MRV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TMR.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AYM.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NCU-WT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BAM-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BTCG-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ROXG.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GPR.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TRL.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RFP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CDV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NHF-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "REI-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SW.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "USF-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SSF-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AP-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SBB.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "UFS.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TGOD-WB.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CMMC.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CEF-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FIRE.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MDS-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CLR.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PMN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NEXA.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "INF-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ALB.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HRR-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MRT-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CFW-WT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HR-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SCL.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SOP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SRV-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CWX.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MID-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TGZ.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SJR-B.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SRX.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GEC-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HSM.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BTB-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ENI-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HRT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RECP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NVEI-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MAW.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TGL.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TECK-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DNT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ATA.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CERV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LGT-B.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VII.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ADW-B.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RCO-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MPCT-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AW-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MHC-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PL.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AHC.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HE.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PAT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BSO-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GRT-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SRHI.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "JFS-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CAR-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CRT-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RNW.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AD-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MOZ.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ERE-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HGI-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AZG.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PSLV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SPG.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PG.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TCL-B.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BUA-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MAX.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PRV-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RBN-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BBL-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NAC-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GCT-C.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MAXR.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PBY-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "JE.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PMTS.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BPF-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CSM.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FCR-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MAV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SZLS-WS.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "LXR.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RAY-B.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CU-X.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CEF.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AHC-WT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SGQ.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PHYS-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "D-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CPI.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HEXO.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ACO-Y.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FRU-R.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GDG-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PSLV-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TZS.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GTMS.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ASP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RCI-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SBI.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MBA.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ABST.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ANX.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ITP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "QETH-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "INO-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NXJ.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VB.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TGOD-WR.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "INV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HDI.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BNAU.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "DII-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RAV-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CIQ-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MI-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SPPP-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HCG.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EXF.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "SNC.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "APY.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TGOD-WA.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GC.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AQA.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HOM-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "EVT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "HOM-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ATD-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CUF-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "INQ.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BC-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WIR-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "APHA.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RIV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GWR.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PIPE.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "URB-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WFT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GSC.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "CRR-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TGOD.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PTI-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KEG-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NSR-WT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FRL-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PATH.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OMI.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "PNC-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "YRI.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "GCT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ATD-B.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "WBR.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "QBR-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BCI.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ATP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TBP-WT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "VLNS.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FFI-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OSP.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TRQ.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MMX.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BBTV.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BBD-A.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "UTE-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AJX.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "RDL.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TXT-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BGI-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MIC.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "TCT-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NVCN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "KL.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "OSB.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "QBTC.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MBCN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "IIP-UN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AXU.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "BTCG-U.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "ORL.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MBN.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "AKT-B.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "MPC.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "FRII.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "JOSE.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "XCT.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "POM.TO",
+    "name": "",
+    "exchange": "TSX"
+  },
+  {
+    "yf_ticker": "NA.TO",
+    "name": "",
+    "exchange": "TSX"
+  }
+]

@@ -19,6 +19,18 @@ nse_bse_data/
 !data/ca_tickers_full.json
 !data/br_tickers_full.json
 !data/za_tickers_full.json
+!data/uk_tickers_full.json
+!data/sa_tickers_full.json
+!data/it_tickers_full.json
+!data/de_tickers_full.json
+!data/fr_tickers_full.json
+!data/se_tickers_full.json
+!data/no_tickers_full.json
+!data/dk_tickers_full.json
+!data/at_tickers_full.json
+!data/nz_tickers_full.json
+!data/ar_tickers_full.json
+!data/ru_tickers_full.json
 
 # NSE/BSE extractor runtime artifacts
 *.log

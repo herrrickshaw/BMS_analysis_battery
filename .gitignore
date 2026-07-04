@@ -10,3 +10,10 @@ __pycache__/
 data/*_chk.csv
 reports/*.png
 logs/
+
+# Global ticker universe files (live in herrrickshaw/global-ticker-universe)
+data/*_tickers_full.json
+data/global_universe.json
+data/global_universe_flat.csv
+data/india_tickers_full.csv
+data/all_stocks_combined.csv

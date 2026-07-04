@@ -5,8 +5,8 @@ eurex_graphql.py
 Queries the Eurex FREE public GraphQL API for T7 reference data.
 No registration required — uses the shared public API key (rate-limited).
 
-Official endpoint (v1.1.0):
-  https://api.developer.deutsche-boerse.com/prod/accesstot7-referencedata/1.1.0/
+Official endpoint (v2.0.0, GCP — AWS v1.1.0 decommissioned Jan 2026):
+  https://api.developer.deutsche-boerse.com/eurex-prod-graphql/
 Shared key: 68cdafd2-c5c1-49be-8558-37244ab4f513
 
 Available data:
@@ -35,8 +35,8 @@ except ImportError:
     sys.exit("pip install requests")
 
 # ── Config ────────────────────────────────────────────────────────────────────
-# Correct endpoint (v1.1.0) — NOT eurex-prod-graphql (that URL is deprecated/moved)
-GRAPHQL_URL = "https://api.developer.deutsche-boerse.com/prod/accesstot7-referencedata/1.1.0/"
+# v2.0.0 GCP endpoint (AWS v1.1.0 decommissioned ~Jan 2026)
+GRAPHQL_URL = "https://api.developer.deutsche-boerse.com/eurex-prod-graphql/"
 SHARED_KEY  = "68cdafd2-c5c1-49be-8558-37244ab4f513"
 
 DATA = Path(__file__).parent.parent / "data"

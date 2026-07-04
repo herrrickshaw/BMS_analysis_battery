@@ -372,3 +372,36 @@ pip install bf4py
 
 All 4 scripts are production-ready. Start with Eurex GraphQL (no auth), add A7 for live data, and S3 for historical.
 
+
+---
+
+## API Endpoint Updates
+
+### Eurex GraphQL Endpoint
+**Production Endpoint:** `https://api.developer.deutsche-boerse.com/eurex-prod-graphql`
+
+**Note:** This endpoint requires authentication. While labeled as a developer API, it may require:
+- Developer registration at https://developer.deutsche-boerse.com/
+- API credentials/token
+- IP whitelisting (for some accounts)
+
+**Recommendation:** Use A7 Xetra Reference API instead
+- Simpler authentication (free token)
+- Better documentation
+- Full equity coverage
+- Same data quality
+
+### Public vs. Authenticated APIs
+
+| API | Endpoint | Auth | Coverage | Status |
+|-----|----------|------|----------|--------|
+| Eurex GraphQL | `api.developer.deutsche-boerse.com/eurex-prod-graphql` | Required | Eurex contracts | Requires setup |
+| A7 Xetra Reference | `a7.deutsche-boerse.com/api/v1` | Free token | All equities + fundamentals | ✅ RECOMMENDED |
+| Xetra PDS S3 | AWS S3 bucket | AWS credentials | Historical 1-min | ✅ RECOMMENDED |
+| Börse Frankfurt | `boerse-frankfurt.de/api` | None | Limited | ❌ Rate-limited |
+
+**For Production Deployment:**
+1. **Register A7 token** (primary source for daily screening)
+2. **Optional S3 setup** (historical deep analysis)
+3. **GraphQL** (advanced users only, requires additional setup)
+

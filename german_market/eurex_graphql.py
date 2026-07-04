@@ -19,7 +19,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-EUREX_GRAPHQL_ENDPOINT = "https://console.developer.deutsche-boerse.com/graphql"
+EUREX_GRAPHQL_ENDPOINT = "https://api.developer.deutsche-boerse.com/eurex-prod-graphql"
 
 class EurexGraphQLClient:
     def __init__(self):

@@ -3,8 +3,13 @@
 # Run ALL German market data extractions and push results to GitHub.
 # Execute from the repo root: bash german_market/extract_and_push.sh
 
-set -e
+set -euo pipefail
 cd "$(dirname "$0")/.."
+
+run_step() {
+  # Run a python step; on failure print the error but continue
+  python3 "$@" 2>&1 || echo "  [WARN] step failed — continuing"
+}
 echo "=== Deutsche Börse Data Extraction ==="
 echo "Working dir: $(pwd)"
 echo ""
@@ -26,17 +31,15 @@ done
 echo ""
 
 echo "[3/4] Eurex trading hours..."
-python3 german_market/eurex_graphql.py --trading-hours \
-  --out data/eurex_trading_hours.csv 2>&1
-echo ""
+run_step german_market/eurex_graphql.py --trading-hours \
+  --out data/eurex_trading_hours.csv
 
 echo "[4/4] Eurex trading holidays..."
-python3 german_market/eurex_graphql.py --holidays \
-  --out data/eurex_holidays.csv 2>&1
-echo ""
+run_step german_market/eurex_graphql.py --holidays \
+  --out data/eurex_holidays.csv
 
 echo "[5/5] Eurex schema introspection..."
-python3 german_market/eurex_graphql.py --introspect 2>&1 | tee data/eurex_schema.txt
+run_step german_market/eurex_graphql.py --introspect | tee data/eurex_schema.txt
 echo ""
 
 # ── Show what we got ─────────────────────────────────────────────────────────

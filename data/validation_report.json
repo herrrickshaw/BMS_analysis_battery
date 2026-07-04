@@ -1,0 +1,361 @@
+{
+  "summary": {
+    "total": 74239,
+    "valid": 60971,
+    "invalid": 13268,
+    "removal_pct": 17.87
+  },
+  "by_market": {
+    "IN": {
+      "total": 5981,
+      "valid": 2984,
+      "invalid": 2997,
+      "source": "financedb"
+    },
+    "US": {
+      "total": 7726,
+      "valid": 6443,
+      "invalid": 1283,
+      "source": "financedb"
+    },
+    "JP": {
+      "total": 3618,
+      "valid": 2658,
+      "invalid": 960,
+      "source": "financedb"
+    },
+    "KR": {
+      "total": 2606,
+      "valid": 545,
+      "invalid": 2061,
+      "source": "financedb"
+    },
+    "AU": {
+      "total": 2297,
+      "valid": 1657,
+      "invalid": 640,
+      "source": "financedb"
+    },
+    "SG": {
+      "total": 171,
+      "valid": 35,
+      "invalid": 136,
+      "source": "financedb"
+    },
+    "CN": {
+      "total": 5345,
+      "valid": 3431,
+      "invalid": 1914,
+      "source": "financedb"
+    },
+    "HK": {
+      "total": 2701,
+      "valid": 1473,
+      "invalid": 1228,
+      "source": "financedb"
+    },
+    "TW": {
+      "total": 1065,
+      "valid": 664,
+      "invalid": 401,
+      "source": "financedb"
+    },
+    "CA": {
+      "total": 2157,
+      "valid": 779,
+      "invalid": 1378,
+      "source": "financedb"
+    },
+    "BR": {
+      "total": 2755,
+      "valid": 2755,
+      "invalid": 0,
+      "source": "unchecked"
+    },
+    "ZA": {
+      "total": 391,
+      "valid": 391,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "UK": {
+      "total": 2713,
+      "valid": 2713,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "SA": {
+      "total": 371,
+      "valid": 154,
+      "invalid": 217,
+      "source": "financedb"
+    },
+    "IT": {
+      "total": 2249,
+      "valid": 2249,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "DE": {
+      "total": 17121,
+      "valid": 17121,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "FR": {
+      "total": 2050,
+      "valid": 2050,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "SE": {
+      "total": 1146,
+      "valid": 1146,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "NO": {
+      "total": 1004,
+      "valid": 1004,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "DK": {
+      "total": 643,
+      "valid": 643,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "AT": {
+      "total": 8813,
+      "valid": 8813,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "NZ": {
+      "total": 137,
+      "valid": 137,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "AR": {
+      "total": 442,
+      "valid": 442,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "RU": {
+      "total": 242,
+      "valid": 242,
+      "invalid": 0,
+      "source": "financedb"
+    },
+    "CH": {
+      "total": 132,
+      "valid": 132,
+      "invalid": 0,
+      "source": "unchecked"
+    },
+    "NL": {
+      "total": 91,
+      "valid": 38,
+      "invalid": 53,
+      "source": "financedb"
+    },
+    "ES": {
+      "total": 106,
+      "valid": 106,
+      "invalid": 0,
+      "source": "unchecked"
+    },
+    "AE": {
+      "total": 38,
+      "valid": 38,
+      "invalid": 0,
+      "source": "unchecked"
+    },
+    "GR": {
+      "total": 25,
+      "valid": 25,
+      "invalid": 0,
+      "source": "unchecked"
+    },
+    "FI": {
+      "total": 25,
+      "valid": 25,
+      "invalid": 0,
+      "source": "unchecked"
+    },
+    "BE": {
+      "total": 20,
+      "valid": 20,
+      "invalid": 0,
+      "source": "unchecked"
+    },
+    "IE": {
+      "total": 20,
+      "valid": 20,
+      "invalid": 0,
+      "source": "unchecked"
+    },
+    "PL": {
+      "total": 20,
+      "valid": 20,
+      "invalid": 0,
+      "source": "unchecked"
+    },
+    "PT": {
+      "total": 18,
+      "valid": 18,
+      "invalid": 0,
+      "source": "unchecked"
+    }
+  },
+  "fd_exchange_stats": {
+    "NSE": {
+      "total": 1930,
+      "active": 1898,
+      "market": "IN"
+    },
+    "BSE": {
+      "total": 3858,
+      "active": 3791,
+      "market": "IN"
+    },
+    "JPX": {
+      "total": 3061,
+      "active": 2888,
+      "market": "JP"
+    },
+    "KSC": {
+      "total": 1545,
+      "active": 1537,
+      "market": "KR"
+    },
+    "TAI": {
+      "total": 728,
+      "active": 728,
+      "market": "TW"
+    },
+    "TWO": {
+      "total": 758,
+      "active": 754,
+      "market": "TW"
+    },
+    "SHH": {
+      "total": 1628,
+      "active": 1626,
+      "market": "CN"
+    },
+    "SHZ": {
+      "total": 2248,
+      "active": 2245,
+      "market": "CN"
+    },
+    "HKG": {
+      "total": 1625,
+      "active": 1599,
+      "market": "HK"
+    },
+    "SES": {
+      "total": 558,
+      "active": 547,
+      "market": "SG"
+    },
+    "ASX": {
+      "total": 2047,
+      "active": 1657,
+      "market": "AU"
+    },
+    "NZE": {
+      "total": 259,
+      "active": 251,
+      "market": "NZ"
+    },
+    "LSE": {
+      "total": 3391,
+      "active": 2713,
+      "market": "UK"
+    },
+    "GER": {
+      "total": 1189,
+      "active": 1041,
+      "market": "DE"
+    },
+    "FRA": {
+      "total": 17123,
+      "active": 16080,
+      "market": "DE"
+    },
+    "PAR": {
+      "total": 2175,
+      "active": 2050,
+      "market": "FR"
+    },
+    "MIL": {
+      "total": 2277,
+      "active": 2249,
+      "market": "IT"
+    },
+    "STO": {
+      "total": 1186,
+      "active": 1146,
+      "market": "SE"
+    },
+    "OSL": {
+      "total": 1053,
+      "active": 1004,
+      "market": "NO"
+    },
+    "CPH": {
+      "total": 659,
+      "active": 643,
+      "market": "DK"
+    },
+    "VIE": {
+      "total": 8855,
+      "active": 8813,
+      "market": "AT"
+    },
+    "TOR": {
+      "total": 1022,
+      "active": 779,
+      "market": "CA"
+    },
+    "SAU": {
+      "total": 154,
+      "active": 154,
+      "market": "SA"
+    },
+    "JNB": {
+      "total": 411,
+      "active": 391,
+      "market": "ZA"
+    },
+    "BUE": {
+      "total": 456,
+      "active": 442,
+      "market": "AR"
+    },
+    "MCX": {
+      "total": 248,
+      "active": 242,
+      "market": "RU"
+    },
+    "NMS": {
+      "total": 6861,
+      "active": 4931,
+      "market": "US"
+    },
+    "NYQ": {
+      "total": 4165,
+      "active": 3109,
+      "market": "US"
+    },
+    "AMS": {
+      "total": 227,
+      "active": 208,
+      "market": "NL"
+    }
+  }
+}

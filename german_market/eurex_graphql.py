@@ -98,12 +98,14 @@ def trading_hours(product_id: str = None, api_key: str = SHARED_KEY) -> list[dic
     date
     data {{
       Product
-      StartContinuosTrading
+      StartContinuousTrading
       EndOpeningAuction
-      EndContinuosTrading
+      EndContinuousTrading
       EndClosingAuction
       StartTES
       EndTES
+      LTDBook
+      LTDTES
     }}
   }}
 }}'''
@@ -113,12 +115,14 @@ def trading_hours(product_id: str = None, api_key: str = SHARED_KEY) -> list[dic
     date
     data {
       Product
-      StartContinuosTrading
+      StartContinuousTrading
       EndOpeningAuction
-      EndContinuosTrading
+      EndContinuousTrading
       EndClosingAuction
       StartTES
       EndTES
+      LTDBook
+      LTDTES
     }
   }
 }'''
@@ -127,15 +131,15 @@ def trading_hours(product_id: str = None, api_key: str = SHARED_KEY) -> list[dic
 
 
 def trading_holidays(api_key: str = SHARED_KEY) -> list[dict]:
-    """Exchange holiday calendar."""
+    """Exchange holiday calendar (v2.0.0: query is Holidays, fields: Holiday, ExchangeHoliday)."""
     q = '''query {
-  TradingHolidays {
+  Holidays {
     date
-    data { Date HolidayType }
+    data { Product Holiday ExchangeHoliday }
   }
 }'''
     data = gql(q, api_key)
-    return data.get("TradingHolidays", {}).get("data", [])
+    return data.get("Holidays", {}).get("data", [])
 
 
 def introspect(api_key: str = SHARED_KEY) -> dict:
@@ -227,9 +231,9 @@ def main():
         print("  " + "─" * 60)
         for h in hours[:20]:
             print(f"  {h.get('Product',''):<12} "
-                  f"{str(h.get('StartContinuosTrading','')):<20} "
+                  f"{str(h.get('StartContinuousTrading','')):<20} "
                   f"{str(h.get('EndOpeningAuction','') or ''):>12} "
-                  f"{str(h.get('EndContinuosTrading','') or ''):>13}")
+                  f"{str(h.get('EndContinuousTrading','') or ''):>13}")
 
         out = Path(args.out) if args.out else DATA / "eurex_trading_hours.csv"
         if hours:
@@ -245,7 +249,7 @@ def main():
         hols = trading_holidays(key)
         print(f"  {len(hols)} holiday records\n")
         for h in hols:
-            print(f"  {h.get('Date',''):<15} {h.get('HolidayType','')}")
+            print(f"  {h.get('Holiday',''):<15} {h.get('ExchangeHoliday','')}")
 
         out = Path(args.out) if args.out else DATA / "eurex_holidays.csv"
         if hols:

@@ -33,7 +33,30 @@ Its default posture everywhere is report, not delete — the one place it
    actually open and decide "supersede, merge, or keep both." Expect some
    over-clustering on generic first words; that's a cheap false positive
    in a report a human reads, not a correctness bug.
-4. **Branch staleness** (`Branch_analyzer`) — ahead/behind commit counts and
+4. **Recency annotations** (`Recency`) — every file listed in a duplicate
+   group or name cluster is tagged with its size and the last-commit date
+   *from its own repo's git history* (not the CLI's combined view — each
+   repo's history is independent). The file with the latest date in each
+   group is marked `**<- most recently touched**`. This is what turns "these
+   are duplicates across repos" into an actual answer for which copy is
+   current: every cross-repo duplicate of the shared engine scripts
+   (`full_us_market_scan.py`, `full_korea_market_scan.py`,
+   `full_japan_market_scan.py`, `full_indian_market_scan.py`,
+   `nse_data_fetcher.py`, and others) resolves to **`global-market-scanners`**
+   as the most recently touched copy — consistently dated 2026-07-03,
+   against `quant-stock-analysis`'s 2026-06-29 and `claude-stock-tools`'s
+   2026-06-13. That's real evidence for which of the three overlapping
+   stock-analysis codebases is being actively maintained, not a guess.
+   Note what this does and doesn't establish: recency says which copy was
+   *touched most recently*, not which is *most complete* — for
+   byte-identical exact duplicates there's no completeness difference to
+   measure (they're the same bytes), so recency is the only signal that
+   applies. For name clusters, where files genuinely differ, size is shown
+   alongside recency so both signals are visible; this tool doesn't try to
+   collapse them into one "winner" for a name cluster, since unlike an
+   exact duplicate, a name cluster's files aren't proven to be the same
+   thing at different points in time — that's still a human's call.
+5. **Branch staleness** (`Branch_analyzer`) — ahead/behind commit counts and
    last-commit date for each branch vs a base ref, with a triage label
    (`Merged` / `Likely_stale` / `Recent`).
 
@@ -77,7 +100,7 @@ worked around per-run.
   you type. They give this tool zero ability to understand whether two
   Python files are logically equivalent, only whether they're
   byte-identical or similarly named. "Defect-free" means *this tool* is
-  defect-free (21 tests, all passing, including regression tests for the
+  defect-free (25 tests, all passing, including regression tests for the
   two real bugs found while running it against real repo data) — not a
   claim that the tool can certify the Python codebases it scans as
   defect-free.
@@ -92,7 +115,7 @@ worked around per-run.
 ```bash
 cd tools/repo-cleaner-ocaml
 dune build
-dune exec test/test_repo_cleaner.exe   # 21 tests, synthetic fixtures
+dune exec test/test_repo_cleaner.exe   # 25 tests, synthetic fixtures
 
 # report only (default -- nothing is ever deleted without --apply)
 dune exec bin/main.exe -- \

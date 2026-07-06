@@ -3,12 +3,17 @@ let human_bytes n =
   else if n >= 1_000 then Printf.sprintf "%.1fKB" (float_of_int n /. 1_000.)
   else Printf.sprintf "%dB" n
 
+let file_line annotate (f : Scanner.file_entry) =
+  match annotate f with
+  | Some note -> Printf.sprintf "  - `%s` %s" f.rel_path note
+  | None -> Printf.sprintf "  - `%s`" f.rel_path
+
 (* Returns plain lines rather than taking the caller's polymorphic Printf-based
    [p] as a parameter -- a `format4`-typed function loses the polymorphism
    printf relies on the moment it's passed across a function boundary like a
    normal value, so building strings here and letting [render] print them is
    simpler than fighting that. *)
-let render_duplicate_groups (groups : Duplicate_finder.group list) : string list =
+let render_duplicate_groups annotate (groups : Duplicate_finder.group list) : string list =
   if groups = [] then [ "None found." ]
   else
     List.concat_map
@@ -16,10 +21,11 @@ let render_duplicate_groups (groups : Duplicate_finder.group list) : string list
         let waste = g.size_bytes * (List.length g.files - 1) in
         Printf.sprintf "- **%s wasted** (%d copies of a %s file):" (human_bytes waste)
           (List.length g.files) (human_bytes g.size_bytes)
-        :: List.map (fun (f : Scanner.file_entry) -> Printf.sprintf "  - `%s`" f.rel_path) g.files)
+        :: List.map (file_line annotate) g.files)
       groups
 
-let render ~root ~duplicate_groups ~name_clusters ~branches ?(data_duplicate_groups = []) () =
+let render ~root ~duplicate_groups ~name_clusters ~branches ?(data_duplicate_groups = [])
+    ?(annotate = fun (_ : Scanner.file_entry) -> None) () =
   let buf = Buffer.create 4096 in
   let p fmt = Printf.ksprintf (fun s -> Buffer.add_string buf s; Buffer.add_char buf '\n') fmt in
 
@@ -34,7 +40,7 @@ let render ~root ~duplicate_groups ~name_clusters ~branches ?(data_duplicate_gro
   p "## Exact duplicate files (%d group%s)" (List.length duplicate_groups)
     (if List.length duplicate_groups = 1 then "" else "s");
   p "";
-  List.iter (fun line -> p "%s" line) (render_duplicate_groups duplicate_groups);
+  List.iter (fun line -> p "%s" line) (render_duplicate_groups annotate duplicate_groups);
   p "";
 
   p "## Data-source duplicates (%d group%s)" (List.length data_duplicate_groups)
@@ -45,7 +51,7 @@ let render ~root ~duplicate_groups ~name_clusters ~branches ?(data_duplicate_gro
   p "downloading the real LFS bytes, since a pointer's declared `oid`/`size`";
   p "already proves byte-identical content on its own.";
   p "";
-  List.iter (fun line -> p "%s" line) (render_duplicate_groups data_duplicate_groups);
+  List.iter (fun line -> p "%s" line) (render_duplicate_groups annotate data_duplicate_groups);
   p "";
 
   p "## Name-based doc-sprawl clusters (%d cluster%s)" (List.length name_clusters)
@@ -60,7 +66,7 @@ let render ~root ~duplicate_groups ~name_clusters ~branches ?(data_duplicate_gro
     List.iter
       (fun (c : Name_clusterer.cluster) ->
         p "- **%s** (%d files):" c.key (List.length c.files);
-        List.iter (fun (f : Scanner.file_entry) -> p "  - `%s`" f.rel_path) c.files)
+        List.iter (fun line -> p "%s" line) (List.map (file_line annotate) c.files))
       name_clusters;
   p "";
 

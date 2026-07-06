@@ -8,86 +8,86 @@ every finding below needs a human decision before anything is removed.
 ## Exact duplicate files (26 groups)
 
 - **12.3MB wasted** (2 copies of a 12.3MB file):
-  - `fuel-retail-outlets/fuel-pump-locations-map/locations-data.js`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.js`
+  - `fuel-retail-outlets/fuel-pump-locations-map/locations-data.js` (12.3MB, last touched 2026-06-30T14:25:08+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.js` (12.3MB, last touched 2026-06-30T14:25:08+05:30)
 - **2.0MB wasted** (2 copies of a 2.0MB file):
-  - `main-repo/nse_screener_reference/scan_results/backtest_1yr_full_NSE_latest.xlsx`
-  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1300.xlsx`
+  - `main-repo/nse_screener_reference/scan_results/backtest_1yr_full_NSE_latest.xlsx` (2.0MB, last touched 2026-06-26T13:48:01+05:30)
+  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1300.xlsx` (2.0MB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
 - **1.9MB wasted** (2 copies of a 1.9MB file):
-  - `main-repo/nse_screener_reference/scan_results/us_full_scan_latest.xlsx`
-  - `main-repo/Downloads/data/us_full_scan/us_full_scan/us_full_scan_20260626_1437.xlsx`
+  - `main-repo/nse_screener_reference/scan_results/us_full_scan_latest.xlsx` (1.9MB, last touched 2026-06-26T14:40:34+05:30)
+  - `main-repo/Downloads/data/us_full_scan/us_full_scan/us_full_scan_20260626_1437.xlsx` (1.9MB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
 - **955.5KB wasted** (2 copies of a 955.5KB file):
-  - `main-repo/nse_screener_reference/scan_results/walkforward_3y5y10y_latest.xlsx`
-  - `main-repo/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1305.xlsx`
+  - `main-repo/nse_screener_reference/scan_results/walkforward_3y5y10y_latest.xlsx` (955.5KB, last touched 2026-06-26T13:48:01+05:30)
+  - `main-repo/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1305.xlsx` (955.5KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
 - **135.0KB wasted** (2 copies of a 135.0KB file):
-  - `main-repo/Downloads/code/notebooks/Stock_reporting.ipynb`
-  - `claude-stock-tools/03_colab_notebooks/india_stock_reporting.ipynb`
+  - `main-repo/Downloads/code/notebooks/Stock_reporting.ipynb` (135.0KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `claude-stock-tools/03_colab_notebooks/india_stock_reporting.ipynb` (135.0KB, last touched 2026-06-13T19:42:45+05:30)
 - **71.5KB wasted** (2 copies of a 71.5KB file):
-  - `main-repo/Downloads/code/python_files/us_stocks_colab.py`
-  - `claude-stock-tools/03_colab_notebooks/us_stocks_colab_script.py`
+  - `main-repo/Downloads/code/python_files/us_stocks_colab.py` (71.5KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `claude-stock-tools/03_colab_notebooks/us_stocks_colab_script.py` (71.5KB, last touched 2026-06-13T19:42:45+05:30)
 - **57.1KB wasted** (3 copies of a 28.6KB file):
-  - `main-repo/Downloads/code/python_files/full_japan_market_scan.py`
-  - `global-market-scanners/full_japan_market_scan.py`
-  - `claude-stock-tools/02_market_screeners/japan_market_scan.py`
+  - `main-repo/Downloads/code/python_files/full_japan_market_scan.py` (28.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/full_japan_market_scan.py` (28.6KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
+  - `claude-stock-tools/02_market_screeners/japan_market_scan.py` (28.6KB, last touched 2026-06-13T19:42:45+05:30)
 - **56.7KB wasted** (2 copies of a 56.7KB file):
-  - `main-repo/Downloads/code/python_files/stock_daily_report_improved.py`
-  - `claude-stock-tools/01_daily_reports/india_daily_report.py`
+  - `main-repo/Downloads/code/python_files/stock_daily_report_improved.py` (56.7KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `claude-stock-tools/01_daily_reports/india_daily_report.py` (56.7KB, last touched 2026-06-13T19:42:45+05:30)
 - **55.8KB wasted** (2 copies of a 55.8KB file):
-  - `main-repo/Downloads/code/python_files/us_stock_daily_report.py`
-  - `claude-stock-tools/01_daily_reports/us_daily_report.py`
+  - `main-repo/Downloads/code/python_files/us_stock_daily_report.py` (55.8KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `claude-stock-tools/01_daily_reports/us_daily_report.py` (55.8KB, last touched 2026-06-13T19:42:45+05:30)
 - **55.3KB wasted** (3 copies of a 27.6KB file):
-  - `main-repo/Downloads/code/python_files/full_korea_market_scan.py`
-  - `global-market-scanners/full_korea_market_scan.py`
-  - `claude-stock-tools/02_market_screeners/korea_market_scan.py`
+  - `main-repo/Downloads/code/python_files/full_korea_market_scan.py` (27.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/full_korea_market_scan.py` (27.6KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
+  - `claude-stock-tools/02_market_screeners/korea_market_scan.py` (27.6KB, last touched 2026-06-13T19:42:45+05:30)
 - **45.8KB wasted** (2 copies of a 45.8KB file):
-  - `main-repo/Downloads/code/python_files/full_us_market_scan.py`
-  - `global-market-scanners/full_us_market_scan.py`
+  - `main-repo/Downloads/code/python_files/full_us_market_scan.py` (45.8KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/full_us_market_scan.py` (45.8KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
 - **44.0KB wasted** (2 copies of a 44.0KB file):
-  - `main-repo/Downloads/code/python_files/nse_data_fetcher.py`
-  - `global-market-scanners/nse_data_fetcher.py`
+  - `main-repo/Downloads/code/python_files/nse_data_fetcher.py` (44.0KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/nse_data_fetcher.py` (44.0KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
 - **42.1KB wasted** (2 copies of a 42.1KB file):
-  - `main-repo/Downloads/code/python_files/full_indian_market_scan.py`
-  - `global-market-scanners/full_indian_market_scan.py`
+  - `main-repo/Downloads/code/python_files/full_indian_market_scan.py` (42.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/full_indian_market_scan.py` (42.1KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
 - **41.9KB wasted** (2 copies of a 41.9KB file):
-  - `main-repo/Downloads/code/python_files/sg_stock_daily_report.py`
-  - `claude-stock-tools/01_daily_reports/singapore_daily_report.py`
+  - `main-repo/Downloads/code/python_files/sg_stock_daily_report.py` (41.9KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `claude-stock-tools/01_daily_reports/singapore_daily_report.py` (41.9KB, last touched 2026-06-13T19:42:45+05:30)
 - **41.1KB wasted** (2 copies of a 41.1KB file):
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.geojson`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.geojson`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.geojson` (41.1KB, last touched 2026-06-30T14:25:08+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.geojson` (41.1KB, last touched 2026-06-30T14:25:08+05:30)
 - **40.5KB wasted** (2 copies of a 40.5KB file):
-  - `main-repo/Downloads/code/python_files/us_market_screener.py`
-  - `claude-stock-tools/02_market_screeners/us_market_screener_v1.py`
+  - `main-repo/Downloads/code/python_files/us_market_screener.py` (40.5KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `claude-stock-tools/02_market_screeners/us_market_screener_v1.py` (40.5KB, last touched 2026-06-13T19:42:45+05:30)
 - **39.3KB wasted** (2 copies of a 39.3KB file):
-  - `main-repo/Downloads/code/notebooks/US_Market_Screener_Colab.ipynb`
-  - `claude-stock-tools/03_colab_notebooks/us_market_screener.ipynb`
+  - `main-repo/Downloads/code/notebooks/US_Market_Screener_Colab.ipynb` (39.3KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `claude-stock-tools/03_colab_notebooks/us_market_screener.ipynb` (39.3KB, last touched 2026-06-13T19:42:45+05:30)
 - **32.1KB wasted** (2 copies of a 32.1KB file):
-  - `main-repo/Downloads/code/notebooks/Stock_Analysis_Colab.ipynb`
-  - `claude-stock-tools/03_colab_notebooks/india_stock_analysis.ipynb`
+  - `main-repo/Downloads/code/notebooks/Stock_Analysis_Colab.ipynb` (32.1KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `claude-stock-tools/03_colab_notebooks/india_stock_analysis.ipynb` (32.1KB, last touched 2026-06-13T19:42:45+05:30)
 - **30.3KB wasted** (2 copies of a 30.3KB file):
-  - `main-repo/Downloads/code/python_files/quick_reference.py`
-  - `claude-stock-tools/04_strategy_reference/momentum_strategy_reference.py`
+  - `main-repo/Downloads/code/python_files/quick_reference.py` (30.3KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `claude-stock-tools/04_strategy_reference/momentum_strategy_reference.py` (30.3KB, last touched 2026-06-13T19:42:45+05:30)
 - **28.0KB wasted** (2 copies of a 28.0KB file):
-  - `main-repo/Downloads/code/python_files/market_data_cache.py`
-  - `global-market-scanners/market_data_cache.py`
+  - `main-repo/Downloads/code/python_files/market_data_cache.py` (28.0KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/market_data_cache.py` (28.0KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
 - **26.3KB wasted** (2 copies of a 26.3KB file):
-  - `main-repo/Downloads/code/python_files/ml_signal_engine.py`
-  - `global-market-scanners/ml_signal_engine.py`
+  - `main-repo/Downloads/code/python_files/ml_signal_engine.py` (26.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/ml_signal_engine.py` (26.3KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
 - **26.0KB wasted** (2 copies of a 26.0KB file):
-  - `main-repo/Downloads/code/python_files/full_european_market_scan.py`
-  - `global-market-scanners/full_european_market_scan.py`
+  - `main-repo/Downloads/code/python_files/full_european_market_scan.py` (26.0KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/full_european_market_scan.py` (26.0KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
 - **15.9KB wasted** (2 copies of a 15.9KB file):
-  - `main-repo/Downloads/code/python_files/stock_utils.py`
-  - `global-market-scanners/stock_utils.py`
+  - `main-repo/Downloads/code/python_files/stock_utils.py` (15.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/stock_utils.py` (15.9KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
 - **13.6KB wasted** (2 copies of a 13.6KB file):
-  - `main-repo/nse_screener_reference/portfolio_IN_latest.xlsx`
-  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2234.xlsx`
+  - `main-repo/nse_screener_reference/portfolio_IN_latest.xlsx` (13.6KB, last touched 2026-06-26T22:35:41+05:30)
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2234.xlsx` (13.6KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
 - **70B wasted** (3 copies of a 35B file):
-  - `fuel-retail-outlets/.gitignore`
-  - `toll-plaza-highways/.gitignore`
-  - `india-trade-export-analysis/.gitignore`
+  - `fuel-retail-outlets/.gitignore` (35B, last touched 2026-06-30T14:25:08+05:30)
+  - `toll-plaza-highways/.gitignore` (35B, last touched 2026-06-30T14:25:20+05:30)
+  - `india-trade-export-analysis/.gitignore` (35B, last touched 2026-06-30T14:25:25+05:30) **<- most recently touched**
 - **45B wasted** (2 copies of a 45B file):
-  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.geojson`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.geojson`
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.geojson` (45B, last touched 2026-06-30T14:25:08+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.geojson` (45B, last touched 2026-06-30T14:25:08+05:30)
 
 ## Data-source duplicates (0 groups)
 
@@ -105,670 +105,654 @@ decide "supersede, merge, or keep both." Over-inclusion is expected; this
 is a naming heuristic, not a content judgment.
 
 - **TOLL** (23 files):
-  - `main-repo/toll_heatmap_2024-11.html`
-  - `main-repo/toll_heatmap_2024-10.html`
-  - `main-repo/toll_heatmap_2024-09.html`
-  - `main-repo/toll_heatmap_2024-08.html`
-  - `main-repo/toll_heatmap_2024-07.html`
-  - `main-repo/toll_heatmap_2024-06.html`
-  - `main-repo/toll_heatmap_2024-05.html`
-  - `main-repo/toll_heatmap_2024-04.html`
-  - `main-repo/toll_heatmap_2024-03.html`
-  - `main-repo/toll_heatmap_2024-01.html`
-  - `main-repo/Downloads/code/web/toll_plazas_map.html`
-  - `main-repo/Downloads/code/web/toll_dashboard.html`
-  - `main-repo/Downloads/code/web/toll_collections_heatmap.html`
-  - `main-repo/Downloads/code/python_files/toll_metrics.json`
-  - `main-repo/Downloads/code/python_files/toll_analysis_report.txt`
-  - `fuel-retail-outlets/api-data-integration/toll_retail_map_20260624_094534.html`
-  - `fuel-retail-outlets/api-data-integration/toll_retail_distance_map_20260624_095202.html`
-  - `fuel-retail-outlets/api-data-integration/TOLL_RETAIL_INTEGRATION_20260624_093854.xlsx`
-  - `fuel-retail-outlets/api-data-integration/TOLL_RETAIL_DISTANCE_ANALYSIS_20260624_095202.xlsx`
-  - `toll-plaza-highways/toll_plaza_visualization.py`
-  - `toll-plaza-highways/toll_plaza_dashboard.py`
-  - `toll-plaza-highways/TOLL_RETAIL_INTEGRATION_SUMMARY.md`
-  - `toll-plaza-highways/TOLL_RETAIL_DISTANCE_ANALYSIS_SUMMARY.md`
+  - `main-repo/toll_heatmap_2024-11.html` (65.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/toll_heatmap_2024-10.html` (65.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/toll_heatmap_2024-09.html` (65.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/toll_heatmap_2024-08.html` (65.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/toll_heatmap_2024-07.html` (65.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/toll_heatmap_2024-06.html` (65.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/toll_heatmap_2024-05.html` (65.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/toll_heatmap_2024-04.html` (65.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/toll_heatmap_2024-03.html` (126.1KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/toll_heatmap_2024-01.html` (126.1KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/Downloads/code/web/toll_plazas_map.html` (1.5MB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/web/toll_dashboard.html` (21.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/web/toll_collections_heatmap.html` (736.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/toll_metrics.json` (9.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/toll_analysis_report.txt` (4.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `fuel-retail-outlets/api-data-integration/toll_retail_map_20260624_094534.html` (10.4MB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/toll_retail_distance_map_20260624_095202.html` (2.8MB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/TOLL_RETAIL_INTEGRATION_20260624_093854.xlsx` (102.6KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/TOLL_RETAIL_DISTANCE_ANALYSIS_20260624_095202.xlsx` (90.9KB, last touched 2026-06-30T14:25:08+05:30)
+  - `toll-plaza-highways/toll_plaza_visualization.py` (16.4KB, last touched 2026-06-30T14:25:20+05:30)
+  - `toll-plaza-highways/toll_plaza_dashboard.py` (22.2KB, last touched 2026-06-30T14:25:20+05:30)
+  - `toll-plaza-highways/TOLL_RETAIL_INTEGRATION_SUMMARY.md` (10.8KB, last touched 2026-06-30T14:25:20+05:30)
+  - `toll-plaza-highways/TOLL_RETAIL_DISTANCE_ANALYSIS_SUMMARY.md` (12.6KB, last touched 2026-06-30T14:25:20+05:30)
 - **README** (21 files):
-  - `main-repo/tools/repo-cleaner-ocaml/README.md`
-  - `main-repo/nse_screener_reference/README.md`
-  - `main-repo/global_expansion_screener_framework/README.md`
-  - `main-repo/docs/README.md`
-  - `main-repo/README.md`
-  - `main-repo/Downloads/code/stock_ddd/README.md`
-  - `main-repo/Downloads/code/python_files/README.md`
-  - `global-market-scanners/README.md`
-  - `fuel-retail-outlets/fuel-station-gap-analysis/README.md`
-  - `fuel-retail-outlets/fuel-pump-locations-map/README.md`
-  - `fuel-retail-outlets/api-data-integration/README.md`
-  - `fuel-retail-outlets/README.md`
-  - `toll-plaza-highways/README.md`
-  - `india-trade-export-analysis/README.md`
-  - `claude-stock-tools/README.md`
-  - `claude-stock-tools/05_enrichment/README.md`
-  - `claude-stock-tools/04_strategy_reference/README.md`
-  - `claude-stock-tools/03_colab_notebooks/README.md`
-  - `claude-stock-tools/02_market_screeners/README.md`
-  - `claude-stock-tools/01_daily_reports/README.md`
-  - `subscription-model-revenue/README.md`
+  - `main-repo/tools/repo-cleaner-ocaml/README.md` (6.9KB, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/nse_screener_reference/README.md` (13.1KB, last touched 2026-06-26T13:48:01+05:30)
+  - `main-repo/global_expansion_screener_framework/README.md` (9.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/docs/README.md` (649B, last touched 2026-06-26T22:44:19+05:30)
+  - `main-repo/README.md` (4.0KB, last touched 2026-06-30T14:28:53+05:30)
+  - `main-repo/Downloads/code/stock_ddd/README.md` (7.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/README.md` (1.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/README.md` (11.3KB, last touched 2026-07-03T15:24:53+05:30)
+  - `fuel-retail-outlets/fuel-station-gap-analysis/README.md` (12.7KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/fuel-pump-locations-map/README.md` (3.4KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/README.md` (7.1KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/README.md` (2.0KB, last touched 2026-06-30T14:25:08+05:30)
+  - `toll-plaza-highways/README.md` (1.4KB, last touched 2026-06-30T14:25:20+05:30)
+  - `india-trade-export-analysis/README.md` (1.3KB, last touched 2026-06-30T14:25:25+05:30)
+  - `claude-stock-tools/README.md` (20.3KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/05_enrichment/README.md` (2.4KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/04_strategy_reference/README.md` (1.4KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/03_colab_notebooks/README.md` (1.5KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/02_market_screeners/README.md` (2.5KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/01_daily_reports/README.md` (959B, last touched 2026-06-13T19:42:45+05:30)
+  - `subscription-model-revenue/README.md` (1.5KB, last touched 2026-06-26T23:34:42+05:30)
 - **SSRI** (20 files):
-  - `fuel-retail-outlets/ssri_api_discovery_report_20260624_084400.json`
-  - `fuel-retail-outlets/api-data-integration/ssri_systematic_extractor.py`
-  - `fuel-retail-outlets/api-data-integration/ssri_petrol_pumps_api.py`
-  - `fuel-retail-outlets/api-data-integration/ssri_html_scraper.py`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_state_wise_20260624_060800.json`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_state_wise_20260624_055627.json`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.js`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.geojson`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.js`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.geojson`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_summary_20260624_063249.json`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.json`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.js`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.geojson`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.csv`
-  - `fuel-retail-outlets/api-data-integration/SSRI_vs_PPAC_Comparison_Report.xlsx`
-  - `fuel-retail-outlets/SSRI_vs_PPAC_TALLY.md`
-  - `fuel-retail-outlets/SSRI_COMPLETE_EXTRACTION_REPORT.md`
-  - `fuel-retail-outlets/SSRI_API_DATA_EXTRACTION.md`
-  - `fuel-retail-outlets/SSRI_100K_INTEGRATION_GUIDE.md`
+  - `fuel-retail-outlets/ssri_api_discovery_report_20260624_084400.json` (406B, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/ssri_systematic_extractor.py` (18.0KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/ssri_petrol_pumps_api.py` (11.9KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/ssri_html_scraper.py` (9.6KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_state_wise_20260624_060800.json` (1.5KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_state_wise_20260624_055627.json` (1.5KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.js` (25.6KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.geojson` (41.1KB, last touched 2026-06-30T14:25:08+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.js` (25.6KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.geojson` (41.1KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_summary_20260624_063249.json` (1.6KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.json` (14.2MB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.js` (12.3MB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.geojson` (14.5MB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.csv` (7.2MB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/SSRI_vs_PPAC_Comparison_Report.xlsx` (4.8MB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/SSRI_vs_PPAC_TALLY.md` (6.3KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/SSRI_COMPLETE_EXTRACTION_REPORT.md` (10.1KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/SSRI_API_DATA_EXTRACTION.md` (9.5KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/SSRI_100K_INTEGRATION_GUIDE.md` (8.7KB, last touched 2026-06-30T14:25:08+05:30)
 - **INIT** (20 files):
-  - `main-repo/Downloads/code/stock_ddd/infrastructure/screening/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/infrastructure/reporting/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/infrastructure/notifications/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/infrastructure/market_data/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/infrastructure/backtest/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/infrastructure/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/domain/shared/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/domain/screening/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/domain/reporting/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/domain/market_data/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/domain/ipo/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/domain/intraday/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/domain/backtest/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/domain/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/application/queries/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/application/ports/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/application/orchestrators/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/application/commands/__init__.py`
-  - `main-repo/Downloads/code/stock_ddd/application/__init__.py`
-  - `main-repo/Downloads/code/python_files/strategies/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/screening/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/reporting/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/notifications/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/market_data/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/backtest/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/domain/shared/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/domain/screening/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/domain/reporting/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/domain/market_data/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/domain/ipo/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/domain/intraday/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/domain/backtest/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/domain/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/application/queries/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/application/ports/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/application/orchestrators/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/application/commands/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/application/__init__.py` (0B, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/strategies/__init__.py` (1.6KB, last touched 2026-06-30T08:09:32+05:30)
 - **CLEANED** (20 files):
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_ZA.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_US.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_UK.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_TW.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_SG.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_SE.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_SA.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_KR.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_JP.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_HK.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_FI.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_EU.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_DK.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_DE.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_CN.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_CH.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_CA.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_BR.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_AU.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_ZA.parquet` (131B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_US.parquet` (133B, last touched 2026-06-29T14:11:31+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_UK.parquet` (132B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_TW.parquet` (132B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_SG.parquet` (132B, last touched 2026-06-29T13:29:53+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_SE.parquet` (132B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_SA.parquet` (132B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_KR.parquet` (132B, last touched 2026-06-29T13:29:53+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_JP.parquet` (133B, last touched 2026-06-29T14:11:31+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_HK.parquet` (132B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_FI.parquet` (131B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_EU.parquet` (132B, last touched 2026-06-29T14:22:03+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_DK.parquet` (131B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_DE.parquet` (132B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_CN.parquet` (133B, last touched 2026-06-29T13:29:53+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_CH.parquet` (131B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_CA.parquet` (132B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_BR.parquet` (132B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_AU.parquet` (132B, last touched 2026-06-29T15:31:13+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long.parquet` (133B, last touched 2026-06-29T11:38:33+05:30)
 - **PHASE** (18 files):
-  - `main-repo/global_expansion_screener_framework/screener/phase1_data_collection.py`
-  - `main-repo/global_expansion_screener_framework/phase5_global_expansion_model.py`
-  - `main-repo/global_expansion_screener_framework/phase4_live_screener.py`
-  - `main-repo/global_expansion_screener_framework/phase3_announcement_impact.py`
-  - `main-repo/global_expansion_screener_framework/phase2_geographic_regression.py`
-  - `main-repo/global_expansion_screener_framework/docs/PHASE1_QUARTERLY_COLLECTION_COMPLETE.md`
-  - `main-repo/global_expansion_screener_framework/Phase1_Leverage_Cache.ipynb`
-  - `main-repo/global_expansion_screener_framework/Phase1_Bhavcopy_GlobalExpansion.ipynb`
-  - `main-repo/global_expansion_screener_framework/PHASE_1_KICKOFF.txt`
-  - `main-repo/global_expansion_screener_framework/PHASE_1_FREE_COLAB.md`
-  - `main-repo/global_expansion_screener_framework/PHASE_1_EXECUTION_GUIDE.md`
-  - `main-repo/global_expansion_screener_framework/PHASE_1_COMPLETION.md`
-  - `main-repo/global_expansion_screener_framework/PHASE_1_BHAVCOPY_STRATEGY.md`
-  - `main-repo/global_expansion_screener_framework/PHASE_1_ACCELERATED_ONLINE.md`
-  - `main-repo/global_expansion_screener_framework/PHASE1_VALIDATED_STRATEGY.md`
-  - `main-repo/global_expansion_screener_framework/PHASE1_LEVERAGE_EXISTING_DATA.md`
-  - `main-repo/global_expansion_screener_framework/PHASE1_KICKOFF_CHECKLIST.md`
-  - `main-repo/global_expansion_screener_framework/PHASE1_EXECUTION_SUMMARY.md`
+  - `main-repo/global_expansion_screener_framework/screener/phase1_data_collection.py` (21.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/phase5_global_expansion_model.py` (8.9KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/phase4_live_screener.py` (10.5KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/phase3_announcement_impact.py` (11.5KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/phase2_geographic_regression.py` (7.6KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/docs/PHASE1_QUARTERLY_COLLECTION_COMPLETE.md` (8.4KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/Phase1_Leverage_Cache.ipynb` (23.1KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/Phase1_Bhavcopy_GlobalExpansion.ipynb` (28.9KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/PHASE_1_KICKOFF.txt` (18.9KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/PHASE_1_FREE_COLAB.md` (23.4KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/PHASE_1_EXECUTION_GUIDE.md` (21.7KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/PHASE_1_COMPLETION.md` (7.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/PHASE_1_BHAVCOPY_STRATEGY.md` (21.7KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/PHASE_1_ACCELERATED_ONLINE.md` (19.1KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/PHASE1_VALIDATED_STRATEGY.md` (7.9KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/PHASE1_LEVERAGE_EXISTING_DATA.md` (9.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/PHASE1_KICKOFF_CHECKLIST.md` (9.8KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/PHASE1_EXECUTION_SUMMARY.md` (9.2KB, last touched 2026-07-03T14:48:57+05:30)
 - **COMBINED** (13 files):
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1917.json`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1917.html`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1909.json`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1909.html`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1906.json`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1906.html`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1847.json`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1847.html`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1845.json`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.json`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.html`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1832.json`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1832.html`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1917.json` (591.5KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1917.html` (7.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1909.json` (572.0KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1909.html` (3.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1906.json` (350.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1906.html` (6.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1847.json` (355.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1847.html` (7.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1845.json` (445.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.json` (445.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.html` (38.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1832.json` (2.5KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1832.html` (1.5KB, last touched 2026-06-29T09:21:35+05:30)
 - **BHAVCOPY** (13 files):
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260611_F_0000.csv`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260610_F_0000.csv`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260609_F_0000.csv`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260608_F_0000.csv`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260612_F_0000.CSV`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260611_F_0000.CSV`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260610_F_0000.CSV`
-  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv`
-  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260624_F_0000.csv`
-  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260623_F_0000.csv`
-  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260622_F_0000.csv`
-  - `main-repo/Downloads/code/python_files/bhavcopy_store.py`
-  - `main-repo/Downloads/code/python_files/bhavcopy_history.py`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260611_F_0000.csv` (580.5KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260610_F_0000.csv` (582.8KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260609_F_0000.csv` (586.5KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260608_F_0000.csv` (588.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260612_F_0000.CSV` (12.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260611_F_0000.CSV` (830.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260610_F_0000.CSV` (827.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv` (591.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260624_F_0000.csv` (589.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260623_F_0000.csv` (588.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260622_F_0000.csv` (597.2KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/bhavcopy_store.py` (7.8KB, last touched 2026-06-29T11:57:32+05:30)
+  - `main-repo/Downloads/code/python_files/bhavcopy_history.py` (14.7KB, last touched 2026-06-29T11:38:33+05:30)
 - **INDIAN** (12 files):
-  - `main-repo/nse_screener_reference/scan_results/indian_full_scan_latest.xlsx`
-  - `main-repo/global_expansion_screener_framework/INDIAN_MARKET_DATA_DB.md`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260626_0943.xlsx`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260626_0907.xlsx`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260625_0836.xlsx`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260624_0837.xlsx`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260623_0840.xlsx`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260623_0838.xlsx`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260622_0836.xlsx`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1156.xlsx`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1135.xlsx`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1120.xlsx`
+  - `main-repo/nse_screener_reference/scan_results/indian_full_scan_latest.xlsx` (441.6KB, last touched 2026-06-26T13:48:01+05:30)
+  - `main-repo/global_expansion_screener_framework/INDIAN_MARKET_DATA_DB.md` (11.4KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260626_0943.xlsx` (453.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260626_0907.xlsx` (438.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260625_0836.xlsx` (120.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260624_0837.xlsx` (122.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260623_0840.xlsx` (346.8KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260623_0838.xlsx` (461.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260622_0836.xlsx` (118.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1156.xlsx` (389.5KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1135.xlsx` (349.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1120.xlsx` (6.1KB, last touched 2026-06-29T09:21:35+05:30)
+- **DATA** (12 files):
+  - `main-repo/tools/repo-cleaner-ocaml/lib/data_manifest.mli` (3.0KB, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/lib/data_manifest.ml` (5.1KB, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/DATA_MANIFEST.csv` (29.5KB, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/global_expansion_screener_framework/DATA_COMPLETENESS_TEST.py` (13.2KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/Downloads/code/python_files/data_sources.py` (5.3KB, last touched 2026-06-29T12:52:07+05:30)
+  - `main-repo/Downloads/code/python_files/DATA_AND_MODULES.md` (11.3KB, last touched 2026-06-30T13:02:37+05:30)
+  - `main-repo/DATA_INTEGRATION_OPTIONS.md` (9.2KB, last touched 2026-06-24T05:45:55+05:30)
+  - `main-repo/DATA_COMPRESSION_REPORT.md` (5.9KB, last touched 2026-07-03T14:48:57+05:30)
+  - `global-market-scanners/data_sources.py` (13.1KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/data_quality.py` (5.9KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/DATA_SOURCES.md` (3.4KB, last touched 2026-07-03T15:24:53+05:30)
+  - `fuel-retail-outlets/fuel-station-gap-analysis/data.js` (13.2KB, last touched 2026-06-30T14:25:08+05:30)
 - **INDIA** (11 files):
-  - `main-repo/global_expansion_screener_framework/india_stocks_2021_2026.db.gz`
-  - `main-repo/global_expansion_screener_framework/india_stocks_2016_2020.db.gz`
-  - `main-repo/global_expansion_screener_framework/india_stocks_2011_2015.db.gz`
-  - `main-repo/global_expansion_screener_framework/india_stocks_15y_full.db`
-  - `main-repo/global_expansion_screener_framework/india_stocks_15y.db.gz`
-  - `main-repo/global_expansion_screener_framework/india_stocks_15y.db`
-  - `main-repo/Downloads/code/python_files/cache_seed/india_ccc_screen.parquet`
-  - `claude-stock-tools/03_colab_notebooks/india_stock_reporting.ipynb`
-  - `claude-stock-tools/03_colab_notebooks/india_stock_analysis.ipynb`
-  - `claude-stock-tools/02_market_screeners/india_market_scan.py`
-  - `claude-stock-tools/01_daily_reports/india_daily_report.py`
+  - `main-repo/global_expansion_screener_framework/india_stocks_2021_2026.db.gz` (132B, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/india_stocks_2016_2020.db.gz` (132B, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/india_stocks_2011_2015.db.gz` (132B, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/india_stocks_15y_full.db` (5.1MB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/india_stocks_15y.db.gz` (986.1KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/india_stocks_15y.db` (2.6MB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/india_ccc_screen.parquet` (129B, last touched 2026-06-30T08:14:18+05:30)
+  - `claude-stock-tools/03_colab_notebooks/india_stock_reporting.ipynb` (135.0KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/03_colab_notebooks/india_stock_analysis.ipynb` (32.1KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/02_market_screeners/india_market_scan.py` (26.9KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/01_daily_reports/india_daily_report.py` (56.7KB, last touched 2026-06-13T19:42:45+05:30)
 - **FULL** (11 files):
-  - `main-repo/Downloads/data/backtest_results/backtest_results/full_run_log.txt`
-  - `main-repo/Downloads/code/python_files/full_us_market_scan.py`
-  - `main-repo/Downloads/code/python_files/full_korea_market_scan.py`
-  - `main-repo/Downloads/code/python_files/full_japan_market_scan.py`
-  - `main-repo/Downloads/code/python_files/full_indian_market_scan.py`
-  - `main-repo/Downloads/code/python_files/full_european_market_scan.py`
-  - `global-market-scanners/full_us_market_scan.py`
-  - `global-market-scanners/full_korea_market_scan.py`
-  - `global-market-scanners/full_japan_market_scan.py`
-  - `global-market-scanners/full_indian_market_scan.py`
-  - `global-market-scanners/full_european_market_scan.py`
-- **DATA** (11 files):
-  - `main-repo/tools/repo-cleaner-ocaml/lib/data_manifest.mli`
-  - `main-repo/tools/repo-cleaner-ocaml/lib/data_manifest.ml`
-  - `main-repo/global_expansion_screener_framework/DATA_COMPLETENESS_TEST.py`
-  - `main-repo/Downloads/code/python_files/data_sources.py`
-  - `main-repo/Downloads/code/python_files/DATA_AND_MODULES.md`
-  - `main-repo/DATA_INTEGRATION_OPTIONS.md`
-  - `main-repo/DATA_COMPRESSION_REPORT.md`
-  - `global-market-scanners/data_sources.py`
-  - `global-market-scanners/data_quality.py`
-  - `global-market-scanners/DATA_SOURCES.md`
-  - `fuel-retail-outlets/fuel-station-gap-analysis/data.js`
+  - `main-repo/Downloads/data/backtest_results/backtest_results/full_run_log.txt` (20.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/full_us_market_scan.py` (45.8KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/full_korea_market_scan.py` (27.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/full_japan_market_scan.py` (28.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/full_indian_market_scan.py` (42.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/full_european_market_scan.py` (26.0KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/full_us_market_scan.py` (45.8KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
+  - `global-market-scanners/full_korea_market_scan.py` (27.6KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
+  - `global-market-scanners/full_japan_market_scan.py` (28.6KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
+  - `global-market-scanners/full_indian_market_scan.py` (42.1KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
+  - `global-market-scanners/full_european_market_scan.py` (26.0KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
 - **MARKET** (10 files):
-  - `main-repo/Downloads/code/python_files/market_performance.py`
-  - `main-repo/Downloads/code/python_files/market_data_cache.py`
-  - `main-repo/Downloads/code/python_files/market_calendar.py`
-  - `main-repo/Downloads/code/python_files/cache_seed/market_performance_5y.xlsx`
-  - `main-repo/Downloads/code/python_files/cache_seed/market_performance_5y.parquet`
-  - `main-repo/Downloads/code/python_files/cache_seed/market_liquidity.parquet`
-  - `main-repo/.github/workflows/market_movers.yml`
-  - `global-market-scanners/market_store.py`
-  - `global-market-scanners/market_holidays.py`
-  - `global-market-scanners/market_data_cache.py`
+  - `main-repo/Downloads/code/python_files/market_performance.py` (4.5KB, last touched 2026-06-29T15:57:44+05:30)
+  - `main-repo/Downloads/code/python_files/market_data_cache.py` (28.0KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/market_calendar.py` (4.1KB, last touched 2026-06-29T11:38:33+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/market_performance_5y.xlsx` (6.6KB, last touched 2026-06-29T15:57:44+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/market_performance_5y.parquet` (129B, last touched 2026-06-29T15:57:44+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/market_liquidity.parquet` (129B, last touched 2026-06-30T03:22:54+05:30)
+  - `main-repo/.github/workflows/market_movers.yml` (2.0KB, last touched 2026-07-04T08:41:06+05:30)
+  - `global-market-scanners/market_store.py` (8.0KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/market_holidays.py` (5.9KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/market_data_cache.py` (28.0KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
 - **STOCK** (9 files):
-  - `main-repo/STOCK_ANALYSIS_SYSTEM.md`
-  - `main-repo/Downloads/data/us_screener_output/us_screener_output/stock_universe.csv`
-  - `main-repo/Downloads/code/python_files/stock_utils.py`
-  - `main-repo/Downloads/code/python_files/stock_enricher.py`
-  - `main-repo/Downloads/code/python_files/stock_daily_report_improved.py`
-  - `main-repo/Downloads/code/python_files/stock_daily_report.R`
-  - `main-repo/Downloads/code/notebooks/Stock_reporting.ipynb`
-  - `main-repo/Downloads/code/notebooks/Stock_Analysis_Colab.ipynb`
-  - `global-market-scanners/stock_utils.py`
+  - `main-repo/STOCK_ANALYSIS_SYSTEM.md` (34.1KB, last touched 2026-06-29T09:14:48+05:30)
+  - `main-repo/Downloads/data/us_screener_output/us_screener_output/stock_universe.csv` (363.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/stock_utils.py` (15.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/stock_enricher.py` (14.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/stock_daily_report_improved.py` (56.7KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `main-repo/Downloads/code/python_files/stock_daily_report.R` (35.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/notebooks/Stock_reporting.ipynb` (135.0KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `main-repo/Downloads/code/notebooks/Stock_Analysis_Colab.ipynb` (32.1KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `global-market-scanners/stock_utils.py` (15.9KB, last touched 2026-07-03T15:24:53+05:30) **<- most recently touched**
 - **PORTFOLIO** (9 files):
-  - `main-repo/nse_screener_reference/portfolio_IN_latest.xlsx`
-  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2234.xlsx`
-  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2233.xlsx`
-  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2227.xlsx`
-  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2226.xlsx`
-  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2224.xlsx`
-  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2223.xlsx`
-  - `main-repo/Downloads/code/python_files/portfolio_builder.py`
-  - `global-market-scanners/portfolio.py`
+  - `main-repo/nse_screener_reference/portfolio_IN_latest.xlsx` (13.6KB, last touched 2026-06-26T22:35:41+05:30)
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2234.xlsx` (13.6KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2233.xlsx` (12.8KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2227.xlsx` (13.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2226.xlsx` (9.8KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2224.xlsx` (9.8KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2223.xlsx` (9.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/portfolio_builder.py` (17.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/portfolio.py` (9.0KB, last touched 2026-07-03T15:24:53+05:30)
 - **GITIGNORE** (9 files):
-  - `main-repo/tools/repo-cleaner-ocaml/.gitignore`
-  - `main-repo/nse_screener_reference/scan_results/.gitignore`
-  - `main-repo/.gitignore`
-  - `global-market-scanners/tests/.gitignore`
-  - `global-market-scanners/.gitignore`
-  - `fuel-retail-outlets/.gitignore`
-  - `toll-plaza-highways/.gitignore`
-  - `india-trade-export-analysis/.gitignore`
-  - `claude-stock-tools/.gitignore`
+  - `main-repo/tools/repo-cleaner-ocaml/.gitignore` (8B, last touched 2026-07-06T12:55:25+00:00)
+  - `main-repo/nse_screener_reference/scan_results/.gitignore` (90B, last touched 2026-06-26T13:48:01+05:30)
+  - `main-repo/.gitignore` (686B, last touched 2026-07-03T14:48:57+05:30)
+  - `global-market-scanners/tests/.gitignore` (34B, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/.gitignore` (1.2KB, last touched 2026-07-03T15:24:53+05:30)
+  - `fuel-retail-outlets/.gitignore` (35B, last touched 2026-06-30T14:25:08+05:30)
+  - `toll-plaza-highways/.gitignore` (35B, last touched 2026-06-30T14:25:20+05:30)
+  - `india-trade-export-analysis/.gitignore` (35B, last touched 2026-06-30T14:25:25+05:30) **<- most recently touched**
+  - `claude-stock-tools/.gitignore` (129B, last touched 2026-06-13T19:42:45+05:30)
 - **EXTRACT** (9 files):
-  - `main-repo/api-data-integration/extract_cold_chain_data.py`
-  - `main-repo/api-data-integration/extract_bpcl_regional_dealerships.py`
-  - `main-repo/Downloads/code/python_files/extract attachment agent.json`
-  - `fuel-retail-outlets/api-data-integration/extract_ssri_complete_107k.py`
-  - `fuel-retail-outlets/api-data-integration/extract_cashatpos_from_pdf.py`
-  - `fuel-retail-outlets/api-data-integration/extract_bpcl_dealership_data.py`
-  - `fuel-retail-outlets/api-data-integration/extract_bpcl_by_zone_state_district.py`
-  - `fuel-retail-outlets/api-data-integration/extract_all_ssri_pumps.py`
-  - `fuel-retail-outlets/api-data-integration/extract_all_ssri_complete.py`
+  - `main-repo/api-data-integration/extract_cold_chain_data.py` (9.2KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/api-data-integration/extract_bpcl_regional_dealerships.py` (16.9KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/Downloads/code/python_files/extract attachment agent.json` (10.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `fuel-retail-outlets/api-data-integration/extract_ssri_complete_107k.py` (8.7KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/extract_cashatpos_from_pdf.py` (13.1KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/extract_bpcl_dealership_data.py` (16.0KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/extract_bpcl_by_zone_state_district.py` (16.0KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/extract_all_ssri_pumps.py` (26.3KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/extract_all_ssri_complete.py` (13.7KB, last touched 2026-06-30T14:25:08+05:30)
 - **DAILY** (9 files):
-  - `main-repo/global_expansion_screener_framework/screener/daily_price_collector.py`
-  - `main-repo/Downloads/code/web/daily_scan_report_20260612.html`
-  - `main-repo/Downloads/code/python_files/daily_scan_report_20260626.txt`
-  - `main-repo/Downloads/code/python_files/daily_scan_report_20260625.txt`
-  - `main-repo/Downloads/code/python_files/daily_scan_report_20260624.txt`
-  - `main-repo/Downloads/code/python_files/daily_scan_report_20260612.txt`
-  - `main-repo/Downloads/code/python_files/daily_pipeline.sh`
-  - `main-repo/Downloads/code/python_files/daily_combined_report.py`
-  - `main-repo/Downloads/code/notebooks/daily_scan_report_20260612.ipynb`
+  - `main-repo/global_expansion_screener_framework/screener/daily_price_collector.py` (9.7KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/Downloads/code/web/daily_scan_report_20260612.html` (28.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/daily_scan_report_20260626.txt` (3.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/daily_scan_report_20260625.txt` (3.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/daily_scan_report_20260624.txt` (4.0KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/daily_scan_report_20260612.txt` (3.5KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/daily_pipeline.sh` (1.3KB, last touched 2026-06-30T10:01:40+05:30)
+  - `main-repo/Downloads/code/python_files/daily_combined_report.py` (18.6KB, last touched 2026-06-29T11:22:55+05:30)
+  - `main-repo/Downloads/code/notebooks/daily_scan_report_20260612.ipynb` (21.2KB, last touched 2026-06-29T09:21:35+05:30)
 - **BPCL** (8 files):
-  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_summary_20260624_081647.json`
-  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_summary_20260624_081532.json`
-  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081647.json`
-  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.json`
-  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.geojson`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_summary_20260624_081300.json`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.json`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.geojson`
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_summary_20260624_081647.json` (537B, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_summary_20260624_081532.json` (718B, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081647.json` (71.4KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.json` (4.4KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.geojson` (45B, last touched 2026-06-30T14:25:08+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_summary_20260624_081300.json` (285B, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.json` (4.0KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.geojson` (45B, last touched 2026-06-30T14:25:08+05:30)
 - **BACKTEST** (8 files):
-  - `main-repo/nse_screener_reference/scan_results/backtest_1yr_full_NSE_latest.xlsx`
-  - `main-repo/global_expansion_screener_framework/docs/BACKTEST_DATA_COLLECTION_ROADMAP.md`
-  - `main-repo/backtest_dsc_filter_2008_2009.py`
-  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_US_20260626_1355.xlsx`
-  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1300.xlsx`
-  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1230.xlsx`
-  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1219.xlsx`
-  - `main-repo/Downloads/code/python_files/backtest_screeners.py`
+  - `main-repo/nse_screener_reference/scan_results/backtest_1yr_full_NSE_latest.xlsx` (2.0MB, last touched 2026-06-26T13:48:01+05:30)
+  - `main-repo/global_expansion_screener_framework/docs/BACKTEST_DATA_COLLECTION_ROADMAP.md` (12.1KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/backtest_dsc_filter_2008_2009.py` (21.8KB, last touched 2026-07-03T15:12:43+05:30)
+  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_US_20260626_1355.xlsx` (5.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1300.xlsx` (2.0MB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1230.xlsx` (84.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1219.xlsx` (96.8KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/backtest_screeners.py` (61.1KB, last touched 2026-06-29T09:21:35+05:30)
 - **REPORT** (7 files):
-  - `main-repo/tools/repo-cleaner-ocaml/lib/report.mli`
-  - `main-repo/tools/repo-cleaner-ocaml/lib/report.ml`
-  - `main-repo/tools/repo-cleaner-ocaml/REPORT.md`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_us_v2.log`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_us_today.log`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_today.log`
-  - `main-repo/Downloads/code/stock_ddd/application/ports/report_writer.py`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/report.mli` (791B, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/lib/report.ml` (3.7KB, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/REPORT.md` (48.8KB, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_us_v2.log` (14.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_us_today.log` (11.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_today.log` (10.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/stock_ddd/application/ports/report_writer.py` (1.8KB, last touched 2026-06-29T09:21:35+05:30)
 - **KAGGLE** (7 files):
-  - `main-repo/KAGGLE_PANDAS_SETUP.md`
-  - `main-repo/KAGGLE_INTEGRATION_SUMMARY.txt`
-  - `main-repo/KAGGLE_INTEGRATION_GUIDE.md`
-  - `main-repo/KAGGLE_IMPLEMENTATION_SUMMARY.md`
-  - `main-repo/KAGGLE_DATASETS_INDIA_MAP.md`
-  - `fuel-retail-outlets/api-data-integration/kaggle_loader.py`
-  - `fuel-retail-outlets/api-data-integration/KAGGLE_QUICK_START.md`
+  - `main-repo/KAGGLE_PANDAS_SETUP.md` (5.5KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/KAGGLE_INTEGRATION_SUMMARY.txt` (14.2KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/KAGGLE_INTEGRATION_GUIDE.md` (4.9KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/KAGGLE_IMPLEMENTATION_SUMMARY.md` (9.3KB, last touched 2026-06-24T05:41:44+05:30)
+  - `main-repo/KAGGLE_DATASETS_INDIA_MAP.md` (10.5KB, last touched 2026-07-03T14:48:57+05:30)
+  - `fuel-retail-outlets/api-data-integration/kaggle_loader.py` (10.6KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/KAGGLE_QUICK_START.md` (3.9KB, last touched 2026-06-30T14:25:08+05:30)
 - **BUILD** (7 files):
-  - `main-repo/docs/_build_repo_pages.py`
-  - `main-repo/Downloads/code/python_files/build_market_seeds.py`
-  - `main-repo/Downloads/code/python_files/build_mailer.py`
-  - `global-market-scanners/scripts/build_paper.js`
-  - `global-market-scanners/scripts/build_manuscript.sh`
-  - `global-market-scanners/scripts/build_deck.js`
-  - `global-market-scanners/build_industry_parquet.py`
+  - `main-repo/docs/_build_repo_pages.py` (9.2KB, last touched 2026-06-27T05:03:01+05:30)
+  - `main-repo/Downloads/code/python_files/build_market_seeds.py` (4.2KB, last touched 2026-06-29T11:57:32+05:30)
+  - `main-repo/Downloads/code/python_files/build_mailer.py` (7.4KB, last touched 2026-06-30T08:26:21+05:30)
+  - `global-market-scanners/scripts/build_paper.js` (21.5KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/scripts/build_manuscript.sh` (2.2KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/scripts/build_deck.js` (13.8KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/build_industry_parquet.py` (7.9KB, last touched 2026-07-03T15:24:53+05:30)
 - **SENTIMENT** (6 files):
-  - `main-repo/Downloads/data/sentiment_results/sentiment_results/sentiment_IN_20260626_1823.json`
-  - `main-repo/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_US_20260626_1817.xlsx`
-  - `main-repo/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_US_20260626_1815.xlsx`
-  - `main-repo/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_IN_20260626_1819.xlsx`
-  - `main-repo/Downloads/code/python_files/sentiment_price_link.py`
-  - `main-repo/Downloads/code/python_files/sentiment_pipeline.py`
+  - `main-repo/Downloads/data/sentiment_results/sentiment_results/sentiment_IN_20260626_1823.json` (2.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_US_20260626_1817.xlsx` (1.8MB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_US_20260626_1815.xlsx` (1.8MB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_IN_20260626_1819.xlsx` (3.5MB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/sentiment_price_link.py` (12.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/sentiment_pipeline.py` (29.0KB, last touched 2026-06-29T09:21:35+05:30)
 - **SECTOR** (6 files):
-  - `main-repo/global_expansion_screener_framework/screener/sector_geographic_analysis.py`
-  - `main-repo/Downloads/data/sector_results/sector_results/sector_analysis_US_20260626_1751.xlsx`
-  - `main-repo/Downloads/data/sector_results/sector_results/sector_analysis_IN_20260626_1827.xlsx`
-  - `main-repo/Downloads/data/sector_results/sector_results/sector_analysis_IN_20260626_1752.xlsx`
-  - `main-repo/Downloads/code/python_files/sector_analysis.py`
-  - `global-market-scanners/sector_rotation.py`
+  - `main-repo/global_expansion_screener_framework/screener/sector_geographic_analysis.py` (32.4KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/Downloads/data/sector_results/sector_results/sector_analysis_US_20260626_1751.xlsx` (9.5KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/sector_results/sector_results/sector_analysis_IN_20260626_1827.xlsx` (10.0KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/sector_results/sector_results/sector_analysis_IN_20260626_1752.xlsx` (8.8KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/sector_analysis.py` (16.0KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/sector_rotation.py` (5.4KB, last touched 2026-07-03T15:24:53+05:30)
 - **DARVAS** (6 files):
-  - `main-repo/Downloads/code/python_files/strategies/darvas.py`
-  - `main-repo/Downloads/code/native/darvas_wrapper.py`
-  - `main-repo/Downloads/code/native/darvas_fast.so`
-  - `main-repo/Downloads/code/native/darvas_fast.c`
-  - `global-market-scanners/darvas_volume.py`
-  - `global-market-scanners/DARVAS_VOLUME.md`
+  - `main-repo/Downloads/code/python_files/strategies/darvas.py` (1.7KB, last touched 2026-06-29T13:15:41+05:30)
+  - `main-repo/Downloads/code/native/darvas_wrapper.py` (9.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/native/darvas_fast.so` (16.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/native/darvas_fast.c` (8.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `global-market-scanners/darvas_volume.py` (11.6KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/DARVAS_VOLUME.md` (3.2KB, last touched 2026-07-03T15:24:53+05:30)
 - **DAMODARAN** (6 files):
-  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_roe.parquet`
-  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_pe.parquet`
-  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_margin.parquet`
-  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_companies.parquet`
-  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_beta.parquet`
-  - `claude-stock-tools/05_enrichment/damodaran_enrichment.py`
+  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_roe.parquet` (129B, last touched 2026-06-29T13:29:53+05:30)
+  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_pe.parquet` (130B, last touched 2026-06-29T13:29:53+05:30)
+  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_margin.parquet` (130B, last touched 2026-06-29T13:29:53+05:30)
+  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_companies.parquet` (132B, last touched 2026-06-29T13:20:42+05:30)
+  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_beta.parquet` (130B, last touched 2026-06-29T13:29:53+05:30)
+  - `claude-stock-tools/05_enrichment/damodaran_enrichment.py` (16.3KB, last touched 2026-06-13T19:42:45+05:30)
 - **SCREENER** (5 files):
-  - `main-repo/SCREENER_BASIS.md`
-  - `main-repo/Downloads/data/us_screener_output/us_screener_output/screener.db`
-  - `main-repo/Downloads/code/python_files/screener_kit.py`
-  - `main-repo/Downloads/code/python_files/screener_in.py`
-  - `main-repo/Downloads/code/python_files/screener_analysis.py`
+  - `main-repo/SCREENER_BASIS.md` (11.9KB, last touched 2026-06-26T22:18:42+05:30)
+  - `main-repo/Downloads/data/us_screener_output/us_screener_output/screener.db` (1.6MB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/screener_kit.py` (10.3KB, last touched 2026-06-30T08:18:42+05:30)
+  - `main-repo/Downloads/code/python_files/screener_in.py` (4.1KB, last touched 2026-06-30T08:14:18+05:30)
+  - `main-repo/Downloads/code/python_files/screener_analysis.py` (51.3KB, last touched 2026-06-29T09:21:35+05:30)
 - **QUICK** (5 files):
-  - `main-repo/Downloads/code/python_files/quick_reference.py`
-  - `main-repo/Downloads/code/python_files/Quick_Start_Guide.md`
-  - `main-repo/Downloads/code/python_files/QUICK_START.md`
-  - `fuel-retail-outlets/data-sources/QUICK_SOURCES_REFERENCE.txt`
-  - `fuel-retail-outlets/api-data-integration/quick_start.sh`
+  - `main-repo/Downloads/code/python_files/quick_reference.py` (30.3KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `main-repo/Downloads/code/python_files/Quick_Start_Guide.md` (8.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/QUICK_START.md` (7.2KB, last touched 2026-06-29T09:21:35+05:30)
+  - `fuel-retail-outlets/data-sources/QUICK_SOURCES_REFERENCE.txt` (17.0KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/quick_start.sh` (3.9KB, last touched 2026-06-30T14:25:08+05:30)
 - **LIQUIDITY** (5 files):
-  - `main-repo/Downloads/code/python_files/liquidity.py`
-  - `main-repo/Downloads/code/python_files/cache_seed/liquidity_index.parquet`
-  - `global-market-scanners/liquidity_multiyear.py`
-  - `global-market-scanners/liquidity_factor.py`
-  - `global-market-scanners/LIQUIDITY.md`
+  - `main-repo/Downloads/code/python_files/liquidity.py` (6.6KB, last touched 2026-06-30T03:46:15+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/liquidity_index.parquet` (131B, last touched 2026-06-30T03:34:12+05:30)
+  - `global-market-scanners/liquidity_multiyear.py` (6.5KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/liquidity_factor.py` (10.0KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/LIQUIDITY.md` (4.1KB, last touched 2026-07-03T15:24:53+05:30)
 - **GLOBAL** (5 files):
-  - `main-repo/global_expansion_screener_framework/screener/global_20country_universe_screener.py`
-  - `main-repo/global_expansion_screener_framework/docs/GLOBAL_EXPANSION_SCREENING_FRAMEWORK.md`
-  - `main-repo/docs/repo/global-market-scanners.html`
-  - `main-repo/Downloads/code/python_files/cache_seed/global_highlights.parquet`
-  - `global-market-scanners/GLOBAL_DVM.md`
+  - `main-repo/global_expansion_screener_framework/screener/global_20country_universe_screener.py` (19.6KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/docs/GLOBAL_EXPANSION_SCREENING_FRAMEWORK.md` (15.9KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/docs/repo/global-market-scanners.html` (2.0KB, last touched 2026-06-26T23:05:03+05:30)
+  - `main-repo/Downloads/code/python_files/cache_seed/global_highlights.parquet` (129B, last touched 2026-06-30T08:22:07+05:30)
+  - `global-market-scanners/GLOBAL_DVM.md` (1.9KB, last touched 2026-07-03T15:24:53+05:30)
 - **EXPORT** (5 files):
-  - `india-trade-export-analysis/export_opportunities.py`
-  - `india-trade-export-analysis/export_insights.py`
-  - `india-trade-export-analysis/export_extended_analysis.py`
-  - `india-trade-export-analysis/export_analysis.py`
-  - `india-trade-export-analysis/EXPORT_INSIGHTS_SUMMARY.md`
+  - `india-trade-export-analysis/export_opportunities.py` (4.3KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/export_insights.py` (5.7KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/export_extended_analysis.py` (10.4KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/export_analysis.py` (6.1KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/EXPORT_INSIGHTS_SUMMARY.md` (5.6KB, last touched 2026-06-30T14:25:25+05:30)
 - **EUROPEAN** (5 files):
-  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1538.xlsx`
-  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1537.xlsx`
-  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1409.xlsx`
-  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1408.xlsx`
-  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1407.xlsx`
+  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1538.xlsx` (21.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1537.xlsx` (20.8KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1409.xlsx` (21.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1408.xlsx` (21.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1407.xlsx` (11.0KB, last touched 2026-06-29T09:21:35+05:30)
 - **SYMBOLS** (4 files):
-  - `main-repo/Downloads/data/us_full_scan/us_full_scan/.symbols_cache.json`
-  - `main-repo/Downloads/data/korea_scan/korea_scan/.symbols_cache.json`
-  - `main-repo/Downloads/data/japan_scan/japan_scan/.symbols_cache.json`
-  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/.symbols_cache.json`
+  - `main-repo/Downloads/data/us_full_scan/us_full_scan/.symbols_cache.json` (60.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/korea_scan/korea_scan/.symbols_cache.json` (453.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/japan_scan/japan_scan/.symbols_cache.json` (479.2KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/.symbols_cache.json` (57.3KB, last touched 2026-06-29T09:21:35+05:30)
 - **RESEARCH** (4 files):
-  - `main-repo/research_publishing_toolkit.py`
-  - `global-market-scanners/RESEARCH_PAPER_SIMPLE.md`
-  - `global-market-scanners/RESEARCH_PAPER_DETAILED.md`
-  - `global-market-scanners/RESEARCH_PAPER.md`
+  - `main-repo/research_publishing_toolkit.py` (30.7KB, last touched 2026-07-03T15:12:43+05:30)
+  - `global-market-scanners/RESEARCH_PAPER_SIMPLE.md` (11.6KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/RESEARCH_PAPER_DETAILED.md` (55.6KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/RESEARCH_PAPER.md` (17.6KB, last touched 2026-07-03T15:24:53+05:30)
 - **REQUIREMENTS** (4 files):
-  - `main-repo/requirements.txt`
-  - `main-repo/Downloads/code/python_files/requirements.txt`
-  - `main-repo/Downloads/code/python_files/requirements-docker.txt`
-  - `global-market-scanners/requirements.txt`
+  - `main-repo/requirements.txt` (1.1KB, last touched 2026-06-29T14:19:17+05:30)
+  - `main-repo/Downloads/code/python_files/requirements.txt` (966B, last touched 2026-06-30T13:02:37+05:30)
+  - `main-repo/Downloads/code/python_files/requirements-docker.txt` (240B, last touched 2026-06-29T11:57:32+05:30)
+  - `global-market-scanners/requirements.txt` (1.9KB, last touched 2026-07-03T15:24:53+05:30)
 - **HYBRID** (4 files):
-  - `main-repo/HYBRID_PROJECT_SUMMARY.md`
-  - `main-repo/HYBRID_EXECUTION_GUIDE.md`
-  - `fuel-retail-outlets/api-data-integration/hybrid_aggregator.py`
-  - `fuel-retail-outlets/api-data-integration/HYBRID_IMPLEMENTATION_GUIDE.md`
+  - `main-repo/HYBRID_PROJECT_SUMMARY.md` (12.8KB, last touched 2026-06-24T05:37:24+05:30)
+  - `main-repo/HYBRID_EXECUTION_GUIDE.md` (9.5KB, last touched 2026-06-24T05:54:53+05:30)
+  - `fuel-retail-outlets/api-data-integration/hybrid_aggregator.py` (16.4KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/HYBRID_IMPLEMENTATION_GUIDE.md` (8.1KB, last touched 2026-06-30T14:25:08+05:30)
 - **DUNE** (4 files):
-  - `main-repo/tools/repo-cleaner-ocaml/test/dune`
-  - `main-repo/tools/repo-cleaner-ocaml/lib/dune`
-  - `main-repo/tools/repo-cleaner-ocaml/dune-project`
-  - `main-repo/tools/repo-cleaner-ocaml/bin/dune`
+  - `main-repo/tools/repo-cleaner-ocaml/test/dune` (74B, last touched 2026-07-06T12:55:25+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/lib/dune` (53B, last touched 2026-07-06T12:55:25+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/dune-project` (36B, last touched 2026-07-06T12:55:25+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/bin/dune` (56B, last touched 2026-07-06T12:55:25+00:00)
 - **DIJKSTRA** (4 files):
-  - `fuel-retail-outlets/api-data-integration/dijkstra_toll_retail_shortest_path.py`
-  - `fuel-retail-outlets/api-data-integration/dijkstra_filtered_service_outlets.py`
-  - `fuel-retail-outlets/api-data-integration/DIJKSTRA_SHORTEST_PATHS_20260624_100334.xlsx`
-  - `fuel-retail-outlets/api-data-integration/DIJKSTRA_SERVICE_OUTLETS_20260624_100732.xlsx`
+  - `fuel-retail-outlets/api-data-integration/dijkstra_toll_retail_shortest_path.py` (18.3KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/dijkstra_filtered_service_outlets.py` (20.6KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/DIJKSTRA_SHORTEST_PATHS_20260624_100334.xlsx` (45.1KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/DIJKSTRA_SERVICE_OUTLETS_20260624_100732.xlsx` (15.4KB, last touched 2026-06-30T14:25:08+05:30)
 - **CREATE** (4 files):
-  - `main-repo/api-data-integration/create_master_integrated_excel.py`
-  - `fuel-retail-outlets/api-data-integration/create_toll_retail_map.py`
-  - `fuel-retail-outlets/api-data-integration/create_toll_retail_distance_map.py`
-  - `fuel-retail-outlets/api-data-integration/create_comprehensive_retail_summary.py`
+  - `main-repo/api-data-integration/create_master_integrated_excel.py` (9.2KB, last touched 2026-07-03T14:48:57+05:30)
+  - `fuel-retail-outlets/api-data-integration/create_toll_retail_map.py` (15.8KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/create_toll_retail_distance_map.py` (23.0KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/create_comprehensive_retail_summary.py` (13.1KB, last touched 2026-06-30T14:25:08+05:30)
 - **COLAB** (4 files):
-  - `main-repo/global_expansion_screener_framework/COLAB_PHASE1_SETUP.md`
-  - `main-repo/docs/repo/colab-experiments.html`
-  - `main-repo/Downloads/code/r/colab_r_setup.R`
-  - `main-repo/Downloads/code/python_files/colab_quickstart.ipynb`
+  - `main-repo/global_expansion_screener_framework/COLAB_PHASE1_SETUP.md` (18.5KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/docs/repo/colab-experiments.html` (1.6KB, last touched 2026-06-26T23:05:03+05:30)
+  - `main-repo/Downloads/code/r/colab_r_setup.R` (4.2KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/colab_quickstart.ipynb` (6.5KB, last touched 2026-06-30T13:02:37+05:30)
 - **WALK** (3 files):
-  - `main-repo/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1305.xlsx`
-  - `main-repo/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1302.xlsx`
-  - `main-repo/Downloads/code/python_files/walk_forward_backtest.py`
+  - `main-repo/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1305.xlsx` (955.5KB, last touched 2026-06-29T09:21:35+05:30) **<- most recently touched**
+  - `main-repo/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1302.xlsx` (9.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/walk_forward_backtest.py` (66.8KB, last touched 2026-06-29T09:21:35+05:30)
 - **UNLISTED** (3 files):
-  - `global-market-scanners/unlisted_valuation.py`
-  - `global-market-scanners/unlisted_firms.parquet`
-  - `global-market-scanners/unlisted_enrichment.py`
+  - `global-market-scanners/unlisted_valuation.py` (6.1KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/unlisted_firms.parquet` (130B, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/unlisted_enrichment.py` (18.8KB, last touched 2026-07-03T15:24:53+05:30)
 - **UNIFIED** (3 files):
-  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_summary_20260624_081357.json`
-  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_20260624_081357.json`
-  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_20260624_081357.geojson`
+  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_summary_20260624_081357.json` (1.0KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_20260624_081357.json` (22.7MB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_20260624_081357.geojson` (11.7MB, last touched 2026-06-30T14:25:08+05:30)
 - **TEST** (3 files):
-  - `main-repo/tools/repo-cleaner-ocaml/test/test_repo_cleaner.ml`
-  - `main-repo/global_expansion_screener_framework/test_report_lfs.md`
-  - `global-market-scanners/tests/test_core.py`
+  - `main-repo/tools/repo-cleaner-ocaml/test/test_repo_cleaner.ml` (16.2KB, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/global_expansion_screener_framework/test_report_lfs.md` (7.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `global-market-scanners/tests/test_core.py` (64.2KB, last touched 2026-07-03T15:24:53+05:30)
 - **STORAGE** (3 files):
-  - `main-repo/storage_menu.sh`
-  - `main-repo/storage_analyzer.sh`
-  - `main-repo/storage.sh`
+  - `main-repo/storage_menu.sh` (6.6KB, last touched 2026-07-03T15:12:26+05:30)
+  - `main-repo/storage_analyzer.sh` (4.7KB, last touched 2026-07-03T15:12:26+05:30)
+  - `main-repo/storage.sh` (6.5KB, last touched 2026-07-03T15:12:26+05:30)
 - **RETAIL** (3 files):
-  - `main-repo/docs/repo/retail-outlet-data.html`
-  - `fuel-retail-outlets/data-sources/RETAIL_OUTLETS_DATA_SOURCES.md`
-  - `fuel-retail-outlets/api-data-integration/RETAIL_OUTLETS_SUMMARY_20260624_093416.xlsx`
+  - `main-repo/docs/repo/retail-outlet-data.html` (2.4KB, last touched 2026-06-26T23:05:03+05:30)
+  - `fuel-retail-outlets/data-sources/RETAIL_OUTLETS_DATA_SOURCES.md` (12.0KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/RETAIL_OUTLETS_SUMMARY_20260624_093416.xlsx` (34.0KB, last touched 2026-06-30T14:25:08+05:30)
 - **QUICKSTART** (3 files):
-  - `main-repo/global_expansion_screener_framework/QUICKSTART_BATCH_EXECUTION.md`
-  - `main-repo/global_expansion_screener_framework/QUICKSTART_5YEAR_SPLITS.md`
-  - `fuel-retail-outlets/fuel-station-gap-analysis/QUICKSTART.md`
+  - `main-repo/global_expansion_screener_framework/QUICKSTART_BATCH_EXECUTION.md` (3.9KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/QUICKSTART_5YEAR_SPLITS.md` (9.7KB, last touched 2026-07-03T14:48:57+05:30)
+  - `fuel-retail-outlets/fuel-station-gap-analysis/QUICKSTART.md` (7.8KB, last touched 2026-06-30T14:25:08+05:30)
 - **PROJECT** (3 files):
-  - `main-repo/global_expansion_screener_framework/docs/PROJECT_STATUS_JULY_2026.md`
-  - `main-repo/PROJECT_STATUS.md`
-  - `main-repo/Downloads/code/python_files/PROJECT_SUMMARY.txt`
+  - `main-repo/global_expansion_screener_framework/docs/PROJECT_STATUS_JULY_2026.md` (11.5KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/PROJECT_STATUS.md` (7.2KB, last touched 2026-06-29T14:53:14+05:30)
+  - `main-repo/Downloads/code/python_files/PROJECT_SUMMARY.txt` (15.4KB, last touched 2026-06-29T09:21:35+05:30)
 - **PATTERNS** (3 files):
-  - `main-repo/Downloads/data/pattern_results/pattern_results/patterns_IN_20260626_1732.xlsx`
-  - `main-repo/Downloads/data/pattern_results/pattern_results/patterns_ALL_20260626_1736.xlsx`
-  - `main-repo/Downloads/data/pattern_results/pattern_results/patterns_ALL_20260626_1733.xlsx`
+  - `main-repo/Downloads/data/pattern_results/pattern_results/patterns_IN_20260626_1732.xlsx` (46.9KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/pattern_results/pattern_results/patterns_ALL_20260626_1736.xlsx` (2.1MB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/pattern_results/pattern_results/patterns_ALL_20260626_1733.xlsx` (2.1MB, last touched 2026-06-29T09:21:35+05:30)
 - **KOREA** (3 files):
-  - `main-repo/Downloads/data/korea_scan/korea_scan/korea_market_scan_20260613_1547.xlsx`
-  - `main-repo/Downloads/data/korea_scan/korea_scan/korea_market_scan_20260613_1513.xlsx`
-  - `claude-stock-tools/02_market_screeners/korea_market_scan.py`
+  - `main-repo/Downloads/data/korea_scan/korea_scan/korea_market_scan_20260613_1547.xlsx` (312.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/korea_scan/korea_scan/korea_market_scan_20260613_1513.xlsx` (11.6KB, last touched 2026-06-29T09:21:35+05:30)
+  - `claude-stock-tools/02_market_screeners/korea_market_scan.py` (27.6KB, last touched 2026-06-13T19:42:45+05:30)
 - **JAPAN** (3 files):
-  - `main-repo/Downloads/data/japan_scan/japan_scan/japan_market_scan_20260613_1517.xlsx`
-  - `main-repo/Downloads/data/japan_scan/japan_scan/japan_market_scan_20260613_1507.xlsx`
-  - `claude-stock-tools/02_market_screeners/japan_market_scan.py`
+  - `main-repo/Downloads/data/japan_scan/japan_scan/japan_market_scan_20260613_1517.xlsx` (452.2KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/japan_scan/japan_scan/japan_market_scan_20260613_1507.xlsx` (14.7KB, last touched 2026-06-29T09:21:35+05:30)
+  - `claude-stock-tools/02_market_screeners/japan_market_scan.py` (28.6KB, last touched 2026-06-13T19:42:45+05:30)
 - **INTRADAY** (3 files):
-  - `main-repo/Downloads/data/intraday_results/intraday_results/intraday_20260626_15m.json`
-  - `main-repo/Downloads/data/intraday_results/intraday_results/intraday_20260626.xlsx`
-  - `main-repo/Downloads/code/python_files/intraday_monitor.py`
+  - `main-repo/Downloads/data/intraday_results/intraday_results/intraday_20260626_15m.json` (6.4KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/data/intraday_results/intraday_results/intraday_20260626.xlsx` (7.2KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/intraday_monitor.py` (28.6KB, last touched 2026-06-29T09:21:35+05:30)
 - **INDEX** (3 files):
-  - `main-repo/docs/index.html`
-  - `fuel-retail-outlets/fuel-station-gap-analysis/index.html`
-  - `fuel-retail-outlets/fuel-pump-locations-map/index.html`
+  - `main-repo/docs/index.html` (18.2KB, last touched 2026-06-26T23:05:03+05:30)
+  - `fuel-retail-outlets/fuel-station-gap-analysis/index.html` (9.6KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/fuel-pump-locations-map/index.html` (8.6KB, last touched 2026-06-30T14:25:08+05:30)
 - **FINAL** (3 files):
-  - `main-repo/global_expansion_screener_framework/FINAL_PHASE_TEST_REPORT.md`
-  - `main-repo/FINAL_PROJECT_SUMMARY.md`
-  - `main-repo/Downloads/code/python_files/FINAL_DELIVERABLES.md`
+  - `main-repo/global_expansion_screener_framework/FINAL_PHASE_TEST_REPORT.md` (6.3KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/FINAL_PROJECT_SUMMARY.md` (9.1KB, last touched 2026-06-24T06:50:46+05:30)
+  - `main-repo/Downloads/code/python_files/FINAL_DELIVERABLES.md` (11.1KB, last touched 2026-06-29T09:21:35+05:30)
 - **CASHATPOS** (3 files):
-  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_summary_20260624_082138.json`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_20260624_082138.json`
-  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_20260624_082138.csv`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_summary_20260624_082138.json` (674B, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_20260624_082138.json` (159.9KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_20260624_082138.csv` (50.5KB, last touched 2026-06-30T14:25:08+05:30)
 - **YEAR** (2 files):
-  - `main-repo/global_expansion_screener_framework/docs/15YEAR_GEOGRAPHIC_TREND_SUMMARY.md`
-  - `india-trade-export-analysis/YEAR_ON_YEAR_TRENDS_DETERIORATION_ANALYSIS.md`
+  - `main-repo/global_expansion_screener_framework/docs/15YEAR_GEOGRAPHIC_TREND_SUMMARY.md` (18.7KB, last touched 2026-07-03T14:48:57+05:30)
+  - `india-trade-export-analysis/YEAR_ON_YEAR_TRENDS_DETERIORATION_ANALYSIS.md` (32.4KB, last touched 2026-06-30T14:25:25+05:30)
 - **WATCHLISTS** (2 files):
-  - `global-market-scanners/watchlists.py`
-  - `global-market-scanners/WATCHLISTS.md`
+  - `global-market-scanners/watchlists.py` (7.6KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/WATCHLISTS.md` (2.4KB, last touched 2026-07-03T15:24:53+05:30)
 - **WATCHLIST** (2 files):
-  - `global-market-scanners/watchlist_store.py`
-  - `global-market-scanners/WATCHLIST_STORE.md`
+  - `global-market-scanners/watchlist_store.py` (11.3KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/WATCHLIST_STORE.md` (3.9KB, last touched 2026-07-03T15:24:53+05:30)
 - **WARM** (2 files):
-  - `main-repo/Downloads/data/dl_strategy_results/dl_strategy_results/warm_india.log`
-  - `main-repo/Downloads/code/python_files/warm_india_cache.py`
+  - `main-repo/Downloads/data/dl_strategy_results/dl_strategy_results/warm_india.log` (4.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/warm_india_cache.py` (2.9KB, last touched 2026-06-29T09:21:35+05:30)
 - **WAREHOUSE** (2 files):
-  - `global-market-scanners/warehouse.py`
-  - `global-market-scanners/WAREHOUSE.md`
+  - `global-market-scanners/warehouse.py` (8.0KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/WAREHOUSE.md` (2.5KB, last touched 2026-07-03T15:24:53+05:30)
 - **VIABILITY** (2 files):
-  - `global-market-scanners/viability_summary_21d.db`
-  - `global-market-scanners/viability_summary.db`
+  - `global-market-scanners/viability_summary_21d.db` (8.2KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/viability_summary.db` (8.2KB, last touched 2026-07-03T15:24:53+05:30)
 - **VALIDATE** (2 files):
-  - `fuel-retail-outlets/api-data-integration/validate_service_outlets_against_pdf.py`
-  - `fuel-retail-outlets/api-data-integration/validate_outlets_against_ssri.py`
+  - `fuel-retail-outlets/api-data-integration/validate_service_outlets_against_pdf.py` (15.6KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/validate_outlets_against_ssri.py` (13.7KB, last touched 2026-06-30T14:25:08+05:30)
 - **TOGAF** (2 files):
-  - `global-market-scanners/architecture/togaf.py`
-  - `global-market-scanners/architecture/TOGAF.md`
+  - `global-market-scanners/architecture/togaf.py` (5.2KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/architecture/TOGAF.md` (3.1KB, last touched 2026-07-03T15:24:53+05:30)
 - **SYMBOL** (2 files):
-  - `main-repo/nse_screener_reference/symbol_master.parquet`
-  - `main-repo/Downloads/code/python_files/symbol_master.py`
+  - `main-repo/nse_screener_reference/symbol_master.parquet` (131B, last touched 2026-06-26T19:02:39+05:30)
+  - `main-repo/Downloads/code/python_files/symbol_master.py` (9.0KB, last touched 2026-06-29T09:21:35+05:30)
 - **SSRN** (2 files):
-  - `main-repo/Downloads/code/backtesting/ssrn-3945468.pdf`
-  - `main-repo/Downloads/code/backtesting/ssrn-3374195.pdf`
+  - `main-repo/Downloads/code/backtesting/ssrn-3945468.pdf` (396.8KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/backtesting/ssrn-3374195.pdf` (4.0MB, last touched 2026-06-29T09:21:35+05:30)
 - **SECURITY** (2 files):
-  - `main-repo/.github/workflows/security-scan.yml`
-  - `global-market-scanners/SECURITY.md`
+  - `main-repo/.github/workflows/security-scan.yml` (2.1KB, last touched 2026-06-29T14:47:30+05:30)
+  - `global-market-scanners/SECURITY.md` (3.6KB, last touched 2026-07-03T15:24:53+05:30)
 - **SEASONAL** (2 files):
-  - `main-repo/Downloads/code/web/seasonal_analysis_dashboard.html`
-  - `main-repo/Downloads/code/python_files/seasonal_analysis_summary.json`
+  - `main-repo/Downloads/code/web/seasonal_analysis_dashboard.html` (12.1KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/seasonal_analysis_summary.json` (1.3KB, last touched 2026-06-29T09:21:35+05:30)
 - **SCREEN** (2 files):
-  - `global-market-scanners/screen_viability.py`
-  - `global-market-scanners/SCREEN_VIABILITY_RESULTS.md`
+  - `global-market-scanners/screen_viability.py` (11.9KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/SCREEN_VIABILITY_RESULTS.md` (3.7KB, last touched 2026-07-03T15:24:53+05:30)
 - **SCANNER** (2 files):
-  - `main-repo/tools/repo-cleaner-ocaml/lib/scanner.mli`
-  - `main-repo/tools/repo-cleaner-ocaml/lib/scanner.ml`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/scanner.mli` (1.5KB, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/lib/scanner.ml` (1.8KB, last touched 2026-07-06T13:14:19+00:00)
 - **SAFE** (2 files):
-  - `global-market-scanners/safe/safe_backlog.py`
-  - `global-market-scanners/safe/SAFE.md`
+  - `global-market-scanners/safe/safe_backlog.py` (4.0KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/safe/SAFE.md` (3.4KB, last touched 2026-07-03T15:24:53+05:30)
 - **RANDOM** (2 files):
-  - `main-repo/Downloads/code/python_files/random_numbers_using_dirichlet.py`
-  - `subscription-model-revenue/random_numbers_using_dirichlet.py`
+  - `main-repo/Downloads/code/python_files/random_numbers_using_dirichlet.py` (2.3KB, last touched 2026-06-29T09:21:35+05:30)
+  - `subscription-model-revenue/random_numbers_using_dirichlet.py` (2.2KB, last touched 2026-06-26T23:34:42+05:30)
 - **QUALITY** (2 files):
-  - `global-market-scanners/quality_factor.py`
-  - `global-market-scanners/QUALITY_FACTOR.md`
+  - `global-market-scanners/quality_factor.py` (15.1KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/QUALITY_FACTOR.md` (5.3KB, last touched 2026-07-03T15:24:53+05:30)
 - **PRICE** (2 files):
-  - `main-repo/global_expansion_screener_framework/screener/price_criterion_correlation_tracker.py`
-  - `main-repo/global_expansion_screener_framework/screener/price_correlation_analysis.py`
+  - `main-repo/global_expansion_screener_framework/screener/price_criterion_correlation_tracker.py` (16.0KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/screener/price_correlation_analysis.py` (15.6KB, last touched 2026-07-03T14:48:57+05:30)
 - **PIPELINE** (2 files):
-  - `main-repo/Downloads/code/python_files/pipeline_news.py`
-  - `main-repo/Downloads/code/python_files/pipeline_historical.py`
+  - `main-repo/Downloads/code/python_files/pipeline_news.py` (9.0KB, last touched 2026-06-29T09:21:35+05:30)
+  - `main-repo/Downloads/code/python_files/pipeline_historical.py` (5.7KB, last touched 2026-06-29T09:21:35+05:30)
 - **PEAD** (2 files):
-  - `global-market-scanners/pead_factor.py`
-  - `global-market-scanners/PEAD.md`
+  - `global-market-scanners/pead_factor.py` (11.6KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/PEAD.md` (3.9KB, last touched 2026-07-03T15:24:53+05:30)
 - **PACKAGE** (2 files):
-  - `global-market-scanners/package.json`
-  - `global-market-scanners/package-lock.json`
+  - `global-market-scanners/package.json` (76B, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/package-lock.json` (10.2KB, last touched 2026-07-03T15:24:53+05:30)
 - **NAME** (2 files):
-  - `main-repo/tools/repo-cleaner-ocaml/lib/name_clusterer.mli`
-  - `main-repo/tools/repo-cleaner-ocaml/lib/name_clusterer.ml`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/name_clusterer.mli` (1.6KB, last touched 2026-07-06T12:55:25+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/lib/name_clusterer.ml` (1.5KB, last touched 2026-07-06T12:55:25+00:00)
 - **MARKITDOWN** (2 files):
-  - `india-trade-export-analysis/markitdown-preprocessor.py`
-  - `india-trade-export-analysis/MARKITDOWN_PREPROCESSING_GUIDE.md`
+  - `india-trade-export-analysis/markitdown-preprocessor.py` (6.5KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/MARKITDOWN_PREPROCESSING_GUIDE.md` (7.8KB, last touched 2026-06-30T14:25:25+05:30)
 - **MAIN** (2 files):
-  - `main-repo/tools/repo-cleaner-ocaml/bin/main.ml`
-  - `main-repo/Downloads/code/latex/main.tex`
+  - `main-repo/tools/repo-cleaner-ocaml/bin/main.ml` (6.3KB, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/Downloads/code/latex/main.tex` (5.4KB, last touched 2026-06-29T09:21:35+05:30)
 - **LOCATIONS** (2 files):
-  - `fuel-retail-outlets/fuel-pump-locations-map/locations-map.js`
-  - `fuel-retail-outlets/fuel-pump-locations-map/locations-data.js`
+  - `fuel-retail-outlets/fuel-pump-locations-map/locations-map.js` (8.9KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/fuel-pump-locations-map/locations-data.js` (12.3MB, last touched 2026-06-30T14:25:08+05:30) **<- most recently touched**
 - **INTEGRATE** (2 files):
-  - `fuel-retail-outlets/api-data-integration/integrate_toll_retail_database.py`
-  - `fuel-retail-outlets/api-data-integration/integrate_multi_source_database.py`
+  - `fuel-retail-outlets/api-data-integration/integrate_toll_retail_database.py` (18.9KB, last touched 2026-06-30T14:25:08+05:30)
+  - `fuel-retail-outlets/api-data-integration/integrate_multi_source_database.py` (15.7KB, last touched 2026-06-30T14:25:08+05:30)
 - **IMPORT** (2 files):
-  - `india-trade-export-analysis/import_export_comparison.py`
-  - `india-trade-export-analysis/IMPORT_EXPORT_ANALYSIS_2025_26.md`
+  - `india-trade-export-analysis/import_export_comparison.py` (12.3KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/IMPORT_EXPORT_ANALYSIS_2025_26.md` (13.7KB, last touched 2026-06-30T14:25:25+05:30)
 - **HIGH** (2 files):
-  - `india-trade-export-analysis/HIGH_OPPORTUNITY_EXPORTS.csv`
-  - `india-trade-export-analysis/HIGH_OPPORTUNITY_2026_PROJECTIONS.csv`
+  - `india-trade-export-analysis/HIGH_OPPORTUNITY_EXPORTS.csv` (28.2KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/HIGH_OPPORTUNITY_2026_PROJECTIONS.csv` (757.4KB, last touched 2026-06-30T14:25:25+05:30)
 - **HASHER** (2 files):
-  - `main-repo/tools/repo-cleaner-ocaml/lib/hasher.mli`
-  - `main-repo/tools/repo-cleaner-ocaml/lib/hasher.ml`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/hasher.mli` (532B, last touched 2026-07-06T12:55:25+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/lib/hasher.ml` (54B, last touched 2026-07-06T12:55:25+00:00)
 - **GROWW** (2 files):
-  - `main-repo/global_expansion_screener_framework/groww_data_pipeline.py`
-  - `main-repo/global_expansion_screener_framework/groww_api_test.py`
+  - `main-repo/global_expansion_screener_framework/groww_data_pipeline.py` (12.9KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/groww_api_test.py` (5.7KB, last touched 2026-07-03T14:48:57+05:30)
 - **GLOSSARY** (2 files):
-  - `main-repo/GLOSSARY.md`
-  - `global-market-scanners/GLOSSARY.md`
+  - `main-repo/GLOSSARY.md` (16.4KB, last touched 2026-06-26T17:47:48+05:30)
+  - `global-market-scanners/GLOSSARY.md` (4.2KB, last touched 2026-07-03T15:24:53+05:30)
 - **GITATTRIBUTES** (2 files):
-  - `main-repo/.gitattributes`
-  - `global-market-scanners/.gitattributes`
+  - `main-repo/.gitattributes` (172B, last touched 2026-07-03T14:48:57+05:30)
+  - `global-market-scanners/.gitattributes` (46B, last touched 2026-07-03T15:24:53+05:30)
 - **GEOGRAPHIC** (2 files):
-  - `main-repo/global_expansion_screener_framework/screener/geographic_factor_regression.py`
-  - `main-repo/global_expansion_screener_framework/docs/GEOGRAPHIC_WEIGHTED_EXPANSION_MODEL.md`
+  - `main-repo/global_expansion_screener_framework/screener/geographic_factor_regression.py` (25.6KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/global_expansion_screener_framework/docs/GEOGRAPHIC_WEIGHTED_EXPANSION_MODEL.md` (29.0KB, last touched 2026-07-03T14:48:57+05:30)
 - **FETCH** (2 files):
-  - `main-repo/Downloads/code/python_files/fetch_market_ohlc.py`
-  - `main-repo/Downloads/code/python_files/fetch_and_analyze_cricket_data.R`
+  - `main-repo/Downloads/code/python_files/fetch_market_ohlc.py` (5.4KB, last touched 2026-06-29T12:52:07+05:30)
+  - `main-repo/Downloads/code/python_files/fetch_and_analyze_cricket_data.R` (14.5KB, last touched 2026-06-29T09:21:35+05:30)
 - **FACTOR** (2 files):
-  - `global-market-scanners/factor_research.py`
-  - `global-market-scanners/FACTOR_RESEARCH.md`
+  - `global-market-scanners/factor_research.py` (8.6KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/FACTOR_RESEARCH.md` (2.4KB, last touched 2026-07-03T15:24:53+05:30)
 - **EXTENDED** (2 files):
-  - `india-trade-export-analysis/EXTENDED_COMPARISON_2020_2026.md`
-  - `india-trade-export-analysis/EXTENDED_ANALYSIS_2020_2026.csv`
+  - `india-trade-export-analysis/EXTENDED_COMPARISON_2020_2026.md` (10.2KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/EXTENDED_ANALYSIS_2020_2026.csv` (1.5MB, last touched 2026-06-30T14:25:25+05:30)
 - **EXECUTIVE** (2 files):
-  - `main-repo/global_expansion_screener_framework/EXECUTIVE_SUMMARY.md`
-  - `india-trade-export-analysis/EXECUTIVE_SUMMARY_COMPREHENSIVE.md`
+  - `main-repo/global_expansion_screener_framework/EXECUTIVE_SUMMARY.md` (12.3KB, last touched 2026-07-03T14:48:57+05:30)
+  - `india-trade-export-analysis/EXECUTIVE_SUMMARY_COMPREHENSIVE.md` (35.6KB, last touched 2026-06-30T14:25:25+05:30)
 - **ENHANCED** (2 files):
-  - `main-repo/enhanced_outlet_map_with_coordinates.html`
-  - `main-repo/api-data-integration/enhanced_geo_map_with_kaggle.py`
+  - `main-repo/enhanced_outlet_map_with_coordinates.html` (7.8MB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/api-data-integration/enhanced_geo_map_with_kaggle.py` (13.3KB, last touched 2026-07-03T14:48:57+05:30)
 - **EARNINGS** (2 files):
-  - `global-market-scanners/earnings_liquidity.py`
-  - `global-market-scanners/EARNINGS_LIQUIDITY.md`
+  - `global-market-scanners/earnings_liquidity.py` (15.2KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/EARNINGS_LIQUIDITY.md` (5.7KB, last touched 2026-07-03T15:24:53+05:30)
 - **DUPLICATE** (2 files):
-  - `main-repo/tools/repo-cleaner-ocaml/lib/duplicate_finder.mli`
-  - `main-repo/tools/repo-cleaner-ocaml/lib/duplicate_finder.ml`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/duplicate_finder.mli` (1.7KB, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/lib/duplicate_finder.ml` (1.2KB, last touched 2026-07-06T13:14:19+00:00)
 - **DOCKERIGNORE** (2 files):
-  - `main-repo/Downloads/code/python_files/.dockerignore`
-  - `main-repo/.dockerignore`
+  - `main-repo/Downloads/code/python_files/.dockerignore` (239B, last touched 2026-06-29T11:38:33+05:30)
+  - `main-repo/.dockerignore` (583B, last touched 2026-06-26T14:48:46+05:30)
 - **DOCKERFILE** (2 files):
-  - `main-repo/Downloads/code/python_files/Dockerfile`
-  - `main-repo/Dockerfile`
+  - `main-repo/Downloads/code/python_files/Dockerfile` (1.2KB, last touched 2026-06-29T11:38:33+05:30)
+  - `main-repo/Dockerfile` (6.2KB, last touched 2026-06-26T22:27:46+05:30)
 - **DISCOM** (2 files):
-  - `main-repo/docs/discom-calculator.html`
-  - `subscription-model-revenue/discom_debt_calculator.py`
+  - `main-repo/docs/discom-calculator.html` (11.8KB, last touched 2026-06-27T05:03:01+05:30)
+  - `subscription-model-revenue/discom_debt_calculator.py` (13.1KB, last touched 2026-06-26T23:34:42+05:30)
 - **DEPLOYMENT** (2 files):
-  - `main-repo/global_expansion_screener_framework/docs/DEPLOYMENT_GUIDE.md`
-  - `main-repo/DEPLOYMENT_CHECKLIST.md`
+  - `main-repo/global_expansion_screener_framework/docs/DEPLOYMENT_GUIDE.md` (11.9KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/DEPLOYMENT_CHECKLIST.md` (11.6KB, last touched 2026-06-29T15:05:52+05:30)
 - **DEOLDIFY** (2 files):
-  - `main-repo/Downloads/code/python_files/deoldify.py`
-  - `colab-experiments/deoldify.py`
+  - `main-repo/Downloads/code/python_files/deoldify.py` (2.0KB, last touched 2026-06-29T09:21:35+05:30)
+  - `colab-experiments/deoldify.py` (2.0KB, last touched 2026-06-26T22:47:40+05:30)
 - **DEBT** (2 files):
-  - `main-repo/Downloads/code/python_files/strategies/debt_reduction.py`
-  - `india-trade-export-analysis/DEBT_BORROWING_TRENDS_ANALYSIS.md`
+  - `main-repo/Downloads/code/python_files/strategies/debt_reduction.py` (2.2KB, last touched 2026-06-29T13:15:41+05:30)
+  - `india-trade-export-analysis/DEBT_BORROWING_TRENDS_ANALYSIS.md` (15.9KB, last touched 2026-06-30T14:25:25+05:30)
 - **CORPORATE** (2 files):
-  - `global-market-scanners/corporate_actions.py`
-  - `global-market-scanners/CORPORATE_ACTIONS.md`
+  - `global-market-scanners/corporate_actions.py` (17.6KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/CORPORATE_ACTIONS.md` (4.2KB, last touched 2026-07-03T15:24:53+05:30)
 - **COLD** (2 files):
-  - `main-repo/cold_chain_outlet_integrated_map.html`
-  - `main-repo/api-data-integration/cold_chain_outlet_map.py`
+  - `main-repo/cold_chain_outlet_integrated_map.html` (40.5KB, last touched 2026-07-03T14:48:57+05:30)
+  - `main-repo/api-data-integration/cold_chain_outlet_map.py` (9.1KB, last touched 2026-07-03T14:48:57+05:30)
 - **CLEANUP** (2 files):
-  - `main-repo/tools/repo-cleaner-ocaml/lib/cleanup.mli`
-  - `main-repo/tools/repo-cleaner-ocaml/lib/cleanup.ml`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/cleanup.mli` (2.7KB, last touched 2026-07-06T13:14:19+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/lib/cleanup.ml` (1.9KB, last touched 2026-07-06T13:14:19+00:00)
 - **CLAUDE** (2 files):
-  - `main-repo/docs/repo/claude-stock-tools.html`
-  - `main-repo/Downloads/code/python_files/CLAUDE.md`
+  - `main-repo/docs/repo/claude-stock-tools.html` (2.2KB, last touched 2026-06-26T23:05:03+05:30)
+  - `main-repo/Downloads/code/python_files/CLAUDE.md` (4.5KB, last touched 2026-06-29T09:21:35+05:30)
 - **CHANGELOG** (2 files):
-  - `main-repo/CHANGELOG.md`
-  - `claude-stock-tools/CHANGELOG.md`
+  - `main-repo/CHANGELOG.md` (17.1KB, last touched 2026-06-26T19:28:07+05:30)
+  - `claude-stock-tools/CHANGELOG.md` (4.8KB, last touched 2026-06-13T19:42:45+05:30)
 - **CALCULATE** (2 files):
-  - `main-repo/calculate_dsc_optimized.py`
-  - `main-repo/calculate_dsc_all_markets.py`
+  - `main-repo/calculate_dsc_optimized.py` (20.5KB, last touched 2026-07-03T15:12:43+05:30)
+  - `main-repo/calculate_dsc_all_markets.py` (18.9KB, last touched 2026-07-03T15:12:43+05:30)
 - **BUFFETT** (2 files):
-  - `claude-stock-tools/04_strategy_reference/buffett_methodology.md`
-  - `claude-stock-tools/02_market_screeners/buffett_value_screener.py`
+  - `claude-stock-tools/04_strategy_reference/buffett_methodology.md` (12.0KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/02_market_screeners/buffett_value_screener.py` (18.1KB, last touched 2026-06-13T19:42:45+05:30)
 - **BRAZIL** (2 files):
-  - `global-market-scanners/brazil_quality.py`
-  - `global-market-scanners/brazil_cvm.py`
+  - `global-market-scanners/brazil_quality.py` (6.6KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/brazil_cvm.py` (11.2KB, last touched 2026-07-03T15:24:53+05:30)
 - **BRANCH** (2 files):
-  - `main-repo/tools/repo-cleaner-ocaml/lib/branch_analyzer.mli`
-  - `main-repo/tools/repo-cleaner-ocaml/lib/branch_analyzer.ml`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/branch_analyzer.mli` (1.7KB, last touched 2026-07-06T12:55:25+00:00)
+  - `main-repo/tools/repo-cleaner-ocaml/lib/branch_analyzer.ml` (2.2KB, last touched 2026-07-06T12:55:25+00:00)
 - **BENCHMARK** (2 files):
-  - `global-market-scanners/benchmark.py`
-  - `global-market-scanners/BENCHMARK.md`
+  - `global-market-scanners/benchmark.py` (12.9KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/BENCHMARK.md` (3.2KB, last touched 2026-07-03T15:24:53+05:30)
 - **ARCHITECTURE** (2 files):
-  - `global-market-scanners/ARCHITECTURE_MAP.md`
-  - `global-market-scanners/ARCHITECTURE.md`
+  - `global-market-scanners/ARCHITECTURE_MAP.md` (4.2KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/ARCHITECTURE.md` (4.4KB, last touched 2026-07-03T15:24:53+05:30)
 - **ACCUMULATION** (2 files):
-  - `global-market-scanners/accumulation_screener.py`
-  - `global-market-scanners/ACCUMULATION_SCREENER.md`
+  - `global-market-scanners/accumulation_screener.py` (9.2KB, last touched 2026-07-03T15:24:53+05:30)
+  - `global-market-scanners/ACCUMULATION_SCREENER.md` (3.6KB, last touched 2026-07-03T15:24:53+05:30)
 
 ## Branch staleness vs base
 
-| Branch | Ahead | Behind | Last commit | Triage |
-|---|---:|---:|---|---|
-| `origin/universe-export` | 30 | 137 | 2026-07-04T01:17:35+00:00 | likely stale -- review before deleting |
-| `origin/feature/scanner-optimise` | 43 | 137 | 2026-06-15T03:45:45+05:30 | likely stale -- review before deleting |
-| `origin/feature/multi-source-data` | 41 | 137 | 2026-06-15T03:19:09+05:30 | likely stale -- review before deleting |
-| `origin/feature/hong-kong-canada` | 40 | 137 | 2026-06-15T03:06:57+05:30 | likely stale -- review before deleting |
-| `origin/feature/geography-status` | 42 | 137 | 2026-06-15T03:31:53+05:30 | likely stale -- review before deleting |
-| `origin/feature/darvas-interpreter` | 44 | 137 | 2026-06-23T03:34:01+00:00 | likely stale -- review before deleting |
-| `origin/claude/surge-pricing-transport-mrwpsl` | 53 | 137 | 2026-06-16T16:27:48+00:00 | likely stale -- review before deleting |
-| `origin/claude/stock-metrics-nse-extraction-di4v0` | 14 | 137 | 2026-06-05T03:44:37+00:00 | likely stale -- review before deleting |
-| `origin/claude/put-call-parity-trading-QMSlK` | 9 | 137 | 2026-05-24T13:37:44+00:00 | likely stale -- review before deleting |
-| `origin/claude/portfolio-beta-efficient-frontier-xJltY` | 11 | 137 | 2026-05-27T17:26:53+00:00 | likely stale -- review before deleting |
-| `origin/claude/nse-bse-pegu-scoring-k7vu9` | 45 | 137 | 2026-07-04T05:37:48+00:00 | likely stale -- review before deleting |
-| `origin/claude/event-driven-stock-news-msv0cq` | 87 | 137 | 2026-07-06T15:48:08+05:30 | likely stale -- review before deleting |
-| `origin/claude/code-style-kubernetes-era-md2q57` | 55 | 137 | 2026-06-16T12:40:32+00:00 | likely stale -- review before deleting |
-| `origin/claude/bms-battery-management-y26x71` | 55 | 137 | 2026-07-03T10:49:00+00:00 | likely stale -- review before deleting |
-| `origin/circleci-project-setup` | 4 | 137 | 2021-08-10T08:49:03+05:30 | likely stale -- review before deleting |
-| `origin/global-expansion-screener-v3.1` | 39 | 11 | 2026-07-02T23:45:37+05:30 | recent -- review for a real merge decision |
+None found.
 

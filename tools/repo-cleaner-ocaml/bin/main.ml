@@ -74,6 +74,52 @@ let () =
   let catalogued = Data_manifest.catalog all_entries in
   let data_duplicate_groups = Data_manifest.duplicates catalogued in
 
+  (* label_to_dir lets an annotation for any file look up ITS OWN repo's git
+     history: the label prefixing every rel_path (see all_entries above) is
+     exactly the --root's basename, and that --root IS the git checkout, so
+     recovering the physical repo directory from a file's label is direct. *)
+  let label_to_dir = List.map (fun root -> (Filename.basename root, root)) !roots in
+  let rel_path_in_own_repo (f : Scanner.file_entry) =
+    let label = Cleanup.repo_label f in
+    let prefix_len = String.length label + 1 in
+    if String.length f.rel_path > prefix_len then
+      String.sub f.rel_path prefix_len (String.length f.rel_path - prefix_len)
+    else f.rel_path
+  in
+  let recency_of (f : Scanner.file_entry) =
+    match List.assoc_opt (Cleanup.repo_label f) label_to_dir with
+    | Some dir -> Recency.lookup ~repo_dir:dir ~rel_path_in_repo:(rel_path_in_own_repo f)
+    | None -> None
+  in
+  (* Precompute which file is "most recently touched (in its own repo's
+     history)" within each duplicate group, so the report can flag it
+     directly instead of leaving a human to eyeball a column of dates. *)
+  let most_recent_rel_paths =
+    let tbl = Hashtbl.create 64 in
+    List.iter
+      (fun (g : Duplicate_finder.group) ->
+        let with_recency = List.map (fun f -> (f, recency_of f)) g.files in
+        match Recency.most_recent with_recency with
+        | Some (winner : Scanner.file_entry) -> Hashtbl.replace tbl winner.rel_path ()
+        | None -> ())
+      (duplicate_groups @ data_duplicate_groups);
+    tbl
+  in
+  let human_size n =
+    if n >= 1_000_000 then Printf.sprintf "%.1fMB" (float_of_int n /. 1_000_000.)
+    else if n >= 1_000 then Printf.sprintf "%.1fKB" (float_of_int n /. 1_000.)
+    else Printf.sprintf "%dB" n
+  in
+  let annotate (f : Scanner.file_entry) =
+    let recency_str =
+      match recency_of f with
+      | Some (info : Recency.info) -> Printf.sprintf "last touched %s" info.last_commit_date
+      | None -> "no git history found for this path"
+    in
+    let winner_marker = if Hashtbl.mem most_recent_rel_paths f.rel_path then " **<- most recently touched**" else "" in
+    Some (Printf.sprintf "(%s, %s)%s" (human_size f.size_bytes) recency_str winner_marker)
+  in
+
   (match !data_manifest_out with
   | Some path ->
       let oc = open_out path in
@@ -88,7 +134,7 @@ let () =
   let report =
     Report.render
       ~root:(String.concat ", " (List.rev !roots))
-      ~duplicate_groups ~name_clusters ~branches:branch_infos ~data_duplicate_groups ()
+      ~duplicate_groups ~name_clusters ~branches:branch_infos ~data_duplicate_groups ~annotate ()
   in
   (match !out_path with
   | Some path ->

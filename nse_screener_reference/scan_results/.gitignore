@@ -1,0 +1,2 @@
+# Allow Excel reference files in this directory (overrides root *.xlsx exclusion)
+!*.xlsx

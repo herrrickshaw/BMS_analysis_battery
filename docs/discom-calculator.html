@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DISCOM Debt Relief — Token Charge Calculator</title>
+<style>
+  :root{--bg:#0f172a;--panel:#1e293b;--panel2:#273449;--line:#334155;--txt:#e2e8f0;
+    --muted:#94a3b8;--accent:#3b82f6;--blue:#60a5fa;--green:#22c55e;--amber:#f59e0b;--red:#ef4444}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5}
+  a{color:var(--accent)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+  header{background:linear-gradient(135deg,#1e293b,#0f172a);border-bottom:1px solid var(--line);padding:26px 0 20px}
+  header h1{font-size:25px;letter-spacing:-.4px}
+  header .sub{color:var(--muted);margin-top:5px;font-size:14px}
+  .crumb{font-size:13px;color:var(--muted);margin-bottom:8px}
+  section{padding:22px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:18px;margin-bottom:12px} h3{font-size:14px;color:var(--muted);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.5px}
+  .layout{display:grid;grid-template-columns:340px 1fr;gap:24px}
+  @media(max-width:820px){.layout{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px}
+  label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 3px}
+  label .note{color:#64748b;font-size:11px}
+  input[type=number]{width:100%;background:#0b1220;border:1px solid var(--line);color:var(--blue);
+    padding:8px 10px;border-radius:7px;font-size:14px;font-family:inherit}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .big{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 14px}
+  .kpi{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+  .kpi .l{font-size:11px;color:var(--muted)} .kpi .v{font-size:23px;font-weight:700;margin-top:3px}
+  .kpi .s{font-size:11px;color:var(--muted);margin-top:2px}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;margin-top:6px}
+  th{background:var(--panel2);text-align:right;padding:7px 9px;color:var(--txt);font-weight:600}
+  th:first-child{text-align:left} td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted)}
+  td:first-child{text-align:left;color:var(--txt)}
+  tr.hl td{background:#1e3a5f}
+  .heat td{text-align:center;font-size:11.5px;color:#0b1220;font-weight:600;border:1px solid #0b1220}
+  .heat th{text-align:center;font-size:11px}
+  .legend{font-size:11.5px;color:var(--muted);margin-top:8px}
+  .chip{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:middle;margin:0 4px 0 10px}
+  .disc{background:#3b1d10;border:1px solid #7c2d12;color:#fdba74;border-radius:9px;padding:11px 14px;font-size:12px;margin-top:18px}
+  .src{font-size:11px;color:#64748b;margin-top:4px}
+  footer{padding:20px 0;color:var(--muted);font-size:12px;text-align:center}
+  .verdict{font-size:13.5px;padding:10px 12px;border-radius:8px;margin-top:10px}
+  .v-ok{background:#14532d;color:#bbf7d0} .v-warn{background:#422006;color:#fde68a} .v-bad{background:#450a0a;color:#fecaca}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="crumb"><a href="repos.html">← Repositories</a> · <a href="repo/subscription-model-revenue.html">subscription-model-revenue</a></div>
+  <h1>⚡ DISCOM Debt Relief — Token Charge Calculator</h1>
+  <div class="sub">India Power Sector · Policy Analysis Model · interactive version of the FY2024-25 workbook</div>
+</div></header>
+
+<div class="wrap">
+<section>
+<div class="layout">
+  <!-- INPUTS -->
+  <div class="panel">
+    <h2>Inputs &amp; Assumptions</h2>
+    <h3>A. DISCOM Financial Position (₹ Crore)</h3>
+    <label>Total DISCOM outstanding debt <span class="note">₹ cr</span></label>
+    <input type="number" id="debt" value="740000">
+    <label>Annual electricity subsidies <span class="note">₹ cr</span></label>
+    <input type="number" id="subsidy" value="210000">
+    <label>Annual debt growth rate <span class="note">decimal (0.087 = 8.7%)</span></label>
+    <input type="number" id="growth" value="0.087" step="0.001">
+
+    <h3>B. Connections (crore)</h3>
+    <label>Subsidised domestic connections <span class="note">crore</span></label>
+    <input type="number" id="domestic" value="15" step="0.1">
+    <label>Free agricultural pump connections <span class="note">crore</span></label>
+    <input type="number" id="agri" value="3" step="0.1">
+
+    <h3>C. Token Charge (drag to model scenarios)</h3>
+    <label>Token charge per connection / month: <b id="chargeLbl" style="color:var(--blue)">₹1</b></label>
+    <input type="range" id="charge" min="1" max="100" value="1" step="1">
+    <label>Billing &amp; collection efficiency: <b id="effLbl" style="color:var(--blue)">70%</b></label>
+    <input type="range" id="eff" min="40" max="100" value="70" step="1">
+    <label>Admin / implementation cost ratio: <b id="adminLbl" style="color:var(--blue)">10%</b></label>
+    <input type="range" id="admin" min="0" max="30" value="10" step="1">
+    <div class="src">Defaults &amp; sources: ICRA May 2025 (debt ₹7.4L cr), IISD 2025 (subsidies ₹2.1L cr),
+      CEA/Manorama (8.7% CAGR), PFC (≈70% rural billing efficiency).</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div>
+    <h2>Impact Analysis</h2>
+    <div class="big">
+      <div class="kpi"><div class="l">Net annual collection</div><div class="v" id="kNet">—</div><div class="s">after efficiency &amp; admin</div></div>
+      <div class="kpi"><div class="l">Dent on total debt / yr</div><div class="v" id="kDent">—</div><div class="s" id="kDentS"></div></div>
+      <div class="kpi"><div class="l">Years to repay</div><div class="v" id="kYears">—</div><div class="s">at this collection (no growth)</div></div>
+      <div class="kpi"><div class="l">vs annual new debt</div><div class="v" id="kNew">—</div><div class="s" id="kNewS"></div></div>
+    </div>
+    <div id="verdict" class="verdict"></div>
+
+    <h3>Calculation breakdown</h3>
+    <table id="breakdown"></table>
+
+    <h3>Scenario comparison — token charge levels</h3>
+    <table id="scenarios">
+      <tr><th>Charge ₹/mo</th><th>Net collection ₹cr</th><th>% of debt/yr</th><th>Years to repay</th><th>Feasibility</th></tr>
+    </table>
+
+    <h3>Sensitivity — net annual collection (₹ cr) by charge × efficiency</h3>
+    <table id="heat" class="heat"></table>
+    <div class="legend">
+      <span class="chip" style="background:#22c55e"></span>&gt; ₹20,000 cr (meaningful)
+      <span class="chip" style="background:#f59e0b"></span>₹5,000–20,000 cr (modest)
+      <span class="chip" style="background:#ef4444"></span>&lt; ₹5,000 cr (negligible)
+      &nbsp;·&nbsp; Reference: new debt ≈ ₹64,000 cr/yr · subsidies ₹2.1L cr · total debt ₹7.4L cr
+    </div>
+  </div>
+</div>
+
+<div class="disc">⚠️ Illustrative policy model with simplifying assumptions (flat token charge, no demand
+elasticity, "years to repay" ignores ongoing debt growth). Educational use only — not a regulatory
+tariff filing, audited DISCOM accounts, or investment advice.</div>
+</section>
+</div>
+
+<footer><a href="repos.html">All repositories</a> · <a href="https://github.com/herrrickshaw/subscription-model-revenue">source repo ↗</a> · Educational/research only</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+function cr(v){return "₹" + Math.round(v).toLocaleString("en-IN") + " cr";}
+function pct(v){return (v*100).toFixed(2) + "%";}
+
+function feasibility(charge){
+  if(charge<=1) return "✓ Very easy";
+  if(charge<=5) return "✓ Easy";
+  if(charge<=10) return "⚠ Moderate";
+  if(charge<=20) return "⚠ Difficult";
+  if(charge<=50) return "✗ Hard";
+  return "✗ Very hard";
+}
+function net(charge, connCr, eff, admin){           // ₹ crore/year
+  return charge * connCr * 12 * eff * (1 - admin);
+}
+function heatColor(v){                               // v in ₹ cr
+  if(v > 20000) return "#22c55e";
+  if(v >= 5000) return "#f59e0b";
+  return "#ef4444";
+}
+
+function recompute(){
+  const debt   = +$("debt").value, subsidy = +$("subsidy").value, growth = +$("growth").value;
+  const conn   = (+$("domestic").value) + (+$("agri").value);
+  const charge = +$("charge").value, eff = (+$("eff").value)/100, admin = (+$("admin").value)/100;
+  $("chargeLbl").textContent = "₹"+charge;
+  $("effLbl").textContent = $("eff").value+"%";
+  $("adminLbl").textContent = $("admin").value+"%";
+
+  const grossMo = charge * conn;                     // ₹ cr/month
+  const grossYr = grossMo * 12;
+  const postEff = grossYr * eff;
+  const adminC  = postEff * admin;
+  const netYr   = postEff - adminC;
+  const newDebt = debt * growth;
+  const change  = netYr - newDebt;
+  const dent    = netYr / debt;
+  const years   = netYr > 0 ? debt / netYr : Infinity;
+  const ofSub   = netYr / subsidy;
+
+  // KPIs
+  $("kNet").textContent = cr(netYr);
+  $("kDent").textContent = pct(dent);
+  $("kDentS").textContent = (ofSub*100).toFixed(1)+"% of subsidy burden";
+  $("kYears").textContent = isFinite(years) ? Math.round(years).toLocaleString("en-IN") : "∞";
+  $("kNew").textContent = cr(newDebt);
+  $("kNewS").textContent = change>=0 ? cr(change)+" surplus" : cr(-change)+" short";
+
+  // verdict
+  const vd = $("verdict");
+  if(change >= 0){ vd.className="verdict v-ok";
+    vd.textContent="✓ At this charge the collection EXCEEDS annual new debt — debt would start falling."; }
+  else if(netYr > newDebt*0.25){ vd.className="verdict v-warn";
+    vd.textContent="⚠ Meaningful but insufficient — covers "+(netYr/newDebt*100).toFixed(0)+"% of the ₹"+Math.round(newDebt).toLocaleString("en-IN")+" cr added each year. Debt still grows, slower."; }
+  else{ vd.className="verdict v-bad";
+    vd.textContent="✗ Negligible vs the problem — only "+(netYr/newDebt*100).toFixed(0)+"% of annual new debt. A token charge alone cannot dent ₹"+Math.round(debt/100000)/10+"L cr."; }
+
+  // breakdown
+  $("breakdown").innerHTML = `
+    <tr><td>Connections covered</td><td>${conn.toFixed(1)} crore</td></tr>
+    <tr><td>Gross monthly collection</td><td>${cr(grossMo)}</td></tr>
+    <tr><td>Gross annual collection</td><td>${cr(grossYr)}</td></tr>
+    <tr><td>After ${$("eff").value}% billing efficiency</td><td>${cr(postEff)}</td></tr>
+    <tr><td>Less ${$("admin").value}% admin cost</td><td>−${cr(adminC)}</td></tr>
+    <tr class="hl"><td><b>Net annual collection</b></td><td><b>${cr(netYr)}</b></td></tr>
+    <tr><td>Annual new debt added (debt × ${(growth*100).toFixed(1)}%)</td><td>${cr(newDebt)}</td></tr>`;
+
+  // scenario table
+  const charges=[1,5,10,20,50,100];
+  let sc="<tr><th>Charge ₹/mo</th><th>Net collection ₹cr</th><th>% of debt/yr</th><th>Years to repay</th><th>Feasibility</th></tr>";
+  charges.forEach(ch=>{
+    const n=net(ch,conn,eff,admin); const y=n>0?Math.round(debt/n):Infinity;
+    const cls = ch==charge ? ' class="hl"' : '';
+    sc+=`<tr${cls}><td>₹${ch}</td><td>${cr(n)}</td><td>${pct(n/debt)}</td><td>${isFinite(y)?y.toLocaleString("en-IN"):"∞"}</td><td>${feasibility(ch)}</td></tr>`;
+  });
+  $("scenarios").innerHTML=sc;
+
+  // sensitivity heatmap
+  const effs=[50,60,70,75,80,85,90,95,100], rows=[1,2,5,10,15,20,30,50,100];
+  let h="<tr><th>₹/mo ↓ · eff →</th>"+effs.map(e=>`<th>${e}%</th>`).join("")+"</tr>";
+  rows.forEach(ch=>{
+    h+=`<tr><th>₹${ch}</th>`+effs.map(e=>{
+      const v=net(ch,conn,e/100,admin);
+      return `<td style="background:${heatColor(v)}">${Math.round(v).toLocaleString("en-IN")}</td>`;
+    }).join("")+"</tr>";
+  });
+  $("heat").innerHTML=h;
+}
+["debt","subsidy","growth","domestic","agri","charge","eff","admin"].forEach(id=>{
+  $(id).addEventListener("input",recompute);
+});
+recompute();
+</script>
+</body>
+</html>

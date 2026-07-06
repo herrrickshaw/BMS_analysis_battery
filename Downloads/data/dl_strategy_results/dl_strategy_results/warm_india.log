@@ -1,0 +1,79 @@
+Fetching NSE EQ universe …
+  NSE EQ: 2372
+Fetching BSE equity universe …
+  BSE equity (2026-06-25): 4321
+  BSE-only (not on NSE): 2133
+
+Total tickers to warm: 4505 (2372 NSE + 2133 BSE-only)
+  Warming cache: 4505 stocks, 5-year window
+  Storage: /Users/umashankar/Downloads/market_cache
+  First run: ~135 minutes | Subsequent runs: < 60 seconds
+
+  Index cached: ^BSESN 2481 bars
+  Cache: 179 fresh | 0 incremental | 4326 cold-start
+    Downloading batch 1/44 (100 tickers) … OK (100/100)
+    Downloading batch 2/44 (100 tickers) … OK (100/100)
+    Downloading batch 3/44 (100 tickers) … OK (100/100)
+    Downloading batch 4/44 (100 tickers) … OK (100/100)
+    Downloading batch 5/44 (100 tickers) … OK (100/100)
+    Downloading batch 6/44 (100 tickers) … OK (100/100)
+    Downloading batch 7/44 (100 tickers) … OK (100/100)
+    Downloading batch 8/44 (100 tickers) … OK (100/100)
+    Downloading batch 9/44 (100 tickers) … OK (100/100)
+    Downloading batch 10/44 (100 tickers) … OK (100/100)
+    Downloading batch 11/44 (100 tickers) … OK (100/100)
+    Downloading batch 12/44 (100 tickers) … OK (100/100)
+    Downloading batch 13/44 (100 tickers) … OK (100/100)
+    Downloading batch 14/44 (100 tickers) … OK (100/100)
+    Downloading batch 15/44 (100 tickers) … OK (100/100)
+    Downloading batch 16/44 (100 tickers) … OK (100/100)
+    Downloading batch 17/44 (100 tickers) … OK (100/100)
+    Downloading batch 18/44 (100 tickers) … OK (100/100)
+    Downloading batch 19/44 (100 tickers) … OK (100/100)
+    Downloading batch 20/44 (100 tickers) … OK (100/100)
+    Downloading batch 21/44 (100 tickers) … OK (100/100)
+    Downloading batch 22/44 (100 tickers) … OK (100/100)
+    Downloading batch 23/44 (100 tickers) … OK (100/100)
+    Downloading batch 24/44 (100 tickers) … OK (100/100)
+    Downloading batch 25/44 (100 tickers) … OK (100/100)
+    Downloading batch 26/44 (100 tickers) … OK (100/100)
+    Downloading batch 27/44 (100 tickers) … OK (100/100)
+    Downloading batch 28/44 (100 tickers) … OK (100/100)
+    Downloading batch 29/44 (100 tickers) … OK (100/100)
+    Downloading batch 30/44 (100 tickers) … OK (100/100)
+    Downloading batch 31/44 (100 tickers) … OK (100/100)
+    Downloading batch 32/44 (100 tickers) … OK (100/100)
+    Downloading batch 33/44 (100 tickers) … OK (100/100)
+    Downloading batch 34/44 (100 tickers) … OK (100/100)
+    Downloading batch 35/44 (100 tickers) … OK (100/100)
+    Downloading batch 36/44 (100 tickers) … 
+18 Failed downloads:
+['PANTH.BO', 'POLSON.BO', 'PFL.BO', 'PANAFIC.BO', 'PANKAJPO.BO', 'PATSPINLTD.BO', 'PADAMCO.BO', 'PRIMAGR.BO', 'PRERINFRA.BO', 'PHOENXINTL.BO', 'PASARI.BO', 'POLYCHEM.BO', 'PHARMAID.BO', 'PADMAIND.BO', 'PBAINFRA.BO', 'PREMCAP.BO', 'PARSHWANA.BO', 'ORIENTTR.BO']: TypeError("'NoneType' object is not subscriptable")
+OK (82/100)
+    Downloading batch 37/44 (100 tickers) … 
+8 Failed downloads:
+['RAPICUT.BO', 'REGENCY.BO', 'PRIMEFRESH.BO', 'RAJPACK.BO', 'RAGHUNAT.BO', 'RAL.BO', 'RESTILE.BO', 'PRIMEPRO.BO']: TypeError("'NoneType' object is not subscriptable")
+OK (92/100)
+    Downloading batch 38/44 (100 tickers) … 
+12 Failed downloads:
+['RIDDHICORP.BO', 'RISHITECH.BO', 'RONI.BO', 'RSCINT.BO', 'RRETAIL.BO', 'SAMRATPH.BO', 'RUNGTAIR.BO', 'RTSPOWR.BO', 'SANJIVIN.BO', 'SAMKRG.BO', 'ROOPAIND.BO', 'RNITAI.BO']: TypeError("'NoneType' object is not subscriptable")
+OK (88/100)
+    Downloading batch 39/44 (100 tickers) … OK (100/100)
+    Downloading batch 40/44 (100 tickers) … OK (100/100)
+    Downloading batch 41/44 (100 tickers) … HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: TEAM24.BO"}}}
+$TEAM24.BO: possibly delisted; no timezone found
+
+1 Failed download:
+['TEAM24.BO']: possibly delisted; no timezone found
+OK (99/100)
+    Downloading batch 42/44 (100 tickers) … OK (100/100)
+    Downloading batch 43/44 (100 tickers) … OK (100/100)
+    Downloading batch 44/44 (26 tickers) … OK (26/26)
+  Bulk download complete: 4287/4326 tickers
+  Cache result: 4466/4505 tickers loaded
+
+  Cache report: 12100 OHLC | 0 fundamental | 2 index | 524.4 MB on disk
+
+  ✅ Cache warm. All future runs will use local Parquet files.
+
+✅ India cache warming complete.

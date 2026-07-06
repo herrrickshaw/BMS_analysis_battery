@@ -1,0 +1,124 @@
+{
+  "market": "IN",
+  "generated": "2026-06-26T18:32:45.270646",
+  "mood": {
+    "mood": "POSITIVE",
+    "score": 0.436,
+    "n_articles": 229,
+    "by_outlet": {
+      "Moneycontrol": 3,
+      "EconomicTimes": 2,
+      "BusinessLine": 1,
+      "LiveMint": 1
+    }
+  },
+  "picks": [
+    {
+      "Symbol": "PRIVISCL",
+      "Tier": "Triple Hit",
+      "Screens": "Darvas+Piotroski+CoffeeCan",
+      "Piotroski": 9,
+      "LTP": 3550.5
+    },
+    {
+      "Symbol": "KOVAI",
+      "Tier": "Triple Hit",
+      "Screens": "Darvas+Piotroski+CoffeeCan",
+      "Piotroski": 9,
+      "LTP": 6019.0
+    },
+    {
+      "Symbol": "CCL",
+      "Tier": "Triple Hit",
+      "Screens": "Darvas+Piotroski+CoffeeCan",
+      "Piotroski": 8,
+      "LTP": 1163.2
+    },
+    {
+      "Symbol": "PRICOLLTD",
+      "Tier": "Triple Hit",
+      "Screens": "Darvas+Piotroski+CoffeeCan",
+      "Piotroski": 7,
+      "LTP": 586.7
+    },
+    {
+      "Symbol": "APOLLOHOSP",
+      "Tier": "Triple Hit",
+      "Screens": "Darvas+Piotroski+CoffeeCan",
+      "Piotroski": 7,
+      "LTP": 8592.0
+    },
+    {
+      "Symbol": "LGBBROSLTD",
+      "Tier": "Triple Hit",
+      "Screens": "Darvas+Piotroski+CoffeeCan",
+      "Piotroski": 7,
+      "LTP": 1587.4
+    },
+    {
+      "Symbol": "LUPIN",
+      "Tier": "Triple Hit",
+      "Screens": "Darvas+Piotroski+CoffeeCan",
+      "Piotroski": 7,
+      "LTP": 2343.5
+    },
+    {
+      "Symbol": "KFINTECH",
+      "Tier": "Triple Hit",
+      "Screens": "Darvas+Piotroski+CoffeeCan",
+      "Piotroski": 7,
+      "LTP": 874.15
+    }
+  ],
+  "convergence": [],
+  "talk": {
+    "PRIVISCL": {
+      "score": 0.0,
+      "label": "NO_DATA",
+      "n_articles": 0,
+      "headlines": []
+    },
+    "KOVAI": {
+      "score": 0.0,
+      "label": "NO_DATA",
+      "n_articles": 0,
+      "headlines": []
+    },
+    "CCL": {
+      "score": 0.0,
+      "label": "NO_DATA",
+      "n_articles": 0,
+      "headlines": []
+    },
+    "PRICOLLTD": {
+      "score": 0.0,
+      "label": "NO_DATA",
+      "n_articles": 0,
+      "headlines": []
+    },
+    "APOLLOHOSP": {
+      "score": 0.0,
+      "label": "NO_DATA",
+      "n_articles": 0,
+      "headlines": []
+    },
+    "LGBBROSLTD": {
+      "score": 0.0,
+      "label": "NO_DATA",
+      "n_articles": 0,
+      "headlines": []
+    },
+    "LUPIN": {
+      "score": 0.0,
+      "label": "NO_DATA",
+      "n_articles": 0,
+      "headlines": []
+    },
+    "KFINTECH": {
+      "score": 0.0,
+      "label": "NO_DATA",
+      "n_articles": 0,
+      "headlines": []
+    }
+  }
+}

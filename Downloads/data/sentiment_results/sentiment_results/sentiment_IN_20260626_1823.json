@@ -1,0 +1,101 @@
+{
+  "RELIANCE": {
+    "ticker": "RELIANCE",
+    "score": -0.1199,
+    "label": "NEUTRAL",
+    "n_articles": 5,
+    "providers": [
+      "IndianRSS"
+    ],
+    "top_headlines": [
+      {
+        "title": "Taking Stock: Market fails to hold on to day#39;s gains, ends marginally higher",
+        "sentiment": -0.44,
+        "source": "IndianRSS:Moneycontrol"
+      },
+      {
+        "title": "SEBI rejects Anil Ambani settlement request over Reliance Infrastructure",
+        "sentiment": -0.36,
+        "source": "IndianRSS:BusinessLine"
+      },
+      {
+        "title": "Sebi seeks clarification from Jio Platforms on IPO filing",
+        "sentiment": 0.2,
+        "source": "IndianRSS:EconomicTimes"
+      },
+      {
+        "title": "Reliance Consolidated March 2024 Net Sales at Rs 236,533.00 crore, up 11.08% Y-o-Y",
+        "sentiment": 0.0,
+        "source": "IndianRSS:Moneycontrol"
+      },
+      {
+        "title": "Reliance Standalone March 2024 Net Sales at Rs 146,832.00 crore, up 23.7% Y-o-Y",
+        "sentiment": 0.0,
+        "source": "IndianRSS:Moneycontrol"
+      }
+    ],
+    "fetched_at": "2026-06-26T18:23:18.548347"
+  },
+  "TCS": {
+    "ticker": "TCS",
+    "score": 0.296,
+    "label": "POSITIVE",
+    "n_articles": 1,
+    "providers": [
+      "IndianRSS"
+    ],
+    "top_headlines": [
+      {
+        "title": "TCS Share Price Highlights: TCS Stock Price History",
+        "sentiment": 0.3,
+        "source": "IndianRSS:EconomicTimes"
+      }
+    ],
+    "fetched_at": "2026-06-26T18:23:18.549468"
+  },
+  "HDFCBANK": {
+    "ticker": "HDFCBANK",
+    "score": 0.0,
+    "label": "NO_DATA",
+    "n_articles": 0,
+    "providers": [],
+    "top_headlines": [],
+    "fetched_at": "2026-06-26T18:23:18.550302"
+  },
+  "INFY": {
+    "ticker": "INFY",
+    "score": 0.0,
+    "label": "NO_DATA",
+    "n_articles": 0,
+    "providers": [],
+    "top_headlines": [],
+    "fetched_at": "2026-06-26T18:23:18.550769"
+  },
+  "ADANIENT": {
+    "ticker": "ADANIENT",
+    "score": 0.6404,
+    "label": "POSITIVE",
+    "n_articles": 3,
+    "providers": [
+      "IndianRSS"
+    ],
+    "top_headlines": [
+      {
+        "title": "Adani Ports emerges top contender for Karanja Terminal takeover",
+        "sentiment": 0.81,
+        "source": "IndianRSS:EconomicTimes"
+      },
+      {
+        "title": "Adani Ports emerges top contender for Karanja Terminal takeover",
+        "sentiment": 0.81,
+        "source": "IndianRSS:EconomicTimes"
+      },
+      {
+        "title": "Adani Ports SEZ Share Price Highlights: Adani Ports SEZ Stock Price History",
+        "sentiment": 0.3,
+        "source": "IndianRSS:EconomicTimes"
+      }
+    ],
+    "fetched_at": "2026-06-26T18:23:18.552580"
+  }
+}

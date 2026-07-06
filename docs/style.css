@@ -1,0 +1,40 @@
+/* Shared theme for the multi-page repository site (docs/) */
+:root{--bg:#0f172a;--panel:#1e293b;--panel2:#273449;--line:#334155;--txt:#e2e8f0;
+  --muted:#94a3b8;--accent:#3b82f6;--green:#22c55e;--amber:#f59e0b;--purple:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);
+  color:var(--txt);line-height:1.55}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:1040px;margin:0 auto;padding:0 18px}
+header{background:linear-gradient(135deg,#1e293b,#0f172a);border-bottom:1px solid var(--line);padding:30px 0 24px}
+header h1{font-size:27px;letter-spacing:-.4px}
+header .sub{color:var(--muted);margin-top:6px;font-size:14.5px}
+.crumb{font-size:13px;color:var(--muted);margin-bottom:8px}
+.pills{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.pill{background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--muted)}
+.pill b{color:var(--txt)}
+nav{background:rgba(15,23,42,.92);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:6px;overflow-x:auto;padding:8px 18px}
+nav a{color:var(--muted);padding:8px 14px;font-size:14px;border-radius:7px;white-space:nowrap}
+nav a:hover{color:var(--txt);text-decoration:none}
+nav a.active{background:var(--accent);color:#fff;font-weight:600}
+section{padding:26px 0}
+h2{font-size:20px;margin-bottom:12px} h3{font-size:15px;margin:14px 0 6px}
+p.lead{color:var(--muted);max-width:760px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px;transition:.15s}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card h3{margin:0 0 6px;display:flex;align-items:center;gap:8px}
+.card p{font-size:13px;color:var(--muted)}
+.card .lang{font-size:10px;padding:2px 8px;border-radius:10px;margin-left:auto;font-weight:600;
+  background:#1e3a8a;color:#bfdbfe}
+.card a.go{display:inline-block;margin-top:10px;font-size:13px}
+ul{margin-left:20px;color:var(--muted);font-size:14px} li{margin:3px 0}
+table{border-collapse:collapse;width:100%;font-size:13px;margin-top:6px}
+th{background:var(--panel2);text-align:left;padding:8px 10px;color:var(--txt)}
+td{padding:7px 10px;border-bottom:1px solid var(--line);color:var(--muted)}
+code{background:#0b1220;color:#7dd3fc;padding:1px 6px;border-radius:4px;font-size:12.5px}
+.disc{background:#3b1d10;border:1px solid #7c2d12;color:#fdba74;border-radius:9px;padding:11px 14px;font-size:12px;margin-top:18px}
+footer{padding:22px 0;color:var(--muted);font-size:12px;text-align:center;border-top:1px solid var(--line)}
+.tag{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+.t-active{background:#14532d;color:#bbf7d0} .t-exp{background:#581c87;color:#e9d5ff}

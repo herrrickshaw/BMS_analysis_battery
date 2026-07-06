@@ -1,0 +1,338 @@
+/Users/umashankar/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+
+######################################################################
+  SCREENER BACKTEST — IN MARKET
+  Started: 26 Jun 2026  12:36:07
+  Lookback: 252 trading days | Horizons: ['T+1d', 'T+3d', 'T+1wk', 'T+1mo', 'T+3mo']
+######################################################################
+
+⚠️  BACKTESTING DISCLAIMER: Results are based on historical data and are subject to survivorship bias, look-ahead bias (fundamental screeners), and data limitations. Past performance does NOT guarantee future results. For educational/research use only — NOT investment advice.
+
+Step 1 — Market index for regime classification …
+  Downloading ^NSEI index (2y) for regime classification … OK (495 bars)
+
+Step 2 — Symbol universe …
+  NSE bhavcopy 2026-06-25: 2406 EQ symbols
+  2406 symbols loaded
+
+Step 3 — Bulk OHLC download (14mo window for 2406 symbols) …
+  Batch 1/13 (200 tickers) … OK (176 usable)
+  Batch 2/13 (200 tickers) … OK (177 usable)
+  Batch 3/13 (200 tickers) … OK (181 usable)
+  Batch 4/13 (200 tickers) … OK (169 usable)
+  Batch 5/13 (200 tickers) … OK (176 usable)
+  Batch 6/13 (200 tickers) … OK (181 usable)
+  Batch 7/13 (200 tickers) … OK (179 usable)
+  Batch 8/13 (200 tickers) … OK (173 usable)
+  Batch 9/13 (200 tickers) … OK (181 usable)
+  Batch 10/13 (200 tickers) … OK (170 usable)
+  Batch 11/13 (200 tickers) … OK (178 usable)
+  Batch 12/13 (200 tickers) … OK (182 usable)
+  Batch 13/13 (6 tickers) … HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"User is unable to access this feature - https://bit.ly/yahoo-finance-api-feedback"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"User is unable to access this feature - https://bit.ly/yahoo-finance-api-feedback"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+OK (5 usable)
+  2128 tickers with usable OHLC data
+  2128 symbols ready for backtesting
+
+Step 4 — Backtest: Darvas Box Breakout …
+  → 14636 signals detected
+
+Step 4 — Backtest: Golden Crossover …
+  → 650 signals detected
+
+Step 4 — Backtest: Piotroski F-Score ≥7 …
+    [piotroski] 50/2128 processed, 6 signals found
+    [piotroski] 100/2128 processed, 16 signals found
+    [piotroski] 150/2128 processed, 29 signals found
+    [piotroski] 200/2128 processed, 39 signals found
+    [piotroski] 250/2128 processed, 43 signals found
+    [piotroski] 300/2128 processed, 60 signals found
+    [piotroski] 350/2128 processed, 69 signals found
+    [piotroski] 400/2128 processed, 79 signals found
+    [piotroski] 450/2128 processed, 82 signals found
+    [piotroski] 500/2128 processed, 82 signals found
+    [piotroski] 550/2128 processed, 82 signals found
+    [piotroski] 600/2128 processed, 82 signals found
+    [piotroski] 650/2128 processed, 82 signals found
+    [piotroski] 700/2128 processed, 82 signals found
+    [piotroski] 750/2128 processed, 82 signals found
+    [piotroski] 800/2128 processed, 82 signals found
+    [piotroski] 850/2128 processed, 82 signals found
+    [piotroski] 900/2128 processed, 82 signals found
+    [piotroski] 950/2128 processed, 82 signals found
+    [piotroski] 1000/2128 processed, 82 signals found
+    [piotroski] 1050/2128 processed, 82 signals found
+    [piotroski] 1100/2128 processed, 82 signals found
+    [piotroski] 1150/2128 processed, 82 signals found
+    [piotroski] 1200/2128 processed, 82 signals found
+    [piotroski] 1250/2128 processed, 82 signals found
+    [piotroski] 1300/2128 processed, 82 signals found
+    [piotroski] 1350/2128 processed, 82 signals found
+    [piotroski] 1400/2128 processed, 82 signals found
+    [piotroski] 1450/2128 processed, 82 signals found
+    [piotroski] 1500/2128 processed, 82 signals found
+    [piotroski] 1550/2128 processed, 82 signals found
+    [piotroski] 1600/2128 processed, 82 signals found
+    [piotroski] 1650/2128 processed, 82 signals found
+    [piotroski] 1700/2128 processed, 82 signals found
+    [piotroski] 1750/2128 processed, 82 signals found
+    [piotroski] 1800/2128 processed, 82 signals found
+    [piotroski] 1850/2128 processed, 82 signals found
+    [piotroski] 1900/2128 processed, 82 signals found
+    [piotroski] 1950/2128 processed, 82 signals found
+    [piotroski] 2000/2128 processed, 82 signals found
+    [piotroski] 2050/2128 processed, 82 signals found
+    [piotroski] 2100/2128 processed, 82 signals found
+    [piotroski] 2128/2128 processed, 82 signals found
+  → 82 signals detected
+
+Step 4 — Backtest: Coffee Can …
+    [coffee_can] 50/2128 processed, 0 signals found
+    [coffee_can] 100/2128 processed, 0 signals found
+    [coffee_can] 150/2128 processed, 0 signals found
+    [coffee_can] 200/2128 processed, 0 signals found
+    [coffee_can] 250/2128 processed, 0 signals found
+    [coffee_can] 300/2128 processed, 0 signals found
+    [coffee_can] 350/2128 processed, 0 signals found
+    [coffee_can] 400/2128 processed, 0 signals found
+    [coffee_can] 450/2128 processed, 0 signals found
+    [coffee_can] 500/2128 processed, 0 signals found
+    [coffee_can] 550/2128 processed, 0 signals found
+    [coffee_can] 600/2128 processed, 0 signals found
+    [coffee_can] 650/2128 processed, 0 signals found
+    [coffee_can] 700/2128 processed, 0 signals found
+    [coffee_can] 750/2128 processed, 0 signals found
+    [coffee_can] 800/2128 processed, 0 signals found
+    [coffee_can] 850/2128 processed, 0 signals found
+    [coffee_can] 900/2128 processed, 0 signals found
+    [coffee_can] 950/2128 processed, 0 signals found
+    [coffee_can] 1000/2128 processed, 0 signals found
+    [coffee_can] 1050/2128 processed, 0 signals found
+    [coffee_can] 1100/2128 processed, 0 signals found
+    [coffee_can] 1150/2128 processed, 0 signals found
+    [coffee_can] 1200/2128 processed, 0 signals found
+    [coffee_can] 1250/2128 processed, 0 signals found
+    [coffee_can] 1300/2128 processed, 0 signals found
+    [coffee_can] 1350/2128 processed, 0 signals found
+    [coffee_can] 1400/2128 processed, 0 signals found
+    [coffee_can] 1450/2128 processed, 0 signals found
+    [coffee_can] 1500/2128 processed, 0 signals found
+    [coffee_can] 1550/2128 processed, 0 signals found
+    [coffee_can] 1600/2128 processed, 0 signals found
+    [coffee_can] 1650/2128 processed, 0 signals found
+    [coffee_can] 1700/2128 processed, 0 signals found
+    [coffee_can] 1750/2128 processed, 0 signals found
+    [coffee_can] 1800/2128 processed, 0 signals found
+    [coffee_can] 1850/2128 processed, 0 signals found
+    [coffee_can] 1900/2128 processed, 0 signals found
+    [coffee_can] 1950/2128 processed, 0 signals found
+    [coffee_can] 2000/2128 processed, 0 signals found
+    [coffee_can] 2050/2128 processed, 0 signals found
+    [coffee_can] 2100/2128 processed, 0 signals found
+    [coffee_can] 2128/2128 processed, 0 signals found
+  → No signals detected
+
+Step 4 — Backtest: Magic Formula …
+    [magic_formula] 50/2128 processed, 0 signals found
+    [magic_formula] 100/2128 processed, 0 signals found
+    [magic_formula] 150/2128 processed, 0 signals found
+    [magic_formula] 200/2128 processed, 0 signals found
+    [magic_formula] 250/2128 processed, 0 signals found
+    [magic_formula] 300/2128 processed, 0 signals found
+    [magic_formula] 350/2128 processed, 0 signals found
+    [magic_formula] 400/2128 processed, 0 signals found
+    [magic_formula] 450/2128 processed, 0 signals found
+    [magic_formula] 500/2128 processed, 0 signals found
+    [magic_formula] 550/2128 processed, 0 signals found
+    [magic_formula] 600/2128 processed, 0 signals found
+    [magic_formula] 650/2128 processed, 0 signals found
+    [magic_formula] 700/2128 processed, 0 signals found
+    [magic_formula] 750/2128 processed, 0 signals found
+    [magic_formula] 800/2128 processed, 0 signals found
+    [magic_formula] 850/2128 processed, 0 signals found
+    [magic_formula] 900/2128 processed, 0 signals found
+    [magic_formula] 950/2128 processed, 0 signals found
+    [magic_formula] 1000/2128 processed, 0 signals found
+    [magic_formula] 1050/2128 processed, 0 signals found
+    [magic_formula] 1100/2128 processed, 0 signals found
+    [magic_formula] 1150/2128 processed, 0 signals found
+    [magic_formula] 1200/2128 processed, 0 signals found
+    [magic_formula] 1250/2128 processed, 0 signals found
+    [magic_formula] 1300/2128 processed, 0 signals found
+    [magic_formula] 1350/2128 processed, 0 signals found
+    [magic_formula] 1400/2128 processed, 0 signals found
+    [magic_formula] 1450/2128 processed, 0 signals found
+    [magic_formula] 1500/2128 processed, 0 signals found
+    [magic_formula] 1550/2128 processed, 0 signals found
+    [magic_formula] 1600/2128 processed, 0 signals found
+    [magic_formula] 1650/2128 processed, 0 signals found
+    [magic_formula] 1700/2128 processed, 0 signals found
+    [magic_formula] 1750/2128 processed, 0 signals found
+    [magic_formula] 1800/2128 processed, 0 signals found
+    [magic_formula] 1850/2128 processed, 0 signals found
+    [magic_formula] 1900/2128 processed, 0 signals found
+    [magic_formula] 1950/2128 processed, 0 signals found
+    [magic_formula] 2000/2128 processed, 0 signals found
+    [magic_formula] 2050/2128 processed, 0 signals found
+    [magic_formula] 2100/2128 processed, 0 signals found
+    [magic_formula] 2128/2128 processed, 0 signals found
+  → No signals detected
+
+Step 4 — Backtest: Bull Cartel …
+    [bull_cartel] 50/2128 processed, 11 signals found
+    [bull_cartel] 100/2128 processed, 19 signals found
+    [bull_cartel] 150/2128 processed, 35 signals found
+    [bull_cartel] 200/2128 processed, 52 signals found
+    [bull_cartel] 250/2128 processed, 62 signals found
+    [bull_cartel] 300/2128 processed, 63 signals found
+    [bull_cartel] 350/2128 processed, 63 signals found
+    [bull_cartel] 400/2128 processed, 63 signals found
+    [bull_cartel] 450/2128 processed, 63 signals found
+    [bull_cartel] 500/2128 processed, 63 signals found
+    [bull_cartel] 550/2128 processed, 63 signals found
+    [bull_cartel] 600/2128 processed, 63 signals found
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+HTTP Error 401: {"finance":{"result":null,"error":{"code":"Unauthorized","description":"Invalid Crumb"}}}
+    [bull_cartel] 650/2128 processed, 63 signals found
+    [bull_cartel] 700/2128 processed, 63 signals found
+    [bull_cartel] 750/2128 processed, 63 signals found
+    [bull_cartel] 800/2128 processed, 63 signals found
+    [bull_cartel] 850/2128 processed, 63 signals found
+    [bull_cartel] 900/2128 processed, 63 signals found
+    [bull_cartel] 950/2128 processed, 63 signals found
+    [bull_cartel] 1000/2128 processed, 63 signals found
+    [bull_cartel] 1050/2128 processed, 63 signals found
+    [bull_cartel] 1100/2128 processed, 63 signals found
+    [bull_cartel] 1150/2128 processed, 63 signals found
+    [bull_cartel] 1200/2128 processed, 63 signals found
+    [bull_cartel] 1250/2128 processed, 63 signals found
+    [bull_cartel] 1300/2128 processed, 63 signals found
+    [bull_cartel] 1350/2128 processed, 63 signals found
+    [bull_cartel] 1400/2128 processed, 63 signals found
+    [bull_cartel] 1450/2128 processed, 65 signals found
+    [bull_cartel] 1500/2128 processed, 65 signals found
+    [bull_cartel] 1550/2128 processed, 65 signals found
+    [bull_cartel] 1600/2128 processed, 65 signals found
+    [bull_cartel] 1650/2128 processed, 66 signals found
+    [bull_cartel] 1700/2128 processed, 66 signals found
+    [bull_cartel] 1750/2128 processed, 66 signals found
+    [bull_cartel] 1800/2128 processed, 66 signals found
+    [bull_cartel] 1850/2128 processed, 66 signals found
+    [bull_cartel] 1900/2128 processed, 66 signals found
+    [bull_cartel] 1950/2128 processed, 66 signals found
+    [bull_cartel] 2000/2128 processed, 66 signals found
+    [bull_cartel] 2050/2128 processed, 66 signals found
+    [bull_cartel] 2100/2128 processed, 66 signals found
+    [bull_cartel] 2128/2128 processed, 66 signals found
+  → 66 signals detected
+
+Step 5 — Statistical analysis …
+
+Step 6 — Saving results …
+
+  📊  Backtest Excel → backtest_results/backtest_IN_20260626_1300.xlsx
+
+======================================================================
+  BACKTEST RESULTS SUMMARY
+  ⚠️  BACKTESTING DISCLAIMER: Results are based on historical data and are subject…
+======================================================================
+
+  Total signals across all screeners: 15434
+    bull_cartel           66 signals
+    darvas                14636 signals
+    golden_cross          650 signals
+    piotroski             82 signals
+
+  ────────────────────────────────────────────────────────────────────
+  HIT RATE % (signals with positive return)
+  ────────────────────────────────────────────────────────────────────
+  Screener               Regime        T+1d     T+3d    T+1wk    T+1mo    T+3mo
+  ────────────────────────────────────────────────────────────────────
+  darvas                 BULL       
+  darvas                 BULL       
+  darvas                 BULL       
+  darvas                 BULL       
+  darvas                 BULL       
+  darvas                 BEAR       
+  darvas                 BEAR       
+  darvas                 BEAR       
+  darvas                 BEAR       
+  darvas                 BEAR       
+  golden_cross           BULL       
+  golden_cross           BULL       
+  golden_cross           BULL       
+  golden_cross           BULL       
+  golden_cross           BULL       
+  golden_cross           BEAR       
+  golden_cross           BEAR       
+  golden_cross           BEAR       
+  golden_cross           BEAR       
+  golden_cross           BEAR       
+  piotroski              BEAR       
+  piotroski              BEAR       
+  piotroski              BEAR       
+  piotroski              BEAR       
+  bull_cartel            BEAR       
+  bull_cartel            BEAR       
+  bull_cartel            BEAR       
+  bull_cartel            BEAR       
+
+  ────────────────────────────────────────────────────────────────────
+  SCREENER RANKING (by composite score: avg hit rate × Sharpe 1mo)
+  ────────────────────────────────────────────────────────────────────
+  Rank  Screener               Regime       Hit%    Ret%  Sharpe     EV%
+  ────────────────────────────────────────────────────────────────────
+  #1    darvas                 BULL         38.2   -1.51  -0.201   -2.32
+  #2    golden_cross           BULL         32.3   -2.87  -1.104   -9.28
+  #1    bull_cartel            BEAR         80.5    8.38   1.832   21.34
+  #2    piotroski              BEAR         79.1    6.71   1.052   15.59
+  #3    darvas                 BEAR         52.9    3.75   0.317    4.22
+  #4    golden_cross           BEAR         50.3    2.44   0.305    4.25
+
+  ────────────────────────────────────────────────────────────────────
+  KEY INTERPRETATIONS
+  ────────────────────────────────────────────────────────────────────
+  Best screener in BULL market: darvas (hit rate 38.2%, 1mo EV -2.32%)
+  Best screener in BEAR market: bull_cartel (hit rate 80.5%, 1mo EV 21.34%)
+
+  ⚠️  ⚠️  BACKTESTING DISCLAIMER: Results are based on historical data and are subject to survivorship bias, look-ahead bias (fundamental screeners), and data limitations. Past performance does NOT guarantee future results. For educational/research use only — NOT investment advice.
+======================================================================
+

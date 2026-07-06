@@ -1,0 +1,32 @@
+# .dockerignore — exclude from Docker build context
+
+# Large data files (mounted as volumes at runtime)
+Downloads/market_cache/
+Downloads/*_scan/
+Downloads/backtest_results/
+Downloads/wf_backtest/
+Downloads/ipo_results/
+Downloads/screener_results/
+
+# OS and editor
+.DS_Store
+*.pyc
+__pycache__/
+.env
+*.log
+
+# Git
+.git/
+.gitignore
+
+# Non-essential reference
+FUEL_*.md
+TOLL_*.md
+SEASONAL_*.md
+QUICKSTART.md
+*.html
+
+# Large outputs already in nse_screener_reference/
+# (these are accessed via volume mount, not baked in)
+Downloads/indian_full_scan/*.xlsx
+Downloads/us_full_scan/*.xlsx

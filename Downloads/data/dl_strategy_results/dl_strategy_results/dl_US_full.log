@@ -1,0 +1,108 @@
+
+##############################################################################
+  DL-INFORMED STRATEGY EVALUATION — US | horizon=21d | long-threshold P(up)≥0.55
+  Framing: directional classification → mechanical long/flat strategy
+  Benchmark: buy-and-hold (Fister 2019; Olorunnimbe 2022; Toichatturat 2024)
+##############################################################################
+⚠️  Backtested trading strategy. Survivorship + look-ahead risk. Economic results are historical, need not persist. NOT advice.
+
+STEP 1 — Load data
+  5721 stocks with ≥600 bars
+
+STEP 2 — Walk-forward train + strategy backtest (GradientBoosting)
+    100/5721 stocks processed, 96 results
+    200/5721 stocks processed, 189 results
+    300/5721 stocks processed, 287 results
+    400/5721 stocks processed, 377 results
+    500/5721 stocks processed, 473 results
+    600/5721 stocks processed, 565 results
+    700/5721 stocks processed, 660 results
+    800/5721 stocks processed, 755 results
+    900/5721 stocks processed, 847 results
+    1000/5721 stocks processed, 942 results
+    1100/5721 stocks processed, 1037 results
+    1200/5721 stocks processed, 1134 results
+    1300/5721 stocks processed, 1228 results
+    1400/5721 stocks processed, 1319 results
+    1500/5721 stocks processed, 1416 results
+    1600/5721 stocks processed, 1512 results
+    1700/5721 stocks processed, 1601 results
+    1800/5721 stocks processed, 1696 results
+    1900/5721 stocks processed, 1789 results
+    2000/5721 stocks processed, 1882 results
+    2100/5721 stocks processed, 1979 results
+    2200/5721 stocks processed, 2072 results
+    2300/5721 stocks processed, 2168 results
+    2400/5721 stocks processed, 2262 results
+    2500/5721 stocks processed, 2359 results
+    2600/5721 stocks processed, 2455 results
+    2700/5721 stocks processed, 2549 results
+    2800/5721 stocks processed, 2641 results
+    2900/5721 stocks processed, 2738 results
+    3000/5721 stocks processed, 2834 results
+    3100/5721 stocks processed, 2929 results
+    3200/5721 stocks processed, 3025 results
+    3300/5721 stocks processed, 3122 results
+    3400/5721 stocks processed, 3219 results
+    3500/5721 stocks processed, 3313 results
+    3600/5721 stocks processed, 3406 results
+    3700/5721 stocks processed, 3499 results
+    3800/5721 stocks processed, 3593 results
+    3900/5721 stocks processed, 3688 results
+    4000/5721 stocks processed, 3782 results
+    4100/5721 stocks processed, 3873 results
+    4200/5721 stocks processed, 3969 results
+    4300/5721 stocks processed, 4065 results
+    4400/5721 stocks processed, 4162 results
+    4500/5721 stocks processed, 4257 results
+    4600/5721 stocks processed, 4353 results
+    4700/5721 stocks processed, 4450 results
+    4800/5721 stocks processed, 4545 results
+    4900/5721 stocks processed, 4639 results
+    5000/5721 stocks processed, 4730 results
+    5100/5721 stocks processed, 4824 results
+    5200/5721 stocks processed, 4919 results
+    5300/5721 stocks processed, 5016 results
+    5400/5721 stocks processed, 5115 results
+    5500/5721 stocks processed, 5209 results
+    5600/5721 stocks processed, 5305 results
+    5700/5721 stocks processed, 5401 results
+    5721/5721 stocks processed, 5422 results
+
+STEP 3 — Economic Evaluation (5422 stocks)
+==============================================================================
+
+  📊 STRATEGY vs BUY-AND-HOLD (out-of-sample, last 30% of history):
+  Metric                           Strategy     Buy&Hold       Edge
+  ────────────────────────────────────────────────────────────────
+  Mean cumulative return%            17.78        36.50    -18.72
+  Median cumulative return%           6.51         9.21     -2.71
+  Mean Sharpe                        0.429        0.450    -0.021
+  Mean max drawdown%                -15.79       -31.68    +15.88
+
+  % of stocks where strategy BEAT buy-and-hold: 47.5%
+
+  ── VERDICT ──
+  Strategy does NOT reliably beat buy-and-hold (alpha -18.7%, beats BH 48%).
+  Confirms semi-efficient markets (Olorunnimbe 2022): directional ML
+  on price-only features rarely earns economic alpha out-of-sample.
+
+  🏆 Top 10 by out-of-sample alpha vs buy-and-hold:
+  Symbol            Strat%       BH%    Alpha%   Sharpe    MaxDD%
+  ──────────────────────────────────────────────────────────────
+  MI               4590.3     335.4  +4254.8     0.96    -15.0
+  ILLR             2464.2     -74.3  +2538.5     1.42     -0.8
+  VOR              1602.1     -21.3  +1623.4     0.96     -5.7
+  REPL              964.2     -24.7   +988.8     1.82    -12.2
+  QTEX             1152.3     330.6   +821.7     1.11    -18.3
+  ATLN              668.8     -14.7   +683.5     1.71      0.0
+  QUCY              540.1     -18.1   +558.2     1.00      0.0
+  ELBM              415.9     -57.3   +473.2     0.92     -4.7
+  LASE              453.3     -11.9   +465.2     1.78    -23.6
+  EDSA              586.3     162.3   +423.9     0.93      0.0
+
+  📊 → dl_strategy_results/dl_strategy_US_20260626_1802.xlsx
+
+==============================================================================
+  ⚠️  Backtested trading strategy. Survivorship + look-ahead risk. Economic results are historical, need not persist. NOT advice.
+==============================================================================

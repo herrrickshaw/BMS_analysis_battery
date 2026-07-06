@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Analysis System — Features & Version History</title>
+<style>
+  :root{
+    --bg:#0f172a; --panel:#1e293b; --panel2:#273449; --line:#334155;
+    --txt:#e2e8f0; --muted:#94a3b8; --accent:#3b82f6; --green:#22c55e;
+    --amber:#f59e0b; --red:#ef4444; --purple:#a78bfa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);
+       color:var(--txt);line-height:1.55}
+  a{color:var(--accent);text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+
+  header{background:linear-gradient(135deg,#1e293b,#0f172a);border-bottom:1px solid var(--line);
+         padding:34px 0 26px}
+  header h1{font-size:30px;letter-spacing:-.5px}
+  header .sub{color:var(--muted);margin-top:6px;font-size:15px}
+  .pills{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .pill{background:var(--panel2);border:1px solid var(--line);border-radius:20px;
+        padding:5px 12px;font-size:12px;color:var(--muted)}
+  .pill b{color:var(--txt)}
+
+  nav{position:sticky;top:0;background:rgba(15,23,42,.92);backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--line);z-index:20}
+  nav .wrap{display:flex;gap:6px;overflow-x:auto;padding:8px 18px}
+  nav button{background:transparent;border:none;color:var(--muted);padding:8px 14px;
+             font-size:14px;cursor:pointer;border-radius:7px;white-space:nowrap}
+  nav button:hover{color:var(--txt)}
+  nav button.active{background:var(--accent);color:#fff;font-weight:600}
+
+  section{padding:30px 0;border-bottom:1px solid var(--line);display:none}
+  section.show{display:block}
+  h2{font-size:22px;margin-bottom:14px}
+  h2 .em{font-size:22px;margin-right:8px}
+  p.lead{color:var(--muted);max-width:760px;margin-bottom:18px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px;
+        transition:.15s;cursor:default}
+  .card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .card h3{font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .card .tag{font-size:10px;padding:2px 7px;border-radius:10px;margin-left:auto;font-weight:600}
+  .t-fund{background:#14532d;color:#bbf7d0}
+  .t-news{background:#7c2d12;color:#fed7aa}
+  .t-ml{background:#581c87;color:#e9d5ff}
+  .t-infra{background:#1e3a8a;color:#bfdbfe}
+  .card p{font-size:13px;color:var(--muted)}
+  .card code{background:#0b1220;color:#7dd3fc;padding:1px 6px;border-radius:4px;font-size:12px}
+
+  .filterbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .fbtn{background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+        padding:6px 13px;border-radius:18px;font-size:12.5px;cursor:pointer}
+  .fbtn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  /* timeline */
+  .tl{position:relative;margin-left:8px;padding-left:26px}
+  .tl::before{content:"";position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:var(--line)}
+  .ver{position:relative;margin-bottom:14px;cursor:pointer}
+  .ver::before{content:"";position:absolute;left:-26px;top:5px;width:12px;height:12px;
+               border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+  .ver.major::before{background:var(--green);width:14px;height:14px;left:-27px}
+  .ver .vh{display:flex;align-items:center;gap:10px}
+  .ver .vtag{font-weight:700;color:var(--txt);font-size:15px}
+  .ver .vdate{font-size:11px;color:var(--muted)}
+  .ver .vtitle{color:var(--muted);font-size:13.5px}
+  .ver .vbody{display:none;margin-top:7px;background:var(--panel);border:1px solid var(--line);
+              border-radius:9px;padding:12px;font-size:13px;color:var(--muted)}
+  .ver.open .vbody{display:block}
+  .ver .vbody ul{margin-left:18px}
+
+  table{border-collapse:collapse;width:100%;font-size:13px;margin-top:6px}
+  th{background:var(--panel2);text-align:left;padding:8px 10px;color:var(--txt)}
+  td{padding:7px 10px;border-bottom:1px solid var(--line);color:var(--muted)}
+  .formula{background:#0b1220;border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+           font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#7dd3fc;margin:8px 0}
+
+  .disc{background:#3b1d10;border:1px solid #7c2d12;color:#fdba74;border-radius:9px;
+        padding:12px 14px;font-size:12.5px;margin-top:20px}
+  footer{padding:24px 0;color:var(--muted);font-size:12px;text-align:center}
+  .stat{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+        padding:12px 18px;margin:4px;text-align:center;min-width:120px}
+  .stat .n{font-size:26px;font-weight:700;color:var(--accent)}
+  .stat .l{font-size:11px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <h1>📈 Stock Analysis System</h1>
+  <div class="sub">NSE · BSE · NASDAQ · NYSE — quantitative screeners, backtesting, ML, news sentiment & portfolio construction</div>
+  <div class="pills">
+    <span class="pill">Version <b>v3.12.0</b></span>
+    <span class="pill"><b>6</b> screeners</span>
+    <span class="pill"><b>16</b> research papers</span>
+    <span class="pill"><b>2</b> pipelines (historical + news)</span>
+    <span class="pill"><b>11,707</b> stocks mapped</span>
+    <span class="pill">🐳 Dockerised</span>
+  </div>
+</div></header>
+
+<nav><div class="wrap">
+  <button class="active" data-s="overview">Overview</button>
+  <button data-s="features">Features</button>
+  <button data-s="approaches">Two Approaches</button>
+  <button data-s="screeners">Screeners &amp; RSI</button>
+  <button data-s="versions">Version History</button>
+  <button data-s="run">Run It</button>
+  <a href="repos.html" style="color:var(--muted);padding:8px 14px;font-size:14px;border-radius:7px;white-space:nowrap;align-self:center">All Repositories ↗</a>
+</div></nav>
+
+<div class="wrap">
+
+<!-- OVERVIEW -->
+<section id="overview" class="show">
+  <h2><span class="em">🧭</span>Overview</h2>
+  <p class="lead">A research platform that analyses the full Indian and US equity universe through
+  two independent lenses — <b>fundamentals</b> (objective screeners on 5-year price &amp; financial
+  history) and <b>the street</b> (live news sentiment) — then backtests, clusters, and builds
+  optimised portfolios from the results.</p>
+  <div style="margin:10px 0 20px">
+    <span class="stat"><div class="n">2,406</div><div class="l">NSE stocks</div></span>
+    <span class="stat"><div class="n">7,624</div><div class="l">US stocks</div></span>
+    <span class="stat"><div class="n">5 yr</div><div class="l">Parquet OHLC cache</div></span>
+    <span class="stat"><div class="n">313×</div><div class="l">C-accelerated Darvas</div></span>
+    <span class="stat"><div class="n">8</div><div class="l">return horizons</div></span>
+  </div>
+  <div class="grid">
+    <div class="card"><h3>📊 Fundamental Screeners</h3><p>Darvas, Golden Cross, Piotroski, Coffee Can, Magic Formula, Bull Cartel — composable specifications run on the full universe.</p></div>
+    <div class="card"><h3>🗞️ News Sentiment</h3><p>Live headlines from Moneycontrol/ET/BusinessLine/LiveMint (IN) and CNBC/MarketWatch (US), company-name matched.</p></div>
+    <div class="card"><h3>🔬 Backtesting</h3><p>1-yr walk-forward + 3y/5y/10y train/test/val with overfitting checks (Bailey et al. 2014).</p></div>
+    <div class="card"><h3>🤖 ML &amp; Patterns</h3><p>Ridge directional model, KMeans archetypes, DBSCAN anomalies, sector clustering.</p></div>
+    <div class="card"><h3>💼 Portfolio Builder</h3><p>Mean-variance optimisation, beta vs Nifty 50, efficient frontier, yield-target weights.</p></div>
+    <div class="card"><h3>🐳 Docker + Cron</h3><p>One image, daily 8:30 AM report emailed with two components + convergence.</p></div>
+  </div>
+  <div class="disc">⚠️ Educational/research use only. Mechanical screeners + noisy sentiment. Convergence is NOT a buy signal. Past results do not guarantee future returns. Consult a SEBI-registered advisor.</div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <h2><span class="em">🧩</span>Features</h2>
+  <p class="lead">Filter by category. Each is an independent module.</p>
+  <div class="filterbar">
+    <span class="fbtn active" data-f="all">All</span>
+    <span class="fbtn" data-f="fund">Fundamental</span>
+    <span class="fbtn" data-f="news">News</span>
+    <span class="fbtn" data-f="ml">ML / Analytics</span>
+    <span class="fbtn" data-f="infra">Infrastructure</span>
+  </div>
+  <div class="grid" id="featgrid"></div>
+</section>
+
+<!-- APPROACHES -->
+<section id="approaches">
+  <h2><span class="em">⚖️</span>The Two Approaches</h2>
+  <p class="lead">Every stock is judged through two lenses with different failure modes. Their agreement is a cross-check — never a buy signal.</p>
+  <div class="grid">
+    <div class="card"><h3>📊 Fundamental / Historical <span class="tag t-fund">offline</span></h3>
+      <p><b>Q:</b> "Sound by its own numbers?"<br><b>Data:</b> 5-yr OHLC + financials (Parquet).<br>
+      <b>Nature:</b> deterministic, backtestable.<br><b>Output:</b> "Stock Picks Based on Fundamentals".<br>
+      <b>Limit:</b> backward-looking; misses catalysts.</p></div>
+    <div class="card"><h3>🗞️ News / Sentiment <span class="tag t-news">online</span></h3>
+      <p><b>Q:</b> "What's the market saying now?"<br><b>Data:</b> live headlines, company-name matched.<br>
+      <b>Nature:</b> forward-looking, noisy.<br><b>Output:</b> "Talk on the Street" + market mood.<br>
+      <b>Limit:</b> provider-dependent; can mis-sign.</p></div>
+  </div>
+  <h2 style="margin-top:24px"><span class="em">⭐</span>Convergence</h2>
+  <p class="lead">✅ Both bullish = highest conviction · ⚠️ strong fundamentals but negative news = caution. Leads the daily email.</p>
+</section>
+
+<!-- SCREENERS -->
+<section id="screeners">
+  <h2><span class="em">🔎</span>Screeners &amp; RSI Basis</h2>
+  <p class="lead">Each screener encodes a research-backed thesis. Full formulas in <a href="https://github.com/herrrickshaw/herrrickshaw/blob/main/SCREENER_BASIS.md">SCREENER_BASIS.md</a>.</p>
+  <div class="formula">RSI = 100 − 100 / (1 + RS)&nbsp;&nbsp;where&nbsp;&nbsp;RS = avg gain(14) / avg loss(14)&nbsp;&nbsp;·&nbsp;&nbsp;&gt;70 overbought, &lt;30 oversold</div>
+  <table>
+    <tr><th>Screener</th><th>Type</th><th>Rule</th><th>Source</th></tr>
+    <tr><td>Darvas Box</td><td>Technical</td><td>Close &gt; confirmed box top, vol ≥ 1.2× avg</td><td>Darvas 1960</td></tr>
+    <tr><td>Golden Cross</td><td>Technical</td><td>50 DMA crosses above 200 DMA</td><td>Classic</td></tr>
+    <tr><td>Piotroski F</td><td>Fundamental</td><td>9-point accounting score ≥ 7</td><td>Piotroski 2000</td></tr>
+    <tr><td>Coffee Can</td><td>Fundamental</td><td>CAGR&gt;10%, ROCE&gt;15%, D/E&lt;1, no loss yr</td><td>Mukherjea</td></tr>
+    <tr><td>Magic Formula</td><td>Fundamental</td><td>ROIC&gt;15% + Earnings Yield&gt;8%</td><td>Greenblatt 2005</td></tr>
+    <tr><td>Bull Cartel</td><td>Fundamental</td><td>YoY sales&gt;15%, profit&gt;20%</td><td>screener.in</td></tr>
+    <tr><td>Triple Hit</td><td>Composite</td><td>Darvas + Piotroski≥7 + Coffee Can</td><td>highest conviction</td></tr>
+  </table>
+</section>
+
+<!-- VERSIONS -->
+<section id="versions">
+  <h2><span class="em">🗓️</span>Version History</h2>
+  <p class="lead">Click any release to expand. 🟢 = major capability.</p>
+  <div class="tl" id="timeline"></div>
+</section>
+
+<!-- RUN -->
+<section id="run">
+  <h2><span class="em">▶️</span>Run It</h2>
+  <p class="lead">Self-contained Docker image; data cached as Parquet.</p>
+  <div class="formula"># build<br>docker build -t stockscan:3.12.0 .<br><br>
+# daily combined report (fundamentals + street talk + convergence)<br>docker run --rm -v $(pwd)/out:/app/output stockscan:3.12.0 report<br><br>
+# portfolio with a 20% yield target<br>python3 portfolio_builder.py --market IN --target-return 0.20 --max-weight 0.15<br><br>
+# news sentiment (IN: Moneycontrol/ET · US: CNBC/MarketWatch)<br>python3 pipeline_news.py --watchlist nifty50 --market IN</div>
+  <p class="lead" style="margin-top:14px">Docs:
+    <a href="https://github.com/herrrickshaw/herrrickshaw/blob/main/STOCK_ANALYSIS_SYSTEM.md">System</a> ·
+    <a href="https://github.com/herrrickshaw/herrrickshaw/blob/main/APPROACHES.md">Approaches</a> ·
+    <a href="https://github.com/herrrickshaw/herrrickshaw/blob/main/SCREENER_BASIS.md">Screener Basis</a> ·
+    <a href="https://github.com/herrrickshaw/herrrickshaw/blob/main/GLOSSARY.md">Glossary</a> ·
+    <a href="https://github.com/herrrickshaw/herrrickshaw/blob/main/CHANGELOG.md">Changelog</a>
+  </p>
+</section>
+
+</div>
+
+<footer>Stock Analysis System v3.12.0 · <a href="https://github.com/herrrickshaw/herrrickshaw">github.com/herrrickshaw</a> · Educational/research only — NOT investment advice</footer>
+
+<script>
+// ── Feature data ──
+const FEATURES = [
+ ["📊 Full Market Scan","fund","All 6 screeners on NSE+BSE & NASDAQ+NYSE; Excel with Triple/Multi-screen hits.","full_indian_market_scan.py"],
+ ["📦 Parquet Cache","infra","3-tier memory→disk→network cache; 334× faster than re-downloading.","market_data_cache.py"],
+ ["🗞️ Sentiment Pipeline","news","4 APIs + RSS (Moneycontrol/ET/BusinessLine/LiveMint, CNBC/MarketWatch).","sentiment_pipeline.py"],
+ ["🔬 Walk-Forward Backtest","ml","3y/5y/10y train/test/val, 8 horizons, overfitting check.","walk_forward_backtest.py"],
+ ["🤖 ML Signal Engine","ml","Ridge directional model (beats LSTM per AlQahtani 2025).","ml_signal_engine.py"],
+ ["🧬 Pattern Discovery","ml","KMeans archetypes + DBSCAN anomalies + co-moving pairs.","pattern_discovery.py"],
+ ["🏭 Sector Analysis","ml","Sector indices + KMeans on return fingerprints.","sector_analysis.py"],
+ ["💼 Portfolio Builder","fund","MPT frontier, beta vs Nifty, yield-target weights, caps + shrinkage.","portfolio_builder.py"],
+ ["🆕 IPO Tracker","fund","Bhavcopy-diff new-listing discovery + graduated screener gates.","ipo_tracker.py"],
+ ["⚡ Intraday Monitor","ml","15/30-min ORB, VWAP, volume surge, BB squeeze, Darvas.","intraday_monitor.py"],
+ ["🧾 Symbol Master","infra","ticker↔company-name parquet for 11,707 stocks (NSE+BSE+US).","symbol_master.py"],
+ ["📰 Sentiment↔Price Link","news","5-yr news-shock event study at 1d/1wk/1mo/3mo.","sentiment_price_link.py"],
+ ["🧱 DDD Architecture","infra","Domain/Application/Infrastructure layering (v3.1).","stock_ddd/"],
+ ["⚙️ C + R Acceleration","infra","313× Darvas in C; R PerformanceAnalytics for stats.","c_extensions/"],
+ ["🧰 Tool Registry","infra","Add a screener/news source/analysis in one decorated function.","tool_registry.py"],
+ ["📧 Daily Combined Report","news","Two components + convergence, emailed 8:30 AM weekdays.","daily_combined_report.py"],
+];
+// ── Version data ──
+const VERS = [
+ ["v1.0.0","2026-06","🟢 First Docker image — 6 screeners, Parquet cache, ML signal, IPO tracker, intraday monitor, 10 papers.",1],
+ ["v3.0.0-dev","2026-06","C extension (313× Darvas) + R statistical analysis + profiling + architecture diagram.",0],
+ ["v3.1.0","2026-06","🟢 Domain-Driven Architecture — Domain/Application/Infrastructure layers, Specification pattern.",1],
+ ["v3.2.0","2026-06","AI Pattern Discovery & Sector Analytics — KMeans/DBSCAN/PCA, DL strategy eval, glossary.",0],
+ ["v3.3.0","2026-06","News Sentiment Ingestion — Marketaux/AlphaVantage/Finnhub/NewsData + VADER.",0],
+ ["v3.4.0","2026-06","Indian news sources — Moneycontrol, ET, BusinessLine, LiveMint (RSS).",0],
+ ["v3.5.0","2026-06","🟢 Two separate pipelines — historical (offline) + news (online).",1],
+ ["v3.6.0","2026-06","Two-component daily report (Fundamentals + Talk on the Street) + Docker services.",0],
+ ["v3.6.3","2026-06","Precise full-universe sentiment — word-boundary + common-word-ticker guard.",0],
+ ["v3.7.0","2026-06","Company-name sentiment matching + symbol-master parquet (11,707 stocks).",0],
+ ["v3.8.0","2026-06","US news — CNBC + MarketWatch (RSS).",0],
+ ["v3.9.0","2026-06","Extensibility registry + two-approach documentation.",0],
+ ["v3.10.0","2026-06","Documented the basis of all RSI filters & screeners.",0],
+ ["v3.11.0","2026-06","🟢 MPT portfolio builder — ordered picks, beta vs Nifty, efficient frontier.",1],
+ ["v3.12.0","2026-06","Yield-expectation weight optimisation — target return, weight caps, return shrinkage.",0],
+];
+
+// render features
+const fg=document.getElementById('featgrid');
+const tagClass={fund:'t-fund',news:'t-news',ml:'t-ml',infra:'t-infra'};
+const tagName={fund:'fundamental',news:'news',ml:'ML',infra:'infra'};
+function renderFeat(f){fg.innerHTML='';FEATURES.filter(x=>f==='all'||x[1]===f).forEach(x=>{
+  fg.innerHTML+=`<div class="card"><h3>${x[0]}<span class="tag ${tagClass[x[1]]}">${tagName[x[1]]}</span></h3>
+    <p>${x[2]}<br><code>${x[3]}</code></p></div>`;});}
+renderFeat('all');
+document.querySelectorAll('.fbtn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');renderFeat(b.dataset.f);});
+
+// render timeline
+const tl=document.getElementById('timeline');
+VERS.slice().reverse().forEach(v=>{
+  tl.innerHTML+=`<div class="ver ${v[3]?'major':''}">
+    <div class="vh"><span class="vtag">${v[0]}</span><span class="vdate">${v[1]}</span></div>
+    <div class="vtitle">${v[2].split('—')[0]}</div>
+    <div class="vbody">${v[2]}</div></div>`;});
+document.querySelectorAll('.ver').forEach(e=>e.onclick=()=>e.classList.toggle('open'));
+
+// nav tabs
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('show'));
+  document.getElementById(b.dataset.s).classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});});
+</script>
+</body>
+</html>

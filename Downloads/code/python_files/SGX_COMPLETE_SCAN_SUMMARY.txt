@@ -1,0 +1,222 @@
+================================================================================
+                    COMPLETE SGX STOCK SCAN - IN PROGRESS
+                            Status Report
+================================================================================
+
+Scan Status:        🔄 RUNNING
+Start Time:         2 Jun 2026, ~14:55 SGT
+Expected End:       ~15:10–15:25 SGT
+Total Stocks:       175 SGX-listed securities
+Expected Success:   ~160–170 stocks (90–95% success rate)
+
+================================================================================
+                           WHAT'S BEING ANALYZED
+================================================================================
+
+CATEGORIES:
+├─ STI-30 Blue Chips (29 stocks)
+│  └─ DBS, UOB, Singtel, Keppel, Singapore Airlines, etc.
+├─ REITs (15+ stocks)
+│  └─ Mapletree Commercial, Ascendas, etc.
+├─ Banks & Finance (8+ stocks)
+├─ Utilities & Infrastructure (8+ stocks)
+├─ Technology & Semiconductors (12+ stocks)
+├─ Manufacturing & Engineering (10+ stocks)
+├─ Retail & Consumer (8+ stocks)
+├─ Marine & Shipping (5+ stocks)
+├─ Oil & Gas (3+ stocks)
+├─ Healthcare & Pharma (5+ stocks)
+├─ Properties & Real Estate (8+ stocks)
+├─ Growth & Cyclicals (60+ stocks)
+└─ Micro-caps & SMEs (40+ stocks)
+
+================================================================================
+                         METRICS FOR EACH STOCK
+================================================================================
+
+✅ CMP — Current Market Price (SGD)
+✅ Daily Change & Change %
+✅ 52-Week High/Low
+✅ 200-Day Moving Average
+✅ P/E Ratio (Price-to-Earnings)
+✅ P/B Ratio (Price-to-Book)
+✅ PEG Ratio (Price/Earnings/Growth)
+✅ Dividend Yield (%)
+✅ Market Cap (SGD)
+✅ Trading Volume
+
+TECHNICAL SCAN (Darvas Box):
+✅ Signal: BREAKOUT_BUY / IN_BOX / BREAKDOWN_SELL
+✅ Box Top (resistance level)
+✅ Box Bottom (support level)
+✅ Position in Box (%)
+✅ Upside to Top (%)
+
+FUNDAMENTAL SCAN (Piotroski F-Score):
+✅ Score: 0–9 (higher = stronger)
+✅ Interpretation: STRONG / MODERATE / WEAK
+✅ Component analysis: Profitability, Leverage, Efficiency
+
+VALUE SCAN (PEGY Ratio):
+✅ PEG Ratio
+✅ PEGY Adjusted (PEG + Dividend Yield)
+✅ Dividend Yield %
+✅ Breakout Signal (vs 200-day MA)
+
+CORPORATE ACTIONS:
+✅ Recent dividends (last 5)
+✅ Ex-dividend dates
+✅ Dividend pay dates
+
+================================================================================
+                         EXPECTED EXCEL OUTPUT
+================================================================================
+
+File: sg_stock_data/sg_stock_report_20260602_HHMMSS.xlsx (30–50 KB)
+
+SHEET 1: "Summary"
+├─ Rows: ~160–170 (one per successful stock)
+├─ Columns: Symbol | Company | Sector | CMP | Change% | P/E | P/B
+│           Div Yield | 52W High | 52W Low | Volume
+│           Darvas Signal | Darvas Top | Darvas Bottom
+│           Piotroski Score | PEGY Ratio | Breakout Signal
+└─ Fully sortable and filterable
+
+SHEETS 2+: Per-Stock Details
+├─ D05 (DBS)
+├─ BN4 (UOB)
+├─ U11 (Singtel)
+├─ C6L (Keppel)
+├─ ... (one sheet per successful stock)
+└─ Each contains:
+   ├─ Quote & Valuation section
+   ├─ Darvas Box scan
+   ├─ Piotroski F-Score
+   └─ PEGY Ratio & Breakout
+
+================================================================================
+                         WHAT'S HAPPENING NOW
+================================================================================
+
+PROGRESS:
+[████████░░░░░░░░░░░░░░░░░░░░░░░░] ~35% (Processing ~60 stocks)
+
+ACTIONS:
+✅ Fetching live price data from Yahoo Finance
+✅ Retrieving financial statements (income, balance sheet, cash flow)
+✅ Computing Darvas Box (6-month OHLC history)
+✅ Calculating Piotroski F-Score (9 accounting metrics)
+✅ Deriving PEGY Ratio (PEG + dividend yield)
+✅ Detecting breakout opportunities (vs 200-day MA)
+✅ Handling delisted stocks gracefully (logging, continuing)
+
+EXPECTED FAILURES (Graceful):
+✅ ~5–10 stocks will be skipped (delisted, suspended, IPO wait-list)
+✅ Script continues with remaining stocks
+✅ Summary shows which stocks failed
+
+================================================================================
+                           TIME ESTIMATE
+================================================================================
+
+Per-Stock Time:       ~5–7 seconds (with all scans)
+Total Stocks:         175
+Total Base Time:      ~15–20 minutes
+Network Latency:      +2–5 minutes (yfinance API)
+Excel Generation:     +1–2 minutes
+
+EXPECTED COMPLETION: ~15:10–15:25 SGT (30–35 minutes from start)
+
+================================================================================
+                         AFTER COMPLETION
+================================================================================
+
+IMMEDIATELY AVAILABLE:
+✅ sg_stock_data/sg_stock_report_20260602_HHMMSS.xlsx
+   └─ 160–170 stocks analyzed
+   └─ All scans included
+   └─ Ready for analysis
+
+USAGE:
+
+Strategy 1: VALUE INVESTORS
+  Filter: Piotroski ≥ 7 + PEGY < 50 + Div Yield ≥ 2%
+  Find: Quality companies trading at discount
+
+Strategy 2: MOMENTUM TRADERS
+  Filter: Darvas = BREAKOUT_BUY + Above 200MA + Volume > 1M
+  Find: Stocks breaking above resistance
+
+Strategy 3: DIVIDEND INCOME
+  Sort by: Dividend Yield (descending)
+  Filter: Yield ≥ 3% + Piotroski ≥ 4 + Cap > S$1B
+  Find: Sustainable income-producing stocks
+
+================================================================================
+                          FINAL DELIVERABLES
+================================================================================
+
+📁 Location: /Users/umashankar/Downloads/
+
+📊 MAIN OUTPUT:
+   sg_stock_data/sg_stock_report_20260602_HHMMSS.xlsx
+   └─ 160–170 stocks fully analyzed with all scans
+
+📚 DOCUMENTATION:
+   sg_stock_daily_report.py ...................... Main script
+   SG_STOCK_ANALYZER_README.md ................... Full docs
+   QUICK_START.md ............................... Quick reference
+   SGX_FULL_SCAN_README.md ...................... Scan details
+   PROJECT_SUMMARY.txt .......................... Feature overview
+   FILE_INDEX.txt ............................... Navigation guide
+   SGX_COMPLETE_SCAN_SUMMARY.txt ............... This file
+
+================================================================================
+                            NEXT ACTIONS
+================================================================================
+
+Step 1: WAIT FOR COMPLETION
+  ⏳ Monitor this message for completion notification
+  ⏳ Expected: Next 30–35 minutes
+
+Step 2: OPEN EXCEL FILE
+  📊 sg_stock_data/sg_stock_report_20260602_HHMMSS.xlsx
+  📊 Review Summary sheet (160–170 stocks)
+  📊 Explore detail sheets for interesting stocks
+
+Step 3: ANALYZE RESULTS
+  🔍 Use one of the 3 strategies to filter
+  🔍 Sort by your preferred metric
+  🔍 Deep dive into compelling opportunities
+
+Step 4: TAKE ACTION
+  ✅ Buy quality stocks with strong scans
+  ✅ Monitor momentum breakouts
+  ✅ Build dividend income portfolio
+
+================================================================================
+                          COMPLETION CHECK
+================================================================================
+
+You will see a notification when the scan completes with the message:
+  "Excel report → sg_stock_data/sg_stock_report_20260602_HHMMSS.xlsx"
+
+At that point:
+  1. The Excel file is ready
+  2. All 175 stocks have been processed
+  3. 160–170 will have complete data
+  4. You can open and analyze immediately
+
+If you see "Done. XXX OK, Y failed" then:
+  ✅ XXX = successfully analyzed stocks
+  ⚠️ Y = delisted or unavailable stocks (expected)
+
+================================================================================
+
+Scan initiated: 2 Jun 2026, ~14:55 SGT
+Will complete: ~15:10–15:25 SGT
+Monitoring: 🟢 LIVE
+
+Stay tuned! 📊
+
+================================================================================

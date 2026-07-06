@@ -1,0 +1,142 @@
+# docker-compose.yml — Stock Analysis System v1.0.0
+# ===================================================
+# Orchestrates three services:
+#   scanner      — daily full scan (runs once, exits)
+#   monitor      — intraday 15-min daemon (runs continuously during market hours)
+#   backtest     — scheduled weekly backtest
+#
+# Usage:
+#   docker compose up scanner          # run full scan and exit
+#   docker compose up -d monitor       # start intraday monitor in background
+#   docker compose run backtest        # run backtest manually
+#   docker compose down                # stop all services
+
+version: "3.9"
+
+# ── Shared configuration ──────────────────────────────────────────────────────
+x-common: &common
+  image: stockscan:1.0.0
+  environment:
+    - MARKET=${MARKET:-BOTH}
+    - WORKERS=${WORKERS:-8}
+    - EMAIL_TO=${EMAIL_TO:-umashankartd1991@gmail.com}
+    - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    - TZ=Asia/Kolkata
+  volumes:
+    - stockscan-output:/app/output      # Excel results, logs — persists
+    - stockscan-cache:/app/cache        # 5yr Parquet OHLC — persists, grows daily
+  restart: "no"
+
+services:
+
+  # ── Daily full scan ──────────────────────────────────────────────────────────
+  # Runs all 6 screeners on full NSE+BSE+NASDAQ+NYSE universe.
+  # Triggered at 8:30 AM IST by the host cron (or `docker compose up scanner`).
+  scanner:
+    <<: *common
+    container_name: stockscan-daily
+    command: scan
+    labels:
+      description: "Full daily scan — NSE+BSE+NASDAQ+NYSE × 6 screeners"
+
+  # ── Combined daily report (fundamentals + talk on the street) ─────────────────
+  report:
+    <<: *common
+    container_name: stockscan-report
+    command: report
+    labels:
+      description: "Two-component daily report: fundamental picks + street talk + convergence"
+
+  # ── Historical analysis pipeline (offline) ────────────────────────────────────
+  historical:
+    <<: *common
+    container_name: stockscan-historical
+    command: historical
+    labels:
+      description: "PIPELINE 1 — offline price/fundamental analysis over 5yr cache"
+
+  # ── News analysis pipeline (live) ─────────────────────────────────────────────
+  news:
+    <<: *common
+    container_name: stockscan-news
+    command: news --watchlist nifty50
+    labels:
+      description: "PIPELINE 2 — live news sentiment (RSS + APIs)"
+
+  # ── IPO tracker ──────────────────────────────────────────────────────────────
+  ipo:
+    <<: *common
+    container_name: stockscan-ipo
+    command: ipo --days 90
+    labels:
+      description: "IPO new listing discovery and analysis"
+
+  # ── Intraday monitor (15-min bars) ────────────────────────────────────────────
+  # Runs as a background daemon during NSE market hours.
+  # Fetches 15-min OHLC and detects intraday patterns.
+  monitor-15m:
+    <<: *common
+    container_name: stockscan-monitor-15m
+    command: monitor 15
+    restart: unless-stopped              # auto-restart if it crashes
+    environment:
+      - MARKET=IN                        # intraday monitor: NSE only
+      - WORKERS=${WORKERS:-8}
+      - TZ=Asia/Kolkata
+    volumes:
+      - stockscan-output:/app/output
+      - stockscan-cache:/app/cache
+    labels:
+      description: "15-min intraday pattern monitor — NSE market hours only"
+
+  # ── Intraday monitor (30-min bars) ────────────────────────────────────────────
+  monitor-30m:
+    <<: *common
+    container_name: stockscan-monitor-30m
+    command: monitor 30
+    restart: unless-stopped
+    environment:
+      - MARKET=IN
+      - WORKERS=${WORKERS:-8}
+      - TZ=Asia/Kolkata
+    volumes:
+      - stockscan-output:/app/output
+      - stockscan-cache:/app/cache
+    labels:
+      description: "30-min intraday pattern monitor — NSE market hours only"
+
+  # ── Backtest ─────────────────────────────────────────────────────────────────
+  backtest:
+    <<: *common
+    container_name: stockscan-backtest
+    command: backtest --market IN --workers 12
+    labels:
+      description: "1-year walk-forward backtest on full NSE universe"
+
+  # ── Walk-forward research ─────────────────────────────────────────────────────
+  walkforward:
+    <<: *common
+    container_name: stockscan-walkforward
+    command: walkforward --liquid --workers 10
+    labels:
+      description: "3y/5y/10y train/test/val research framework"
+
+  # ── Cache warm-up ─────────────────────────────────────────────────────────────
+  # Run once after first build to populate the 5-year OHLC cache.
+  cache-init:
+    <<: *common
+    container_name: stockscan-cache-init
+    command: cache-init
+    labels:
+      description: "Download 5-year OHLC for all NSE EQ stocks (~12 min)"
+
+# ── Persistent volumes ────────────────────────────────────────────────────────
+volumes:
+  stockscan-output:
+    driver: local
+    labels:
+      description: "Excel scan results, logs — mount at /app/output"
+  stockscan-cache:
+    driver: local
+    labels:
+      description: "5-year Parquet OHLC cache — mount at /app/cache"

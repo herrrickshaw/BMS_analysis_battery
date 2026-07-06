@@ -1,0 +1,70 @@
+DAILY MARKET SCAN — 25 Jun 2026
+Generated: 08:45 IST
+=====================================================
+
+INDIAN MARKET (NSE + BSE — 1,000 stocks scanned of ~2,681 total)
+-----------------------------------------------------------------
+NOTE: Run with --top 1000 (first 1000 symbols). Full 2,681-symbol run may surface more hits.
+
+★ Triple Hits (Darvas breakout + Piotroski ≥7 + Coffee Can PASS): 13 total
+  CCL         F=8/9  CC=5/5  LTP=₹1,167.10  -1.17% to box top
+  BELRISE     F=8/9  CC=5/5  LTP=₹244.61    -3.32% to box top
+  HBLENGINE   F=8/9  CC=5/5  LTP=₹823.10    -4.66% to box top
+  DYCL        F=8/9  CC=5/5  LTP=₹353.50    -8.95% to box top
+  ASTRAMICRO  F=8/9  CC=5/5  LTP=₹1,662.60  -11.05% to box top
+  ARSSBL      F=7/9  CC=5/5  LTP=₹553.70    -0.06% to box top
+  APOLLOHOSP  F=7/9  CC=5/5  LTP=₹8,573.50  -0.46% to box top
+  DOLLAR      F=7/9  CC=5/5  LTP=₹266.70    -4.39% to box top
+  ADOR        F=7/9  CC=5/5  LTP=₹1,226.60  -5.27% to box top
+  CEATLTD     F=7/9  CC=5/5  LTP=₹3,450.80  -5.52% to box top
+  20MICRONS   F=7/9  CC=5/5  LTP=₹207.92    -7.18% to box top
+  AHLUCONT    F=7/9  CC=5/5  LTP=₹872.15    -7.50% to box top
+  INDHOTEL    F=7/9  CC=5/5  LTP=₹725.50    -7.62% to box top
+
+Top Darvas Breakouts — freshest:
+  GPTHEALTH   ₹149.92  Box=₹149.84  -0.05%
+  DIGJAMLMTD  ₹47.01   Box=₹46.98   -0.06%
+  ARSSBL      ₹553.70  Box=₹553.37  -0.06% ★
+  BRIGHOTEL   ₹64.81   Box=₹64.77   -0.06%
+  HECPROJECT  ₹137.13  Box=₹137.00  -0.09%
+  BRITANNIA   ₹5262.50 Box=₹5258.00 -0.09%
+  CASHIETF    ₹1067.79 Box=₹1066.75 -0.10%
+  EBBETF0431  ₹1431.79 Box=₹1429.89 -0.13%
+  IDFCFIRSTB  ₹79.20   Box=₹79.09   -0.14%
+  BSL         ₹127.90  Box=₹127.71  -0.15%
+
+Darvas Breakdowns: 198 total
+  HEALTHY, HEALTHCARE, AXISHCETF, HEALTHADD, EBBETF0433, GROWWLOVOL, BBETF0432,
+  GSEC10IETF, GILT5YBEES, ABBOTINDIA, EBBETF0430, HDFCLIQUID, GROWWLIQID,
+  AONELIQUID, ABSLLIQUID, ABGSEC, GSEC10YEAR, GSEC5IETF, INDIANB, CELLO ...
+
+US MARKET (NASDAQ + NYSE — 7,627 symbols, 7,336 with usable data)
+------------------------------------------------------------------
+★ Triple Hits: 1
+  UFPT  F=7/9  CC=6/6  LTP=$242.95  -0.19% to box top  (+3.61% on day)
+
+Top Darvas Breakouts — freshest:
+  TRTN-PB $25.25  Box=$25.25  0.00%
+  WEA     $10.53  Box=$10.53  0.00%
+  MTB     $233.26 Box=$233.23 -0.01%
+  BRK-B   $494.81 Box=$494.77 -0.01%
+  NUVL    $123.58 Box=$123.57 -0.01%
+  PMTU    $25.37  Box=$25.37  -0.01%
+  WMK     $80.36  Box=$80.34  -0.02%
+  FTS     $57.15  Box=$57.14  -0.02%
+  MKL     $1900.36 Box=$1900.00 -0.02%
+  SCCD    $24.68  Box=$24.67  -0.02%
+
+Darvas Breakdowns: 741 total
+  EUDA, FIVE, GOODO, CLM, CMSD, ATH-PA, EPR-PG, KPET-UN, JBK, FTW,
+  CRF, TACOU, MAYS, HLXC, REFI, KBONU, BZ, NSA-PA, ZGN, QULL ...
+
+ERRORS
+------
+US: FBYDP, UCFIW (delisted), CSW (TypeError) — 3 symbols skipped
+Indian: None
+
+OUTPUT FILES
+------------
+Indian: ~/Downloads/indian_full_scan/indian_full_scan_20260625_0836.xlsx
+US:     ~/Downloads/us_full_scan/us_full_scan_20260625_0845.xlsx

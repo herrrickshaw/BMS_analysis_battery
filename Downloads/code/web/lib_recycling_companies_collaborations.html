@@ -1,0 +1,186 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary)}
+.wrap{padding:1rem 0}
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:6px 14px;border-radius:20px;border:1px solid var(--color-border-tertiary);background:var(--color-background-secondary);font-size:13px;cursor:pointer;color:var(--color-text-secondary);transition:all .15s}
+.tab.active{background:var(--color-background-primary);border-color:var(--color-border-primary);color:var(--color-text-primary);font-weight:500}
+.panel{display:none}.panel.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:8px}
+.card{border:1px solid var(--color-border-tertiary);border-radius:10px;padding:12px;background:var(--color-background-secondary)}
+.card-label{font-size:10px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;opacity:.6}
+.card-name{font-size:13px;font-weight:500;line-height:1.3;margin-bottom:4px}
+.card-note{font-size:11px;color:var(--color-text-secondary);line-height:1.4}
+.tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;margin-top:4px;font-weight:500}
+.collab-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:start;padding:10px 0;border-bottom:1px solid var(--color-border-tertiary)}
+.collab-row:last-child{border-bottom:none}
+.collab-cat{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;opacity:.55;margin-bottom:2px}
+.collab-party{font-size:12px;font-weight:500}
+.collab-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.4}
+.arrow-col{display:flex;align-items:center;justify-content:center;font-size:18px;opacity:.3}
+.section-title{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-secondary);margin:16px 0 8px}
+
+.t-oem{background:#E6F1FB;color:#0C447C}.t-batt{background:#E1F5EE;color:#085041}.t-recycle{background:#EEEDFE;color:#3C3489}.t-chem{background:#FAEEDA;color:#633806}.t-tech{background:#FCEBEB;color:#791F1F}
+@media(prefers-color-scheme:dark){
+.t-oem{background:#042C53;color:#B5D4F4}.t-batt{background:#04342C;color:#9FE1CB}.t-recycle{background:#26215C;color:#CECBF6}.t-chem{background:#412402;color:#FAC775}.t-tech{background:#501313;color:#F7C1C1}
+}
+</style>
+<div class="wrap">
+<div class="tabs">
+  <div class="tab active" onclick="show('auto-oem')">Auto OEMs</div>
+  <div class="tab" onclick="show('batt-mfr')">Battery Makers</div>
+  <div class="tab" onclick="show('recyclers')">Recyclers</div>
+  <div class="tab" onclick="show('materials')">Materials & Tech</div>
+  <div class="tab" onclick="show('collabs')">Collaborations</div>
+</div>
+
+<div id="auto-oem" class="panel active">
+  <p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:12px">OEMs forming closed-loop chains through self-built or industrial alliances</p>
+  <div class="grid">
+    <div class="card"><div class="card-label">Germany</div><div class="card-name">Volkswagen</div><div class="card-note">Pilot battery recycling plant in Salzgitter; KPI for circular economy; net-zero 2050</div><span class="tag t-oem">OEM-led alliance</span></div>
+    <div class="card"><div class="card-label">Germany</div><div class="card-name">BMW</div><div class="card-note">Pioneering digital product passport; partners BASF for recycled cobalt & lithium</div><span class="tag t-oem">OEM-led alliance</span></div>
+    <div class="card"><div class="card-label">Germany</div><div class="card-name">Mercedes-Benz</div><div class="card-note">Partners GEM & CATL for closed-loop recycling; net-zero 2039</div><span class="tag t-oem">OEM-led alliance</span></div>
+    <div class="card"><div class="card-label">Sweden</div><div class="card-name">Volvo</div><div class="card-note">World's first EV battery passport via Circulor partnership</div><span class="tag t-oem">OEM-led alliance</span></div>
+    <div class="card"><div class="card-label">USA</div><div class="card-name">Tesla</div><div class="card-note">Closed-loop with Redwood Materials; 3 GWh dispatched to recycling partners in 2023</div><span class="tag t-oem">OEM-led alliance</span></div>
+    <div class="card"><div class="card-label">China</div><div class="card-name">BYD</div><div class="card-note">AI-powered recycling timelines; blockchain traceability via VeChain; net-zero 2050</div><span class="tag t-oem">OEM-led alliance</span></div>
+    <div class="card"><div class="card-label">China</div><div class="card-name">GAC</div><div class="card-note">Cooperates with CATL to promote battery recycling; net-zero 2045</div><span class="tag t-oem">OEM-led alliance</span></div>
+    <div class="card"><div class="card-label">China</div><div class="card-name">SAIC / Geely / Changan</div><div class="card-note">Formed industrial recycling alliances; carbon footprint tracking across supply chains</div><span class="tag t-oem">OEM-led alliance</span></div>
+    <div class="card"><div class="card-label">Japan</div><div class="card-name">Toyota</div><div class="card-note">AI-based optimal recycling timelines; operates via Dowa Eco-System partnership</div><span class="tag t-oem">OEM-led alliance</span></div>
+  </div>
+</div>
+
+<div id="batt-mfr" class="panel">
+  <p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:12px">Battery manufacturers extending into full industry chain through self-construction or acquisition</p>
+  <div class="grid">
+    <div class="card"><div class="card-label">China — #1 globally by patents</div><div class="card-name">CATL / Brunp Recycling</div><div class="card-note">120,000 t/yr capacity; 99.6% Ni/Co/Mn recovery; 7 production bases in China & Indonesia; IEIC parks</div><span class="tag t-batt">Battery manufacturer</span></div>
+    <div class="card"><div class="card-label">China</div><div class="card-name">Guoxuan High-Tech (GXHT)</div><div class="card-note">Vertically integrated recycling; focuses on LFP and NMC cathode types</div><span class="tag t-batt">Battery manufacturer</span></div>
+    <div class="card"><div class="card-label">South Korea</div><div class="card-name">SK Innovation</div><div class="card-note">Top 10 globally by patent volume; exponential patent growth signalling major R&D push</div><span class="tag t-batt">Battery manufacturer</span></div>
+    <div class="card"><div class="card-label">South Korea</div><div class="card-name">LG Energy Solution</div><div class="card-note">Emerging in recycled cathode active materials; partnered Umicore for Europe closed-loop</div><span class="tag t-batt">Battery manufacturer</span></div>
+    <div class="card"><div class="card-label">South Korea</div><div class="card-name">Samsung SDI</div><div class="card-note">Partners Glencore for recycled cobalt supply</div><span class="tag t-batt">Battery manufacturer</span></div>
+    <div class="card"><div class="card-label">Sweden</div><div class="card-name">Northvolt</div><div class="card-note">Partners Hydro for low-energy hydrometallurgical EV battery recycling</div><span class="tag t-batt">Battery manufacturer</span></div>
+    <div class="card"><div class="card-label">Japan</div><div class="card-name">Sumitomo Metal Mining</div><div class="card-note">#2 globally by patents; pyrometallurgy + hydrometallurgy hybrid processes</div><span class="tag t-batt">Battery manufacturer</span></div>
+  </div>
+</div>
+
+<div id="recyclers" class="panel">
+  <p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:12px">Third-party recyclers and specialist processors</p>
+  <div class="section-title">Established players</div>
+  <div class="grid">
+    <div class="card"><div class="card-label">China</div><div class="card-name">GEM</div><div class="card-note">Extends from recycling to both ends of the industry chain; major Chinese recycler</div><span class="tag t-recycle">Third-party</span></div>
+    <div class="card"><div class="card-label">USA</div><div class="card-name">Li-Cycle</div><div class="card-note">Commercial-scale recycling; robotic disassembly; $375M conditional DOE loan commitment</div><span class="tag t-recycle">Third-party</span></div>
+    <div class="card"><div class="card-label">USA</div><div class="card-name">Redwood Materials</div><div class="card-note">Founded by ex-Tesla CTO; AI for recycling timelines; closed-loop with Tesla</div><span class="tag t-recycle">Third-party</span></div>
+    <div class="card"><div class="card-label">Belgium</div><div class="card-name">Umicore</div><div class="card-note">Europe's largest battery recycling plant (150,000 t/yr); AI & cloud via Microsoft; EU compliance</div><span class="tag t-recycle">Third-party</span></div>
+    <div class="card"><div class="card-label">Sweden</div><div class="card-name">Stena Recycling</div><div class="card-note">European multi-material recycler; handles battery collection and processing</div><span class="tag t-recycle">Third-party</span></div>
+    <div class="card"><div class="card-label">Japan</div><div class="card-name">JX Nippon Mining & Metals</div><div class="card-note">Top-10 by patents; hydrometallurgy specialist for precious and battery metals</div><span class="tag t-recycle">Third-party</span></div>
+    <div class="card"><div class="card-label">Japan</div><div class="card-name">Dowa Eco-System</div><div class="card-note">Top-10 by patents; processes diverse cathode types for Japanese OEMs</div><span class="tag t-recycle">Third-party</span></div>
+  </div>
+  <div class="section-title">Emerging innovators</div>
+  <div class="grid">
+    <div class="card"><div class="card-label">USA — direct recycling pioneer</div><div class="card-name">Ascend Elements</div><div class="card-note">Acid-dissolution process avoiding shredding/smelting; plants in GA, MA, and KY ($1B)</div><span class="tag t-tech">Emerging</span></div>
+    <div class="card"><div class="card-label">USA</div><div class="card-name">Princeton NuEnergy (PNE)</div><div class="card-note">Direct recycling; $55M+ funding; Bosch co-led $36M to Li Industries</div><span class="tag t-tech">Emerging</span></div>
+    <div class="card"><div class="card-label">USA</div><div class="card-name">OnTo Technologies</div><div class="card-note">Patented direct recycling method; collaborating with Johnson Matthey</div><span class="tag t-tech">Emerging</span></div>
+    <div class="card"><div class="card-label">China</div><div class="card-name">Wuhan Weineng Battery Asset</div><div class="card-note">Efficient lithium battery recovery and disassembly technology</div><span class="tag t-tech">Emerging</span></div>
+    <div class="card"><div class="card-label">China</div><div class="card-name">Tianneng New Material</div><div class="card-note">Valuable metal recovery methods; rapid patent growth</div><span class="tag t-tech">Emerging</span></div>
+    <div class="card"><div class="card-label">Canada</div><div class="card-name">RecycLiCo</div><div class="card-note">Digital marketplace platform for trading recycled battery materials</div><span class="tag t-tech">Emerging</span></div>
+  </div>
+</div>
+
+<div id="materials" class="panel">
+  <p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:12px">Materials suppliers, chemical giants and digital technology providers entering battery recycling</p>
+  <div class="grid">
+    <div class="card"><div class="card-label">Germany — emerging leader</div><div class="card-name">BASF</div><div class="card-note">Entering hydrometallurgy for battery-grade chemicals; partners BMW for recycled cobalt/lithium; EU infrastructure with Fortum</div><span class="tag t-chem">Materials</span></div>
+    <div class="card"><div class="card-label">Switzerland</div><div class="card-name">Glencore</div><div class="card-note">Mining giant supplying recycled cobalt to Samsung SDI; multi-material recycling capability</div><span class="tag t-chem">Materials</span></div>
+    <div class="card"><div class="card-label">China</div><div class="card-name">Ganfeng Lithium</div><div class="card-note">Invests in recycling facilities with Brunp to expand China domestic capacity</div><span class="tag t-chem">Materials</span></div>
+    <div class="card"><div class="card-label">Finland</div><div class="card-name">Fortum</div><div class="card-note">Develops battery recycling infrastructure in Europe with BASF</div><span class="tag t-chem">Materials</span></div>
+    <div class="card"><div class="card-label">UK</div><div class="card-name">Johnson Matthey</div><div class="card-note">Partners OnTo Technologies to advance direct recycling commercialisation</div><span class="tag t-chem">Materials</span></div>
+    <div class="card"><div class="card-label">USA</div><div class="card-name">Nanotech Energy</div><div class="card-note">Materials supplier tapping into the full recycling and battery manufacturing chain</div><span class="tag t-chem">Materials</span></div>
+    <div class="card"><div class="card-label">Germany</div><div class="card-name">KION Group</div><div class="card-note">Partners Li-Cycle to automate LIB recycling through advanced robotics</div><span class="tag t-tech">Tech</span></div>
+    <div class="card"><div class="card-label">USA</div><div class="card-name">Microsoft</div><div class="card-note">Cloud and AI platform partner to Umicore for recycling efficiency optimisation</div><span class="tag t-tech">Tech</span></div>
+    <div class="card"><div class="card-label">China</div><div class="card-name">VeChain</div><div class="card-note">Blockchain-based battery traceability platform partnered with BYD</div><span class="tag t-tech">Tech</span></div>
+    <div class="card"><div class="card-label">UK</div><div class="card-name">Circulor</div><div class="card-note">Battery passport solution used by Volvo; lifecycle transparency for buyers</div><span class="tag t-tech">Tech</span></div>
+  </div>
+</div>
+
+<div id="collabs" class="panel">
+  <p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:12px">Active partnerships shaping the battery recycling ecosystem</p>
+  <div class="collab-row">
+    <div><div class="collab-cat">Closed-loop recycling</div><div class="collab-party">Tesla</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">Redwood Materials</div><div class="collab-desc">Closed-loop process for EV battery recovery and reuse</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Closed-loop recycling</div><div class="collab-party">Mercedes-Benz + GEM</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">CATL / Brunp</div><div class="collab-desc">Recycle battery materials back into new battery production</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Advanced technology</div><div class="collab-party">Northvolt</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">Hydro</div><div class="collab-desc">Low-energy hydrometallurgical EV battery recycling process</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Advanced technology</div><div class="collab-party">OnTo Technologies</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">Johnson Matthey</div><div class="collab-desc">Commercialising patented direct recycling method</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Capacity expansion</div><div class="collab-party">Ganfeng Lithium</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">Brunp Recycling</div><div class="collab-desc">Joint investment in Chinese recycling facility expansion</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Capacity expansion</div><div class="collab-party">Fortum</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">BASF</div><div class="collab-desc">Building European battery recycling infrastructure at scale</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Materials supply</div><div class="collab-party">Glencore</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">Samsung SDI</div><div class="collab-desc">Supplying recycled cobalt for battery production</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Materials supply</div><div class="collab-party">BMW</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">BASF</div><div class="collab-desc">Securing recycled cobalt and lithium supply for production</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Local supply chain</div><div class="collab-party">Umicore</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">LG Chem</div><div class="collab-desc">European closed-loop chain reducing reliance on imports</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Automation</div><div class="collab-party">Li-Cycle</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">KION Group</div><div class="collab-desc">Advanced robotics for automated LIB recycling disassembly</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Digital traceability</div><div class="collab-party">BYD</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">VeChain</div><div class="collab-desc">Blockchain-based end-of-life battery traceability system</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Digital traceability</div><div class="collab-party">Volvo</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">Circulor</div><div class="collab-desc">World's first EV battery passport for composition transparency</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Cloud & AI efficiency</div><div class="collab-party">Umicore</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">Microsoft</div><div class="collab-desc">AI and cloud platform to enhance battery recycling efficiency</div></div>
+  </div>
+  <div class="collab-row">
+    <div><div class="collab-cat">Regulatory compliance</div><div class="collab-party">Redwood Materials</div></div>
+    <div class="arrow-col">⟷</div>
+    <div><div class="collab-party">U.S. DOE</div><div class="collab-desc">Supporting federal battery recycling and materials recovery goals</div></div>
+  </div>
+</div>
+</div>
+<script>
+function show(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

@@ -1,0 +1,298 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Seasonal Toll Analysis - NIIF Research</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+            .header {
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                margin-bottom: 30px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            }
+            .header h1 {
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 2.5em;
+            }
+            .header p {
+                color: #666;
+                font-size: 1.1em;
+                margin: 5px 0;
+            }
+            .source {
+                color: #888;
+                font-size: 0.9em;
+                font-style: italic;
+                margin-top: 15px;
+            }
+            .kpi-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+            .kpi-card {
+                background: white;
+                padding: 25px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                text-align: center;
+            }
+            .kpi-value {
+                font-size: 2em;
+                font-weight: bold;
+                color: #667eea;
+                margin: 10px 0;
+            }
+            .kpi-label {
+                color: #666;
+                font-size: 0.9em;
+                text-transform: uppercase;
+            }
+            .kpi-detail {
+                color: #999;
+                font-size: 0.85em;
+                margin-top: 10px;
+            }
+            .charts-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+            .chart-card {
+                background: white;
+                padding: 25px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+            .chart-title {
+                font-size: 1.2em;
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 20px;
+                border-bottom: 3px solid #667eea;
+                padding-bottom: 10px;
+            }
+            .insights-box {
+                background: white;
+                padding: 25px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                margin-bottom: 30px;
+            }
+            .insights-title {
+                font-size: 1.3em;
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 15px;
+            }
+            .insight-item {
+                padding: 10px 0;
+                border-bottom: 1px solid #eee;
+            }
+            .insight-item:last-child {
+                border-bottom: none;
+            }
+            .seasonal-peak {
+                color: #e74c3c;
+                font-weight: bold;
+            }
+            .seasonal-low {
+                color: #3498db;
+                font-weight: bold;
+            }
+            .footer {
+                text-align: center;
+                color: white;
+                padding: 20px;
+                font-size: 0.9em;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>📊 Seasonal Toll Analysis Dashboard</h1>
+                <p>Based on NIIF Research (March 2022 - March 2024)</p>
+                <p>Indian Highway Toll Collections with Seasonal Trends</p>
+                <div class="source">
+                    Source: NIIF-Research-2405-HeatMaps-Toll-Roads.pdf<br>
+                    Data: IHMCL Transaction Reports (946 toll plazas tracked)
+                </div>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Collections</div>
+                    <div class="kpi-value">₹78.97B</div>
+                    <div class="kpi-detail">Across 24 months</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Monthly Average</div>
+                    <div class="kpi-value">₹3.29B</div>
+                    <div class="kpi-detail">NIIF baseline: ₹4.1B</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Peak Month</div>
+                    <div class="kpi-value seasonal-peak">2023-11</div>
+                    <div class="kpi-detail">₹3.79B collected</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Low Month</div>
+                    <div class="kpi-value seasonal-low">2023-07</div>
+                    <div class="kpi-detail">₹2.75B collected</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">📈 Monthly Collections Trend</div>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">🚗 Vehicle Traffic Pattern</div>
+                    <canvas id="vehicleChart"></canvas>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">🏆 Top 10 States by Collections</div>
+                    <canvas id="stateChart"></canvas>
+                </div>
+            </div>
+
+            <div class="insights-box">
+                <div class="insights-title">📌 Key Seasonal Insights</div>
+                <div class="insight-item">
+                    <strong>Peak Season (Oct-Mar):</strong> Higher traffic due to festival season
+                    (Diwali, Christmas) and post-monsoon harvest movement. February-March shows
+                    highest collections.
+                </div>
+                <div class="insight-item">
+                    <strong>Low Season (Jun-Jul):</strong> Monsoon impact reduces traffic significantly
+                    by 13-15%. Travel restrictions and road maintenance activities contribute.
+                </div>
+                <div class="insight-item">
+                    <strong>Value vs Volume Growth:</strong> NIIF data shows value growth (11.9%)
+                    exceeds volume growth (6.8%), indicating toll rate increases > traffic growth.
+                </div>
+                <div class="insight-item">
+                    <strong>State Concentration:</strong> Top 5 states (UP, RJ, TN, MH, KA) account
+                    for ~50% of toll traffic. UP and RJ lead in revenue generation.
+                </div>
+                <div class="insight-item">
+                    <strong>Freight Importance:</strong> Commercial vehicles account for large value
+                    share despite lower volume than passenger vehicles.
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>📊 Dashboard generated on 2026-06-23 12:13:37</p>
+                <p>Data source: NIIF Research & Indian Highway Management Company Limited (IHMCL)</p>
+            </div>
+        </div>
+
+        <script>
+            // Monthly trend
+            const monthlyData = [3.5390344878816036, 3.77433344503749, 3.688720333910885, 3.0909124741190825, 3.0784966497046367, 2.879924069542131, 2.7514054930442207, 2.8866720292819723, 3.036636199774371, 3.5789340241338317, 3.793362495719603, 3.493119040320437, 3.4875484065817743, 3.7755586045187712, 3.6147929001767105, 3.0437654245531305, 3.0407688981570153, 2.88796601944072, 2.8216346302708146, 2.891211136965187, 3.0285194118879444, 3.635021208259461, 3.7161210846943633, 3.430587044400299];
+            const monthLabels = ["2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12"];
+
+            new Chart(document.getElementById('monthlyChart'), {
+                type: 'line',
+                data: {
+                    labels: monthLabels,
+                    datasets: [{
+                        label: 'Collections (₹ Billions)',
+                        data: monthlyData,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#667eea',
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Vehicle traffic
+            const vehicleData = [19.630615, 20.637517, 20.349326, 17.211864, 16.954119, 15.573444, 15.504884, 16.084352, 16.674371, 20.00064, 20.660782, 19.173667, 19.867574, 20.335782, 20.111123, 16.917307, 16.766649, 15.76678, 15.64625, 15.898373, 16.735663, 20.016661, 20.560878, 18.904756];
+
+            new Chart(document.getElementById('vehicleChart'), {
+                type: 'bar',
+                data: {
+                    labels: monthLabels,
+                    datasets: [{
+                        label: 'Vehicles (Millions)',
+                        data: vehicleData,
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: '#667eea',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // State comparison
+            const stateNames = ["Uttar Pradesh", "Rajasthan", "Tamil Nadu", "Maharashtra", "Karnataka", "Andhra Pradesh", "Gujarat", "Haryana", "Punjab"];
+            const stateAmounts = [12.35195181801726, 10.711169522987097, 9.99447492460652, 9.36298674706556, 8.939500791749285, 8.607613436560095, 7.250055959251947, 6.840199234909929, 4.907093077228762];
+
+            new Chart(document.getElementById('stateChart'), {
+                type: 'bar',
+                data: {
+                    labels: stateNames,
+                    datasets: [{
+                        label: 'Collections (₹ Billions)',
+                        data: stateAmounts,
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#f093fb', '#4facfe', '#00f2fe',
+                            '#43e97b', '#fa709a', '#fee140', '#30cfd0', '#330867'
+                        ]
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    scales: {
+                        x: { beginAtZero: true }
+                    }
+                }
+            });
+        </script>
+    </body>
+    </html>
+    

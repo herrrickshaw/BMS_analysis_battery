@@ -1,0 +1,718 @@
+# repo-cleaner-ocaml report
+
+Scanned root: `/tmp/claude-0/-home-user/4c70da6e-fbb1-5d08-a901-6ee952f753bc/scratchpad/repo-analysis/main-repo, /tmp/claude-0/-home-user/4c70da6e-fbb1-5d08-a901-6ee952f753bc/scratchpad/repo-analysis/global-market-scanners, /tmp/claude-0/-home-user/4c70da6e-fbb1-5d08-a901-6ee952f753bc/scratchpad/repo-analysis/fuel-retail-outlets, /tmp/claude-0/-home-user/4c70da6e-fbb1-5d08-a901-6ee952f753bc/scratchpad/repo-analysis/toll-plaza-highways, /tmp/claude-0/-home-user/4c70da6e-fbb1-5d08-a901-6ee952f753bc/scratchpad/repo-analysis/india-trade-export-analysis, /tmp/claude-0/-home-user/4c70da6e-fbb1-5d08-a901-6ee952f753bc/scratchpad/repo-analysis/claude-stock-tools, /tmp/claude-0/-home-user/4c70da6e-fbb1-5d08-a901-6ee952f753bc/scratchpad/repo-analysis/colab-experiments, /tmp/claude-0/-home-user/4c70da6e-fbb1-5d08-a901-6ee952f753bc/scratchpad/repo-analysis/subscription-model-revenue`
+
+This report only lists candidates. Nothing here has been deleted --
+every finding below needs a human decision before anything is removed.
+
+## Exact duplicate files (32 groups)
+
+- **12.3MB wasted** (2 copies of a 12.3MB file):
+  - `fuel-retail-outlets/fuel-pump-locations-map/locations-data.js`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.js`
+- **2.0MB wasted** (2 copies of a 2.0MB file):
+  - `main-repo/nse_screener_reference/scan_results/backtest_1yr_full_NSE_latest.xlsx`
+  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1300.xlsx`
+- **1.9MB wasted** (2 copies of a 1.9MB file):
+  - `main-repo/nse_screener_reference/scan_results/us_full_scan_latest.xlsx`
+  - `main-repo/Downloads/data/us_full_scan/us_full_scan/us_full_scan_20260626_1437.xlsx`
+- **955.5KB wasted** (2 copies of a 955.5KB file):
+  - `main-repo/nse_screener_reference/scan_results/walkforward_3y5y10y_latest.xlsx`
+  - `main-repo/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1305.xlsx`
+- **640.5KB wasted** (2 copies of a 640.5KB file):
+  - `main-repo/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models.pdf`
+  - `main-repo/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models (1).pdf`
+- **591.7KB wasted** (2 copies of a 591.7KB file):
+  - `main-repo/Downloads/data/wf_backtest/wf_backtest/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv`
+  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv`
+- **135.0KB wasted** (2 copies of a 135.0KB file):
+  - `main-repo/Downloads/code/notebooks/Stock_reporting.ipynb`
+  - `claude-stock-tools/03_colab_notebooks/india_stock_reporting.ipynb`
+- **71.5KB wasted** (2 copies of a 71.5KB file):
+  - `main-repo/Downloads/code/python_files/us_stocks_colab.py`
+  - `claude-stock-tools/03_colab_notebooks/us_stocks_colab_script.py`
+- **57.1KB wasted** (3 copies of a 28.6KB file):
+  - `main-repo/Downloads/code/python_files/full_japan_market_scan.py`
+  - `global-market-scanners/full_japan_market_scan.py`
+  - `claude-stock-tools/02_market_screeners/japan_market_scan.py`
+- **56.7KB wasted** (2 copies of a 56.7KB file):
+  - `main-repo/Downloads/code/python_files/stock_daily_report_improved.py`
+  - `claude-stock-tools/01_daily_reports/india_daily_report.py`
+- **55.8KB wasted** (2 copies of a 55.8KB file):
+  - `main-repo/Downloads/code/python_files/us_stock_daily_report.py`
+  - `claude-stock-tools/01_daily_reports/us_daily_report.py`
+- **55.3KB wasted** (3 copies of a 27.6KB file):
+  - `main-repo/Downloads/code/python_files/full_korea_market_scan.py`
+  - `global-market-scanners/full_korea_market_scan.py`
+  - `claude-stock-tools/02_market_screeners/korea_market_scan.py`
+- **45.8KB wasted** (2 copies of a 45.8KB file):
+  - `main-repo/Downloads/code/python_files/full_us_market_scan.py`
+  - `global-market-scanners/full_us_market_scan.py`
+- **44.0KB wasted** (2 copies of a 44.0KB file):
+  - `main-repo/Downloads/code/python_files/nse_data_fetcher.py`
+  - `global-market-scanners/nse_data_fetcher.py`
+- **42.1KB wasted** (2 copies of a 42.1KB file):
+  - `main-repo/Downloads/code/python_files/full_indian_market_scan.py`
+  - `global-market-scanners/full_indian_market_scan.py`
+- **41.9KB wasted** (2 copies of a 41.9KB file):
+  - `main-repo/Downloads/code/python_files/sg_stock_daily_report.py`
+  - `claude-stock-tools/01_daily_reports/singapore_daily_report.py`
+- **41.9KB wasted** (2 copies of a 41.9KB file):
+  - `main-repo/Downloads/code/web/notification.html`
+  - `main-repo/Downloads/code/web/notification (1).html`
+- **41.1KB wasted** (2 copies of a 41.1KB file):
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.geojson`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.geojson`
+- **40.5KB wasted** (2 copies of a 40.5KB file):
+  - `main-repo/Downloads/code/python_files/us_market_screener.py`
+  - `claude-stock-tools/02_market_screeners/us_market_screener_v1.py`
+- **39.3KB wasted** (2 copies of a 39.3KB file):
+  - `main-repo/Downloads/code/notebooks/US_Market_Screener_Colab.ipynb`
+  - `claude-stock-tools/03_colab_notebooks/us_market_screener.ipynb`
+- **38.4KB wasted** (2 copies of a 38.4KB file):
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1845.html`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.html`
+- **32.1KB wasted** (2 copies of a 32.1KB file):
+  - `main-repo/Downloads/code/notebooks/Stock_Analysis_Colab.ipynb`
+  - `claude-stock-tools/03_colab_notebooks/india_stock_analysis.ipynb`
+- **30.3KB wasted** (2 copies of a 30.3KB file):
+  - `main-repo/Downloads/code/python_files/quick_reference.py`
+  - `claude-stock-tools/04_strategy_reference/momentum_strategy_reference.py`
+- **28.0KB wasted** (2 copies of a 28.0KB file):
+  - `main-repo/Downloads/code/python_files/market_data_cache.py`
+  - `global-market-scanners/market_data_cache.py`
+- **26.3KB wasted** (2 copies of a 26.3KB file):
+  - `main-repo/Downloads/code/python_files/ml_signal_engine.py`
+  - `global-market-scanners/ml_signal_engine.py`
+- **26.0KB wasted** (2 copies of a 26.0KB file):
+  - `main-repo/Downloads/code/python_files/full_european_market_scan.py`
+  - `global-market-scanners/full_european_market_scan.py`
+- **15.9KB wasted** (2 copies of a 15.9KB file):
+  - `main-repo/Downloads/code/python_files/stock_utils.py`
+  - `global-market-scanners/stock_utils.py`
+- **13.6KB wasted** (2 copies of a 13.6KB file):
+  - `main-repo/nse_screener_reference/portfolio_IN_latest.xlsx`
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2234.xlsx`
+- **316B wasted** (2 copies of a 316B file):
+  - `main-repo/Downloads/data/bhavcopy_cache/nse_holidays.json`
+  - `main-repo/Downloads/code/python_files/cache_seed/nse_holidays.json`
+- **224B wasted** (2 copies of a 224B file):
+  - `main-repo/Downloads/data/bhavcopy_cache/no_data_dates.json`
+  - `main-repo/Downloads/code/python_files/cache_seed/no_data_dates.json`
+- **70B wasted** (3 copies of a 35B file):
+  - `fuel-retail-outlets/.gitignore`
+  - `toll-plaza-highways/.gitignore`
+  - `india-trade-export-analysis/.gitignore`
+- **45B wasted** (2 copies of a 45B file):
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.geojson`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.geojson`
+
+## Name-based doc-sprawl clusters (105 clusters)
+
+Files sharing a leading name token -- candidates for a human to read and
+decide "supersede, merge, or keep both." Over-inclusion is expected; this
+is a naming heuristic, not a content judgment.
+
+- **TOLL** (23 files):
+  - `main-repo/toll_heatmap_2024-11.html`
+  - `main-repo/toll_heatmap_2024-10.html`
+  - `main-repo/toll_heatmap_2024-09.html`
+  - `main-repo/toll_heatmap_2024-08.html`
+  - `main-repo/toll_heatmap_2024-07.html`
+  - `main-repo/toll_heatmap_2024-06.html`
+  - `main-repo/toll_heatmap_2024-05.html`
+  - `main-repo/toll_heatmap_2024-04.html`
+  - `main-repo/toll_heatmap_2024-03.html`
+  - `main-repo/toll_heatmap_2024-01.html`
+  - `main-repo/Downloads/code/web/toll_plazas_map.html`
+  - `main-repo/Downloads/code/web/toll_dashboard.html`
+  - `main-repo/Downloads/code/web/toll_collections_heatmap.html`
+  - `main-repo/Downloads/code/python_files/toll_metrics.json`
+  - `main-repo/Downloads/code/python_files/toll_analysis_report.txt`
+  - `fuel-retail-outlets/api-data-integration/toll_retail_map_20260624_094534.html`
+  - `fuel-retail-outlets/api-data-integration/toll_retail_distance_map_20260624_095202.html`
+  - `fuel-retail-outlets/api-data-integration/TOLL_RETAIL_INTEGRATION_20260624_093854.xlsx`
+  - `fuel-retail-outlets/api-data-integration/TOLL_RETAIL_DISTANCE_ANALYSIS_20260624_095202.xlsx`
+  - `toll-plaza-highways/toll_plaza_visualization.py`
+  - `toll-plaza-highways/toll_plaza_dashboard.py`
+  - `toll-plaza-highways/TOLL_RETAIL_INTEGRATION_SUMMARY.md`
+  - `toll-plaza-highways/TOLL_RETAIL_DISTANCE_ANALYSIS_SUMMARY.md`
+- **SSRI** (20 files):
+  - `fuel-retail-outlets/ssri_api_discovery_report_20260624_084400.json`
+  - `fuel-retail-outlets/api-data-integration/ssri_systematic_extractor.py`
+  - `fuel-retail-outlets/api-data-integration/ssri_petrol_pumps_api.py`
+  - `fuel-retail-outlets/api-data-integration/ssri_html_scraper.py`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_state_wise_20260624_060800.json`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_state_wise_20260624_055627.json`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.js`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.geojson`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.js`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.geojson`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_summary_20260624_063249.json`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.json`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.js`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.geojson`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.csv`
+  - `fuel-retail-outlets/api-data-integration/SSRI_vs_PPAC_Comparison_Report.xlsx`
+  - `fuel-retail-outlets/SSRI_vs_PPAC_TALLY.md`
+  - `fuel-retail-outlets/SSRI_COMPLETE_EXTRACTION_REPORT.md`
+  - `fuel-retail-outlets/SSRI_API_DATA_EXTRACTION.md`
+  - `fuel-retail-outlets/SSRI_100K_INTEGRATION_GUIDE.md`
+- **README** (20 files):
+  - `main-repo/nse_screener_reference/README.md`
+  - `main-repo/global_expansion_screener_framework/README.md`
+  - `main-repo/docs/README.md`
+  - `main-repo/README.md`
+  - `main-repo/Downloads/code/stock_ddd/README.md`
+  - `main-repo/Downloads/code/python_files/README.md`
+  - `global-market-scanners/README.md`
+  - `fuel-retail-outlets/fuel-station-gap-analysis/README.md`
+  - `fuel-retail-outlets/fuel-pump-locations-map/README.md`
+  - `fuel-retail-outlets/api-data-integration/README.md`
+  - `fuel-retail-outlets/README.md`
+  - `toll-plaza-highways/README.md`
+  - `india-trade-export-analysis/README.md`
+  - `claude-stock-tools/README.md`
+  - `claude-stock-tools/05_enrichment/README.md`
+  - `claude-stock-tools/04_strategy_reference/README.md`
+  - `claude-stock-tools/03_colab_notebooks/README.md`
+  - `claude-stock-tools/02_market_screeners/README.md`
+  - `claude-stock-tools/01_daily_reports/README.md`
+  - `subscription-model-revenue/README.md`
+- **INIT** (20 files):
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/screening/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/reporting/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/notifications/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/market_data/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/backtest/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/infrastructure/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/domain/shared/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/domain/screening/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/domain/reporting/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/domain/market_data/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/domain/ipo/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/domain/intraday/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/domain/backtest/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/domain/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/application/queries/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/application/ports/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/application/orchestrators/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/application/commands/__init__.py`
+  - `main-repo/Downloads/code/stock_ddd/application/__init__.py`
+  - `main-repo/Downloads/code/python_files/strategies/__init__.py`
+- **PHASE** (18 files):
+  - `main-repo/global_expansion_screener_framework/screener/phase1_data_collection.py`
+  - `main-repo/global_expansion_screener_framework/phase5_global_expansion_model.py`
+  - `main-repo/global_expansion_screener_framework/phase4_live_screener.py`
+  - `main-repo/global_expansion_screener_framework/phase3_announcement_impact.py`
+  - `main-repo/global_expansion_screener_framework/phase2_geographic_regression.py`
+  - `main-repo/global_expansion_screener_framework/docs/PHASE1_QUARTERLY_COLLECTION_COMPLETE.md`
+  - `main-repo/global_expansion_screener_framework/Phase1_Leverage_Cache.ipynb`
+  - `main-repo/global_expansion_screener_framework/Phase1_Bhavcopy_GlobalExpansion.ipynb`
+  - `main-repo/global_expansion_screener_framework/PHASE_1_KICKOFF.txt`
+  - `main-repo/global_expansion_screener_framework/PHASE_1_FREE_COLAB.md`
+  - `main-repo/global_expansion_screener_framework/PHASE_1_EXECUTION_GUIDE.md`
+  - `main-repo/global_expansion_screener_framework/PHASE_1_COMPLETION.md`
+  - `main-repo/global_expansion_screener_framework/PHASE_1_BHAVCOPY_STRATEGY.md`
+  - `main-repo/global_expansion_screener_framework/PHASE_1_ACCELERATED_ONLINE.md`
+  - `main-repo/global_expansion_screener_framework/PHASE1_VALIDATED_STRATEGY.md`
+  - `main-repo/global_expansion_screener_framework/PHASE1_LEVERAGE_EXISTING_DATA.md`
+  - `main-repo/global_expansion_screener_framework/PHASE1_KICKOFF_CHECKLIST.md`
+  - `main-repo/global_expansion_screener_framework/PHASE1_EXECUTION_SUMMARY.md`
+- **COMBINED** (14 files):
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1917.json`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1917.html`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1909.json`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1909.html`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1906.json`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1906.html`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1847.json`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1847.html`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1845.json`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1845.html`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.json`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.html`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1832.json`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1832.html`
+- **BHAVCOPY** (14 files):
+  - `main-repo/Downloads/data/wf_backtest/wf_backtest/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260611_F_0000.csv`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260610_F_0000.csv`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260609_F_0000.csv`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260608_F_0000.csv`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260612_F_0000.CSV`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260611_F_0000.CSV`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260610_F_0000.CSV`
+  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv`
+  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260624_F_0000.csv`
+  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260623_F_0000.csv`
+  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260622_F_0000.csv`
+  - `main-repo/Downloads/code/python_files/bhavcopy_store.py`
+  - `main-repo/Downloads/code/python_files/bhavcopy_history.py`
+- **INDIAN** (12 files):
+  - `main-repo/nse_screener_reference/scan_results/indian_full_scan_latest.xlsx`
+  - `main-repo/global_expansion_screener_framework/INDIAN_MARKET_DATA_DB.md`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260626_0943.xlsx`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260626_0907.xlsx`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260625_0836.xlsx`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260624_0837.xlsx`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260623_0840.xlsx`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260623_0838.xlsx`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260622_0836.xlsx`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1156.xlsx`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1135.xlsx`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1120.xlsx`
+- **FULL** (11 files):
+  - `main-repo/Downloads/data/backtest_results/backtest_results/full_run_log.txt`
+  - `main-repo/Downloads/code/python_files/full_us_market_scan.py`
+  - `main-repo/Downloads/code/python_files/full_korea_market_scan.py`
+  - `main-repo/Downloads/code/python_files/full_japan_market_scan.py`
+  - `main-repo/Downloads/code/python_files/full_indian_market_scan.py`
+  - `main-repo/Downloads/code/python_files/full_european_market_scan.py`
+  - `global-market-scanners/full_us_market_scan.py`
+  - `global-market-scanners/full_korea_market_scan.py`
+  - `global-market-scanners/full_japan_market_scan.py`
+  - `global-market-scanners/full_indian_market_scan.py`
+  - `global-market-scanners/full_european_market_scan.py`
+- **STOCK** (9 files):
+  - `main-repo/STOCK_ANALYSIS_SYSTEM.md`
+  - `main-repo/Downloads/data/us_screener_output/us_screener_output/stock_universe.csv`
+  - `main-repo/Downloads/code/python_files/stock_utils.py`
+  - `main-repo/Downloads/code/python_files/stock_enricher.py`
+  - `main-repo/Downloads/code/python_files/stock_daily_report_improved.py`
+  - `main-repo/Downloads/code/python_files/stock_daily_report.R`
+  - `main-repo/Downloads/code/notebooks/Stock_reporting.ipynb`
+  - `main-repo/Downloads/code/notebooks/Stock_Analysis_Colab.ipynb`
+  - `global-market-scanners/stock_utils.py`
+- **PORTFOLIO** (9 files):
+  - `main-repo/nse_screener_reference/portfolio_IN_latest.xlsx`
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2234.xlsx`
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2233.xlsx`
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2227.xlsx`
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2226.xlsx`
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2224.xlsx`
+  - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2223.xlsx`
+  - `main-repo/Downloads/code/python_files/portfolio_builder.py`
+  - `global-market-scanners/portfolio.py`
+- **EXTRACT** (9 files):
+  - `main-repo/api-data-integration/extract_cold_chain_data.py`
+  - `main-repo/api-data-integration/extract_bpcl_regional_dealerships.py`
+  - `main-repo/Downloads/code/python_files/extract attachment agent.json`
+  - `fuel-retail-outlets/api-data-integration/extract_ssri_complete_107k.py`
+  - `fuel-retail-outlets/api-data-integration/extract_cashatpos_from_pdf.py`
+  - `fuel-retail-outlets/api-data-integration/extract_bpcl_dealership_data.py`
+  - `fuel-retail-outlets/api-data-integration/extract_bpcl_by_zone_state_district.py`
+  - `fuel-retail-outlets/api-data-integration/extract_all_ssri_pumps.py`
+  - `fuel-retail-outlets/api-data-integration/extract_all_ssri_complete.py`
+- **DATA** (9 files):
+  - `main-repo/global_expansion_screener_framework/DATA_COMPLETENESS_TEST.py`
+  - `main-repo/Downloads/code/python_files/data_sources.py`
+  - `main-repo/Downloads/code/python_files/DATA_AND_MODULES.md`
+  - `main-repo/DATA_INTEGRATION_OPTIONS.md`
+  - `main-repo/DATA_COMPRESSION_REPORT.md`
+  - `global-market-scanners/data_sources.py`
+  - `global-market-scanners/data_quality.py`
+  - `global-market-scanners/DATA_SOURCES.md`
+  - `fuel-retail-outlets/fuel-station-gap-analysis/data.js`
+- **DAILY** (9 files):
+  - `main-repo/global_expansion_screener_framework/screener/daily_price_collector.py`
+  - `main-repo/Downloads/code/web/daily_scan_report_20260612.html`
+  - `main-repo/Downloads/code/python_files/daily_scan_report_20260626.txt`
+  - `main-repo/Downloads/code/python_files/daily_scan_report_20260625.txt`
+  - `main-repo/Downloads/code/python_files/daily_scan_report_20260624.txt`
+  - `main-repo/Downloads/code/python_files/daily_scan_report_20260612.txt`
+  - `main-repo/Downloads/code/python_files/daily_pipeline.sh`
+  - `main-repo/Downloads/code/python_files/daily_combined_report.py`
+  - `main-repo/Downloads/code/notebooks/daily_scan_report_20260612.ipynb`
+- **MARKET** (8 files):
+  - `main-repo/Downloads/code/python_files/market_performance.py`
+  - `main-repo/Downloads/code/python_files/market_data_cache.py`
+  - `main-repo/Downloads/code/python_files/market_calendar.py`
+  - `main-repo/Downloads/code/python_files/cache_seed/market_performance_5y.xlsx`
+  - `main-repo/.github/workflows/market_movers.yml`
+  - `global-market-scanners/market_store.py`
+  - `global-market-scanners/market_holidays.py`
+  - `global-market-scanners/market_data_cache.py`
+- **GITIGNORE** (8 files):
+  - `main-repo/nse_screener_reference/scan_results/.gitignore`
+  - `main-repo/.gitignore`
+  - `global-market-scanners/tests/.gitignore`
+  - `global-market-scanners/.gitignore`
+  - `fuel-retail-outlets/.gitignore`
+  - `toll-plaza-highways/.gitignore`
+  - `india-trade-export-analysis/.gitignore`
+  - `claude-stock-tools/.gitignore`
+- **BPCL** (8 files):
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_summary_20260624_081647.json`
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_summary_20260624_081532.json`
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081647.json`
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.json`
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.geojson`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_summary_20260624_081300.json`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.json`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.geojson`
+- **BACKTEST** (8 files):
+  - `main-repo/nse_screener_reference/scan_results/backtest_1yr_full_NSE_latest.xlsx`
+  - `main-repo/global_expansion_screener_framework/docs/BACKTEST_DATA_COLLECTION_ROADMAP.md`
+  - `main-repo/backtest_dsc_filter_2008_2009.py`
+  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_US_20260626_1355.xlsx`
+  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1300.xlsx`
+  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1230.xlsx`
+  - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1219.xlsx`
+  - `main-repo/Downloads/code/python_files/backtest_screeners.py`
+- **KAGGLE** (7 files):
+  - `main-repo/KAGGLE_PANDAS_SETUP.md`
+  - `main-repo/KAGGLE_INTEGRATION_SUMMARY.txt`
+  - `main-repo/KAGGLE_INTEGRATION_GUIDE.md`
+  - `main-repo/KAGGLE_IMPLEMENTATION_SUMMARY.md`
+  - `main-repo/KAGGLE_DATASETS_INDIA_MAP.md`
+  - `fuel-retail-outlets/api-data-integration/kaggle_loader.py`
+  - `fuel-retail-outlets/api-data-integration/KAGGLE_QUICK_START.md`
+- **INDIA** (7 files):
+  - `main-repo/global_expansion_screener_framework/india_stocks_15y_full.db`
+  - `main-repo/global_expansion_screener_framework/india_stocks_15y.db.gz`
+  - `main-repo/global_expansion_screener_framework/india_stocks_15y.db`
+  - `claude-stock-tools/03_colab_notebooks/india_stock_reporting.ipynb`
+  - `claude-stock-tools/03_colab_notebooks/india_stock_analysis.ipynb`
+  - `claude-stock-tools/02_market_screeners/india_market_scan.py`
+  - `claude-stock-tools/01_daily_reports/india_daily_report.py`
+- **BUILD** (7 files):
+  - `main-repo/docs/_build_repo_pages.py`
+  - `main-repo/Downloads/code/python_files/build_market_seeds.py`
+  - `main-repo/Downloads/code/python_files/build_mailer.py`
+  - `global-market-scanners/scripts/build_paper.js`
+  - `global-market-scanners/scripts/build_manuscript.sh`
+  - `global-market-scanners/scripts/build_deck.js`
+  - `global-market-scanners/build_industry_parquet.py`
+- **SENTIMENT** (6 files):
+  - `main-repo/Downloads/data/sentiment_results/sentiment_results/sentiment_IN_20260626_1823.json`
+  - `main-repo/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_US_20260626_1817.xlsx`
+  - `main-repo/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_US_20260626_1815.xlsx`
+  - `main-repo/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_IN_20260626_1819.xlsx`
+  - `main-repo/Downloads/code/python_files/sentiment_price_link.py`
+  - `main-repo/Downloads/code/python_files/sentiment_pipeline.py`
+- **SECTOR** (6 files):
+  - `main-repo/global_expansion_screener_framework/screener/sector_geographic_analysis.py`
+  - `main-repo/Downloads/data/sector_results/sector_results/sector_analysis_US_20260626_1751.xlsx`
+  - `main-repo/Downloads/data/sector_results/sector_results/sector_analysis_IN_20260626_1827.xlsx`
+  - `main-repo/Downloads/data/sector_results/sector_results/sector_analysis_IN_20260626_1752.xlsx`
+  - `main-repo/Downloads/code/python_files/sector_analysis.py`
+  - `global-market-scanners/sector_rotation.py`
+- **DARVAS** (6 files):
+  - `main-repo/Downloads/code/python_files/strategies/darvas.py`
+  - `main-repo/Downloads/code/native/darvas_wrapper.py`
+  - `main-repo/Downloads/code/native/darvas_fast.so`
+  - `main-repo/Downloads/code/native/darvas_fast.c`
+  - `global-market-scanners/darvas_volume.py`
+  - `global-market-scanners/DARVAS_VOLUME.md`
+- **SCREENER** (5 files):
+  - `main-repo/SCREENER_BASIS.md`
+  - `main-repo/Downloads/data/us_screener_output/us_screener_output/screener.db`
+  - `main-repo/Downloads/code/python_files/screener_kit.py`
+  - `main-repo/Downloads/code/python_files/screener_in.py`
+  - `main-repo/Downloads/code/python_files/screener_analysis.py`
+- **QUICK** (5 files):
+  - `main-repo/Downloads/code/python_files/quick_reference.py`
+  - `main-repo/Downloads/code/python_files/Quick_Start_Guide.md`
+  - `main-repo/Downloads/code/python_files/QUICK_START.md`
+  - `fuel-retail-outlets/data-sources/QUICK_SOURCES_REFERENCE.txt`
+  - `fuel-retail-outlets/api-data-integration/quick_start.sh`
+- **EXPORT** (5 files):
+  - `india-trade-export-analysis/export_opportunities.py`
+  - `india-trade-export-analysis/export_insights.py`
+  - `india-trade-export-analysis/export_extended_analysis.py`
+  - `india-trade-export-analysis/export_analysis.py`
+  - `india-trade-export-analysis/EXPORT_INSIGHTS_SUMMARY.md`
+- **EUROPEAN** (5 files):
+  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1538.xlsx`
+  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1537.xlsx`
+  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1409.xlsx`
+  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1408.xlsx`
+  - `main-repo/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1407.xlsx`
+- **SYMBOLS** (4 files):
+  - `main-repo/Downloads/data/us_full_scan/us_full_scan/.symbols_cache.json`
+  - `main-repo/Downloads/data/korea_scan/korea_scan/.symbols_cache.json`
+  - `main-repo/Downloads/data/japan_scan/japan_scan/.symbols_cache.json`
+  - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/.symbols_cache.json`
+- **RESEARCH** (4 files):
+  - `main-repo/research_publishing_toolkit.py`
+  - `global-market-scanners/RESEARCH_PAPER_SIMPLE.md`
+  - `global-market-scanners/RESEARCH_PAPER_DETAILED.md`
+  - `global-market-scanners/RESEARCH_PAPER.md`
+- **REQUIREMENTS** (4 files):
+  - `main-repo/requirements.txt`
+  - `main-repo/Downloads/code/python_files/requirements.txt`
+  - `main-repo/Downloads/code/python_files/requirements-docker.txt`
+  - `global-market-scanners/requirements.txt`
+- **REPORT** (4 files):
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_us_v2.log`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_us_today.log`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_today.log`
+  - `main-repo/Downloads/code/stock_ddd/application/ports/report_writer.py`
+- **LIQUIDITY** (4 files):
+  - `main-repo/Downloads/code/python_files/liquidity.py`
+  - `global-market-scanners/liquidity_multiyear.py`
+  - `global-market-scanners/liquidity_factor.py`
+  - `global-market-scanners/LIQUIDITY.md`
+- **HYBRID** (4 files):
+  - `main-repo/HYBRID_PROJECT_SUMMARY.md`
+  - `main-repo/HYBRID_EXECUTION_GUIDE.md`
+  - `fuel-retail-outlets/api-data-integration/hybrid_aggregator.py`
+  - `fuel-retail-outlets/api-data-integration/HYBRID_IMPLEMENTATION_GUIDE.md`
+- **GLOBAL** (4 files):
+  - `main-repo/global_expansion_screener_framework/screener/global_20country_universe_screener.py`
+  - `main-repo/global_expansion_screener_framework/docs/GLOBAL_EXPANSION_SCREENING_FRAMEWORK.md`
+  - `main-repo/docs/repo/global-market-scanners.html`
+  - `global-market-scanners/GLOBAL_DVM.md`
+- **DIJKSTRA** (4 files):
+  - `fuel-retail-outlets/api-data-integration/dijkstra_toll_retail_shortest_path.py`
+  - `fuel-retail-outlets/api-data-integration/dijkstra_filtered_service_outlets.py`
+  - `fuel-retail-outlets/api-data-integration/DIJKSTRA_SHORTEST_PATHS_20260624_100334.xlsx`
+  - `fuel-retail-outlets/api-data-integration/DIJKSTRA_SERVICE_OUTLETS_20260624_100732.xlsx`
+- **CREATE** (4 files):
+  - `main-repo/api-data-integration/create_master_integrated_excel.py`
+  - `fuel-retail-outlets/api-data-integration/create_toll_retail_map.py`
+  - `fuel-retail-outlets/api-data-integration/create_toll_retail_distance_map.py`
+  - `fuel-retail-outlets/api-data-integration/create_comprehensive_retail_summary.py`
+- **COLAB** (4 files):
+  - `main-repo/global_expansion_screener_framework/COLAB_PHASE1_SETUP.md`
+  - `main-repo/docs/repo/colab-experiments.html`
+  - `main-repo/Downloads/code/r/colab_r_setup.R`
+  - `main-repo/Downloads/code/python_files/colab_quickstart.ipynb`
+- **WALK** (3 files):
+  - `main-repo/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1305.xlsx`
+  - `main-repo/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1302.xlsx`
+  - `main-repo/Downloads/code/python_files/walk_forward_backtest.py`
+- **UNLISTED** (3 files):
+  - `global-market-scanners/unlisted_valuation.py`
+  - `global-market-scanners/unlisted_firms.parquet`
+  - `global-market-scanners/unlisted_enrichment.py`
+- **UNIFIED** (3 files):
+  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_summary_20260624_081357.json`
+  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_20260624_081357.json`
+  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_20260624_081357.geojson`
+- **STORAGE** (3 files):
+  - `main-repo/storage_menu.sh`
+  - `main-repo/storage_analyzer.sh`
+  - `main-repo/storage.sh`
+- **RETAIL** (3 files):
+  - `main-repo/docs/repo/retail-outlet-data.html`
+  - `fuel-retail-outlets/data-sources/RETAIL_OUTLETS_DATA_SOURCES.md`
+  - `fuel-retail-outlets/api-data-integration/RETAIL_OUTLETS_SUMMARY_20260624_093416.xlsx`
+- **QUICKSTART** (3 files):
+  - `main-repo/global_expansion_screener_framework/QUICKSTART_BATCH_EXECUTION.md`
+  - `main-repo/global_expansion_screener_framework/QUICKSTART_5YEAR_SPLITS.md`
+  - `fuel-retail-outlets/fuel-station-gap-analysis/QUICKSTART.md`
+- **PROJECT** (3 files):
+  - `main-repo/global_expansion_screener_framework/docs/PROJECT_STATUS_JULY_2026.md`
+  - `main-repo/PROJECT_STATUS.md`
+  - `main-repo/Downloads/code/python_files/PROJECT_SUMMARY.txt`
+- **PATTERNS** (3 files):
+  - `main-repo/Downloads/data/pattern_results/pattern_results/patterns_IN_20260626_1732.xlsx`
+  - `main-repo/Downloads/data/pattern_results/pattern_results/patterns_ALL_20260626_1736.xlsx`
+  - `main-repo/Downloads/data/pattern_results/pattern_results/patterns_ALL_20260626_1733.xlsx`
+- **KOREA** (3 files):
+  - `main-repo/Downloads/data/korea_scan/korea_scan/korea_market_scan_20260613_1547.xlsx`
+  - `main-repo/Downloads/data/korea_scan/korea_scan/korea_market_scan_20260613_1513.xlsx`
+  - `claude-stock-tools/02_market_screeners/korea_market_scan.py`
+- **JAPAN** (3 files):
+  - `main-repo/Downloads/data/japan_scan/japan_scan/japan_market_scan_20260613_1517.xlsx`
+  - `main-repo/Downloads/data/japan_scan/japan_scan/japan_market_scan_20260613_1507.xlsx`
+  - `claude-stock-tools/02_market_screeners/japan_market_scan.py`
+- **INTRADAY** (3 files):
+  - `main-repo/Downloads/data/intraday_results/intraday_results/intraday_20260626_15m.json`
+  - `main-repo/Downloads/data/intraday_results/intraday_results/intraday_20260626.xlsx`
+  - `main-repo/Downloads/code/python_files/intraday_monitor.py`
+- **INDEX** (3 files):
+  - `main-repo/docs/index.html`
+  - `fuel-retail-outlets/fuel-station-gap-analysis/index.html`
+  - `fuel-retail-outlets/fuel-pump-locations-map/index.html`
+- **FINAL** (3 files):
+  - `main-repo/global_expansion_screener_framework/FINAL_PHASE_TEST_REPORT.md`
+  - `main-repo/FINAL_PROJECT_SUMMARY.md`
+  - `main-repo/Downloads/code/python_files/FINAL_DELIVERABLES.md`
+- **CASHATPOS** (3 files):
+  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_summary_20260624_082138.json`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_20260624_082138.json`
+  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_20260624_082138.csv`
+- **YEAR** (2 files):
+  - `main-repo/global_expansion_screener_framework/docs/15YEAR_GEOGRAPHIC_TREND_SUMMARY.md`
+  - `india-trade-export-analysis/YEAR_ON_YEAR_TRENDS_DETERIORATION_ANALYSIS.md`
+- **WATCHLISTS** (2 files):
+  - `global-market-scanners/watchlists.py`
+  - `global-market-scanners/WATCHLISTS.md`
+- **WATCHLIST** (2 files):
+  - `global-market-scanners/watchlist_store.py`
+  - `global-market-scanners/WATCHLIST_STORE.md`
+- **WARM** (2 files):
+  - `main-repo/Downloads/data/dl_strategy_results/dl_strategy_results/warm_india.log`
+  - `main-repo/Downloads/code/python_files/warm_india_cache.py`
+- **WAREHOUSE** (2 files):
+  - `global-market-scanners/warehouse.py`
+  - `global-market-scanners/WAREHOUSE.md`
+- **VIABILITY** (2 files):
+  - `global-market-scanners/viability_summary_21d.db`
+  - `global-market-scanners/viability_summary.db`
+- **VALIDATE** (2 files):
+  - `fuel-retail-outlets/api-data-integration/validate_service_outlets_against_pdf.py`
+  - `fuel-retail-outlets/api-data-integration/validate_outlets_against_ssri.py`
+- **TOGAF** (2 files):
+  - `global-market-scanners/architecture/togaf.py`
+  - `global-market-scanners/architecture/TOGAF.md`
+- **TEST** (2 files):
+  - `main-repo/global_expansion_screener_framework/test_report_lfs.md`
+  - `global-market-scanners/tests/test_core.py`
+- **SSRN** (2 files):
+  - `main-repo/Downloads/code/backtesting/ssrn-3945468.pdf`
+  - `main-repo/Downloads/code/backtesting/ssrn-3374195.pdf`
+- **SECURITY** (2 files):
+  - `main-repo/.github/workflows/security-scan.yml`
+  - `global-market-scanners/SECURITY.md`
+- **SEASONAL** (2 files):
+  - `main-repo/Downloads/code/web/seasonal_analysis_dashboard.html`
+  - `main-repo/Downloads/code/python_files/seasonal_analysis_summary.json`
+- **SCREEN** (2 files):
+  - `global-market-scanners/screen_viability.py`
+  - `global-market-scanners/SCREEN_VIABILITY_RESULTS.md`
+- **SAFE** (2 files):
+  - `global-market-scanners/safe/safe_backlog.py`
+  - `global-market-scanners/safe/SAFE.md`
+- **RANDOM** (2 files):
+  - `main-repo/Downloads/code/python_files/random_numbers_using_dirichlet.py`
+  - `subscription-model-revenue/random_numbers_using_dirichlet.py`
+- **QUALITY** (2 files):
+  - `global-market-scanners/quality_factor.py`
+  - `global-market-scanners/QUALITY_FACTOR.md`
+- **PRICE** (2 files):
+  - `main-repo/global_expansion_screener_framework/screener/price_criterion_correlation_tracker.py`
+  - `main-repo/global_expansion_screener_framework/screener/price_correlation_analysis.py`
+- **PIPELINE** (2 files):
+  - `main-repo/Downloads/code/python_files/pipeline_news.py`
+  - `main-repo/Downloads/code/python_files/pipeline_historical.py`
+- **PEAD** (2 files):
+  - `global-market-scanners/pead_factor.py`
+  - `global-market-scanners/PEAD.md`
+- **PAPER** (2 files):
+  - `main-repo/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models.pdf`
+  - `main-repo/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models (1).pdf`
+- **PACKAGE** (2 files):
+  - `global-market-scanners/package.json`
+  - `global-market-scanners/package-lock.json`
+- **NOTIFICATION** (2 files):
+  - `main-repo/Downloads/code/web/notification.html`
+  - `main-repo/Downloads/code/web/notification (1).html`
+- **MARKITDOWN** (2 files):
+  - `india-trade-export-analysis/markitdown-preprocessor.py`
+  - `india-trade-export-analysis/MARKITDOWN_PREPROCESSING_GUIDE.md`
+- **LOCATIONS** (2 files):
+  - `fuel-retail-outlets/fuel-pump-locations-map/locations-map.js`
+  - `fuel-retail-outlets/fuel-pump-locations-map/locations-data.js`
+- **INTEGRATE** (2 files):
+  - `fuel-retail-outlets/api-data-integration/integrate_toll_retail_database.py`
+  - `fuel-retail-outlets/api-data-integration/integrate_multi_source_database.py`
+- **IMPORT** (2 files):
+  - `india-trade-export-analysis/import_export_comparison.py`
+  - `india-trade-export-analysis/IMPORT_EXPORT_ANALYSIS_2025_26.md`
+- **HIGH** (2 files):
+  - `india-trade-export-analysis/HIGH_OPPORTUNITY_EXPORTS.csv`
+  - `india-trade-export-analysis/HIGH_OPPORTUNITY_2026_PROJECTIONS.csv`
+- **GROWW** (2 files):
+  - `main-repo/global_expansion_screener_framework/groww_data_pipeline.py`
+  - `main-repo/global_expansion_screener_framework/groww_api_test.py`
+- **GLOSSARY** (2 files):
+  - `main-repo/GLOSSARY.md`
+  - `global-market-scanners/GLOSSARY.md`
+- **GITATTRIBUTES** (2 files):
+  - `main-repo/.gitattributes`
+  - `global-market-scanners/.gitattributes`
+- **GEOGRAPHIC** (2 files):
+  - `main-repo/global_expansion_screener_framework/screener/geographic_factor_regression.py`
+  - `main-repo/global_expansion_screener_framework/docs/GEOGRAPHIC_WEIGHTED_EXPANSION_MODEL.md`
+- **FETCH** (2 files):
+  - `main-repo/Downloads/code/python_files/fetch_market_ohlc.py`
+  - `main-repo/Downloads/code/python_files/fetch_and_analyze_cricket_data.R`
+- **FACTOR** (2 files):
+  - `global-market-scanners/factor_research.py`
+  - `global-market-scanners/FACTOR_RESEARCH.md`
+- **EXTENDED** (2 files):
+  - `india-trade-export-analysis/EXTENDED_COMPARISON_2020_2026.md`
+  - `india-trade-export-analysis/EXTENDED_ANALYSIS_2020_2026.csv`
+- **EXECUTIVE** (2 files):
+  - `main-repo/global_expansion_screener_framework/EXECUTIVE_SUMMARY.md`
+  - `india-trade-export-analysis/EXECUTIVE_SUMMARY_COMPREHENSIVE.md`
+- **ENHANCED** (2 files):
+  - `main-repo/enhanced_outlet_map_with_coordinates.html`
+  - `main-repo/api-data-integration/enhanced_geo_map_with_kaggle.py`
+- **EARNINGS** (2 files):
+  - `global-market-scanners/earnings_liquidity.py`
+  - `global-market-scanners/EARNINGS_LIQUIDITY.md`
+- **DOCKERIGNORE** (2 files):
+  - `main-repo/Downloads/code/python_files/.dockerignore`
+  - `main-repo/.dockerignore`
+- **DOCKERFILE** (2 files):
+  - `main-repo/Downloads/code/python_files/Dockerfile`
+  - `main-repo/Dockerfile`
+- **DISCOM** (2 files):
+  - `main-repo/docs/discom-calculator.html`
+  - `subscription-model-revenue/discom_debt_calculator.py`
+- **DEPLOYMENT** (2 files):
+  - `main-repo/global_expansion_screener_framework/docs/DEPLOYMENT_GUIDE.md`
+  - `main-repo/DEPLOYMENT_CHECKLIST.md`
+- **DEOLDIFY** (2 files):
+  - `main-repo/Downloads/code/python_files/deoldify.py`
+  - `colab-experiments/deoldify.py`
+- **DEBT** (2 files):
+  - `main-repo/Downloads/code/python_files/strategies/debt_reduction.py`
+  - `india-trade-export-analysis/DEBT_BORROWING_TRENDS_ANALYSIS.md`
+- **CORPORATE** (2 files):
+  - `global-market-scanners/corporate_actions.py`
+  - `global-market-scanners/CORPORATE_ACTIONS.md`
+- **COLD** (2 files):
+  - `main-repo/cold_chain_outlet_integrated_map.html`
+  - `main-repo/api-data-integration/cold_chain_outlet_map.py`
+- **CLAUDE** (2 files):
+  - `main-repo/docs/repo/claude-stock-tools.html`
+  - `main-repo/Downloads/code/python_files/CLAUDE.md`
+- **CHANGELOG** (2 files):
+  - `main-repo/CHANGELOG.md`
+  - `claude-stock-tools/CHANGELOG.md`
+- **CALCULATE** (2 files):
+  - `main-repo/calculate_dsc_optimized.py`
+  - `main-repo/calculate_dsc_all_markets.py`
+- **BUFFETT** (2 files):
+  - `claude-stock-tools/04_strategy_reference/buffett_methodology.md`
+  - `claude-stock-tools/02_market_screeners/buffett_value_screener.py`
+- **BRAZIL** (2 files):
+  - `global-market-scanners/brazil_quality.py`
+  - `global-market-scanners/brazil_cvm.py`
+- **BENCHMARK** (2 files):
+  - `global-market-scanners/benchmark.py`
+  - `global-market-scanners/BENCHMARK.md`
+- **ARCHITECTURE** (2 files):
+  - `global-market-scanners/ARCHITECTURE_MAP.md`
+  - `global-market-scanners/ARCHITECTURE.md`
+- **ACCUMULATION** (2 files):
+  - `global-market-scanners/accumulation_screener.py`
+  - `global-market-scanners/ACCUMULATION_SCREENER.md`
+
+## Branch staleness vs base
+
+| Branch | Ahead | Behind | Last commit | Triage |
+|---|---:|---:|---|---|
+| `origin/universe-export` | 30 | 137 | 2026-07-04T01:17:35+00:00 | likely stale -- review before deleting |
+| `origin/feature/scanner-optimise` | 43 | 137 | 2026-06-15T03:45:45+05:30 | likely stale -- review before deleting |
+| `origin/feature/multi-source-data` | 41 | 137 | 2026-06-15T03:19:09+05:30 | likely stale -- review before deleting |
+| `origin/feature/hong-kong-canada` | 40 | 137 | 2026-06-15T03:06:57+05:30 | likely stale -- review before deleting |
+| `origin/feature/geography-status` | 42 | 137 | 2026-06-15T03:31:53+05:30 | likely stale -- review before deleting |
+| `origin/feature/darvas-interpreter` | 44 | 137 | 2026-06-23T03:34:01+00:00 | likely stale -- review before deleting |
+| `origin/claude/surge-pricing-transport-mrwpsl` | 53 | 137 | 2026-06-16T16:27:48+00:00 | likely stale -- review before deleting |
+| `origin/claude/stock-metrics-nse-extraction-di4v0` | 14 | 137 | 2026-06-05T03:44:37+00:00 | likely stale -- review before deleting |
+| `origin/claude/put-call-parity-trading-QMSlK` | 9 | 137 | 2026-05-24T13:37:44+00:00 | likely stale -- review before deleting |
+| `origin/claude/portfolio-beta-efficient-frontier-xJltY` | 11 | 137 | 2026-05-27T17:26:53+00:00 | likely stale -- review before deleting |
+| `origin/claude/nse-bse-pegu-scoring-k7vu9` | 45 | 137 | 2026-07-04T05:37:48+00:00 | likely stale -- review before deleting |
+| `origin/claude/event-driven-stock-news-msv0cq` | 87 | 137 | 2026-07-06T15:48:08+05:30 | likely stale -- review before deleting |
+| `origin/claude/code-style-kubernetes-era-md2q57` | 55 | 137 | 2026-06-16T12:40:32+00:00 | likely stale -- review before deleting |
+| `origin/claude/bms-battery-management-y26x71` | 55 | 137 | 2026-07-03T10:49:00+00:00 | likely stale -- review before deleting |
+| `origin/circleci-project-setup` | 4 | 137 | 2021-08-10T08:49:03+05:30 | likely stale -- review before deleting |
+| `origin/global-expansion-screener-v3.1` | 39 | 11 | 2026-07-02T23:45:37+05:30 | recent -- review for a real merge decision |
+

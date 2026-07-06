@@ -9,8 +9,20 @@ type file_entry = {
   size_bytes : int;
 }
 
+val default_exclude_dirs : string list
+(** [".git"; "_build"; "node_modules"; ".venv"; "venv"; "__pycache__";
+    "dist"; "target"] -- common build-output/dependency directories across
+    several ecosystems. This is a fixed denylist, NOT real [.gitignore]
+    parsing: a project with an unusual ignored directory name will still
+    have it scanned. It exists because {!scan} operates on the filesystem
+    directly, not git's index -- a build artifact under one of these names
+    can otherwise be mistaken for source (this is not hypothetical: an
+    early run of this tool against its own [_build/] output proposed
+    keeping a compiled copy of a source file and deleting the real one,
+    caught in a dry run before anything was actually removed). *)
+
 val scan : ?exclude_dirs:string list -> string -> file_entry list
 (** [scan ?exclude_dirs root] walks [root] recursively and returns every
     regular file found. [exclude_dirs] names (not paths) are skipped
-    entirely, defaulting to [[".git"]]. Symlinks are not followed, so a
-    symlink loop can't cause non-termination. *)
+    entirely, defaulting to {!default_exclude_dirs}. Symlinks are not
+    followed, so a symlink loop can't cause non-termination. *)

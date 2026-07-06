@@ -3,7 +3,23 @@ let human_bytes n =
   else if n >= 1_000 then Printf.sprintf "%.1fKB" (float_of_int n /. 1_000.)
   else Printf.sprintf "%dB" n
 
-let render ~root ~duplicate_groups ~name_clusters ~branches =
+(* Returns plain lines rather than taking the caller's polymorphic Printf-based
+   [p] as a parameter -- a `format4`-typed function loses the polymorphism
+   printf relies on the moment it's passed across a function boundary like a
+   normal value, so building strings here and letting [render] print them is
+   simpler than fighting that. *)
+let render_duplicate_groups (groups : Duplicate_finder.group list) : string list =
+  if groups = [] then [ "None found." ]
+  else
+    List.concat_map
+      (fun (g : Duplicate_finder.group) ->
+        let waste = g.size_bytes * (List.length g.files - 1) in
+        Printf.sprintf "- **%s wasted** (%d copies of a %s file):" (human_bytes waste)
+          (List.length g.files) (human_bytes g.size_bytes)
+        :: List.map (fun (f : Scanner.file_entry) -> Printf.sprintf "  - `%s`" f.rel_path) g.files)
+      groups
+
+let render ~root ~duplicate_groups ~name_clusters ~branches ?(data_duplicate_groups = []) () =
   let buf = Buffer.create 4096 in
   let p fmt = Printf.ksprintf (fun s -> Buffer.add_string buf s; Buffer.add_char buf '\n') fmt in
 
@@ -18,15 +34,18 @@ let render ~root ~duplicate_groups ~name_clusters ~branches =
   p "## Exact duplicate files (%d group%s)" (List.length duplicate_groups)
     (if List.length duplicate_groups = 1 then "" else "s");
   p "";
-  if duplicate_groups = [] then p "None found."
-  else
-    List.iter
-      (fun (g : Duplicate_finder.group) ->
-        let waste = g.size_bytes * (List.length g.files - 1) in
-        p "- **%s wasted** (%d copies of a %s file):" (human_bytes waste) (List.length g.files)
-          (human_bytes g.size_bytes);
-        List.iter (fun (f : Scanner.file_entry) -> p "  - `%s`" f.rel_path) g.files)
-      duplicate_groups;
+  List.iter (fun line -> p "%s" line) (render_duplicate_groups duplicate_groups);
+  p "";
+
+  p "## Data-source duplicates (%d group%s)" (List.length data_duplicate_groups)
+    (if List.length data_duplicate_groups = 1 then "" else "s");
+  p "";
+  p "Same underlying dataset (by Git LFS pointer `oid`, or raw content hash for";
+  p "small non-LFS data files) checked into more than one place -- found without";
+  p "downloading the real LFS bytes, since a pointer's declared `oid`/`size`";
+  p "already proves byte-identical content on its own.";
+  p "";
+  List.iter (fun line -> p "%s" line) (render_duplicate_groups data_duplicate_groups);
   p "";
 
   p "## Name-based doc-sprawl clusters (%d cluster%s)" (List.length name_clusters)

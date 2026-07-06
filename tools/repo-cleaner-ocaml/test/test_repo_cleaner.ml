@@ -30,7 +30,10 @@ let rec rm_rf path =
   else Sys.remove path
 
 let run_git dir args =
-  let cmd = Printf.sprintf "git -C %s %s > /dev/null 2>&1" (Filename.quote dir) (String.concat " " args) in
+  let cmd =
+    Printf.sprintf "git -C %s %s > /dev/null 2>&1" (Filename.quote dir)
+      (String.concat " " (List.map Filename.quote args))
+  in
   if Sys.command cmd <> 0 then failwith ("git command failed: " ^ cmd)
 
 (* ---------- Name_clusterer.normalize_stem ---------- *)
@@ -174,6 +177,58 @@ let test_branch_analyzer_computes_ahead_behind_and_classifies () =
   assert (recent.last_commit_subject = "c2");
   rm_rf dir;
   print_endline "OK branch_analyzer_computes_ahead_behind_and_classifies"
+
+(* ---------- Recency ---------- *)
+
+let make_git_entry_at dir ~rel_path ~content ~subject =
+  write_file dir rel_path content;
+  run_git dir [ "add"; rel_path ];
+  run_git dir [ "commit"; "-q"; "-m"; subject ]
+
+let test_recency_lookup_returns_last_commit_for_path () =
+  let dir = fresh_dir "recency_test" in
+  run_git dir [ "init"; "-q"; "-b"; "main" ];
+  run_git dir [ "config"; "user.email"; "test@example.com" ];
+  run_git dir [ "config"; "user.name"; "Test" ];
+  make_git_entry_at dir ~rel_path:"a.py" ~content:"v1" ~subject:"add a.py";
+  make_git_entry_at dir ~rel_path:"a.py" ~content:"v2" ~subject:"update a.py again";
+  match Recency.lookup ~repo_dir:dir ~rel_path_in_repo:"a.py" with
+  | Some info ->
+      assert (info.Recency.last_commit_subject = "update a.py again");
+      rm_rf dir;
+      print_endline "OK recency_lookup_returns_last_commit_for_path"
+  | None -> failwith "expected recency info for a committed path"
+
+let test_recency_lookup_returns_none_for_unknown_path () =
+  let dir = fresh_dir "recency_unknown_test" in
+  run_git dir [ "init"; "-q"; "-b"; "main" ];
+  run_git dir [ "config"; "user.email"; "test@example.com" ];
+  run_git dir [ "config"; "user.name"; "Test" ];
+  make_git_entry_at dir ~rel_path:"a.py" ~content:"v1" ~subject:"add a.py";
+  assert (Recency.lookup ~repo_dir:dir ~rel_path_in_repo:"never_committed.py" = None);
+  rm_rf dir;
+  print_endline "OK recency_lookup_returns_none_for_unknown_path"
+
+let test_recency_most_recent_picks_latest_date () =
+  let mk rel_path date_str =
+    ({ Scanner.abs_path = rel_path; rel_path; size_bytes = 0 }, Some { Recency.last_commit_date = date_str; last_commit_subject = "" })
+  in
+  let entries =
+    [
+      mk "repoA/x.py" "2025-01-01T00:00:00+00:00";
+      mk "repoB/x.py" "2026-06-15T00:00:00+00:00";
+      mk "repoC/x.py" "2024-11-30T00:00:00+00:00";
+    ]
+  in
+  match Recency.most_recent entries with
+  | Some f -> assert (f.Scanner.rel_path = "repoB/x.py");
+      print_endline "OK recency_most_recent_picks_latest_date"
+  | None -> failwith "expected a most-recent file"
+
+let test_recency_most_recent_returns_none_when_nothing_resolved () =
+  let entries = [ ({ Scanner.abs_path = "x"; rel_path = "x"; size_bytes = 0 }, None) ] in
+  assert (Recency.most_recent entries = None);
+  print_endline "OK recency_most_recent_returns_none_when_nothing_resolved"
 
 (* ---------- Data_manifest ---------- *)
 
@@ -350,6 +405,10 @@ let () =
   test_name_clusterer_clusters_research_paper_variants ();
   test_name_clusterer_respects_min_token_length ();
   test_branch_analyzer_computes_ahead_behind_and_classifies ();
+  test_recency_lookup_returns_last_commit_for_path ();
+  test_recency_lookup_returns_none_for_unknown_path ();
+  test_recency_most_recent_picks_latest_date ();
+  test_recency_most_recent_returns_none_when_nothing_resolved ();
   test_parse_lfs_pointer_extracts_oid_and_size ();
   test_parse_lfs_pointer_rejects_real_content ();
   test_catalog_reports_true_size_from_pointer_not_ondisk_size ();

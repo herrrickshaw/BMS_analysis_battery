@@ -67,6 +67,24 @@ let test_scanner_does_not_follow_symlinks () =
   rm_rf dir;
   print_endline "OK scanner_does_not_follow_symlinks"
 
+let test_scanner_skips_build_and_dependency_dirs_by_default () =
+  (* Regression test: a real run of this tool against its own checked-out
+     source found _build/ (dune's output, a byte-identical copy of every
+     source file) sorting alphabetically BEFORE lib/, which would have
+     made Cleanup.plan propose keeping the build artifact and deleting the
+     real source. Caught in a dry run before anything was removed; this
+     pins the actual fix down so it can't regress silently. *)
+  let dir = fresh_dir "scanner_buildartifact_test" in
+  write_file dir "lib/scanner.ml" "real source";
+  write_file dir "_build/default/lib/scanner.ml" "real source";
+  write_file dir "node_modules/pkg/index.js" "vendored";
+  write_file dir "__pycache__/mod.pyc" "bytecode";
+  let entries = Scanner.scan dir in
+  let rel_paths = List.map (fun (e : Scanner.file_entry) -> e.rel_path) entries |> List.sort compare in
+  assert (rel_paths = [ "lib/scanner.ml" ]);
+  rm_rf dir;
+  print_endline "OK scanner_skips_build_and_dependency_dirs_by_default"
+
 (* ---------- Duplicate_finder ---------- *)
 
 let test_duplicate_finder_finds_byte_identical_across_dirs () =
@@ -157,6 +175,156 @@ let test_branch_analyzer_computes_ahead_behind_and_classifies () =
   rm_rf dir;
   print_endline "OK branch_analyzer_computes_ahead_behind_and_classifies"
 
+(* ---------- Data_manifest ---------- *)
+
+let lfs_pointer_text oid size =
+  Printf.sprintf "version https://git-lfs.github.com/spec/v1\noid sha256:%s\nsize %d\n" oid size
+
+let test_parse_lfs_pointer_extracts_oid_and_size () =
+  let oid = String.make 64 'a' in
+  let text = lfs_pointer_text oid 12345678 in
+  match Data_manifest.parse_lfs_pointer text with
+  | Some (parsed_oid, parsed_size) ->
+      assert (parsed_oid = oid);
+      assert (parsed_size = 12345678);
+      print_endline "OK parse_lfs_pointer_extracts_oid_and_size"
+  | None -> failwith "expected a parsed pointer"
+
+let test_parse_lfs_pointer_rejects_real_content () =
+  assert (Data_manifest.parse_lfs_pointer "PK\x03\x04 binary parquet bytes, not a pointer" = None);
+  assert (Data_manifest.parse_lfs_pointer "" = None);
+  print_endline "OK parse_lfs_pointer_rejects_real_content"
+
+let test_catalog_reports_true_size_from_pointer_not_ondisk_size () =
+  let dir = fresh_dir "manifest_test" in
+  let oid = String.make 64 'b' in
+  (* the pointer FILE on disk is tiny; the dataset it stands in for is declared as 50MB *)
+  write_file dir "data/big_cache.parquet" (lfs_pointer_text oid 50_000_000);
+  let entries = Scanner.scan dir in
+  let catalogued = Data_manifest.catalog entries in
+  assert (List.length catalogued = 1);
+  let c = List.hd catalogued in
+  assert c.is_lfs_pointer;
+  assert (c.true_size_bytes = 50_000_000);
+  assert (c.true_size_bytes <> c.file.Scanner.size_bytes);
+  (* the pointer text itself is well under 200 bytes *)
+  assert (c.content_key = Some ("lfs:" ^ oid));
+  rm_rf dir;
+  print_endline "OK catalog_reports_true_size_from_pointer_not_ondisk_size"
+
+let test_catalog_ignores_non_data_extensions () =
+  let dir = fresh_dir "manifest_ext_test" in
+  write_file dir "notes.txt" "not a data file";
+  write_file dir "data.csv" "a,b,c\n1,2,3\n";
+  let entries = Scanner.scan dir in
+  let catalogued = Data_manifest.catalog entries in
+  assert (List.length catalogued = 1);
+  assert ((List.hd catalogued).file.Scanner.rel_path = "data.csv");
+  rm_rf dir;
+  print_endline "OK catalog_ignores_non_data_extensions"
+
+let test_data_manifest_duplicates_finds_same_lfs_oid_across_repos () =
+  let dir = fresh_dir "manifest_dupe_test" in
+  let shared_oid = String.make 64 'c' in
+  write_file dir "repoA/cache_seed/US.parquet" (lfs_pointer_text shared_oid 900_000);
+  write_file dir "repoB/cache_seed/US.parquet" (lfs_pointer_text shared_oid 900_000);
+  write_file dir "repoC/cache_seed/IN.parquet"
+    (lfs_pointer_text (String.make 64 'd') 500_000);
+  let entries = Scanner.scan dir in
+  let catalogued = Data_manifest.catalog entries in
+  let groups = Data_manifest.duplicates catalogued in
+  assert (List.length groups = 1);
+  let g = List.hd groups in
+  assert (List.length g.Duplicate_finder.files = 2);
+  assert (g.Duplicate_finder.size_bytes = 900_000);
+  rm_rf dir;
+  print_endline "OK data_manifest_duplicates_finds_same_lfs_oid_across_repos"
+
+let test_to_csv_rows_has_header_and_one_row_per_entry () =
+  let dir = fresh_dir "manifest_csv_test" in
+  write_file dir "a.json" "{}";
+  write_file dir "b.parquet" (lfs_pointer_text (String.make 64 'e') 42);
+  let catalogued = Data_manifest.catalog (Scanner.scan dir) in
+  let rows = Data_manifest.to_csv_rows catalogued in
+  assert (List.length rows = 3);
+  (* header + 2 entries *)
+  assert (List.hd rows = [ "path"; "kind"; "true_size_bytes"; "is_lfs_pointer"; "content_key" ]);
+  rm_rf dir;
+  print_endline "OK to_csv_rows_has_header_and_one_row_per_entry"
+
+(* ---------- Cleanup ---------- *)
+
+let test_cleanup_plans_within_repo_duplicates () =
+  let dir = fresh_dir "cleanup_test" in
+  write_file dir "repoA/notification.html" "same content";
+  write_file dir "repoA/notification (1).html" "same content";
+  (* rel_path already starts with "repoA/" here since that's the directory
+     structure under the scan root -- this mirrors what the CLI produces by
+     prefixing each --root's entries with its own repo label. *)
+  let groups = Duplicate_finder.find (Scanner.scan dir) in
+  let actions = Cleanup.plan groups in
+  assert (List.length actions = 1);
+  let a = List.hd actions in
+  assert (a.Cleanup.keep.Scanner.rel_path = "repoA/notification (1).html");
+  (* alphabetically first: '(' < 'n' as raw bytes -- pin the actual rule down, not just "some file" *)
+  assert (List.length a.Cleanup.remove = 1);
+  rm_rf dir;
+  print_endline "OK cleanup_plans_within_repo_duplicates"
+
+let test_cleanup_skips_groups_with_a_protected_alias_name () =
+  (* Regression test: a real run proposed deleting a "_latest" file and
+     keeping only its timestamped twin, purely on alphabetical sort order
+     -- exactly the kind of silent breakage a stable-alias filename should
+     block, even though the two files are genuinely byte-identical. *)
+  let dir = fresh_dir "cleanup_latest_test" in
+  write_file dir "repoA/scan_results/backtest_1yr_full_NSE_latest.xlsx" "same bytes";
+  write_file dir "repoA/Downloads/data/backtest_results/backtest_IN_20260626_1300.xlsx" "same bytes";
+  let groups = Duplicate_finder.find (Scanner.scan dir) in
+  let actions = Cleanup.plan groups in
+  assert (actions = []);
+  rm_rf dir;
+  print_endline "OK cleanup_skips_groups_with_a_protected_alias_name"
+
+let test_cleanup_skips_cross_repo_duplicates () =
+  let dir = fresh_dir "cleanup_cross_test" in
+  write_file dir "repoA/shared_script.py" "identical logic";
+  write_file dir "repoB/shared_script.py" "identical logic";
+  let entries = Scanner.scan dir in
+  let groups = Duplicate_finder.find entries in
+  let actions = Cleanup.plan groups in
+  assert (actions = []);
+  rm_rf dir;
+  print_endline "OK cleanup_skips_cross_repo_duplicates"
+
+let test_cleanup_apply_dry_run_removes_nothing () =
+  let dir = fresh_dir "cleanup_dryrun_test" in
+  write_file dir "repoA/a.txt" "dup";
+  write_file dir "repoA/b.txt" "dup";
+  let groups = Duplicate_finder.find (Scanner.scan dir) in
+  let actions = Cleanup.plan groups in
+  let results = Cleanup.apply ~dry_run:true actions in
+  assert (results = []);
+  assert (Sys.file_exists (Filename.concat dir "repoA/a.txt"));
+  assert (Sys.file_exists (Filename.concat dir "repoA/b.txt"));
+  rm_rf dir;
+  print_endline "OK cleanup_apply_dry_run_removes_nothing"
+
+let test_cleanup_apply_real_run_removes_all_but_kept () =
+  let dir = fresh_dir "cleanup_apply_test" in
+  write_file dir "repoA/a.txt" "dup";
+  write_file dir "repoA/b.txt" "dup";
+  write_file dir "repoA/c.txt" "dup";
+  let groups = Duplicate_finder.find (Scanner.scan dir) in
+  let actions = Cleanup.plan groups in
+  let results = Cleanup.apply ~dry_run:false actions in
+  assert (List.length results = 2);
+  assert (List.for_all (fun (_, err) -> err = None) results);
+  assert (Sys.file_exists (Filename.concat dir "repoA/a.txt"));
+  assert (not (Sys.file_exists (Filename.concat dir "repoA/b.txt")));
+  assert (not (Sys.file_exists (Filename.concat dir "repoA/c.txt")));
+  rm_rf dir;
+  print_endline "OK cleanup_apply_real_run_removes_all_but_kept"
+
 (* ---------- Report ---------- *)
 
 let contains hay needle =
@@ -165,7 +333,7 @@ let contains hay needle =
   go 0
 
 let test_report_render_includes_all_sections () =
-  let out = Report.render ~root:"/tmp/example" ~duplicate_groups:[] ~name_clusters:[] ~branches:[] in
+  let out = Report.render ~root:"/tmp/example" ~duplicate_groups:[] ~name_clusters:[] ~branches:[] () in
   assert (contains out "repo-cleaner-ocaml report");
   assert (contains out "Exact duplicate files");
   assert (contains out "Name-based doc-sprawl clusters");
@@ -176,10 +344,22 @@ let () =
   test_normalize_stem_strips_digits_and_splits ();
   test_scanner_finds_files_and_skips_git_dir ();
   test_scanner_does_not_follow_symlinks ();
+  test_scanner_skips_build_and_dependency_dirs_by_default ();
   test_duplicate_finder_finds_byte_identical_across_dirs ();
   test_duplicate_finder_ignores_empty_files ();
   test_name_clusterer_clusters_research_paper_variants ();
   test_name_clusterer_respects_min_token_length ();
   test_branch_analyzer_computes_ahead_behind_and_classifies ();
+  test_parse_lfs_pointer_extracts_oid_and_size ();
+  test_parse_lfs_pointer_rejects_real_content ();
+  test_catalog_reports_true_size_from_pointer_not_ondisk_size ();
+  test_catalog_ignores_non_data_extensions ();
+  test_data_manifest_duplicates_finds_same_lfs_oid_across_repos ();
+  test_to_csv_rows_has_header_and_one_row_per_entry ();
+  test_cleanup_plans_within_repo_duplicates ();
+  test_cleanup_skips_groups_with_a_protected_alias_name ();
+  test_cleanup_skips_cross_repo_duplicates ();
+  test_cleanup_apply_dry_run_removes_nothing ();
+  test_cleanup_apply_real_run_removes_all_but_kept ();
   test_report_render_includes_all_sections ();
   print_endline "\nAll repo-cleaner-ocaml tests passed."

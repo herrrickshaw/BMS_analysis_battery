@@ -13,7 +13,10 @@ let strip_root_prefix ~root path =
     else rest
   else path
 
-let scan ?(exclude_dirs = [ ".git" ]) root =
+let default_exclude_dirs =
+  [ ".git"; "_build"; "node_modules"; ".venv"; "venv"; "__pycache__"; "dist"; "target" ]
+
+let scan ?(exclude_dirs = default_exclude_dirs) root =
   let results = ref [] in
   let rec walk dir =
     let entries =

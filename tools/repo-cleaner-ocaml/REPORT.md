@@ -5,7 +5,7 @@ Scanned root: `/tmp/claude-0/-home-user/4c70da6e-fbb1-5d08-a901-6ee952f753bc/scr
 This report only lists candidates. Nothing here has been deleted --
 every finding below needs a human decision before anything is removed.
 
-## Exact duplicate files (32 groups)
+## Exact duplicate files (26 groups)
 
 - **12.3MB wasted** (2 copies of a 12.3MB file):
   - `fuel-retail-outlets/fuel-pump-locations-map/locations-data.js`
@@ -19,12 +19,6 @@ every finding below needs a human decision before anything is removed.
 - **955.5KB wasted** (2 copies of a 955.5KB file):
   - `main-repo/nse_screener_reference/scan_results/walkforward_3y5y10y_latest.xlsx`
   - `main-repo/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1305.xlsx`
-- **640.5KB wasted** (2 copies of a 640.5KB file):
-  - `main-repo/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models.pdf`
-  - `main-repo/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models (1).pdf`
-- **591.7KB wasted** (2 copies of a 591.7KB file):
-  - `main-repo/Downloads/data/wf_backtest/wf_backtest/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv`
-  - `main-repo/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv`
 - **135.0KB wasted** (2 copies of a 135.0KB file):
   - `main-repo/Downloads/code/notebooks/Stock_reporting.ipynb`
   - `claude-stock-tools/03_colab_notebooks/india_stock_reporting.ipynb`
@@ -57,9 +51,6 @@ every finding below needs a human decision before anything is removed.
 - **41.9KB wasted** (2 copies of a 41.9KB file):
   - `main-repo/Downloads/code/python_files/sg_stock_daily_report.py`
   - `claude-stock-tools/01_daily_reports/singapore_daily_report.py`
-- **41.9KB wasted** (2 copies of a 41.9KB file):
-  - `main-repo/Downloads/code/web/notification.html`
-  - `main-repo/Downloads/code/web/notification (1).html`
 - **41.1KB wasted** (2 copies of a 41.1KB file):
   - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.geojson`
   - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.geojson`
@@ -69,9 +60,6 @@ every finding below needs a human decision before anything is removed.
 - **39.3KB wasted** (2 copies of a 39.3KB file):
   - `main-repo/Downloads/code/notebooks/US_Market_Screener_Colab.ipynb`
   - `claude-stock-tools/03_colab_notebooks/us_market_screener.ipynb`
-- **38.4KB wasted** (2 copies of a 38.4KB file):
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1845.html`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.html`
 - **32.1KB wasted** (2 copies of a 32.1KB file):
   - `main-repo/Downloads/code/notebooks/Stock_Analysis_Colab.ipynb`
   - `claude-stock-tools/03_colab_notebooks/india_stock_analysis.ipynb`
@@ -93,12 +81,6 @@ every finding below needs a human decision before anything is removed.
 - **13.6KB wasted** (2 copies of a 13.6KB file):
   - `main-repo/nse_screener_reference/portfolio_IN_latest.xlsx`
   - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2234.xlsx`
-- **316B wasted** (2 copies of a 316B file):
-  - `main-repo/Downloads/data/bhavcopy_cache/nse_holidays.json`
-  - `main-repo/Downloads/code/python_files/cache_seed/nse_holidays.json`
-- **224B wasted** (2 copies of a 224B file):
-  - `main-repo/Downloads/data/bhavcopy_cache/no_data_dates.json`
-  - `main-repo/Downloads/code/python_files/cache_seed/no_data_dates.json`
 - **70B wasted** (3 copies of a 35B file):
   - `fuel-retail-outlets/.gitignore`
   - `toll-plaza-highways/.gitignore`
@@ -107,7 +89,16 @@ every finding below needs a human decision before anything is removed.
   - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.geojson`
   - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.geojson`
 
-## Name-based doc-sprawl clusters (105 clusters)
+## Data-source duplicates (0 groups)
+
+Same underlying dataset (by Git LFS pointer `oid`, or raw content hash for
+small non-LFS data files) checked into more than one place -- found without
+downloading the real LFS bytes, since a pointer's declared `oid`/`size`
+already proves byte-identical content on its own.
+
+None found.
+
+## Name-based doc-sprawl clusters (114 clusters)
 
 Files sharing a leading name token -- candidates for a human to read and
 decide "supersede, merge, or keep both." Over-inclusion is expected; this
@@ -137,6 +128,28 @@ is a naming heuristic, not a content judgment.
   - `toll-plaza-highways/toll_plaza_dashboard.py`
   - `toll-plaza-highways/TOLL_RETAIL_INTEGRATION_SUMMARY.md`
   - `toll-plaza-highways/TOLL_RETAIL_DISTANCE_ANALYSIS_SUMMARY.md`
+- **README** (21 files):
+  - `main-repo/tools/repo-cleaner-ocaml/README.md`
+  - `main-repo/nse_screener_reference/README.md`
+  - `main-repo/global_expansion_screener_framework/README.md`
+  - `main-repo/docs/README.md`
+  - `main-repo/README.md`
+  - `main-repo/Downloads/code/stock_ddd/README.md`
+  - `main-repo/Downloads/code/python_files/README.md`
+  - `global-market-scanners/README.md`
+  - `fuel-retail-outlets/fuel-station-gap-analysis/README.md`
+  - `fuel-retail-outlets/fuel-pump-locations-map/README.md`
+  - `fuel-retail-outlets/api-data-integration/README.md`
+  - `fuel-retail-outlets/README.md`
+  - `toll-plaza-highways/README.md`
+  - `india-trade-export-analysis/README.md`
+  - `claude-stock-tools/README.md`
+  - `claude-stock-tools/05_enrichment/README.md`
+  - `claude-stock-tools/04_strategy_reference/README.md`
+  - `claude-stock-tools/03_colab_notebooks/README.md`
+  - `claude-stock-tools/02_market_screeners/README.md`
+  - `claude-stock-tools/01_daily_reports/README.md`
+  - `subscription-model-revenue/README.md`
 - **SSRI** (20 files):
   - `fuel-retail-outlets/ssri_api_discovery_report_20260624_084400.json`
   - `fuel-retail-outlets/api-data-integration/ssri_systematic_extractor.py`
@@ -158,27 +171,6 @@ is a naming heuristic, not a content judgment.
   - `fuel-retail-outlets/SSRI_COMPLETE_EXTRACTION_REPORT.md`
   - `fuel-retail-outlets/SSRI_API_DATA_EXTRACTION.md`
   - `fuel-retail-outlets/SSRI_100K_INTEGRATION_GUIDE.md`
-- **README** (20 files):
-  - `main-repo/nse_screener_reference/README.md`
-  - `main-repo/global_expansion_screener_framework/README.md`
-  - `main-repo/docs/README.md`
-  - `main-repo/README.md`
-  - `main-repo/Downloads/code/stock_ddd/README.md`
-  - `main-repo/Downloads/code/python_files/README.md`
-  - `global-market-scanners/README.md`
-  - `fuel-retail-outlets/fuel-station-gap-analysis/README.md`
-  - `fuel-retail-outlets/fuel-pump-locations-map/README.md`
-  - `fuel-retail-outlets/api-data-integration/README.md`
-  - `fuel-retail-outlets/README.md`
-  - `toll-plaza-highways/README.md`
-  - `india-trade-export-analysis/README.md`
-  - `claude-stock-tools/README.md`
-  - `claude-stock-tools/05_enrichment/README.md`
-  - `claude-stock-tools/04_strategy_reference/README.md`
-  - `claude-stock-tools/03_colab_notebooks/README.md`
-  - `claude-stock-tools/02_market_screeners/README.md`
-  - `claude-stock-tools/01_daily_reports/README.md`
-  - `subscription-model-revenue/README.md`
 - **INIT** (20 files):
   - `main-repo/Downloads/code/stock_ddd/infrastructure/screening/__init__.py`
   - `main-repo/Downloads/code/stock_ddd/infrastructure/reporting/__init__.py`
@@ -200,6 +192,27 @@ is a naming heuristic, not a content judgment.
   - `main-repo/Downloads/code/stock_ddd/application/commands/__init__.py`
   - `main-repo/Downloads/code/stock_ddd/application/__init__.py`
   - `main-repo/Downloads/code/python_files/strategies/__init__.py`
+- **CLEANED** (20 files):
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_ZA.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_US.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_UK.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_TW.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_SG.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_SE.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_SA.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_KR.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_JP.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_HK.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_FI.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_EU.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_DK.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_DE.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_CN.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_CH.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_CA.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_BR.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long_AU.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/cleaned_long.parquet`
 - **PHASE** (18 files):
   - `main-repo/global_expansion_screener_framework/screener/phase1_data_collection.py`
   - `main-repo/global_expansion_screener_framework/phase5_global_expansion_model.py`
@@ -219,7 +232,7 @@ is a naming heuristic, not a content judgment.
   - `main-repo/global_expansion_screener_framework/PHASE1_LEVERAGE_EXISTING_DATA.md`
   - `main-repo/global_expansion_screener_framework/PHASE1_KICKOFF_CHECKLIST.md`
   - `main-repo/global_expansion_screener_framework/PHASE1_EXECUTION_SUMMARY.md`
-- **COMBINED** (14 files):
+- **COMBINED** (13 files):
   - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1917.json`
   - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1917.html`
   - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1909.json`
@@ -229,13 +242,11 @@ is a naming heuristic, not a content judgment.
   - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1847.json`
   - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1847.html`
   - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1845.json`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1845.html`
   - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.json`
   - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.html`
   - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1832.json`
   - `main-repo/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1832.html`
-- **BHAVCOPY** (14 files):
-  - `main-repo/Downloads/data/wf_backtest/wf_backtest/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv`
+- **BHAVCOPY** (13 files):
   - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260611_F_0000.csv`
   - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260610_F_0000.csv`
   - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260609_F_0000.csv`
@@ -262,6 +273,18 @@ is a naming heuristic, not a content judgment.
   - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1156.xlsx`
   - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1135.xlsx`
   - `main-repo/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1120.xlsx`
+- **INDIA** (11 files):
+  - `main-repo/global_expansion_screener_framework/india_stocks_2021_2026.db.gz`
+  - `main-repo/global_expansion_screener_framework/india_stocks_2016_2020.db.gz`
+  - `main-repo/global_expansion_screener_framework/india_stocks_2011_2015.db.gz`
+  - `main-repo/global_expansion_screener_framework/india_stocks_15y_full.db`
+  - `main-repo/global_expansion_screener_framework/india_stocks_15y.db.gz`
+  - `main-repo/global_expansion_screener_framework/india_stocks_15y.db`
+  - `main-repo/Downloads/code/python_files/cache_seed/india_ccc_screen.parquet`
+  - `claude-stock-tools/03_colab_notebooks/india_stock_reporting.ipynb`
+  - `claude-stock-tools/03_colab_notebooks/india_stock_analysis.ipynb`
+  - `claude-stock-tools/02_market_screeners/india_market_scan.py`
+  - `claude-stock-tools/01_daily_reports/india_daily_report.py`
 - **FULL** (11 files):
   - `main-repo/Downloads/data/backtest_results/backtest_results/full_run_log.txt`
   - `main-repo/Downloads/code/python_files/full_us_market_scan.py`
@@ -274,6 +297,29 @@ is a naming heuristic, not a content judgment.
   - `global-market-scanners/full_japan_market_scan.py`
   - `global-market-scanners/full_indian_market_scan.py`
   - `global-market-scanners/full_european_market_scan.py`
+- **DATA** (11 files):
+  - `main-repo/tools/repo-cleaner-ocaml/lib/data_manifest.mli`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/data_manifest.ml`
+  - `main-repo/global_expansion_screener_framework/DATA_COMPLETENESS_TEST.py`
+  - `main-repo/Downloads/code/python_files/data_sources.py`
+  - `main-repo/Downloads/code/python_files/DATA_AND_MODULES.md`
+  - `main-repo/DATA_INTEGRATION_OPTIONS.md`
+  - `main-repo/DATA_COMPRESSION_REPORT.md`
+  - `global-market-scanners/data_sources.py`
+  - `global-market-scanners/data_quality.py`
+  - `global-market-scanners/DATA_SOURCES.md`
+  - `fuel-retail-outlets/fuel-station-gap-analysis/data.js`
+- **MARKET** (10 files):
+  - `main-repo/Downloads/code/python_files/market_performance.py`
+  - `main-repo/Downloads/code/python_files/market_data_cache.py`
+  - `main-repo/Downloads/code/python_files/market_calendar.py`
+  - `main-repo/Downloads/code/python_files/cache_seed/market_performance_5y.xlsx`
+  - `main-repo/Downloads/code/python_files/cache_seed/market_performance_5y.parquet`
+  - `main-repo/Downloads/code/python_files/cache_seed/market_liquidity.parquet`
+  - `main-repo/.github/workflows/market_movers.yml`
+  - `global-market-scanners/market_store.py`
+  - `global-market-scanners/market_holidays.py`
+  - `global-market-scanners/market_data_cache.py`
 - **STOCK** (9 files):
   - `main-repo/STOCK_ANALYSIS_SYSTEM.md`
   - `main-repo/Downloads/data/us_screener_output/us_screener_output/stock_universe.csv`
@@ -294,6 +340,16 @@ is a naming heuristic, not a content judgment.
   - `main-repo/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2223.xlsx`
   - `main-repo/Downloads/code/python_files/portfolio_builder.py`
   - `global-market-scanners/portfolio.py`
+- **GITIGNORE** (9 files):
+  - `main-repo/tools/repo-cleaner-ocaml/.gitignore`
+  - `main-repo/nse_screener_reference/scan_results/.gitignore`
+  - `main-repo/.gitignore`
+  - `global-market-scanners/tests/.gitignore`
+  - `global-market-scanners/.gitignore`
+  - `fuel-retail-outlets/.gitignore`
+  - `toll-plaza-highways/.gitignore`
+  - `india-trade-export-analysis/.gitignore`
+  - `claude-stock-tools/.gitignore`
 - **EXTRACT** (9 files):
   - `main-repo/api-data-integration/extract_cold_chain_data.py`
   - `main-repo/api-data-integration/extract_bpcl_regional_dealerships.py`
@@ -304,16 +360,6 @@ is a naming heuristic, not a content judgment.
   - `fuel-retail-outlets/api-data-integration/extract_bpcl_by_zone_state_district.py`
   - `fuel-retail-outlets/api-data-integration/extract_all_ssri_pumps.py`
   - `fuel-retail-outlets/api-data-integration/extract_all_ssri_complete.py`
-- **DATA** (9 files):
-  - `main-repo/global_expansion_screener_framework/DATA_COMPLETENESS_TEST.py`
-  - `main-repo/Downloads/code/python_files/data_sources.py`
-  - `main-repo/Downloads/code/python_files/DATA_AND_MODULES.md`
-  - `main-repo/DATA_INTEGRATION_OPTIONS.md`
-  - `main-repo/DATA_COMPRESSION_REPORT.md`
-  - `global-market-scanners/data_sources.py`
-  - `global-market-scanners/data_quality.py`
-  - `global-market-scanners/DATA_SOURCES.md`
-  - `fuel-retail-outlets/fuel-station-gap-analysis/data.js`
 - **DAILY** (9 files):
   - `main-repo/global_expansion_screener_framework/screener/daily_price_collector.py`
   - `main-repo/Downloads/code/web/daily_scan_report_20260612.html`
@@ -324,24 +370,6 @@ is a naming heuristic, not a content judgment.
   - `main-repo/Downloads/code/python_files/daily_pipeline.sh`
   - `main-repo/Downloads/code/python_files/daily_combined_report.py`
   - `main-repo/Downloads/code/notebooks/daily_scan_report_20260612.ipynb`
-- **MARKET** (8 files):
-  - `main-repo/Downloads/code/python_files/market_performance.py`
-  - `main-repo/Downloads/code/python_files/market_data_cache.py`
-  - `main-repo/Downloads/code/python_files/market_calendar.py`
-  - `main-repo/Downloads/code/python_files/cache_seed/market_performance_5y.xlsx`
-  - `main-repo/.github/workflows/market_movers.yml`
-  - `global-market-scanners/market_store.py`
-  - `global-market-scanners/market_holidays.py`
-  - `global-market-scanners/market_data_cache.py`
-- **GITIGNORE** (8 files):
-  - `main-repo/nse_screener_reference/scan_results/.gitignore`
-  - `main-repo/.gitignore`
-  - `global-market-scanners/tests/.gitignore`
-  - `global-market-scanners/.gitignore`
-  - `fuel-retail-outlets/.gitignore`
-  - `toll-plaza-highways/.gitignore`
-  - `india-trade-export-analysis/.gitignore`
-  - `claude-stock-tools/.gitignore`
 - **BPCL** (8 files):
   - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_summary_20260624_081647.json`
   - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_summary_20260624_081532.json`
@@ -360,6 +388,14 @@ is a naming heuristic, not a content judgment.
   - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1230.xlsx`
   - `main-repo/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1219.xlsx`
   - `main-repo/Downloads/code/python_files/backtest_screeners.py`
+- **REPORT** (7 files):
+  - `main-repo/tools/repo-cleaner-ocaml/lib/report.mli`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/report.ml`
+  - `main-repo/tools/repo-cleaner-ocaml/REPORT.md`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_us_v2.log`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_us_today.log`
+  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_today.log`
+  - `main-repo/Downloads/code/stock_ddd/application/ports/report_writer.py`
 - **KAGGLE** (7 files):
   - `main-repo/KAGGLE_PANDAS_SETUP.md`
   - `main-repo/KAGGLE_INTEGRATION_SUMMARY.txt`
@@ -368,14 +404,6 @@ is a naming heuristic, not a content judgment.
   - `main-repo/KAGGLE_DATASETS_INDIA_MAP.md`
   - `fuel-retail-outlets/api-data-integration/kaggle_loader.py`
   - `fuel-retail-outlets/api-data-integration/KAGGLE_QUICK_START.md`
-- **INDIA** (7 files):
-  - `main-repo/global_expansion_screener_framework/india_stocks_15y_full.db`
-  - `main-repo/global_expansion_screener_framework/india_stocks_15y.db.gz`
-  - `main-repo/global_expansion_screener_framework/india_stocks_15y.db`
-  - `claude-stock-tools/03_colab_notebooks/india_stock_reporting.ipynb`
-  - `claude-stock-tools/03_colab_notebooks/india_stock_analysis.ipynb`
-  - `claude-stock-tools/02_market_screeners/india_market_scan.py`
-  - `claude-stock-tools/01_daily_reports/india_daily_report.py`
 - **BUILD** (7 files):
   - `main-repo/docs/_build_repo_pages.py`
   - `main-repo/Downloads/code/python_files/build_market_seeds.py`
@@ -405,6 +433,13 @@ is a naming heuristic, not a content judgment.
   - `main-repo/Downloads/code/native/darvas_fast.c`
   - `global-market-scanners/darvas_volume.py`
   - `global-market-scanners/DARVAS_VOLUME.md`
+- **DAMODARAN** (6 files):
+  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_roe.parquet`
+  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_pe.parquet`
+  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_margin.parquet`
+  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_companies.parquet`
+  - `main-repo/Downloads/code/python_files/reference_seed/damodaran_beta.parquet`
+  - `claude-stock-tools/05_enrichment/damodaran_enrichment.py`
 - **SCREENER** (5 files):
   - `main-repo/SCREENER_BASIS.md`
   - `main-repo/Downloads/data/us_screener_output/us_screener_output/screener.db`
@@ -417,6 +452,18 @@ is a naming heuristic, not a content judgment.
   - `main-repo/Downloads/code/python_files/QUICK_START.md`
   - `fuel-retail-outlets/data-sources/QUICK_SOURCES_REFERENCE.txt`
   - `fuel-retail-outlets/api-data-integration/quick_start.sh`
+- **LIQUIDITY** (5 files):
+  - `main-repo/Downloads/code/python_files/liquidity.py`
+  - `main-repo/Downloads/code/python_files/cache_seed/liquidity_index.parquet`
+  - `global-market-scanners/liquidity_multiyear.py`
+  - `global-market-scanners/liquidity_factor.py`
+  - `global-market-scanners/LIQUIDITY.md`
+- **GLOBAL** (5 files):
+  - `main-repo/global_expansion_screener_framework/screener/global_20country_universe_screener.py`
+  - `main-repo/global_expansion_screener_framework/docs/GLOBAL_EXPANSION_SCREENING_FRAMEWORK.md`
+  - `main-repo/docs/repo/global-market-scanners.html`
+  - `main-repo/Downloads/code/python_files/cache_seed/global_highlights.parquet`
+  - `global-market-scanners/GLOBAL_DVM.md`
 - **EXPORT** (5 files):
   - `india-trade-export-analysis/export_opportunities.py`
   - `india-trade-export-analysis/export_insights.py`
@@ -444,26 +491,16 @@ is a naming heuristic, not a content judgment.
   - `main-repo/Downloads/code/python_files/requirements.txt`
   - `main-repo/Downloads/code/python_files/requirements-docker.txt`
   - `global-market-scanners/requirements.txt`
-- **REPORT** (4 files):
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_us_v2.log`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_us_today.log`
-  - `main-repo/Downloads/data/combined_report_results/combined_report_results/report_today.log`
-  - `main-repo/Downloads/code/stock_ddd/application/ports/report_writer.py`
-- **LIQUIDITY** (4 files):
-  - `main-repo/Downloads/code/python_files/liquidity.py`
-  - `global-market-scanners/liquidity_multiyear.py`
-  - `global-market-scanners/liquidity_factor.py`
-  - `global-market-scanners/LIQUIDITY.md`
 - **HYBRID** (4 files):
   - `main-repo/HYBRID_PROJECT_SUMMARY.md`
   - `main-repo/HYBRID_EXECUTION_GUIDE.md`
   - `fuel-retail-outlets/api-data-integration/hybrid_aggregator.py`
   - `fuel-retail-outlets/api-data-integration/HYBRID_IMPLEMENTATION_GUIDE.md`
-- **GLOBAL** (4 files):
-  - `main-repo/global_expansion_screener_framework/screener/global_20country_universe_screener.py`
-  - `main-repo/global_expansion_screener_framework/docs/GLOBAL_EXPANSION_SCREENING_FRAMEWORK.md`
-  - `main-repo/docs/repo/global-market-scanners.html`
-  - `global-market-scanners/GLOBAL_DVM.md`
+- **DUNE** (4 files):
+  - `main-repo/tools/repo-cleaner-ocaml/test/dune`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/dune`
+  - `main-repo/tools/repo-cleaner-ocaml/dune-project`
+  - `main-repo/tools/repo-cleaner-ocaml/bin/dune`
 - **DIJKSTRA** (4 files):
   - `fuel-retail-outlets/api-data-integration/dijkstra_toll_retail_shortest_path.py`
   - `fuel-retail-outlets/api-data-integration/dijkstra_filtered_service_outlets.py`
@@ -491,6 +528,10 @@ is a naming heuristic, not a content judgment.
   - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_summary_20260624_081357.json`
   - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_20260624_081357.json`
   - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_20260624_081357.geojson`
+- **TEST** (3 files):
+  - `main-repo/tools/repo-cleaner-ocaml/test/test_repo_cleaner.ml`
+  - `main-repo/global_expansion_screener_framework/test_report_lfs.md`
+  - `global-market-scanners/tests/test_core.py`
 - **STORAGE** (3 files):
   - `main-repo/storage_menu.sh`
   - `main-repo/storage_analyzer.sh`
@@ -559,9 +600,9 @@ is a naming heuristic, not a content judgment.
 - **TOGAF** (2 files):
   - `global-market-scanners/architecture/togaf.py`
   - `global-market-scanners/architecture/TOGAF.md`
-- **TEST** (2 files):
-  - `main-repo/global_expansion_screener_framework/test_report_lfs.md`
-  - `global-market-scanners/tests/test_core.py`
+- **SYMBOL** (2 files):
+  - `main-repo/nse_screener_reference/symbol_master.parquet`
+  - `main-repo/Downloads/code/python_files/symbol_master.py`
 - **SSRN** (2 files):
   - `main-repo/Downloads/code/backtesting/ssrn-3945468.pdf`
   - `main-repo/Downloads/code/backtesting/ssrn-3374195.pdf`
@@ -574,6 +615,9 @@ is a naming heuristic, not a content judgment.
 - **SCREEN** (2 files):
   - `global-market-scanners/screen_viability.py`
   - `global-market-scanners/SCREEN_VIABILITY_RESULTS.md`
+- **SCANNER** (2 files):
+  - `main-repo/tools/repo-cleaner-ocaml/lib/scanner.mli`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/scanner.ml`
 - **SAFE** (2 files):
   - `global-market-scanners/safe/safe_backlog.py`
   - `global-market-scanners/safe/SAFE.md`
@@ -592,18 +636,18 @@ is a naming heuristic, not a content judgment.
 - **PEAD** (2 files):
   - `global-market-scanners/pead_factor.py`
   - `global-market-scanners/PEAD.md`
-- **PAPER** (2 files):
-  - `main-repo/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models.pdf`
-  - `main-repo/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models (1).pdf`
 - **PACKAGE** (2 files):
   - `global-market-scanners/package.json`
   - `global-market-scanners/package-lock.json`
-- **NOTIFICATION** (2 files):
-  - `main-repo/Downloads/code/web/notification.html`
-  - `main-repo/Downloads/code/web/notification (1).html`
+- **NAME** (2 files):
+  - `main-repo/tools/repo-cleaner-ocaml/lib/name_clusterer.mli`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/name_clusterer.ml`
 - **MARKITDOWN** (2 files):
   - `india-trade-export-analysis/markitdown-preprocessor.py`
   - `india-trade-export-analysis/MARKITDOWN_PREPROCESSING_GUIDE.md`
+- **MAIN** (2 files):
+  - `main-repo/tools/repo-cleaner-ocaml/bin/main.ml`
+  - `main-repo/Downloads/code/latex/main.tex`
 - **LOCATIONS** (2 files):
   - `fuel-retail-outlets/fuel-pump-locations-map/locations-map.js`
   - `fuel-retail-outlets/fuel-pump-locations-map/locations-data.js`
@@ -616,6 +660,9 @@ is a naming heuristic, not a content judgment.
 - **HIGH** (2 files):
   - `india-trade-export-analysis/HIGH_OPPORTUNITY_EXPORTS.csv`
   - `india-trade-export-analysis/HIGH_OPPORTUNITY_2026_PROJECTIONS.csv`
+- **HASHER** (2 files):
+  - `main-repo/tools/repo-cleaner-ocaml/lib/hasher.mli`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/hasher.ml`
 - **GROWW** (2 files):
   - `main-repo/global_expansion_screener_framework/groww_data_pipeline.py`
   - `main-repo/global_expansion_screener_framework/groww_api_test.py`
@@ -646,6 +693,9 @@ is a naming heuristic, not a content judgment.
 - **EARNINGS** (2 files):
   - `global-market-scanners/earnings_liquidity.py`
   - `global-market-scanners/EARNINGS_LIQUIDITY.md`
+- **DUPLICATE** (2 files):
+  - `main-repo/tools/repo-cleaner-ocaml/lib/duplicate_finder.mli`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/duplicate_finder.ml`
 - **DOCKERIGNORE** (2 files):
   - `main-repo/Downloads/code/python_files/.dockerignore`
   - `main-repo/.dockerignore`
@@ -670,6 +720,9 @@ is a naming heuristic, not a content judgment.
 - **COLD** (2 files):
   - `main-repo/cold_chain_outlet_integrated_map.html`
   - `main-repo/api-data-integration/cold_chain_outlet_map.py`
+- **CLEANUP** (2 files):
+  - `main-repo/tools/repo-cleaner-ocaml/lib/cleanup.mli`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/cleanup.ml`
 - **CLAUDE** (2 files):
   - `main-repo/docs/repo/claude-stock-tools.html`
   - `main-repo/Downloads/code/python_files/CLAUDE.md`
@@ -685,6 +738,9 @@ is a naming heuristic, not a content judgment.
 - **BRAZIL** (2 files):
   - `global-market-scanners/brazil_quality.py`
   - `global-market-scanners/brazil_cvm.py`
+- **BRANCH** (2 files):
+  - `main-repo/tools/repo-cleaner-ocaml/lib/branch_analyzer.mli`
+  - `main-repo/tools/repo-cleaner-ocaml/lib/branch_analyzer.ml`
 - **BENCHMARK** (2 files):
   - `global-market-scanners/benchmark.py`
   - `global-market-scanners/BENCHMARK.md`

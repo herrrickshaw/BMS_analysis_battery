@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.screener.daily-mailer</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/umashankar/daily_mailer.py</string>
+        <string>--send</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>8</integer>
+        <key>Minute</key>
+        <integer>30</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/umashankar/.screener/daily_mailer_stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/umashankar/.screener/daily_mailer_stderr.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>DAILY_MAILER_EMAIL</key>
+        <string>herrrickshaw@gmail.com</string>
+        <key>DAILY_MAILER_RECIPIENT</key>
+        <string>umashankartd1991@gmail.com</string>
+        <!-- PASSWORD MUST BE SET VIA: launchctl setenv DAILY_MAILER_PASSWORD "your-app-password" -->
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>KeepAlive</key>
+    <false/>
+</dict>
+</plist>

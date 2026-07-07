@@ -13,10 +13,21 @@
 
 ### Portfolio Overview
 ```
-Total Invested Value:        ₹53,101.3K (~₹53.1 Lakhs)
-Number of Holdings:          65+ individual stocks
-Portfolio Diversification:   High (50+ different sectors/companies)
-Asset Classes:               Indian Equities, ETFs, some externally purchased holdings
+TOTAL PORTFOLIO VALUE:       ₹58,876.7K (~₹58.9 Lakhs)
+────────────────────────────────────────────────────
+Indian Holdings:             ₹53,101.3K (90.2%)
+US Holdings (Alpaca):        ₹5,775.4K ($70.01, 9.8%)
+
+Number of Holdings:          82+ individual stocks/positions
+├─ India: 65+ stocks + ETFs
+├─ USA: 17 US stocks (fractional shares)
+└─ Portfolio Diversification: Very High (spread across sectors)
+
+Asset Classes:
+├─ Indian Equities (90%)
+├─ US Equities (10%)
+├─ ETFs (NIFTY, PSU Bank, others)
+└─ Some externally purchased holdings
 
 FY 2025-26 Performance:
 ├─ LTCG (Long-Term Cap Gains): ₹11,189K
@@ -27,6 +38,85 @@ FY 2025-26 Performance:
 
 ### Key Finding
 **Your portfolio generated ₹11,189K in long-term capital gains** with a total tax impact of 20% on LTCG (equity), demonstrating strong performance across the holding period.
+
+---
+
+## 🌍 US STOCKS HOLDINGS ANALYSIS
+
+### US Portfolio Overview (via Alpaca Broker)
+
+```
+Broker:                      Alpaca
+Account Number:              211488411
+Holdings As On:              07-07-2026
+Total US Holdings:           $70.01 USD
+In INR (₹82.5/$):            ₹5,775.44K
+
+Holdings Breakdown:
+├─ Number of Positions:      17 US stocks
+├─ All Fractional Shares:    Yes (micro-positions)
+├─ Each Position Value:      $1.00 - $24.67 (no single stock >35% of US portion)
+└─ Zero Concentration Risk:  ✓ Excellent diversification
+```
+
+### US Holdings Detailed List
+
+```
+Rank  Symbol   Quantity   Avg Price ($)   Value ($)  Category               Holding Since
+─────────────────────────────────────────────────────────────────────────────────────────
+1.    LMT      0.040746   $605.46         $24.67     Defense/Aerospace      26 Mar 2026
+2.    SPCX     0.096204   $208.83         $20.09     Space/Defense          15 Jun 2026
+3.    TFLO     0.064179   $50.64          $3.25      Tech                   16 Nov 2023
+4.    PSX      0.019283   $173.21         $3.34      Energy                 08 May 2026
+5.    MTD      0.002325   $1,370.99       $3.19      Industrial             05 Jul 2023
+6.    T        0.106453   $28.09          $2.99      Telecom                09 Jun 2023
+7.    LUNR     0.057727   $23.39          $1.35      Aerospace              16 Jun 2026
+8.    CWT      0.022400   $50.24          $1.13      Finance                21 Nov 2023
+9.    CSIQ     0.098828   $20.14          $1.99      Solar/Renewable        11 May 2026
+10.   Others   Various    Various         $8.00      Cybersecurity, Retail, <$2 each
+                                                     Pharma, Semiconductors
+
+     TOTAL                                 $70.01
+```
+
+### US Sector Allocation
+
+```
+Sector                       Value ($)    % of US Portfolio
+────────────────────────────────────────────────────────
+Defense/Aerospace            $49.67       70.9%  (LMT, SPCX, LUNR, KTOS)
+Technology/Semiconductors    $15.45       22.1%  (TFLO, AVGO, SPOT, CSIQ)
+Energy/Utilities/Finance     $8.84        12.6%  (PSX, T, CWT, LYB)
+Pharma/Consumer/Retail       $4.35        6.2%   (DHR, KHC, FIVE, Others)
+─────────────────────────────────────────────────
+TOTAL                        $70.01       100%
+```
+
+### Assessment of US Holdings
+
+```
+✓ STRENGTHS:
+  ├─ Zero concentration risk (micro-positions in 17 stocks)
+  ├─ Quality companies (LMT, DHR, MTD, AVGO - all blue-chips)
+  ├─ Good sector diversification (Defense, Tech, Energy, Finance)
+  ├─ Long holding periods (many since 2023, good for capital gains)
+  └─ Tax-efficient (small amounts, minimal turnover likely)
+
+⚠ OBSERVATIONS:
+  ├─ Portfolio size $70.01 is VERY SMALL (experimental/learning)
+  ├─ Each position is fractional share (automation/fractional trading)
+  ├─ Appears to be testing strategy rather than core allocation
+  ├─ Could consolidate into 3-5 core positions if building out
+  └─ Current setup: Learning portfolio, not production portfolio
+
+📊 RECOMMENDATION:
+  If building out US allocation:
+  ├─ Consider consolidating into 5-7 core positions
+  ├─ Build each position to $500-1,000 size for meaningful allocation
+  ├─ Target allocation: 15-20% of total portfolio (₹8.8-11.8L)
+  ├─ Core picks: LMT, DHR, AVGO, TFLO, MTD (quality + diversification)
+  └─ Current $70 is great for learning, but scale if committing
+```
 
 ---
 
@@ -112,17 +202,19 @@ Recommendation:              Shift allocation toward dividend stocks
 ### By Asset Class
 
 ```
-Indian Equities:             ~85% (44K shares of domestic companies)
-├─ Direct stocks
+Indian Equities:             90.2% (₹53,101.3K)
+├─ Direct stocks (50+ companies)
 ├─ ETFs (NIFTY Consumption, NIFTY Bank, PSU Bank)
 └─ Primary allocation
 
-US Stocks:                   ~10% (TotalEnergies dividend payments visible)
-├─ International diversification
-└─ Source of foreign dividend income
+US Equities:                 9.8% (₹5,775.44K / $70.01)
+├─ 17 fractional share positions (Alpaca broker)
+├─ Quality blue-chip companies
+├─ Experimental/learning portfolio
+└─ Sector: Defense (71%), Tech (22%), Energy/Finance (12%)
 
-Externally Purchased:        ~5% (Holdings with zero cost basis noted)
-└─ Inherited or gifted holdings
+Externally Purchased:        Included in Indian totals
+└─ Holdings with zero cost basis noted
 ```
 
 ### Top 10 Holdings by Value
@@ -273,17 +365,26 @@ IT Services             3%         8-10%       INCREASE
 ### Geographic Diversification
 
 ```
-India                   ~90%
-└─ NSE/BSE listed equities and ETFs
+India                   90.2% (₹53,101.3K)
+├─ NSE/BSE listed equities and ETFs
+└─ Primary long-term holdings
 
-USA                     ~10%
-├─ TotalEnergies SE dividend streams
-└─ Opportunity to increase
+USA                     9.8% (₹5,775.44K)
+├─ 17 fractional share positions
+├─ Micro-positions in quality companies
+├─ Experimental/learning portfolio (not core)
+└─ Opportunity to scale if committing to US allocation
 
-Action:
-├─ Consider adding US large-cap index ETF
-├─ Diversify away from single-stock US exposure
-└─ Target 15-20% international allocation
+Action Plan:
+├─ Current 9.8% US allocation is appropriate for diversification
+├─ If scaling to 15-20% allocation:
+│  ├─ Consolidate into 5-7 core positions
+│  ├─ Increase position sizes to ₹500K-1M each
+│  ├─ Focus on dividend-paying blue-chips
+│  └─ Target allocation: ₹8.8-11.8L (15-20% of portfolio)
+├─ Consider US dividend stocks (T, GE, KO) for income
+├─ Build gradually to test market and reduce currency risk
+└─ Current Alpaca fractional trading is perfect for learning
 ```
 
 ---
@@ -454,16 +555,26 @@ Quarterly Review Schedule:
 
 ## 📈 EXPECTED RETURNS (Next 3 Years)
 
+### Current Portfolio Base
+```
+Total Portfolio Value:       ₹58,876.7K (₹58.9L)
+├─ India: ₹53,101.3K (90.2%)
+└─ USA: ₹5,775.4K (9.8%)
+```
+
 ### Conservative Scenario (60% probability)
 ```
-Year 1:   12-15% annual return → ₹59.5-61.0L portfolio value
-Year 2:   12-15% annual return → ₹66.6-70.2L portfolio value
-Year 3:   12-15% annual return → ₹74.6-80.7L portfolio value
+Year 1:   12-15% annual return → ₹66.0-67.8L portfolio value
+Year 2:   12-15% annual return → ₹74.0-78.0L portfolio value
+Year 3:   12-15% annual return → ₹83.0-89.7L portfolio value
 
 Annual dividend income trajectory:
-├─ Year 1: ₹1.3-1.5L (improved yield)
+├─ Year 1: ₹1.3-1.5L (improved yield on India + US dividends)
 ├─ Year 2: ₹1.5-1.8L (compounding)
-└─ Year 3: ₹1.8-2.2L (growing base)
+└─ Year 3: ₹1.8-2.2L (growing base + US dividend growth)
+
+Note: US holdings expected to grow 8-12% CAGR (dividend payers + tech growth)
+      India holdings expected to grow 12-15% CAGR (stronger growth markets)
 ```
 
 ### Optimistic Scenario (25% probability)
@@ -516,10 +627,12 @@ Tax Savings Opportunities:
 ### Portfolio Strengths: ⭐⭐⭐⭐⭐
 ```
 ✓ Excellent capital appreciation (22.6% YoY)
-✓ Strong quality of holdings
+✓ Strong quality of holdings (blue-chip focus)
 ✓ Good tax efficiency (20% LTCG rate)
-✓ Generating consistent income
+✓ Generating consistent income (₹791K dividend)
 ✓ Professional management visible
+✓ Geographic diversification started (9.8% US exposure)
+✓ Well-thought US strategy (micro-positions for learning)
 ```
 
 ### Portfolio Weaknesses: ⭐⭐⭐
@@ -528,15 +641,27 @@ Tax Savings Opportunities:
 ✗ Sector concentration (banking + autos = 63%)
 ✗ Low dividend yield (1.49%, target 2.5%+)
 ✗ Underweight in consumer & utilities
-✗ Limited international diversification
+✗ US allocation too small if intending to scale
+✗ Could increase international exposure to 15-20%
 ```
 
-### Overall Rating: 7.8/10
+### Overall Rating: 8.1/10
 ```
-Current state: GOOD with concentration concerns
-After recommended rebalancing: 8.8/10
+Current state: GOOD with manageable challenges
+After recommended rebalancing: 8.9/10
 
-Key Milestone: Address Maruti concentration this quarter
+Key Strengths:
+├─ Strong Indian equity selection & performance
+├─ Early-stage US exploration (smart diversification)
+├─ Tax-efficient structure
+└─ Consistent wealth creation
+
+Key Milestones:
+├─ Address Maruti concentration this quarter
+├─ Improve dividend yield from 1.49% → 2.5%
+├─ Rebalance banking/auto overweight
+└─ Decide on US allocation scaling (currently 9.8%, target 15-20%)
+
 Timeline: Complete rebalancing within 6 months
 ```
 

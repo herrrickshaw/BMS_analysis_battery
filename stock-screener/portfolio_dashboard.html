@@ -3,978 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Resilience Global Fund - Live Portfolio Dashboard</title>
+    <title>Portfolio Analyzer Dashboard</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary-dark: #0f1419;
-            --primary-light: #1a1f2e;
-            --accent-blue: #3b82f6;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --accent-gold: #f59e0b;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --border-color: #334155;
-            --chart-color-1: #3b82f6;
-            --chart-color-2: #10b981;
-            --chart-color-3: #f59e0b;
-            --chart-color-4: #8b5cf6;
-            --chart-color-5: #ec4899;
-        }
-
-        body {
-            background-color: var(--primary-dark);
-            color: var(--text-primary);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-        }
-
-        .header {
-            background: linear-gradient(135deg, var(--primary-light) 0%, #2d3748 100%);
-            padding: 2rem;
-            border-bottom: 2px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .status-indicator {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .live-dot {
-            width: 12px;
-            height: 12px;
-            background-color: var(--accent-green);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .last-update {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .grid-4 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .card {
-            background-color: var(--primary-light);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
-        }
-
-        .card-title {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .card-subtitle {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .positive {
-            color: var(--accent-green);
-        }
-
-        .negative {
-            color: var(--accent-red);
-        }
-
-        .neutral {
-            color: var(--text-secondary);
-        }
-
-        .metric-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .metric-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .metric-value {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .chart-container {
-            height: 300px;
-            position: relative;
-            margin-top: 1rem;
-        }
-
-        .allocation-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .allocation-item {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .allocation-bar {
-            flex: 1;
-            height: 20px;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        .allocation-fill {
-            height: 100%;
-            transition: width 0.5s ease;
-        }
-
-        .allocation-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            min-width: 60px;
-        }
-
-        .allocation-percent {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            min-width: 40px;
-            text-align: right;
-        }
-
-        .market-badge {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .market-usa {
-            background-color: rgba(59, 130, 246, 0.2);
-            color: var(--accent-blue);
-            border: 1px solid var(--accent-blue);
-        }
-
-        .market-india {
-            background-color: rgba(245, 158, 11, 0.2);
-            color: var(--accent-gold);
-            border: 1px solid var(--accent-gold);
-        }
-
-        .market-europe {
-            background-color: rgba(16, 185, 129, 0.2);
-            color: var(--accent-green);
-            border: 1px solid var(--accent-green);
-        }
-
-        .market-japan {
-            background-color: rgba(139, 92, 246, 0.2);
-            color: #a78bfa;
-            border: 1px solid #a78bfa;
-        }
-
-        .market-emasia {
-            background-color: rgba(236, 72, 153, 0.2);
-            color: #f472b6;
-            border: 1px solid #f472b6;
-        }
-
-        .holding-row {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1fr;
-            gap: 1rem;
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            align-items: center;
-        }
-
-        .holding-row:hover {
-            background-color: rgba(59, 130, 246, 0.05);
-        }
-
-        .holding-name {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .holding-ticker {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .holding-details {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-        }
-
-        .alert-box {
-            background-color: rgba(239, 68, 68, 0.1);
-            border-left: 4px solid var(--accent-red);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .alert-box.warning {
-            background-color: rgba(245, 158, 11, 0.1);
-            border-left-color: var(--accent-gold);
-        }
-
-        .alert-box.success {
-            background-color: rgba(16, 185, 129, 0.1);
-            border-left-color: var(--accent-green);
-        }
-
-        .alert-title {
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-        }
-
-        .alert-message {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .sparkline {
-            display: inline-block;
-            width: 60px;
-            height: 30px;
-        }
-
-        .button {
-            background-color: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.3s;
-        }
-
-        .button:hover {
-            background-color: #2563eb;
-        }
-
-        .button-secondary {
-            background-color: transparent;
-            border: 1px solid var(--accent-blue);
-            color: var(--accent-blue);
-        }
-
-        .button-secondary:hover {
-            background-color: rgba(59, 130, 246, 0.1);
-        }
-
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .tab {
-            padding: 0.8rem 1.5rem;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-        }
-
-        .tab.active {
-            color: var(--accent-blue);
-            border-bottom-color: var(--accent-blue);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .performance-chart {
-            width: 100%;
-            height: 300px;
-            position: relative;
-        }
-
-        .risk-meter {
-            display: flex;
-            gap: 4px;
-            margin-top: 1rem;
-        }
-
-        .risk-segment {
-            flex: 1;
-            height: 8px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .risk-segment.filled {
-            background-color: var(--accent-green);
-        }
-
-        .risk-segment.filled.warning {
-            background-color: var(--accent-gold);
-        }
-
-        .risk-segment.filled.danger {
-            background-color: var(--accent-red);
-        }
-
-        .responsive-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .responsive-table th {
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .responsive-table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .responsive-table tr:hover {
-            background-color: rgba(59, 130, 246, 0.05);
-        }
-
-        .footer {
-            background-color: var(--primary-light);
-            padding: 2rem;
-            border-top: 1px solid var(--border-color);
-            margin-top: 3rem;
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 1200px) {
-            .grid-4 {
-                grid-template-columns: 1fr 1fr;
-            }
-            .grid-3 {
-                grid-template-columns: 1fr 1fr;
-            }
-            .holding-row {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .grid-2, .grid-3, .grid-4 {
-                grid-template-columns: 1fr;
-            }
-            .holding-row {
-                grid-template-columns: 1fr;
-            }
-            .header {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
+            --primary: #1e40af; --success: #059669; --warning: #d97706; --danger: #dc2626;
+            --info: #0891b2; --text: #1f2937; --bg: #f9fafb; --border: #e5e7eb; --card-bg: #ffffff;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 20px 0; margin-bottom: 30px; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        h1 { font-size: 28px; font-weight: 700; color: var(--primary); }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        button { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 14px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #1e3a8a; }
+        .btn-secondary { background: var(--info); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        input[type="file"] { padding: 8px; border: 1px solid var(--border); border-radius: 6px; }
+        .tab-navigation { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
+        .tab-btn { padding: 12px 20px; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 600; color: #6b7280; transition: all 0.3s; }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; }
+        .card-value { font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+        .positive { color: var(--success); }
+        .negative { color: var(--danger); }
+        table { width: 100%; border-collapse: collapse; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        thead { background: #f3f4f6; border-bottom: 2px solid var(--border); }
+        th { padding: 12px 16px; text-align: left; font-weight: 600; font-size: 13px; text-transform: uppercase; color: #6b7280; }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .badge-india { background: #dbeafe; color: #0369a1; }
+        .badge-us { background: #ddd6fe; color: #4c1d95; }
+        .badge-europe { background: #fce7f3; color: #be185d; }
+        .alert { padding: 16px; border-radius: 6px; margin-bottom: 16px; border-left: 4px solid; }
+        .alert.high { background: #fee2e2; border-left-color: var(--danger); }
+        .alert.medium { background: #fef3c7; border-left-color: var(--warning); }
+        .alert.low { background: #dbeafe; border-left-color: var(--info); }
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; padding: 16px; border-radius: 6px; }
+        .success-message { background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 16px; border-radius: 6px; }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <h1>📊 Modern Resilience Global Fund</h1>
-        <div class="status-indicator">
-            <div class="live-dot"></div>
-            <span class="last-update">Live Portfolio • Updated <span id="lastUpdate">2:45 PM</span></span>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1>📊 Portfolio Analyzer</h1>
+                <div class="header-actions">
+                    <input type="file" id="fileInput" accept=".csv,.xls,.xlsx">
+                    <button class="btn-primary" onclick="uploadPortfolio()">Upload Portfolio</button>
+                    <button class="btn-secondary" onclick="loadSample()">Load Sample</button>
+                    <button class="btn-success" onclick="fetchPrices()">Update Prices</button>
+                </div>
+            </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Main Container -->
     <div class="container">
-        <!-- Portfolio Summary Cards -->
-        <div class="grid-4">
-            <div class="card">
-                <div class="card-title">Portfolio Value</div>
-                <div class="card-value">₹<span id="portfolioValue">68,289</span>K</div>
-                <div class="card-subtitle">As of today</div>
-            </div>
-            <div class="card">
-                <div class="card-title">Total Gain</div>
-                <div class="card-value positive">+₹<span id="totalGain">43,289</span>K</div>
-                <div class="card-subtitle">Since inception (Mar 2020)</div>
-            </div>
-            <div class="card">
-                <div class="card-title">Return %</div>
-                <div class="card-value positive">+<span id="returnPercent">173.2</span>%</div>
-                <div class="card-subtitle"><span id="cagr">17.9%</span> annualized CAGR</div>
-            </div>
-            <div class="card">
-                <div class="card-title">Volatility</div>
-                <div class="card-value"><span id="volatility">14.2</span>%</div>
-                <div class="card-subtitle">Annual standard deviation</div>
-            </div>
+        <div id="errorMessage"></div>
+        <div id="successMessage"></div>
+
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchTab('holdings')">Holdings</button>
+            <button class="tab-btn" onclick="switchTab('quality')">Quality</button>
+            <button class="tab-btn" onclick="switchTab('rebalancing')">Rebalancing</button>
+            <button class="tab-btn" onclick="switchTab('sectors')">Sectors</button>
+            <button class="tab-btn" onclick="switchTab('alerts')">Alerts</button>
         </div>
 
-        <!-- Alert Boxes -->
-        <div id="alertContainer"></div>
-
-        <!-- Performance Overview -->
-        <div class="grid-2">
-            <div class="card">
-                <div class="card-title">Risk Metrics</div>
-                <div class="metric-row">
-                    <span class="metric-label">Sharpe Ratio</span>
-                    <span class="metric-value positive">1.56</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Max Drawdown</span>
-                    <span class="metric-value negative">-14.2%</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Win Rate</span>
-                    <span class="metric-value positive">68%</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Dividend Yield</span>
-                    <span class="metric-value positive">2.22%</span>
-                </div>
-                <div class="risk-meter">
-                    <div class="risk-segment filled"></div>
-                    <div class="risk-segment filled"></div>
-                    <div class="risk-segment filled warning"></div>
-                    <div class="risk-segment"></div>
-                    <div class="risk-segment"></div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">2026 Performance</div>
-                <div class="metric-row">
-                    <span class="metric-label">YTD Return</span>
-                    <span class="metric-value positive">+13.9%</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Month Gain (Jun)</span>
-                    <span class="metric-value negative">-2.1%</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Best Month</span>
-                    <span class="metric-value positive">+8.4% (Jan)</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Win Months</span>
-                    <span class="metric-value positive">5/6 months</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Benchmark (MSCI)</span>
-                    <span class="metric-value positive">+8.2% (outperformance)</span>
-                </div>
-            </div>
+        <div id="overview" class="tab-content active">
+            <div class="grid" id="summaryCards"><div style="text-align:center;"><span class="spinner"></span> Loading...</div></div>
+            <div id="metricsDetails" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;"></div>
         </div>
 
-        <!-- Geographic Allocation -->
-        <div class="grid-2">
-            <div class="card">
-                <div class="card-title">Geographic Allocation</div>
-                <div class="allocation-grid">
-                    <div class="allocation-item">
-                        <span class="allocation-label">USA</span>
-                        <div class="allocation-bar">
-                            <div class="allocation-fill" style="width: 35%; background: linear-gradient(90deg, #3b82f6, #2563eb);"></div>
-                        </div>
-                        <span class="allocation-percent">35%</span>
-                    </div>
-                    <div class="allocation-item">
-                        <span class="allocation-label">India</span>
-                        <div class="allocation-bar">
-                            <div class="allocation-fill" style="width: 25%; background: linear-gradient(90deg, #f59e0b, #d97706);"></div>
-                        </div>
-                        <span class="allocation-percent">25%</span>
-                    </div>
-                    <div class="allocation-item">
-                        <span class="allocation-label">Europe</span>
-                        <div class="allocation-bar">
-                            <div class="allocation-fill" style="width: 20%; background: linear-gradient(90deg, #10b981, #059669);"></div>
-                        </div>
-                        <span class="allocation-percent">20%</span>
-                    </div>
-                    <div class="allocation-item">
-                        <span class="allocation-label">Japan</span>
-                        <div class="allocation-bar">
-                            <div class="allocation-fill" style="width: 10%; background: linear-gradient(90deg, #8b5cf6, #7c3aed);"></div>
-                        </div>
-                        <span class="allocation-percent">10%</span>
-                    </div>
-                    <div class="allocation-item">
-                        <span class="allocation-label">EM Asia</span>
-                        <div class="allocation-bar">
-                            <div class="allocation-fill" style="width: 10%; background: linear-gradient(90deg, #ec4899, #db2777);"></div>
-                        </div>
-                        <span class="allocation-percent">10%</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">Sector Allocation</div>
-                <div class="allocation-grid">
-                    <div class="allocation-item">
-                        <span class="allocation-label">Financials</span>
-                        <div class="allocation-bar">
-                            <div class="allocation-fill" style="width: 25%; background: #3b82f6;"></div>
-                        </div>
-                        <span class="allocation-percent">25%</span>
-                    </div>
-                    <div class="allocation-item">
-                        <span class="allocation-label">Energy/Utils</span>
-                        <div class="allocation-bar">
-                            <div class="allocation-fill" style="width: 20%; background: #10b981;"></div>
-                        </div>
-                        <span class="allocation-percent">20%</span>
-                    </div>
-                    <div class="allocation-item">
-                        <span class="allocation-label">Technology</span>
-                        <div class="allocation-bar">
-                            <div class="allocation-fill" style="width: 18%; background: #f59e0b;"></div>
-                        </div>
-                        <span class="allocation-percent">18%</span>
-                    </div>
-                    <div class="allocation-item">
-                        <span class="allocation-label">Industrials</span>
-                        <div class="allocation-bar">
-                            <div class="allocation-fill" style="width: 15%; background: #8b5cf6;"></div>
-                        </div>
-                        <span class="allocation-percent">15%</span>
-                    </div>
-                    <div class="allocation-item">
-                        <span class="allocation-label">Healthcare</span>
-                        <div class="allocation-bar">
-                            <div class="allocation-fill" style="width: 12%; background: #ec4899;"></div>
-                        </div>
-                        <span class="allocation-percent">12%</span>
-                    </div>
-                    <div class="allocation-item">
-                        <span class="allocation-label">Consumer</span>
-                        <div class="allocation-bar">
-                            <div class="allocation-fill" style="width: 10%; background: #06b6d4;"></div>
-                        </div>
-                        <span class="allocation-percent">10%</span>
-                    </div>
-                </div>
-            </div>
+        <div id="holdings" class="tab-content">
+            <table><thead><tr><th>Ticker</th><th>Market</th><th>Quantity</th><th>Cost Basis</th><th>Current Value</th><th>Gain/Loss</th><th>Gain/Loss %</th><th>Allocation %</th></tr></thead><tbody id="holdingsTable"><tr><td colspan="8">Loading...</td></tr></tbody></table>
         </div>
 
-        <!-- Top Holdings -->
-        <div class="card">
-            <div class="card-title">Top 10 Holdings</div>
-            <table class="responsive-table">
-                <thead>
-                    <tr>
-                        <th>Company</th>
-                        <th>Market</th>
-                        <th>Price</th>
-                        <th>Change</th>
-                        <th>Weight</th>
-                        <th>Gain/(Loss)</th>
-                        <th>Yield</th>
-                    </tr>
-                </thead>
-                <tbody id="topHoldingsTable">
-                    <tr>
-                        <td><strong>MSFT</strong> <br><span style="color: #94a3b8; font-size: 0.85rem;">Microsoft Corp</span></td>
-                        <td><span class="market-badge market-usa">USA</span></td>
-                        <td>₹14,500</td>
-                        <td class="positive">+2.3%</td>
-                        <td>5.2%</td>
-                        <td class="positive">+₹3,548K</td>
-                        <td>0.75%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>HDFC</strong> <br><span style="color: #94a3b8; font-size: 0.85rem;">HDFC Bank Ltd</span></td>
-                        <td><span class="market-badge market-india">INDIA</span></td>
-                        <td>₹1,180</td>
-                        <td class="positive">+1.8%</td>
-                        <td>4.8%</td>
-                        <td class="positive">+₹3,285K</td>
-                        <td>2.45%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>ICICI</strong> <br><span style="color: #94a3b8; font-size: 0.85rem;">ICICI Bank Ltd</span></td>
-                        <td><span class="market-badge market-india">INDIA</span></td>
-                        <td>₹1,180</td>
-                        <td class="negative">-0.5%</td>
-                        <td>4.5%</td>
-                        <td class="positive">+₹2,965K</td>
-                        <td>2.12%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>NVDA</strong> <br><span style="color: #94a3b8; font-size: 0.85rem;">Nvidia Corp</span></td>
-                        <td><span class="market-badge market-usa">USA</span></td>
-                        <td>₹22,800</td>
-                        <td class="positive">+4.2%</td>
-                        <td>4.2%</td>
-                        <td class="positive">+₹8,956K</td>
-                        <td>0.05%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>JPM</strong> <br><span style="color: #94a3b8; font-size: 0.85rem;">JPMorgan Chase</span></td>
-                        <td><span class="market-badge market-usa">USA</span></td>
-                        <td>₹8,450</td>
-                        <td class="positive">+1.1%</td>
-                        <td>3.8%</td>
-                        <td class="positive">+₹2,145K</td>
-                        <td>2.35%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Shell</strong> <br><span style="color: #94a3b8; font-size: 0.85rem;">Royal Dutch Shell</span></td>
-                        <td><span class="market-badge market-europe">EUROPE</span></td>
-                        <td>₹4,800</td>
-                        <td class="negative">-1.2%</td>
-                        <td>3.5%</td>
-                        <td class="positive">+₹2,380K</td>
-                        <td>4.25%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Reliance</strong> <br><span style="color: #94a3b8; font-size: 0.85rem;">Reliance Industries</span></td>
-                        <td><span class="market-badge market-india">INDIA</span></td>
-                        <td>₹2,850</td>
-                        <td class="positive">+0.9%</td>
-                        <td>3.2%</td>
-                        <td class="positive">+₹1,892K</td>
-                        <td>1.88%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Samsung</strong> <br><span style="color: #94a3b8; font-size: 0.85rem;">Samsung Electronics</span></td>
-                        <td><span class="market-badge market-emasia">EM ASIA</span></td>
-                        <td>₹4,100</td>
-                        <td class="positive">+3.1%</td>
-                        <td>3.0%</td>
-                        <td class="positive">+₹4,285K</td>
-                        <td>1.22%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>TCS</strong> <br><span style="color: #94a3b8; font-size: 0.85rem;">Tata Consultancy</span></td>
-                        <td><span class="market-badge market-india">INDIA</span></td>
-                        <td>₹4,250</td>
-                        <td class="positive">+0.6%</td>
-                        <td>2.8%</td>
-                        <td class="positive">+₹1,548K</td>
-                        <td>2.06%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>MUFG</strong> <br><span style="color: #94a3b8; font-size: 0.85rem;">Mitsubishi UFJ</span></td>
-                        <td><span class="market-badge market-japan">JAPAN</span></td>
-                        <td>₹950</td>
-                        <td class="positive">+0.8%</td>
-                        <td>2.2%</td>
-                        <td class="positive">+₹1,285K</td>
-                        <td>2.89%</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div id="quality" class="tab-content">
+            <table><thead><tr><th>Ticker</th><th>Market</th><th>Allocation %</th><th>P/E Ratio</th><th>P/B Ratio</th><th>ROE</th><th>Dividend Yield</th><th>Quality Score</th></tr></thead><tbody id="qualityTable"><tr><td colspan="8">Loading...</td></tr></tbody></table>
         </div>
 
-        <!-- Market Performance Tabs -->
-        <div class="card" style="margin-top: 2rem;">
-            <div class="card-title">Market Performance Breakdown</div>
-
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab(event, 'daily')">Daily Performance</button>
-                <button class="tab" onclick="switchTab(event, 'weekly')">Weekly Summary</button>
-                <button class="tab" onclick="switchTab(event, 'monthly')">Monthly Trends</button>
-            </div>
-
-            <div id="daily" class="tab-content active">
-                <div style="margin-top: 1rem;">
-                    <div class="metric-row">
-                        <span class="metric-label">Today's Change</span>
-                        <span class="metric-value positive">+₹285K (+0.42%)</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Best Performer</span>
-                        <span class="metric-value positive">NVDA +4.2%</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Worst Performer</span>
-                        <span class="metric-value negative">Shell -1.2%</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Market Volatility (VIX)</span>
-                        <span class="metric-value neutral">12.8</span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="weekly" class="tab-content">
-                <div style="margin-top: 1rem;">
-                    <div class="metric-row">
-                        <span class="metric-label">Week Change</span>
-                        <span class="metric-value positive">+₹1,285K (+1.88%)</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Sector Leader</span>
-                        <span class="metric-value positive">Technology +3.5%</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Market Leader</span>
-                        <span class="metric-value positive">USA +2.1%</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Dividend Income</span>
-                        <span class="metric-value positive">+₹32.5K</span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="monthly" class="tab-content">
-                <div style="margin-top: 1rem;">
-                    <div class="metric-row">
-                        <span class="metric-label">Month Change (Jun)</span>
-                        <span class="metric-value negative">-₹1,485K (-2.1%)</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Best Month (Jan)</span>
-                        <span class="metric-value positive">+8.4%</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">Dividend Income (YTD)</span>
-                        <span class="metric-value positive">+₹195K</span>
-                    </div>
-                    <div class="metric-row">
-                        <span class="metric-label">YTD Return</span>
-                        <span class="metric-value positive">+13.9%</span>
-                    </div>
-                </div>
-            </div>
+        <div id="rebalancing" class="tab-content">
+            <h3>Overweight Positions (>10%)</h3>
+            <table id="overweightTable"><thead><tr><th>Ticker</th><th>Allocation %</th><th>Current Value</th><th>Gain/Loss %</th></tr></thead><tbody></tbody></table>
         </div>
 
-        <!-- Alerts & Notifications -->
-        <div class="card" style="margin-top: 2rem;">
-            <div class="card-title">Portfolio Alerts & Updates</div>
-
-            <div class="alert-box success">
-                <div class="alert-title">✓ Dividend Payment Received</div>
-                <div class="alert-message">HDFC Bank distributed ₹22/share dividend (₹26,462 to portfolio) - Reinvested</div>
-            </div>
-
-            <div class="alert-box">
-                <div class="alert-title">⚠ Rebalancing Alert</div>
-                <div class="alert-message">USA allocation drift to 36.2% (target 35%). Quarterly rebalancing recommended.</div>
-            </div>
-
-            <div class="alert-box warning">
-                <div class="alert-title">📊 Market Condition Update</div>
-                <div class="alert-message">Global equity volatility elevated. Defensive sectors (utilities, staples) showing strength.</div>
-            </div>
-
-            <div class="alert-box">
-                <div class="alert-title">✓ Modern Resilience Score Update</div>
-                <div class="alert-message">Portfolio average r_modern score: 0.68 (Maintained > 0.62 threshold). Strong conviction portfolio.</div>
-            </div>
+        <div id="sectors" class="tab-content">
+            <div id="sectorAllocation" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;"></div>
         </div>
 
-        <!-- Recommendations -->
-        <div class="card" style="margin-top: 2rem;">
-            <div class="card-title">AI-Powered Portfolio Recommendations</div>
-
-            <div style="margin-top: 1rem;">
-                <div class="metric-row">
-                    <span class="metric-label">Next Action</span>
-                    <span class="metric-value">Harvest Profits on NVDA (+18% gain)</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Accumulate</span>
-                    <span class="metric-value positive">Shell Energy (Recent dip)</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Monitor</span>
-                    <span class="metric-value neutral">ICICI Bank (Valuation compression)</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Quarterly Review</span>
-                    <span class="metric-value">Jul 31, 2026 (25 days away)</span>
-                </div>
-            </div>
-
-            <button class="button" style="margin-top: 1rem;">View Full Analytics</button>
-            <button class="button button-secondary" style="margin-left: 0.5rem;">Export Report</button>
+        <div id="alerts" class="tab-content">
+            <div id="alertsContainer"></div>
         </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-        <p>Modern Resilience Global Dividend + Growth Fund • Live Portfolio Dashboard</p>
-        <p>Data refreshed every 5 minutes | Holdings as of June 30, 2026 | Powered by Advanced Analytics</p>
-        <p style="margin-top: 1rem; color: #64748b;">Disclaimer: This dashboard is for informational purposes only. Past performance does not guarantee future results. Consult your financial advisor before making investment decisions.</p>
     </div>
 
     <script>
-        // Tab Switching Function
-        function switchTab(evt, tabName) {
-            const tabContents = document.querySelectorAll('.tab-content');
-            const tabs = document.querySelectorAll('.tab');
+        const API_BASE = "http://127.0.0.1:8001";
+        let currentData = null;
 
-            tabContents.forEach(tab => tab.classList.remove('active'));
-            tabs.forEach(tab => tab.classList.remove('active'));
-
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
-            evt.currentTarget.classList.add('active');
+            event.target.classList.add('active');
+            if (currentData) loadTabData(tabName);
         }
 
-        // Update last update time
-        function updateTime() {
-            const now = new Date();
-            const time = now.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            document.getElementById('lastUpdate').textContent = time;
+        async function uploadPortfolio() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) { showError('Select a file'); return; }
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/upload`, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (response.ok) { showSuccess(`Loaded: ${data.stocks} stocks`); loadPortfolioData(); } 
+                else showError(data.detail);
+            } catch (err) { showError(err.message); }
         }
 
-        // Real-time data update simulation
-        function updatePortfolioData() {
-            // Simulate real-time price updates
-            const portfolioValue = 68289 + (Math.random() - 0.5) * 500;
-            const change = portfolioValue - 68289;
-            const changePercent = (change / 68289 * 100).toFixed(2);
+        async function loadSample() {
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/load-sample`, { method: 'POST' });
+                const data = await response.json();
+                if (response.ok) { showSuccess(`Sample loaded: ${data.stocks} stocks`); loadPortfolioData(); } 
+                else showError(data.detail);
+            } catch (err) { showError(err.message); }
+        }
 
-            document.getElementById('portfolioValue').textContent = portfolioValue.toFixed(0);
+        async function loadPortfolioData() {
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/report`);
+                if (!response.ok) throw new Error('Failed to load');
+                currentData = await response.json();
+                loadTabData('overview');
+            } catch (err) { showError(err.message); }
+        }
 
-            // Create alerts dynamically
-            const alertContainer = document.getElementById('alertContainer');
-            if (Math.abs(change) > 200) {
-                const alertType = change > 0 ? 'success' : '';
-                const alertMessage = change > 0
-                    ? `Portfolio up ₹${Math.abs(change).toFixed(0)}K today`
-                    : `Portfolio down ₹${Math.abs(change).toFixed(0)}K today`;
+        async function loadTabData(tabName) {
+            if (tabName === 'overview') renderOverview();
+            else if (tabName === 'holdings') await renderHoldings();
+            else if (tabName === 'quality') renderQuality();
+            else if (tabName === 'rebalancing') renderRebalancing();
+            else if (tabName === 'sectors') renderSectors();
+            else if (tabName === 'alerts') await renderAlerts();
+        }
 
-                if (alertContainer.children.length < 1) {
-                    const alert = document.createElement('div');
-                    alert.className = `alert-box ${alertType}`;
-                    alert.innerHTML = `
-                        <div class="alert-title">📈 Live Market Update</div>
-                        <div class="alert-message">${alertMessage} (${changePercent > 0 ? '+' : ''}${changePercent}%)</div>
-                    `;
-                    alertContainer.appendChild(alert);
+        function renderOverview() {
+            const m = currentData.portfolio_metrics;
+            const s = m.summary;
+            document.getElementById('summaryCards').innerHTML = `
+                <div class="card"><div class="card-title">Total Invested</div><div class="card-value">₹${(s.total_invested/1e5).toFixed(1)}L</div></div>
+                <div class="card"><div class="card-title">Current Value</div><div class="card-value">₹${(s.current_value/1e5).toFixed(1)}L</div></div>
+                <div class="card"><div class="card-title">Total Gain</div><div class="card-value ${s.total_gain >= 0 ? 'positive' : 'negative'}">₹${(s.total_gain/1e5).toFixed(1)}L</div><div style="font-size:13px; color:#6b7280;"><span class="${s.total_gain_pct >= 0 ? 'positive' : 'negative'}">${s.total_gain_pct >= 0 ? '+' : ''}${s.total_gain_pct.toFixed(2)}%</span></div></div>
+                <div class="card"><div class="card-title">Holdings</div><div class="card-value">${s.number_of_stocks}</div><div style="font-size:13px; color:#6b7280;">stocks</div></div>
+            `;
+        }
+
+        async function renderHoldings() {
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/holdings`);
+                const holdings = await response.json();
+                let html = '';
+                for (const h of holdings) {
+                    html += `<tr><td><strong>${h.ticker}</strong></td><td><span class="badge badge-${h.market}">${h.market}</span></td><td>${h.quantity}</td><td>₹${(h.cost_basis/1e5).toFixed(2)}L</td><td>₹${(h.current_value/1e5).toFixed(2)}L</td><td class="${h.gain_loss >= 0 ? 'positive' : 'negative'}">₹${(h.gain_loss/1e5).toFixed(2)}L</td><td class="${h.gain_loss_pct >= 0 ? 'positive' : 'negative'}">${h.gain_loss_pct >= 0 ? '+' : ''}${h.gain_loss_pct.toFixed(2)}%</td><td>${h.allocation_pct.toFixed(2)}%</td></tr>`;
                 }
+                document.getElementById('holdingsTable').innerHTML = html;
+            } catch (err) { showError(err.message); }
+        }
+
+        function renderQuality() {
+            const quality = currentData.position_quality;
+            let html = '';
+            for (const pos of quality) {
+                html += `<tr><td><strong>${pos.ticker}</strong></td><td><span class="badge badge-${pos.market}">${pos.market}</span></td><td>${pos.allocation_pct.toFixed(2)}%</td><td>${pos.pe_ratio ? pos.pe_ratio.toFixed(2) : '-'}</td><td>${pos.pb_ratio ? pos.pb_ratio.toFixed(2) : '-'}</td><td>${pos.roe ? (pos.roe*100).toFixed(1) : '-'}%</td><td>${pos.dividend_yield ? (pos.dividend_yield*100).toFixed(2) : '-'}%</td><td>${pos.quality_score || '-'}</td></tr>`;
             }
+            document.getElementById('qualityTable').innerHTML = html;
         }
 
-        // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            updateTime();
-            setInterval(updateTime, 1000);
-            setInterval(updatePortfolioData, 5000);
-        });
-
-        // Format numbers with commas
-        function formatNumber(num) {
-            return new Intl.NumberFormat('en-IN').format(num);
+        function renderRebalancing() {
+            const r = currentData.rebalancing_opportunities;
+            let html = '';
+            for (const pos of r.overweight_positions) {
+                html += `<tr><td><strong>${pos.ticker}</strong></td><td class="negative">${pos.allocation_pct.toFixed(2)}%</td><td>₹${(pos.current_value/1e5).toFixed(2)}L</td><td class="${pos.gain_loss_pct >= 0 ? 'positive' : 'negative'}">${pos.gain_loss_pct >= 0 ? '+' : ''}${pos.gain_loss_pct.toFixed(2)}%</td></tr>`;
+            }
+            document.querySelector('#overweightTable tbody').innerHTML = html || '<tr><td colspan="4">No overweight positions</td></tr>';
         }
 
-        // Simulated WebSocket for real-time updates
-        function initializeRealtimeUpdates() {
-            setInterval(() => {
-                // Update top holdings prices
-                const holdings = document.querySelectorAll('#topHoldingsTable tr');
-                holdings.forEach(row => {
-                    const changeCell = row.querySelector('td:nth-child(4)');
-                    if (changeCell) {
-                        const randomChange = (Math.random() - 0.45) * 3;
-                        const changeClass = randomChange > 0 ? 'positive' : 'negative';
-                        changeCell.innerHTML = `<span class="${changeClass}">${randomChange > 0 ? '+' : ''}${randomChange.toFixed(2)}%</span>`;
-                    }
-                });
-            }, 5000);
+        function renderSectors() {
+            const sectors = currentData.sector_allocation;
+            let html = '';
+            for (const [sector, data] of Object.entries(sectors)) {
+                html += `<div style="background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:16px;"><div style="font-weight:600; margin-bottom:8px;">${sector.toUpperCase()}: ${data.allocation_pct.toFixed(2)}%</div></div>`;
+            }
+            document.getElementById('sectorAllocation').innerHTML = html;
         }
 
-        initializeRealtimeUpdates();
+        async function renderAlerts() {
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/alerts`);
+                const data = await response.json();
+                let html = '';
+                for (const alert of data.alerts) {
+                    html += `<div class="alert ${alert.severity}"><strong>${alert.type.toUpperCase()}</strong><div style="font-size:13px;">${alert.message}</div><div style="font-size:12px; color:#6b7280; margin-top:8px;">→ ${alert.action}</div></div>`;
+                }
+                document.getElementById('alertsContainer').innerHTML = html || '<div class="success-message">✓ No alerts. Portfolio looks good!</div>';
+            } catch (err) { showError(err.message); }
+        }
+
+        async function fetchPrices() {
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/fetch-prices`, { method: 'POST' });
+                if (response.ok) { showSuccess('Prices updated'); loadPortfolioData(); } else showError('Failed');
+            } catch (err) { showError(err.message); }
+        }
+
+        function showError(message) {
+            const div = document.getElementById('errorMessage');
+            div.innerHTML = `<div class="error">${message}</div>`;
+            setTimeout(() => { div.innerHTML = ''; }, 5000);
+        }
+
+        function showSuccess(message) {
+            const div = document.getElementById('successMessage');
+            div.innerHTML = `<div class="success-message">${message}</div>`;
+            setTimeout(() => { div.innerHTML = ''; }, 5000);
+        }
+
+        window.addEventListener('load', () => { loadSample(); });
     </script>
 </body>
 </html>

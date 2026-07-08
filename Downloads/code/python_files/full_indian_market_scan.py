@@ -108,6 +108,15 @@ try:
 except ImportError:
     sys.exit("❌  pip install yfinance")
 
+# NSE Bhavcopy bulk-OHLC source (one archive file = full EOD universe/day).
+# Replaces the rate-limit-prone yfinance batch download for .NS tickers.
+try:
+    import bhavcopy_fetcher as _bhav
+    _BHAV_OK = True
+except Exception as _e:                       # pragma: no cover
+    _BHAV_OK = False
+    print(f"  ⚠️  bhavcopy_fetcher unavailable ({_e}); OHLC falls back to yfinance")
+
 # ── Constants ──────────────────────────────────────────────────────────────────
 DOWNLOAD_DIR   = Path("./indian_full_scan")
 DOWNLOAD_DIR.mkdir(exist_ok=True)
@@ -115,6 +124,8 @@ DOWNLOAD_DIR.mkdir(exist_ok=True)
 DARVAS_CONFIRM    = 3     # consecutive days a high/low must hold
 BATCH_SIZE        = 300   # tickers per yfinance.download() call
 SLEEP_BETWEEN     = 1.0   # seconds between bulk-download batches
+BHAV_DAYS         = 260   # trading days of bhavcopy history to keep (≥201 for 200-DMA)
+USE_BHAVCOPY      = True   # set False to force the legacy yfinance OHLC path
 MAX_WORKERS       = 12    # threads for fundamental scans (I/O-bound → high count fine)
 MAX_FUND_CANDIDATES = 300 # cap Stage 4 to the N freshest breakouts (closest to box top)
 SYMBOL_CACHE_TTL  = 86400 # seconds — refresh symbol lists once per day
@@ -275,6 +286,61 @@ def bulk_download_ohlc(tickers: list[str], period: str = "3mo") -> dict[str, pd.
 
         if idx < len(batches):
             time.sleep(SLEEP_BETWEEN)
+
+    return result
+
+
+def bulk_ohlc(tickers: list[str], period: str = "1y") -> dict[str, pd.DataFrame]:
+    """
+    Bulk OHLC dispatcher. Serves NSE (.NS) tickers from the local NSE Bhavcopy
+    cache (one archive file per trading day = full EOD universe; ~40x faster than
+    yfinance and immune to its rate-limiting). Any ticker the cache can't cover
+    (BSE-only .BO, or an NSE symbol missing from bhavcopy) falls back to the
+    legacy yfinance batch download. Returns the SAME shape as bulk_download_ohlc:
+    dict yf_ticker → DataFrame with Open/High/Low/Close/Volume columns.
+    """
+    if not (USE_BHAVCOPY and _BHAV_OK):
+        return bulk_download_ohlc(tickers, period=period)
+
+    ns = [t for t in tickers if t.endswith(".NS")]
+    other = [t for t in tickers if not t.endswith(".NS")]
+    result: dict[str, pd.DataFrame] = {}
+
+    # 1) Refresh the bhavcopy cache (only missing days are downloaded).
+    print(f"  Bhavcopy: refreshing {BHAV_DAYS}-day OHLC cache …", flush=True)
+    try:
+        hist, stats = _bhav.build_history(BHAV_DAYS)
+        print(f"    cache: {stats['symbols']} symbols · {stats['days']} days · "
+              f"{stats['downloaded']} new file(s) in {stats['fetch_secs']}s")
+    except Exception as e:
+        print(f"    ⚠️  bhavcopy build failed ({e}); full yfinance fallback")
+        return bulk_download_ohlc(tickers, period=period)
+
+    # 2) Pivot cache → per-symbol OHLC frames (bhavcopy keys are BARE NSE symbols).
+    #    Only materialise the symbols actually requested (bare form of the .NS list).
+    want_syms = {t[:-3] for t in ns}
+    if not hist.empty:
+        hist = hist[hist["symbol"].isin(want_syms)].sort_values("d")
+        min_bars = DARVAS_CONFIRM + 5
+        for sym, g in hist.groupby("symbol", sort=False):
+            if len(g) < min_bars:
+                continue
+            df = g.rename(columns={"open": "Open", "high": "High", "low": "Low",
+                                   "close": "Close", "volume": "Volume"})
+            df = df.set_index(pd.to_datetime(df["d"]))[["Open", "High", "Low",
+                                                        "Close", "Volume"]]
+            result[f"{sym}.NS"] = df
+
+    covered = sum(1 for t in ns if t in result)
+    missing_ns = [t for t in ns if t not in result]
+    print(f"    bhavcopy covered {covered}/{len(ns)} NSE tickers")
+
+    # 3) yfinance fallback for BSE-only + any NSE symbol absent from bhavcopy.
+    fallback = other + missing_ns
+    if fallback:
+        print(f"  yfinance fallback for {len(fallback)} tickers "
+              f"({len(other)} BSE-only, {len(missing_ns)} NSE not in bhavcopy) …")
+        result.update(bulk_download_ohlc(fallback, period=period))
 
     return result
 
@@ -644,8 +710,8 @@ def main(nse_only: bool = False, top: int = 0, run_scans: bool = True,
     print(f"\nTotal tickers to scan: {len(all_tickers)}")
 
     # ── Stage 2: bulk OHLC download ──────────────────────────────────────────
-    print("\nStage 2 — Bulk OHLC download (1-year window; needed for Golden Crossover 200 DMA) …")
-    ohlc_data = bulk_download_ohlc(all_tickers, period="1y")
+    print("\nStage 2 — Bulk OHLC (NSE Bhavcopy cache + yfinance fallback; 1-year window for 200 DMA) …")
+    ohlc_data = bulk_ohlc(all_tickers, period="1y")
     print(f"  → {len(ohlc_data)} tickers with usable OHLC data\n")
 
     # ── Stage 3: Darvas Box screen ───────────────────────────────────────────

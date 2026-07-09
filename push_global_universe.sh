@@ -5,12 +5,16 @@
 set -euo pipefail
 
 BRANCH="claude/nse-bse-pegu-scoring-k7vu9"
-SRC_BASE="https://raw.githubusercontent.com/herrrickshaw/herrrickshaw/${BRANCH}"
+# NB: "herrrickshaw/herrrickshaw" (this repo's name before it was renamed to
+# BMS_analysis_battery) still resolves here via GitHub's rename redirect, but
+# pin the current name so this script doesn't depend on that redirect staying
+# in place indefinitely.
+SRC_BASE="https://raw.githubusercontent.com/herrrickshaw/BMS_analysis_battery/${BRANCH}"
 REPO_URL="https://github.com/herrrickshaw/global-ticker-universe"
 REPO_DIR="${1:-/tmp/global-ticker-universe-sync}"
 
 echo "=== herrrickshaw/global-ticker-universe sync ==="
-echo "Source branch : herrrickshaw/herrrickshaw @ ${BRANCH}"
+echo "Source branch : herrrickshaw/BMS_analysis_battery @ ${BRANCH}"
 echo "Target repo   : ${REPO_URL}"
 echo "Local clone   : ${REPO_DIR}"
 echo

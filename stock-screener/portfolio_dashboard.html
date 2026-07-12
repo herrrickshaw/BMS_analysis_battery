@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Analyzer Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1e40af; --success: #059669; --warning: #d97706; --danger: #dc2626;
+            --info: #0891b2; --text: #1f2937; --bg: #f9fafb; --border: #e5e7eb; --card-bg: #ffffff;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 20px 0; margin-bottom: 30px; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        h1 { font-size: 28px; font-weight: 700; color: var(--primary); }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        button { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 14px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #1e3a8a; }
+        .btn-secondary { background: var(--info); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        input[type="file"] { padding: 8px; border: 1px solid var(--border); border-radius: 6px; }
+        .tab-navigation { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
+        .tab-btn { padding: 12px 20px; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 600; color: #6b7280; transition: all 0.3s; }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; }
+        .card-value { font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+        .positive { color: var(--success); }
+        .negative { color: var(--danger); }
+        table { width: 100%; border-collapse: collapse; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        thead { background: #f3f4f6; border-bottom: 2px solid var(--border); }
+        th { padding: 12px 16px; text-align: left; font-weight: 600; font-size: 13px; text-transform: uppercase; color: #6b7280; }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .badge-india { background: #dbeafe; color: #0369a1; }
+        .badge-us { background: #ddd6fe; color: #4c1d95; }
+        .badge-europe { background: #fce7f3; color: #be185d; }
+        .alert { padding: 16px; border-radius: 6px; margin-bottom: 16px; border-left: 4px solid; }
+        .alert.high { background: #fee2e2; border-left-color: var(--danger); }
+        .alert.medium { background: #fef3c7; border-left-color: var(--warning); }
+        .alert.low { background: #dbeafe; border-left-color: var(--info); }
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; padding: 16px; border-radius: 6px; }
+        .success-message { background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 16px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1>📊 Portfolio Analyzer</h1>
+                <div class="header-actions">
+                    <input type="file" id="fileInput" accept=".csv,.xls,.xlsx">
+                    <button class="btn-primary" onclick="uploadPortfolio()">Upload Portfolio</button>
+                    <button class="btn-secondary" onclick="loadSample()">Load Sample</button>
+                    <button class="btn-success" onclick="fetchPrices()">Update Prices</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="errorMessage"></div>
+        <div id="successMessage"></div>
+
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchTab('holdings')">Holdings</button>
+            <button class="tab-btn" onclick="switchTab('quality')">Quality</button>
+            <button class="tab-btn" onclick="switchTab('rebalancing')">Rebalancing</button>
+            <button class="tab-btn" onclick="switchTab('sectors')">Sectors</button>
+            <button class="tab-btn" onclick="switchTab('alerts')">Alerts</button>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <div class="grid" id="summaryCards"><div style="text-align:center;"><span class="spinner"></span> Loading...</div></div>
+            <div id="metricsDetails" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;"></div>
+        </div>
+
+        <div id="holdings" class="tab-content">
+            <table><thead><tr><th>Ticker</th><th>Market</th><th>Quantity</th><th>Cost Basis</th><th>Current Value</th><th>Gain/Loss</th><th>Gain/Loss %</th><th>Allocation %</th></tr></thead><tbody id="holdingsTable"><tr><td colspan="8">Loading...</td></tr></tbody></table>
+        </div>
+
+        <div id="quality" class="tab-content">
+            <table><thead><tr><th>Ticker</th><th>Market</th><th>Allocation %</th><th>P/E Ratio</th><th>P/B Ratio</th><th>ROE</th><th>Dividend Yield</th><th>Quality Score</th></tr></thead><tbody id="qualityTable"><tr><td colspan="8">Loading...</td></tr></tbody></table>
+        </div>
+
+        <div id="rebalancing" class="tab-content">
+            <h3>Overweight Positions (>10%)</h3>
+            <table id="overweightTable"><thead><tr><th>Ticker</th><th>Allocation %</th><th>Current Value</th><th>Gain/Loss %</th></tr></thead><tbody></tbody></table>
+        </div>
+
+        <div id="sectors" class="tab-content">
+            <div id="sectorAllocation" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;"></div>
+        </div>
+
+        <div id="alerts" class="tab-content">
+            <div id="alertsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8001";
+        let currentData = null;
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            if (currentData) loadTabData(tabName);
+        }
+
+        async function uploadPortfolio() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) { showError('Select a file'); return; }
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/upload`, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (response.ok) { showSuccess(`Loaded: ${data.stocks} stocks`); loadPortfolioData(); } 
+                else showError(data.detail);
+            } catch (err) { showError(err.message); }
+        }
+
+        async function loadSample() {
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/load-sample`, { method: 'POST' });
+                const data = await response.json();
+                if (response.ok) { showSuccess(`Sample loaded: ${data.stocks} stocks`); loadPortfolioData(); } 
+                else showError(data.detail);
+            } catch (err) { showError(err.message); }
+        }
+
+        async function loadPortfolioData() {
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/report`);
+                if (!response.ok) throw new Error('Failed to load');
+                currentData = await response.json();
+                loadTabData('overview');
+            } catch (err) { showError(err.message); }
+        }
+
+        async function loadTabData(tabName) {
+            if (tabName === 'overview') renderOverview();
+            else if (tabName === 'holdings') await renderHoldings();
+            else if (tabName === 'quality') renderQuality();
+            else if (tabName === 'rebalancing') renderRebalancing();
+            else if (tabName === 'sectors') renderSectors();
+            else if (tabName === 'alerts') await renderAlerts();
+        }
+
+        function renderOverview() {
+            const m = currentData.portfolio_metrics;
+            const s = m.summary;
+            document.getElementById('summaryCards').innerHTML = `
+                <div class="card"><div class="card-title">Total Invested</div><div class="card-value">₹${(s.total_invested/1e5).toFixed(1)}L</div></div>
+                <div class="card"><div class="card-title">Current Value</div><div class="card-value">₹${(s.current_value/1e5).toFixed(1)}L</div></div>
+                <div class="card"><div class="card-title">Total Gain</div><div class="card-value ${s.total_gain >= 0 ? 'positive' : 'negative'}">₹${(s.total_gain/1e5).toFixed(1)}L</div><div style="font-size:13px; color:#6b7280;"><span class="${s.total_gain_pct >= 0 ? 'positive' : 'negative'}">${s.total_gain_pct >= 0 ? '+' : ''}${s.total_gain_pct.toFixed(2)}%</span></div></div>
+                <div class="card"><div class="card-title">Holdings</div><div class="card-value">${s.number_of_stocks}</div><div style="font-size:13px; color:#6b7280;">stocks</div></div>
+            `;
+        }
+
+        async function renderHoldings() {
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/holdings`);
+                const holdings = await response.json();
+                let html = '';
+                for (const h of holdings) {
+                    html += `<tr><td><strong>${h.ticker}</strong></td><td><span class="badge badge-${h.market}">${h.market}</span></td><td>${h.quantity}</td><td>₹${(h.cost_basis/1e5).toFixed(2)}L</td><td>₹${(h.current_value/1e5).toFixed(2)}L</td><td class="${h.gain_loss >= 0 ? 'positive' : 'negative'}">₹${(h.gain_loss/1e5).toFixed(2)}L</td><td class="${h.gain_loss_pct >= 0 ? 'positive' : 'negative'}">${h.gain_loss_pct >= 0 ? '+' : ''}${h.gain_loss_pct.toFixed(2)}%</td><td>${h.allocation_pct.toFixed(2)}%</td></tr>`;
+                }
+                document.getElementById('holdingsTable').innerHTML = html;
+            } catch (err) { showError(err.message); }
+        }
+
+        function renderQuality() {
+            const quality = currentData.position_quality;
+            let html = '';
+            for (const pos of quality) {
+                html += `<tr><td><strong>${pos.ticker}</strong></td><td><span class="badge badge-${pos.market}">${pos.market}</span></td><td>${pos.allocation_pct.toFixed(2)}%</td><td>${pos.pe_ratio ? pos.pe_ratio.toFixed(2) : '-'}</td><td>${pos.pb_ratio ? pos.pb_ratio.toFixed(2) : '-'}</td><td>${pos.roe ? (pos.roe*100).toFixed(1) : '-'}%</td><td>${pos.dividend_yield ? (pos.dividend_yield*100).toFixed(2) : '-'}%</td><td>${pos.quality_score || '-'}</td></tr>`;
+            }
+            document.getElementById('qualityTable').innerHTML = html;
+        }
+
+        function renderRebalancing() {
+            const r = currentData.rebalancing_opportunities;
+            let html = '';
+            for (const pos of r.overweight_positions) {
+                html += `<tr><td><strong>${pos.ticker}</strong></td><td class="negative">${pos.allocation_pct.toFixed(2)}%</td><td>₹${(pos.current_value/1e5).toFixed(2)}L</td><td class="${pos.gain_loss_pct >= 0 ? 'positive' : 'negative'}">${pos.gain_loss_pct >= 0 ? '+' : ''}${pos.gain_loss_pct.toFixed(2)}%</td></tr>`;
+            }
+            document.querySelector('#overweightTable tbody').innerHTML = html || '<tr><td colspan="4">No overweight positions</td></tr>';
+        }
+
+        function renderSectors() {
+            const sectors = currentData.sector_allocation;
+            let html = '';
+            for (const [sector, data] of Object.entries(sectors)) {
+                html += `<div style="background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:16px;"><div style="font-weight:600; margin-bottom:8px;">${sector.toUpperCase()}: ${data.allocation_pct.toFixed(2)}%</div></div>`;
+            }
+            document.getElementById('sectorAllocation').innerHTML = html;
+        }
+
+        async function renderAlerts() {
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/alerts`);
+                const data = await response.json();
+                let html = '';
+                for (const alert of data.alerts) {
+                    html += `<div class="alert ${alert.severity}"><strong>${alert.type.toUpperCase()}</strong><div style="font-size:13px;">${alert.message}</div><div style="font-size:12px; color:#6b7280; margin-top:8px;">→ ${alert.action}</div></div>`;
+                }
+                document.getElementById('alertsContainer').innerHTML = html || '<div class="success-message">✓ No alerts. Portfolio looks good!</div>';
+            } catch (err) { showError(err.message); }
+        }
+
+        async function fetchPrices() {
+            try {
+                const response = await fetch(`${API_BASE}/portfolio/fetch-prices`, { method: 'POST' });
+                if (response.ok) { showSuccess('Prices updated'); loadPortfolioData(); } else showError('Failed');
+            } catch (err) { showError(err.message); }
+        }
+
+        function showError(message) {
+            const div = document.getElementById('errorMessage');
+            div.innerHTML = `<div class="error">${message}</div>`;
+            setTimeout(() => { div.innerHTML = ''; }, 5000);
+        }
+
+        function showSuccess(message) {
+            const div = document.getElementById('successMessage');
+            div.innerHTML = `<div class="success-message">${message}</div>`;
+            setTimeout(() => { div.innerHTML = ''; }, 5000);
+        }
+
+        window.addEventListener('load', () => { loadSample(); });
+    </script>
+</body>
+</html>

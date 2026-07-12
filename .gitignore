@@ -28,3 +28,10 @@ data/canada_list.csv
 uploads/
 .env.providers
 .env
+.env.local
+
+# Credentials / private keys - never commit
+.ssh/
+.aws/
+*.pem
+stock-extractor.pem

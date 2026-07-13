@@ -7,7 +7,7 @@
 
 | Credential | Value | Status |
 |-----------|-------|--------|
-| **FRED API Key** | `eb0870595b95a815d6343b3a4ff803af` | ✅ Verified |
+| **FRED API Key** | `<REDACTED-set-FRED_API_KEY-in-.env.local>` | ✅ Verified |
 | **Screener Email** | `umashankartd1991@gmail.com` | ✅ Verified |
 | **Screener Password** | `screener@123` | ✅ Verified |
 
@@ -28,7 +28,7 @@
   
   Add these 3 secrets:
     Name: FRED_API_KEY
-    Value: eb0870595b95a815d6343b3a4ff803af
+    Value: <REDACTED-set-FRED_API_KEY-in-.env.local>
     
     Name: SCREENER_EMAIL
     Value: umashankartd1991@gmail.com
@@ -85,7 +85,7 @@ Google Colab (left sidebar):
 Click "Add new secret"
 ↓
 Name: FRED_API_KEY
-Value: eb0870595b95a815d6343b3a4ff803af
+Value: <REDACTED-set-FRED_API_KEY-in-.env.local>
 → Click "Add secret"
 ↓
 Repeat for SCREENER_EMAIL and SCREENER_PASSWORD
@@ -159,7 +159,7 @@ Left sidebar → 🔑 "Secrets" → "Add new secret"
 
 Secret 1:
   Name: FRED_API_KEY
-  Value: eb0870595b95a815d6343b3a4ff803af
+  Value: <REDACTED-set-FRED_API_KEY-in-.env.local>
 
 Secret 2:
   Name: SCREENER_EMAIL  
@@ -364,7 +364,7 @@ MID-AUG             → Ready for live screening
 ## 🚀 Ready to Launch?
 
 ### Your Setup:
-✅ FRED API Key: `eb0870595b95a815d6343b3a4ff803af`  
+✅ FRED API Key: `<REDACTED-set-FRED_API_KEY-in-.env.local>`  
 ✅ Screener Email: `umashankartd1991@gmail.com`  
 ✅ Screener Password: `screener@123`  
 ✅ Code ready: `COLAB_PHASE1_SETUP.md`  

@@ -113,7 +113,10 @@ def news_picks(market: str, top: int = 12, min_mentions: int = 1) -> list:
     df = load_master(auto_refresh=False)
     uni = df[df["exchange"].isin(_EXCH.get(market, []))]
 
-    picks = {}   # key -> best row (dedup NSE/BSE dual listings by phrase key)
+    # Build every candidate hit first; NSE/BSE dual-listing dedup is handled
+    # afterwards by the shared entity-resolution consolidator (see below) --
+    # same net behaviour as before, just no longer reinvented inline here.
+    candidates = []
     for _, r in uni.iterrows():
         pat, key = _distinctive_phrase(str(r["name"]))
         if pat is None:
@@ -128,20 +131,22 @@ def news_picks(market: str, top: int = 12, min_mentions: int = 1) -> list:
         avg = sum(scores) / len(scores)
         best = (max(hits, key=lambda a: a["score"]) if avg >= 0
                 else min(hits, key=lambda a: a["score"]))
-        cand = {
+        candidates.append({
+            "_key": key,
             "symbol": r["symbol"], "name": r["name"], "exchange": r["exchange"],
             "mentions": len(hits), "score": round(avg, 2), "label": label_of(avg),
             "headline": best["title"][:100], "outlet": best["outlet"],
-        }
-        prev = picks.get(key)
-        # keep NSE over BSE; otherwise keep the one with more mentions
-        if (prev is None or
-                (cand["exchange"] == "NSE" and prev["exchange"] != "NSE") or
-                (cand["exchange"] == prev["exchange"] and
-                 cand["mentions"] > prev["mentions"])):
-            picks[key] = cand
+        })
 
-    ranked = sorted(picks.values(), key=lambda p: (-p["mentions"], -p["score"]))
+    from entity_resolution import consolidate, preferred_exchange_rank
+
+    picks = consolidate(
+        candidates,
+        key_fn=lambda c: c["_key"],
+        rank_fn=lambda c: preferred_exchange_rank(c["exchange"], "NSE", c["mentions"]),
+    )
+
+    ranked = sorted(picks, key=lambda p: (-p["mentions"], -p["score"]))
     return ranked[:top]
 
 

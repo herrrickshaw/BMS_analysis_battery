@@ -46,6 +46,7 @@ cassandra-driver>=3.25.0   # Cassandra Python driver (OPTIONAL)
 matplotlib>=3.4.0          # Plotting library
 plotly>=5.0.0              # Interactive visualizations
 seaborn>=0.11.0            # Statistical data visualization
+networkx>=3.0              # Correlation-network layout (portfolio_analysis.py)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # EMAIL & HTML GENERATION

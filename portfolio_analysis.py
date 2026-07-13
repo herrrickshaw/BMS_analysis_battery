@@ -649,6 +649,157 @@ def plot_efficient_frontier(
     print(f"\n  Chart saved → {save_path}")
 
 
+def plot_seasonality_spiral(
+    symbol: str,
+    years: int = 8,
+    save_path: str = "seasonality_spiral.png",
+) -> pd.DataFrame:
+    """
+    Derived from patent MY269086 "System and method for visualizing large
+    graph data using spirals" (IIIT-Hyderabad, DSAC). Renders monthly returns
+    for *symbol* as a growing spiral (radius = elapsed time, angle = month of
+    year), so seasonal patterns line up radially across years -- the same
+    layout style popularised for visualising climate time series.
+
+    Returns the underlying monthly-returns DataFrame (Year, Month, Return_pct)
+    so callers can inspect the numbers behind the chart.
+    """
+    prices = fetch_prices([symbol], period=f"{years}y")
+    if symbol not in prices.columns or prices[symbol].dropna().empty:
+        raise ValueError(f"No price history returned for {symbol!r}")
+
+    monthly = prices[symbol].dropna().resample("ME").last()
+    monthly_ret = monthly.pct_change().dropna() * 100
+
+    rows = [
+        {"Year": idx.year, "Month": idx.month, "Return_pct": float(r)}
+        for idx, r in monthly_ret.items()
+    ]
+    df = pd.DataFrame(rows)
+    if df.empty:
+        raise ValueError(f"Not enough monthly history for {symbol!r} to plot seasonality")
+
+    # Spiral coordinates: radius grows monotonically with elapsed time so each
+    # calendar year forms one full loop further out than the last; angle is
+    # purely month-of-year, so December of every year lines up radially with
+    # every other December.
+    t0_year, t0_month = df["Year"].min(), df.loc[df["Year"] == df["Year"].min(), "Month"].min()
+    elapsed_months = (df["Year"] - t0_year) * 12 + (df["Month"] - t0_month)
+    df["_r"] = 1.0 + elapsed_months / 12.0
+    df["_theta"] = (df["Month"] - 1) / 12.0 * 2 * np.pi
+
+    fig, ax = plt.subplots(figsize=(9, 9), subplot_kw={"projection": "polar"})
+    fig.patch.set_facecolor("#0d1117")
+    ax.set_facecolor("#0d1117")
+
+    vmax = float(np.abs(df["Return_pct"]).max()) or 1.0
+    for yr, grp in df.sort_values("_r").groupby("Year"):
+        grp = grp.sort_values("Month")
+        ax.plot(grp["_theta"], grp["_r"], "-", color="#555", linewidth=1, zorder=1)
+        sc = ax.scatter(
+            grp["_theta"], grp["_r"], c=grp["Return_pct"],
+            cmap="RdYlGn", vmin=-vmax, vmax=vmax, s=70, zorder=2,
+            edgecolors="white", linewidths=0.3,
+        )
+
+    ax.set_xticks(np.linspace(0, 2 * np.pi, 12, endpoint=False))
+    ax.set_xticklabels(["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], color="white")
+    ax.set_yticklabels([])
+    ax.tick_params(colors="white")
+    ax.spines["polar"].set_color("#333")
+    ax.set_title(f"Seasonality Spiral — {symbol}\n(radius = year, colour = monthly return %)",
+                 color="white", fontsize=13, fontweight="bold", pad=20)
+    cbar = fig.colorbar(sc, ax=ax, pad=0.1, shrink=0.7)
+    cbar.set_label("Monthly Return (%)", color="white", fontsize=9)
+    cbar.ax.yaxis.set_tick_params(color="white")
+    plt.setp(plt.getp(cbar.ax.axes, "yticklabels"), color="white")
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.close()
+    print(f"\n  Chart saved → {save_path}")
+
+    return df[["Year", "Month", "Return_pct"]].reset_index(drop=True)
+
+
+def plot_correlation_network(
+    symbols: list,
+    prices: pd.DataFrame,
+    edge_threshold: float = 0.5,
+    save_path: str = "correlation_network.png",
+):
+    """
+    Derived from patents MY269086/MY2690135 "reducing node overlaps and edge
+    crossings in large graph data" (IIIT-Hyderabad, DSAC). Visualises the
+    portfolio's return-correlation structure as a force-directed network
+    graph, pruning edges below *edge_threshold* -- a practical declutter
+    equivalent for a small stock-count graph: with only the strong
+    relationships kept, node overlaps and edge crossings drop out almost
+    entirely without needing the full crossing-minimisation algorithm.
+
+    Node size scales with degree (how many other holdings a stock is
+    strongly correlated with); edge width/opacity scales with |correlation|.
+    """
+    import networkx as nx
+
+    returns = prices[symbols].pct_change().dropna()
+    corr = returns.corr()
+
+    G = nx.Graph()
+    G.add_nodes_from(symbols)
+    for i, a in enumerate(symbols):
+        for b in symbols[i + 1:]:
+            c = corr.loc[a, b]
+            if abs(c) >= edge_threshold:
+                G.add_edge(a, b, weight=float(c))
+
+    pos = nx.spring_layout(G, seed=42, k=1.5 / max(len(symbols) ** 0.5, 1))
+
+    fig, ax = plt.subplots(figsize=(10, 9))
+    fig.patch.set_facecolor("#0d1117")
+    ax.set_facecolor("#0d1117")
+
+    for a, b, data in G.edges(data=True):
+        w = data["weight"]
+        color = "#2e7d32" if w > 0 else "#c62828"
+        ax.plot(
+            [pos[a][0], pos[b][0]], [pos[a][1], pos[b][1]],
+            color=color, alpha=min(abs(w), 1.0), linewidth=1 + 2 * abs(w), zorder=1,
+        )
+
+    degrees = dict(G.degree())
+    xs = [pos[s][0] for s in symbols]
+    ys = [pos[s][1] for s in symbols]
+    sizes = [200 + 120 * degrees.get(s, 0) for s in symbols]
+    ax.scatter(xs, ys, s=sizes, color="#87CEFA", edgecolors="white", linewidths=0.8, zorder=2)
+    # Labels sit just above each node (not centred inside it) so long tickers
+    # (RELIANCE, HDFCBANK, ...) stay legible regardless of marker size.
+    for s in symbols:
+        ax.annotate(s, xy=pos[s], xytext=(0, 12), textcoords="offset points",
+                    ha="center", va="bottom", color="white", fontsize=9, fontweight="bold", zorder=3)
+
+    ax.set_title(
+        f"Correlation Network (|corr| ≥ {edge_threshold:.2f} shown)\n"
+        f"green edge = positive correlation, red = negative, width/size = strength",
+        color="white", fontsize=12, fontweight="bold", pad=14,
+    )
+    ax.set_xticks([])
+    ax.set_yticks([])
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    # Generous margins: labels extend beyond node markers, and force-directed
+    # layouts can place nodes near the auto-scaled data boundary.
+    ax.margins(0.2)
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.close()
+    print(f"\n  Chart saved → {save_path}")
+
+    return corr
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # DISPLAY HELPERS
 # ─────────────────────────────────────────────────────────────────────────────

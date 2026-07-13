@@ -1,0 +1,1524 @@
+# repo-cleaner-ocaml report
+
+Scanned root: `/private/tmp/claude-501/-Users-umashankar/561217fd-26ba-431d-9245-ae8d478dcc3a/scratchpad/main-repo-clean, /private/tmp/claude-501/-Users-umashankar/561217fd-26ba-431d-9245-ae8d478dcc3a/scratchpad/repo-analysis-update/global-stock-screener, /private/tmp/claude-501/-Users-umashankar/561217fd-26ba-431d-9245-ae8d478dcc3a/scratchpad/repo-analysis-update/fuel-retail-outlets, /private/tmp/claude-501/-Users-umashankar/561217fd-26ba-431d-9245-ae8d478dcc3a/scratchpad/repo-analysis-update/toll-plaza-highways, /private/tmp/claude-501/-Users-umashankar/561217fd-26ba-431d-9245-ae8d478dcc3a/scratchpad/repo-analysis-update/india-trade-export-analysis, /private/tmp/claude-501/-Users-umashankar/561217fd-26ba-431d-9245-ae8d478dcc3a/scratchpad/repo-analysis-update/claude-stock-tools, /private/tmp/claude-501/-Users-umashankar/561217fd-26ba-431d-9245-ae8d478dcc3a/scratchpad/repo-analysis-update/colab-experiments, /private/tmp/claude-501/-Users-umashankar/561217fd-26ba-431d-9245-ae8d478dcc3a/scratchpad/repo-analysis-update/subscription-model-revenue`
+
+This report only lists candidates. Nothing here has been deleted --
+every finding below needs a human decision before anything is removed.
+
+## Exact duplicate files (93 groups)
+
+- **12.3MB wasted** (2 copies of a 12.3MB file):
+  - `fuel-retail-outlets/fuel-pump-locations-map/locations-data.js` (12.3MB, last touched 2026-07-12T10:29:24+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.js` (12.3MB, last touched 2026-07-12T10:29:24+05:30)
+- **7.1MB wasted** (2 copies of a 7.1MB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_TW.parquet` (7.1MB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/TW.parquet` (7.1MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **4.0MB wasted** (2 copies of a 4.0MB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_EU.parquet` (4.0MB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/EU.parquet` (4.0MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **4.0MB wasted** (2 copies of a 4.0MB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_CA.parquet` (4.0MB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/CA.parquet` (4.0MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **3.6MB wasted** (2 copies of a 3.6MB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_AU.parquet` (3.6MB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/AU.parquet` (3.6MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **3.3MB wasted** (2 copies of a 3.3MB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_UK.parquet` (3.3MB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/UK.parquet` (3.3MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **2.8MB wasted** (2 copies of a 2.8MB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_HK.parquet` (2.8MB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/HK.parquet` (2.8MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **2.0MB wasted** (2 copies of a 2.0MB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_SE.parquet` (2.0MB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/SE.parquet` (2.0MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **2.0MB wasted** (2 copies of a 2.0MB file):
+  - `main-repo-clean/nse_screener_reference/scan_results/backtest_1yr_full_NSE_latest.xlsx` (2.0MB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1300.xlsx` (2.0MB, no git history found for this path)
+- **1.9MB wasted** (2 copies of a 1.9MB file):
+  - `main-repo-clean/nse_screener_reference/scan_results/us_full_scan_latest.xlsx` (1.9MB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/us_full_scan/us_full_scan/us_full_scan_20260626_1437.xlsx` (1.9MB, no git history found for this path)
+- **1.7MB wasted** (2 copies of a 1.7MB file):
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/damodaran_companies.parquet` (1.7MB, no git history found for this path)
+  - `global-stock-screener/reference_seed/damodaran_companies.parquet` (1.7MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **1.5MB wasted** (2 copies of a 1.5MB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_SA.parquet` (1.5MB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/SA.parquet` (1.5MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **1.5MB wasted** (2 copies of a 1.5MB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_DE.parquet` (1.5MB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/DE.parquet` (1.5MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **1.3MB wasted** (2 copies of a 1.3MB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_SG.parquet` (1.3MB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/SG.parquet` (1.3MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **1.1MB wasted** (2 copies of a 1.1MB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_BR.parquet` (1.1MB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/BR.parquet` (1.1MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **955.5KB wasted** (2 copies of a 955.5KB file):
+  - `main-repo-clean/nse_screener_reference/scan_results/walkforward_3y5y10y_latest.xlsx` (955.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1305.xlsx` (955.5KB, no git history found for this path)
+- **877.2KB wasted** (2 copies of a 877.2KB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_ZA.parquet` (877.2KB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/ZA.parquet` (877.2KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **872.6KB wasted** (2 copies of a 872.6KB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_CH.parquet` (872.6KB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/CH.parquet` (872.6KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **716.4KB wasted** (2 copies of a 716.4KB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_FI.parquet` (716.4KB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/FI.parquet` (716.4KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **652.2KB wasted** (2 copies of a 652.2KB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/liquidity_index.parquet` (652.2KB, no git history found for this path)
+  - `global-stock-screener/cache_seed/liquidity_index.parquet` (652.2KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **640.5KB wasted** (2 copies of a 640.5KB file):
+  - `main-repo-clean/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models.pdf` (640.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models (1).pdf` (640.5KB, no git history found for this path)
+- **591.7KB wasted** (2 copies of a 591.7KB file):
+  - `main-repo-clean/Downloads/data/wf_backtest/wf_backtest/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv` (591.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv` (591.7KB, no git history found for this path)
+- **406.9KB wasted** (2 copies of a 406.9KB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_DK.parquet` (406.9KB, no git history found for this path)
+  - `global-stock-screener/cache_seed/ltm/DK.parquet` (406.9KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **135.0KB wasted** (2 copies of a 135.0KB file):
+  - `main-repo-clean/Downloads/code/notebooks/Stock_reporting.ipynb` (135.0KB, no git history found for this path)
+  - `claude-stock-tools/03_colab_notebooks/india_stock_reporting.ipynb` (135.0KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **71.5KB wasted** (2 copies of a 71.5KB file):
+  - `main-repo-clean/Downloads/code/python_files/us_stocks_colab.py` (71.5KB, no git history found for this path)
+  - `claude-stock-tools/03_colab_notebooks/us_stocks_colab_script.py` (71.5KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **56.7KB wasted** (2 copies of a 56.7KB file):
+  - `main-repo-clean/Downloads/code/python_files/stock_daily_report_improved.py` (56.7KB, no git history found for this path)
+  - `claude-stock-tools/01_daily_reports/india_daily_report.py` (56.7KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **55.8KB wasted** (2 copies of a 55.8KB file):
+  - `main-repo-clean/Downloads/code/python_files/us_stock_daily_report.py` (55.8KB, no git history found for this path)
+  - `claude-stock-tools/01_daily_reports/us_daily_report.py` (55.8KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **41.9KB wasted** (2 copies of a 41.9KB file):
+  - `main-repo-clean/Downloads/code/python_files/sg_stock_daily_report.py` (41.9KB, no git history found for this path)
+  - `claude-stock-tools/01_daily_reports/singapore_daily_report.py` (41.9KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **41.9KB wasted** (2 copies of a 41.9KB file):
+  - `main-repo-clean/Downloads/code/web/notification.html` (41.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/web/notification (1).html` (41.9KB, no git history found for this path)
+- **41.1KB wasted** (2 copies of a 41.1KB file):
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.geojson` (41.1KB, last touched 2026-07-12T10:29:24+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.geojson` (41.1KB, last touched 2026-07-12T10:29:24+05:30)
+- **40.5KB wasted** (2 copies of a 40.5KB file):
+  - `main-repo-clean/Downloads/code/python_files/us_market_screener.py` (40.5KB, no git history found for this path)
+  - `claude-stock-tools/02_market_screeners/us_market_screener_v1.py` (40.5KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **39.3KB wasted** (2 copies of a 39.3KB file):
+  - `main-repo-clean/Downloads/code/notebooks/US_Market_Screener_Colab.ipynb` (39.3KB, no git history found for this path)
+  - `claude-stock-tools/03_colab_notebooks/us_market_screener.ipynb` (39.3KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **38.4KB wasted** (2 copies of a 38.4KB file):
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1845.html` (38.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.html` (38.4KB, no git history found for this path)
+- **37.7KB wasted** (2 copies of a 37.7KB file):
+  - `main-repo-clean/Downloads/code/python_files/us_stock_daily_report.R` (37.7KB, no git history found for this path)
+  - `global-stock-screener/us_stock_daily_report.R` (37.7KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **35.3KB wasted** (2 copies of a 35.3KB file):
+  - `main-repo-clean/Downloads/code/python_files/stock_daily_report.R` (35.3KB, no git history found for this path)
+  - `global-stock-screener/stock_daily_report.R` (35.3KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **32.9KB wasted** (2 copies of a 32.9KB file):
+  - `main-repo-clean/stock-screener/daily_mailer_universal_integrated.py` (32.9KB, no git history found for this path)
+  - `main-repo-clean/daily_mailer_universal_integrated.py` (32.9KB, no git history found for this path)
+- **32.1KB wasted** (2 copies of a 32.1KB file):
+  - `main-repo-clean/Downloads/code/notebooks/Stock_Analysis_Colab.ipynb` (32.1KB, no git history found for this path)
+  - `claude-stock-tools/03_colab_notebooks/india_stock_analysis.ipynb` (32.1KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **30.3KB wasted** (2 copies of a 30.3KB file):
+  - `main-repo-clean/Downloads/code/python_files/quick_reference.py` (30.3KB, no git history found for this path)
+  - `claude-stock-tools/04_strategy_reference/momentum_strategy_reference.py` (30.3KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **29.8KB wasted** (2 copies of a 29.8KB file):
+  - `main-repo-clean/stock-screener/docs/FILTER_MARKET_INSIGHTS_ANALYSIS.md` (29.8KB, no git history found for this path)
+  - `main-repo-clean/FILTER_MARKET_INSIGHTS_ANALYSIS.md` (29.8KB, no git history found for this path)
+- **29.6KB wasted** (2 copies of a 29.6KB file):
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/damodaran_margin.parquet` (29.6KB, no git history found for this path)
+  - `global-stock-screener/reference_seed/damodaran_margin.parquet` (29.6KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **28.6KB wasted** (2 copies of a 28.6KB file):
+  - `main-repo-clean/Downloads/code/python_files/full_japan_market_scan.py` (28.6KB, no git history found for this path)
+  - `claude-stock-tools/02_market_screeners/japan_market_scan.py` (28.6KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **27.6KB wasted** (2 copies of a 27.6KB file):
+  - `main-repo-clean/Downloads/code/python_files/full_korea_market_scan.py` (27.6KB, no git history found for this path)
+  - `claude-stock-tools/02_market_screeners/korea_market_scan.py` (27.6KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **23.7KB wasted** (2 copies of a 23.7KB file):
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/damodaran_beta.parquet` (23.7KB, no git history found for this path)
+  - `global-stock-screener/reference_seed/damodaran_beta.parquet` (23.7KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **23.4KB wasted** (2 copies of a 23.4KB file):
+  - `main-repo-clean/stock-screener/backtest_full_market_universe.py` (23.4KB, no git history found for this path)
+  - `main-repo-clean/backtest_full_market_universe.py` (23.4KB, no git history found for this path)
+- **21.1KB wasted** (2 copies of a 21.1KB file):
+  - `main-repo-clean/stock-screener/notebooks/COLAB_QUICK_CHECK.ipynb` (21.1KB, no git history found for this path)
+  - `main-repo-clean/COLAB_QUICK_CHECK.ipynb` (21.1KB, no git history found for this path)
+- **18.3KB wasted** (2 copies of a 18.3KB file):
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/french_ff3.parquet` (18.3KB, no git history found for this path)
+  - `global-stock-screener/reference_seed/french_ff3.parquet` (18.3KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **18.1KB wasted** (2 copies of a 18.1KB file):
+  - `main-repo-clean/stock-screener/morning_ocaml_routine.sh` (18.1KB, no git history found for this path)
+  - `main-repo-clean/morning_ocaml_routine.sh` (18.1KB, no git history found for this path)
+- **17.2KB wasted** (2 copies of a 17.2KB file):
+  - `main-repo-clean/stock-screener/implement_universal_screener.py` (17.2KB, no git history found for this path)
+  - `main-repo-clean/implement_universal_screener.py` (17.2KB, no git history found for this path)
+- **16.8KB wasted** (2 copies of a 16.8KB file):
+  - `main-repo-clean/stock-screener/docs/INTEGRATED_SYSTEM_SUMMARY.md` (16.8KB, no git history found for this path)
+  - `main-repo-clean/INTEGRATED_SYSTEM_SUMMARY.md` (16.8KB, no git history found for this path)
+- **15.9KB wasted** (2 copies of a 15.9KB file):
+  - `main-repo-clean/global_expansion_screener_framework/docs/GLOBAL_EXPANSION_SCREENING_FRAMEWORK.md` (15.9KB, no git history found for this path)
+  - `global-stock-screener/GLOBAL_EXPANSION_SCREENING_FRAMEWORK.md` (15.9KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **15.7KB wasted** (2 copies of a 15.7KB file):
+  - `main-repo-clean/stock-screener/docs/MAILER_INTEGRATION_GUIDE.md` (15.7KB, no git history found for this path)
+  - `main-repo-clean/MAILER_INTEGRATION_GUIDE.md` (15.7KB, no git history found for this path)
+- **15.7KB wasted** (2 copies of a 15.7KB file):
+  - `main-repo-clean/global_expansion_screener_framework/docs/EXPANSION_SCREENING_DEPLOYMENT_SUMMARY.md` (15.7KB, no git history found for this path)
+  - `global-stock-screener/EXPANSION_SCREENING_DEPLOYMENT_SUMMARY.md` (15.7KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **15.6KB wasted** (2 copies of a 15.6KB file):
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/damodaran_pe.parquet` (15.6KB, no git history found for this path)
+  - `global-stock-screener/reference_seed/damodaran_pe.parquet` (15.6KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **15.4KB wasted** (2 copies of a 15.4KB file):
+  - `main-repo-clean/Downloads/code/python_files/PROJECT_SUMMARY.txt` (15.4KB, no git history found for this path)
+  - `global-stock-screener/PROJECT_SUMMARY.txt` (15.4KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **14.5KB wasted** (2 copies of a 14.5KB file):
+  - `main-repo-clean/Downloads/code/python_files/fetch_and_analyze_cricket_data.R` (14.5KB, no git history found for this path)
+  - `global-stock-screener/fetch_and_analyze_cricket_data.R` (14.5KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **13.9KB wasted** (2 copies of a 13.9KB file):
+  - `main-repo-clean/stock-screener/docs/DEPLOYMENT_CHECKLIST.md` (13.9KB, no git history found for this path)
+  - `main-repo-clean/DEPLOYMENT_CHECKLIST.md` (13.9KB, no git history found for this path)
+- **13.6KB wasted** (2 copies of a 13.6KB file):
+  - `main-repo-clean/nse_screener_reference/portfolio_IN_latest.xlsx` (13.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2234.xlsx` (13.6KB, no git history found for this path)
+- **12.1KB wasted** (2 copies of a 12.1KB file):
+  - `main-repo-clean/global_expansion_screener_framework/docs/BACKTEST_DATA_COLLECTION_ROADMAP.md` (12.1KB, no git history found for this path)
+  - `global-stock-screener/BACKTEST_DATA_COLLECTION_ROADMAP.md` (12.1KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **11.9KB wasted** (2 copies of a 11.9KB file):
+  - `main-repo-clean/global_expansion_screener_framework/docs/DEPLOYMENT_GUIDE.md` (11.9KB, no git history found for this path)
+  - `global-stock-screener/DEPLOYMENT_GUIDE.md` (11.9KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **11.6KB wasted** (2 copies of a 11.6KB file):
+  - `main-repo-clean/stock-screener/docs/MORNING_ROUTINE_SETUP.md` (11.6KB, no git history found for this path)
+  - `main-repo-clean/MORNING_ROUTINE_SETUP.md` (11.6KB, no git history found for this path)
+- **11.5KB wasted** (2 copies of a 11.5KB file):
+  - `main-repo-clean/global_expansion_screener_framework/docs/PROJECT_STATUS_JULY_2026.md` (11.5KB, no git history found for this path)
+  - `global-stock-screener/PROJECT_STATUS_JULY_2026.md` (11.5KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **11.2KB wasted** (2 copies of a 11.2KB file):
+  - `main-repo-clean/stock-screener/docs/SETUP_AND_REQUIREMENTS.md` (11.2KB, no git history found for this path)
+  - `main-repo-clean/SETUP_AND_REQUIREMENTS.md` (11.2KB, no git history found for this path)
+- **10.9KB wasted** (2 copies of a 10.9KB file):
+  - `main-repo-clean/Downloads/code/python_files/FILE_INDEX.txt` (10.9KB, no git history found for this path)
+  - `global-stock-screener/FILE_INDEX.txt` (10.9KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **10.6KB wasted** (2 copies of a 10.6KB file):
+  - `main-repo-clean/global_expansion_screener_framework/docs/MODEL_ENHANCEMENT_ANALYSIS.md` (10.6KB, no git history found for this path)
+  - `global-stock-screener/MODEL_ENHANCEMENT_ANALYSIS.md` (10.6KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **10.3KB wasted** (2 copies of a 10.3KB file):
+  - `main-repo-clean/Downloads/code/python_files/extract attachment agent.json` (10.3KB, no git history found for this path)
+  - `global-stock-screener/extract attachment agent.json` (10.3KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **9.7KB wasted** (2 copies of a 9.7KB file):
+  - `main-repo-clean/Downloads/code/python_files/toll_metrics.json` (9.7KB, no git history found for this path)
+  - `global-stock-screener/toll_metrics.json` (9.7KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **9.0KB wasted** (2 copies of a 9.0KB file):
+  - `main-repo-clean/stock-screener/requirements.txt` (9.0KB, no git history found for this path)
+  - `main-repo-clean/requirements.txt` (9.0KB, no git history found for this path)
+- **8.9KB wasted** (2 copies of a 8.9KB file):
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/damodaran_roe.parquet` (8.9KB, no git history found for this path)
+  - `global-stock-screener/reference_seed/damodaran_roe.parquet` (8.9KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **8.5KB wasted** (2 copies of a 8.5KB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/market_performance_5y.parquet` (8.5KB, no git history found for this path)
+  - `global-stock-screener/cache_seed/market_performance_5y.parquet` (8.5KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **8.4KB wasted** (2 copies of a 8.4KB file):
+  - `main-repo-clean/global_expansion_screener_framework/docs/PHASE1_QUARTERLY_COLLECTION_COMPLETE.md` (8.4KB, no git history found for this path)
+  - `global-stock-screener/PHASE1_QUARTERLY_COLLECTION_COMPLETE.md` (8.4KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **8.2KB wasted** (2 copies of a 8.2KB file):
+  - `main-repo-clean/Downloads/code/python_files/SGX_COMPLETE_SCAN_SUMMARY.txt` (8.2KB, no git history found for this path)
+  - `global-stock-screener/SGX_COMPLETE_SCAN_SUMMARY.txt` (8.2KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **8.0KB wasted** (2 copies of a 8.0KB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/global_highlights.parquet` (8.0KB, no git history found for this path)
+  - `global-stock-screener/cache_seed/global_highlights.parquet` (8.0KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **7.2KB wasted** (2 copies of a 7.2KB file):
+  - `main-repo-clean/Downloads/code/python_files/QUICK_START.md` (7.2KB, no git history found for this path)
+  - `global-stock-screener/QUICK_START.md` (7.2KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **6.7KB wasted** (2 copies of a 6.7KB file):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/market_liquidity.parquet` (6.7KB, no git history found for this path)
+  - `global-stock-screener/cache_seed/market_liquidity.parquet` (6.7KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **4.7KB wasted** (2 copies of a 4.7KB file):
+  - `main-repo-clean/global_expansion_screener_framework/docs/LAUNCH_CHECKLIST.md` (4.7KB, no git history found for this path)
+  - `global-stock-screener/LAUNCH_CHECKLIST.md` (4.7KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **4.5KB wasted** (2 copies of a 4.5KB file):
+  - `main-repo-clean/stock-screener/docs/QUICK_START.md` (4.5KB, no git history found for this path)
+  - `main-repo-clean/QUICK_START.md` (4.5KB, no git history found for this path)
+- **4.5KB wasted** (2 copies of a 4.5KB file):
+  - `main-repo-clean/Downloads/code/python_files/CLAUDE.md` (4.5KB, no git history found for this path)
+  - `global-stock-screener/CLAUDE.md` (4.5KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **4.3KB wasted** (2 copies of a 4.3KB file):
+  - `main-repo-clean/Downloads/code/python_files/toll_analysis_report.txt` (4.3KB, no git history found for this path)
+  - `global-stock-screener/toll_analysis_report.txt` (4.3KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **4.0KB wasted** (2 copies of a 4.0KB file):
+  - `main-repo-clean/Downloads/code/python_files/daily_scan_report_20260624.txt` (4.0KB, no git history found for this path)
+  - `global-stock-screener/daily_scan_report_20260624.txt` (4.0KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **3.8KB wasted** (2 copies of a 3.8KB file):
+  - `main-repo-clean/Downloads/code/python_files/BLOOMBERG_SOURCES.md` (3.8KB, no git history found for this path)
+  - `global-stock-screener/BLOOMBERG_SOURCES.md` (3.8KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **3.5KB wasted** (2 copies of a 3.5KB file):
+  - `main-repo-clean/Downloads/code/python_files/daily_scan_report_20260612.txt` (3.5KB, no git history found for this path)
+  - `global-stock-screener/daily_scan_report_20260612.txt` (3.5KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **3.4KB wasted** (2 copies of a 3.4KB file):
+  - `main-repo-clean/Downloads/code/python_files/EXCHANGE_COVERAGE.md` (3.4KB, no git history found for this path)
+  - `global-stock-screener/EXCHANGE_COVERAGE.md` (3.4KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **3.1KB wasted** (2 copies of a 3.1KB file):
+  - `main-repo-clean/stock-screener/docs/README.md` (3.1KB, no git history found for this path)
+  - `main-repo-clean/README.md` (3.1KB, no git history found for this path)
+- **3.1KB wasted** (2 copies of a 3.1KB file):
+  - `main-repo-clean/Downloads/code/python_files/daily_scan_report_20260626.txt` (3.1KB, no git history found for this path)
+  - `global-stock-screener/daily_scan_report_20260626.txt` (3.1KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **3.1KB wasted** (2 copies of a 3.1KB file):
+  - `main-repo-clean/Downloads/code/python_files/daily_scan_report_20260625.txt` (3.1KB, no git history found for this path)
+  - `global-stock-screener/daily_scan_report_20260625.txt` (3.1KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **1.3KB wasted** (2 copies of a 1.3KB file):
+  - `main-repo-clean/Downloads/code/python_files/seasonal_analysis_summary.json` (1.3KB, no git history found for this path)
+  - `global-stock-screener/seasonal_analysis_summary.json` (1.3KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **632B wasted** (3 copies of a 316B file):
+  - `main-repo-clean/Downloads/data/bhavcopy_cache/nse_holidays.json` (316B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/nse_holidays.json` (316B, no git history found for this path)
+  - `global-stock-screener/cache_seed/nse_holidays.json` (316B, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **448B wasted** (3 copies of a 224B file):
+  - `main-repo-clean/Downloads/data/bhavcopy_cache/no_data_dates.json` (224B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/no_data_dates.json` (224B, no git history found for this path)
+  - `global-stock-screener/cache_seed/no_data_dates.json` (224B, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **278B wasted** (2 copies of a 278B file):
+  - `main-repo-clean/data/nse_stocks_fundamental.csv` (278B, no git history found for this path)
+  - `main-repo-clean/data/all_stocks_combined.csv` (278B, no git history found for this path)
+- **240B wasted** (2 copies of a 240B file):
+  - `main-repo-clean/Downloads/code/python_files/requirements-docker.txt` (240B, no git history found for this path)
+  - `global-stock-screener/requirements-docker.txt` (240B, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **239B wasted** (2 copies of a 239B file):
+  - `main-repo-clean/Downloads/code/python_files/.dockerignore` (239B, no git history found for this path)
+  - `global-stock-screener/.dockerignore` (239B, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **70B wasted** (3 copies of a 35B file):
+  - `fuel-retail-outlets/.gitignore` (35B, last touched 2026-07-12T10:29:24+05:30) **<- most recently touched**
+  - `toll-plaza-highways/.gitignore` (35B, last touched 2026-06-30T14:25:20+05:30)
+  - `india-trade-export-analysis/.gitignore` (35B, last touched 2026-06-30T14:25:25+05:30)
+- **45B wasted** (2 copies of a 45B file):
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.geojson` (45B, last touched 2026-07-12T10:29:24+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.geojson` (45B, last touched 2026-07-12T10:29:24+05:30)
+
+## Data-source duplicates (0 groups)
+
+Same underlying dataset (by Git LFS pointer `oid`, or raw content hash for
+small non-LFS data files) checked into more than one place -- found without
+downloading the real LFS bytes, since a pointer's declared `oid`/`size`
+already proves byte-identical content on its own.
+
+None found.
+
+## Name-based doc-sprawl clusters (176 clusters)
+
+Files sharing a leading name token -- candidates for a human to read and
+decide "supersede, merge, or keep both." Over-inclusion is expected; this
+is a naming heuristic, not a content judgment.
+
+- **INIT** (70 files):
+  - `main-repo-clean/stock-portfolio-evaluator/stock_evaluator/__init__.py` (615B, no git history found for this path)
+  - `main-repo-clean/put_call_parity/__init__.py` (26B, no git history found for this path)
+  - `main-repo-clean/bms/__init__.py` (3.4KB, no git history found for this path)
+  - `main-repo-clean/backend/scanners/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/backend/routers/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/backend/parsers/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/backend/fetchers/providers/__init__.py` (2.2KB, no git history found for this path)
+  - `main-repo-clean/backend/fetchers/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/backend/events/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/backend/db/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/backend/config/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/infrastructure/screening/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/infrastructure/reporting/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/infrastructure/notifications/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/infrastructure/market_data/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/infrastructure/backtest/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/infrastructure/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/domain/shared/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/domain/screening/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/domain/reporting/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/domain/market_data/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/domain/ipo/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/domain/intraday/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/domain/backtest/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/domain/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/application/queries/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/application/ports/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/application/orchestrators/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/application/commands/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/application/__init__.py` (0B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/strategies/__init__.py` (1.6KB, no git history found for this path)
+  - `global-stock-screener/tests/unit/stock_analysis/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/unit/risk_signals/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/unit/reporting/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/unit/portfolio_strategy/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/unit/market_data/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/unit/backtesting/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/unit/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/integration/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/strategies/__init__.py` (1.6KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/stock_analysis/infrastructure/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/stock_analysis/domain/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/stock_analysis/application/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/stock_analysis/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/shared/infrastructure/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/shared/domain/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/shared/application/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/shared/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/risk_signals/infrastructure/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/risk_signals/domain/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/risk_signals/application/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/risk_signals/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/reporting/infrastructure/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/reporting/domain/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/reporting/application/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/reporting/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/portfolio_strategy/infrastructure/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/portfolio_strategy/domain/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/portfolio_strategy/application/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/portfolio_strategy/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/market_data/infrastructure/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/market_data/domain/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/market_data/application/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/market_data/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/backtesting/infrastructure/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/backtesting/domain/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/backtesting/application/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/backtesting/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/__init__.py` (0B, last touched 2026-07-12T14:54:29+05:30)
+- **TEST** (39 files):
+  - `main-repo-clean/tests/test_bms.py` (39.6KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/test_strategies_with_real_data.py` (12.6KB, no git history found for this path)
+  - `main-repo-clean/stock-portfolio-evaluator/tests/test_evaluator.py` (16.1KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/test_report_lfs.md` (7.0KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/test_screener_in.py` (5.3KB, no git history found for this path)
+  - `global-stock-screener/tests/unit/market_data/test_models.py` (6.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_yf_fundamentals.py` (1.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_validation.py` (1.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_trendlyne.py` (1.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_strategies.py` (2.6KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_store.py` (1.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_sector_map.py` (1.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_screen_metrics.py` (2.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_repo_dashboard.py` (1.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_query.py` (992B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_preflight.py` (1.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_portfolio_evaluator.py` (1.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_pipeline.py` (2.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_pi_pe_aliases.py` (1.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_partition_ltm.py` (1.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_name_and_manual.py` (2.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_morning_mailer.py` (2.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_ml_supervised_rl.py` (2.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_ml_and_calendar.py` (2.8KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_liquidity_and_custom.py` (2.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_governance.py` (739B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_fundamental_metrics.py` (2.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_flows_and_delta.py` (1.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_f04_dvm_pledge.py` (1.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_delivery_signal.py` (1.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_delivery_in_decision.py` (976B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_decision_engine.py` (2.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_daily_brief_and_boom.py` (1.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_cleaning.py` (1.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_batch_c.py` (882B, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_batch_b.py` (1.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_backtest.py` (1.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_backlog.py` (2.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/tests/test_analytics_totalreturn.py` (1.4KB, last touched 2026-07-12T14:54:29+05:30)
+- **PHASE** (37 files):
+  - `main-repo-clean/stock-screener/phase3_execution_framework.py` (15.9KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_results/phase2_execution_status.json` (623B, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_results/final/phase2_final_results.json` (1.1KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_results/final/PHASE3_DEPLOYMENT_PLAN.md` (4.0KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_results/final/PHASE2_GO_NO_GO_DECISION.json` (1.8KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_master_executor.py` (14.2KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_execution_workflow.py` (14.8KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase1_validation.py` (15.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/PHASE2_PROGRESS_UPDATE.md` (10.0KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/PHASE2_FINAL_STATUS.md` (10.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/PHASE2_EXECUTION_DASHBOARD.md` (12.4KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/PHASE2_COMPREHENSIVE_BACKTEST.md` (9.4KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/PHASE2_ACTIVATION_REPORT.md` (14.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/PHASE1_VALIDATION_REPORT.md` (10.7KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/screener/phase1_data_collection.py` (21.0KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/phase5_global_expansion_model.py` (8.9KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/phase4_live_screener.py` (10.5KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/phase3_announcement_impact.py` (11.5KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/phase2_geographic_regression.py` (7.6KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/docs/PHASE1_QUARTERLY_COLLECTION_COMPLETE.md` (8.4KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/Phase1_Leverage_Cache.ipynb` (23.1KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/Phase1_Bhavcopy_GlobalExpansion.ipynb` (28.9KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/PHASE_1_KICKOFF.txt` (18.9KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/PHASE_1_FREE_COLAB.md` (23.4KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/PHASE_1_EXECUTION_GUIDE.md` (21.7KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/PHASE_1_COMPLETION.md` (7.0KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/PHASE_1_BHAVCOPY_STRATEGY.md` (21.7KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/PHASE_1_ACCELERATED_ONLINE.md` (19.1KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/PHASE1_VALIDATED_STRATEGY.md` (7.9KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/PHASE1_LEVERAGE_EXISTING_DATA.md` (9.0KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/PHASE1_KICKOFF_CHECKLIST.md` (9.8KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/PHASE1_EXECUTION_SUMMARY.md` (9.2KB, no git history found for this path)
+  - `main-repo-clean/PHASE4_EXECUTIVE_DASHBOARD_SYNTHESIS.md` (16.7KB, no git history found for this path)
+  - `main-repo-clean/PHASE4_DEPLOYMENT_CONFIGURATION.md` (17.3KB, no git history found for this path)
+  - `main-repo-clean/PHASE2_LAUNCH_DOCUMENT.md` (10.4KB, no git history found for this path)
+  - `main-repo-clean/PHASE2_DEUTSCHE_BOERSE_INTEGRATION.md` (8.6KB, no git history found for this path)
+  - `global-stock-screener/PHASE1_QUARTERLY_COLLECTION_COMPLETE.md` (8.4KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **WEEK** (29 files):
+  - `main-repo-clean/stock-screener/week4_final_validation.py` (20.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/week3_backtest_executor.py` (23.4KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/week2_backtest_executor.py` (21.3KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/week1_transaction_costs_applied.py` (11.7KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/week1_risk_metrics_calculation.py` (14.2KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/week1_day5_survivorship_bias.py` (13.7KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/week1_day4_compilation.py` (19.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/week1_day3_drawdown_analysis.py` (17.4KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/week1_backtest_executor.py` (15.3KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_results/week3/week3_consolidated_results.json` (7.7KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_results/week3/WEEK3_EXECUTION_REPORT.md` (6.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_results/week2/week2_consolidated_results.json` (6.8KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_results/week2/WEEK2_EXECUTION_REPORT.md` (6.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_results/week1/week1_consolidated_results.json` (4.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/phase2_results/week1/WEEK1_EXECUTION_REPORT.md` (4.1KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK6_NOVEL_STRATEGY_2021_2026_RESEARCH_PLAN.md` (8.6KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK6_IMPLEMENTATION_GUIDE.md` (16.1KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK6_EXECUTIVE_SUMMARY.md` (12.8KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK5_RANDOM_BASKET_BACKTEST_VALIDATION.md` (4.0KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK4_2022_RATE_SHOCK_CRISIS_ANALYSIS.md` (21.1KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK3_REWARD_OPTIMIZED_PORTFOLIO_SELECTION.md` (15.4KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK2_CRISIS_VALIDATION.md` (11.1KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK2_CRISIS_COMPARISON_2000_VS_2008.md` (20.1KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK1_SUMMARY.md` (8.7KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK1_EXECUTION.md` (8.2KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK1_DAY5_SUMMARY.md` (11.0KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK1_DAY4_SUMMARY.md` (12.9KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK1_DAY3_SUMMARY.md` (7.2KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK1_DAY2_SUMMARY.md` (8.9KB, no git history found for this path)
+- **BACKTEST** (28 files):
+  - `main-repo-clean/stock-screener/backtest_full_market_universe.py` (23.4KB, no git history found for this path)
+  - `main-repo-clean/nse_screener_reference/scan_results/backtest_1yr_full_NSE_latest.xlsx` (2.0MB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/docs/BACKTEST_DATA_COLLECTION_ROADMAP.md` (12.1KB, no git history found for this path)
+  - `main-repo-clean/backtest_screener_strategies.py` (32.4KB, no git history found for this path)
+  - `main-repo-clean/backtest_full_market_universe.py` (23.4KB, no git history found for this path)
+  - `main-repo-clean/backtest_dsc_filter_2008_2009.py` (21.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/backtest_results/backtest_results/backtest_US_20260626_1355.xlsx` (5.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1300.xlsx` (2.0MB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1230.xlsx` (84.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/backtest_results/backtest_results/backtest_IN_20260626_1219.xlsx` (96.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/backtest_screeners.py` (61.1KB, no git history found for this path)
+  - `main-repo-clean/BACKTEST_RESULTS_COMPREHENSIVE.txt` (16.2KB, no git history found for this path)
+  - `global-stock-screener/backtest_weight_validation.py` (8.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/backtest_weight_optimization.py` (19.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/backtest_price_sweep.py` (5.8KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/backtest_piotroski_us.py` (6.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/backtest_piotroski_in.py` (9.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/backtest_magic_formula_us.py` (5.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/backtest_fundamentals_all.py` (9.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/backtest_combo_us.py` (10.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/backtest_combo_all.py` (9.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/backtest_coffee_can_us.py` (5.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/backtest.py` (5.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/BACKTEST_TEMPLATE_CHANGES.md` (9.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/BACKTEST_RESULTS_SUMMARY.md` (9.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/BACKTEST_FINDINGS.md` (3.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/BACKTEST_DATA_COLLECTION_ROADMAP.md` (12.1KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/.bt_bin/backtest.py` (6.0KB, last touched 2026-07-12T14:54:29+05:30)
+- **SSRI** (27 files):
+  - `fuel-retail-outlets/ssri_api_discovery_report_20260624_084400.json` (406B, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/ssri_systematic_extractor.py` (18.0KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/ssri_petrol_pumps_api.py` (11.9KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/ssri_html_scraper.py` (9.6KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_state_wise_20260624_060800.json` (1.5KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_state_wise_20260624_055627.json` (1.5KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.js` (25.6KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_060800.geojson` (41.1KB, last touched 2026-07-12T10:29:24+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.js` (25.6KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_pumps/ssri_pumps_20260624_055627.geojson` (41.1KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_summary_20260712_095541.json` (1.6KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_summary_20260624_063249.json` (1.6KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_deduplicated_summary_20260712.json` (1.8KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_deduplicated_20260712.json` (44.4MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_deduplicated_20260712.csv` (23.5MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260712_095541.json` (56.4MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260712_095541.csv` (29.8MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.json` (14.2MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.js` (12.3MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.geojson` (14.5MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_ssri_complete/ssri_all_pumps_20260624_063249.csv` (7.2MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/SSRI_vs_PPAC_Comparison_Report.xlsx` (4.8MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/SSRI_vs_PPAC_TALLY.md` (6.3KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/SSRI_REEXTRACTION_20260712.md` (4.4KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/SSRI_COMPLETE_EXTRACTION_REPORT.md` (10.1KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/SSRI_API_DATA_EXTRACTION.md` (9.5KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/SSRI_100K_INTEGRATION_GUIDE.md` (8.7KB, last touched 2026-07-12T10:29:24+05:30)
+- **DAILY** (27 files):
+  - `main-repo-clean/stock-screener/daily_mailer_universal_integrated.py` (32.9KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/screener/daily_price_collector.py` (9.7KB, no git history found for this path)
+  - `main-repo-clean/daily_scan_and_mail.sh` (4.0KB, no git history found for this path)
+  - `main-repo-clean/daily_mailer_universal_integrated.py` (32.9KB, no git history found for this path)
+  - `main-repo-clean/daily_mailer_enhanced.py` (25.9KB, no git history found for this path)
+  - `main-repo-clean/daily_mailer.py` (23.1KB, no git history found for this path)
+  - `main-repo-clean/backend/scanners/daily_scanner.py` (18.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/web/daily_scan_report_20260612.html` (28.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/daily_scan_report_20260626.txt` (3.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/daily_scan_report_20260625.txt` (3.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/daily_scan_report_20260624.txt` (4.0KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/daily_scan_report_20260612.txt` (3.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/daily_pipeline.sh` (1.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/daily_combined_report.py` (18.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/notebooks/daily_scan_report_20260612.ipynb` (21.2KB, no git history found for this path)
+  - `main-repo-clean/DAILY_MAILER_README.md` (7.9KB, no git history found for this path)
+  - `main-repo-clean/DAILY_MAILER_QUICKSTART.md` (6.9KB, no git history found for this path)
+  - `global-stock-screener/data/curated/daily_checklist_2026-07-09.md` (4.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/daily_scan_report_20260626.txt` (3.1KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/daily_scan_report_20260625.txt` (3.1KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/daily_scan_report_20260624.txt` (4.0KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/daily_scan_report_20260612.txt` (3.5KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/daily_price_collector.py` (10.6KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/daily_pipeline.sh` (2.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/daily_pipeline.legacy.sh` (2.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/daily_memory.sh` (1.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/daily_brief.py` (4.2KB, last touched 2026-07-12T14:54:29+05:30)
+- **TOLL** (25 files):
+  - `main-repo-clean/toll_heatmap_2024-11.html` (65.0KB, no git history found for this path)
+  - `main-repo-clean/toll_heatmap_2024-10.html` (65.0KB, no git history found for this path)
+  - `main-repo-clean/toll_heatmap_2024-09.html` (65.0KB, no git history found for this path)
+  - `main-repo-clean/toll_heatmap_2024-08.html` (65.0KB, no git history found for this path)
+  - `main-repo-clean/toll_heatmap_2024-07.html` (65.0KB, no git history found for this path)
+  - `main-repo-clean/toll_heatmap_2024-06.html` (65.0KB, no git history found for this path)
+  - `main-repo-clean/toll_heatmap_2024-05.html` (65.0KB, no git history found for this path)
+  - `main-repo-clean/toll_heatmap_2024-04.html` (65.0KB, no git history found for this path)
+  - `main-repo-clean/toll_heatmap_2024-03.html` (126.1KB, no git history found for this path)
+  - `main-repo-clean/toll_heatmap_2024-01.html` (126.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/web/toll_plazas_map.html` (1.5MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/web/toll_dashboard.html` (21.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/web/toll_collections_heatmap.html` (736.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/toll_metrics.json` (9.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/toll_analysis_report.txt` (4.3KB, no git history found for this path)
+  - `global-stock-screener/toll_metrics.json` (9.7KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/toll_analysis_report.txt` (4.3KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/toll_retail_map_20260624_094534.html` (10.4MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/toll_retail_distance_map_20260624_095202.html` (2.8MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/TOLL_RETAIL_INTEGRATION_20260624_093854.xlsx` (102.6KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/TOLL_RETAIL_DISTANCE_ANALYSIS_20260624_095202.xlsx` (90.9KB, last touched 2026-07-12T10:29:24+05:30)
+  - `toll-plaza-highways/toll_plaza_visualization.py` (16.4KB, last touched 2026-06-30T14:25:20+05:30)
+  - `toll-plaza-highways/toll_plaza_dashboard.py` (22.2KB, last touched 2026-06-30T14:25:20+05:30)
+  - `toll-plaza-highways/TOLL_RETAIL_INTEGRATION_SUMMARY.md` (10.8KB, last touched 2026-06-30T14:25:20+05:30)
+  - `toll-plaza-highways/TOLL_RETAIL_DISTANCE_ANALYSIS_SUMMARY.md` (12.6KB, last touched 2026-06-30T14:25:20+05:30)
+- **README** (25 files):
+  - `main-repo-clean/stock-screener/docs/README.md` (3.1KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/README.md` (12.4KB, no git history found for this path)
+  - `main-repo-clean/stock-portfolio-evaluator/README.md` (7.7KB, no git history found for this path)
+  - `main-repo-clean/nse_screener_reference/README.md` (13.1KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/README.md` (9.0KB, no git history found for this path)
+  - `main-repo-clean/german_market/README.md` (9.9KB, no git history found for this path)
+  - `main-repo-clean/docs/README.md` (649B, no git history found for this path)
+  - `main-repo-clean/README.md` (3.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/README.md` (7.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/README.md` (1.4KB, no git history found for this path)
+  - `global-stock-screener/notebooks/README.md` (1.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/README.md` (6.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `fuel-retail-outlets/fuel-station-gap-analysis/README.md` (12.7KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/fuel-pump-locations-map/README.md` (3.4KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/README.md` (7.1KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/README.md` (2.8KB, last touched 2026-07-12T10:29:24+05:30)
+  - `toll-plaza-highways/README.md` (1.4KB, last touched 2026-06-30T14:25:20+05:30)
+  - `india-trade-export-analysis/README.md` (1.3KB, last touched 2026-06-30T14:25:25+05:30)
+  - `claude-stock-tools/README.md` (20.3KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/05_enrichment/README.md` (2.4KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/04_strategy_reference/README.md` (1.4KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/03_colab_notebooks/README.md` (1.5KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/02_market_screeners/README.md` (2.5KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/01_daily_reports/README.md` (959B, last touched 2026-06-13T19:42:45+05:30)
+  - `subscription-model-revenue/README.md` (1.5KB, last touched 2026-06-26T23:34:42+05:30)
+- **PORTFOLIO** (24 files):
+  - `main-repo-clean/stock-screener/portfolio_requirements.txt` (119B, no git history found for this path)
+  - `main-repo-clean/stock-screener/portfolio_dashboard.html` (15.3KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/portfolio_api.py` (15.6KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/portfolio_analyzer.py` (17.4KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/PORTFOLIO_SETUP.md` (9.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/PORTFOLIO_REBALANCING_TRACKER.md` (21.2KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/PORTFOLIO_AND_VALIDATION_SUMMARY.md` (12.3KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/PORTFOLIO_ANALYZER_README.md` (13.9KB, no git history found for this path)
+  - `main-repo-clean/stock-portfolio-evaluator/stock_evaluator/portfolio.py` (4.9KB, no git history found for this path)
+  - `main-repo-clean/portfolio_b_german_expansion.py` (22.4KB, no git history found for this path)
+  - `main-repo-clean/portfolio_analysis.py` (34.4KB, no git history found for this path)
+  - `main-repo-clean/nse_screener_reference/portfolio_IN_latest.xlsx` (13.6KB, no git history found for this path)
+  - `main-repo-clean/backend/routers/portfolio.py` (5.4KB, no git history found for this path)
+  - `main-repo-clean/backend/events/portfolio_monitor.py` (7.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2234.xlsx` (13.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2233.xlsx` (12.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2227.xlsx` (13.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2226.xlsx` (9.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2224.xlsx` (9.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/portfolio_results/portfolio_results/portfolio_IN_20260626_2223.xlsx` (9.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/portfolio_builder.py` (17.9KB, no git history found for this path)
+  - `global-stock-screener/portfolio_evaluator.py` (15.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/portfolio_analytics.py` (5.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/notebooks/04_portfolio_evaluator.ipynb` (3.4KB, last touched 2026-07-12T14:54:29+05:30)
+- **DATA** (22 files):
+  - `main-repo-clean/stock-screener/DATA_DISCOVERY_PLAN.md` (13.2KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/DATA_COMPLETENESS_TEST.py` (13.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/data_sources.py` (5.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/DATA_AND_MODULES.md` (11.3KB, no git history found for this path)
+  - `main-repo-clean/DATA_INTEGRATION_OPTIONS.md` (9.2KB, no git history found for this path)
+  - `main-repo-clean/DATA_COMPRESSION_REPORT.md` (5.9KB, no git history found for this path)
+  - `global-stock-screener/notebooks/01_data_layer.ipynb` (3.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/data_validator.py` (26.8KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/data_sources.py` (9.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/data_inventory_report.json` (17.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/data_config.py` (16.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/DATA_VALIDATION_QUICKSTART.md` (6.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/DATA_VALIDATION_IMPLEMENTATION_ROADMAP.md` (12.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/DATA_VALIDATION_HONEST_SUMMARY.md` (5.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/DATA_VALIDATION_GUIDE.md` (15.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/DATA_STRUCTURE_GUIDE.md` (11.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/DATA_SOURCES.md` (7.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/DATA_SCHEMA_AND_ARCHITECTURE.md` (8.6KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/DATA_LINKAGE.md` (5.6KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/DATA_DEDUPLICATION_STRATEGY.md` (9.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/DATA_AND_MODULES.md` (11.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `fuel-retail-outlets/fuel-station-gap-analysis/data.js` (13.2KB, last touched 2026-07-12T10:29:24+05:30)
+- **CLEANED** (20 files):
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_ZA.parquet` (877.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_US.parquet` (32.1MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_UK.parquet` (3.3MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_TW.parquet` (7.1MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_SG.parquet` (1.3MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_SE.parquet` (2.0MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_SA.parquet` (1.5MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_KR.parquet` (9.3MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_JP.parquet` (12.3MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_HK.parquet` (2.8MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_FI.parquet` (716.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_EU.parquet` (4.0MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_DK.parquet` (406.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_DE.parquet` (1.5MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_CN.parquet` (21.8MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_CH.parquet` (872.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_CA.parquet` (4.0MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_BR.parquet` (1.1MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long_AU.parquet` (3.6MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/cleaned_long.parquet` (16.5MB, no git history found for this path)
+- **INDIA** (17 files):
+  - `main-repo-clean/global_expansion_screener_framework/india_stocks_2021_2026.db.gz` (3.2MB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/india_stocks_2021_2026.db` (10.1MB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/india_stocks_2016_2020.db.gz` (2.8MB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/india_stocks_2016_2020.db` (8.4MB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/india_stocks_2011_2015.db.gz` (2.6MB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/india_stocks_2011_2015.db` (7.9MB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/india_stocks_15y_full.db` (5.1MB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/india_stocks_15y.db.gz` (986.1KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/india_stocks_15y.db` (2.6MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/india_ccc_screen.parquet` (7.9KB, no git history found for this path)
+  - `global-stock-screener/india_public.py` (3.8KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/india_fundamentals_yf.py` (6.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/india_ccc_screen.parquet` (6.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `claude-stock-tools/03_colab_notebooks/india_stock_reporting.ipynb` (135.0KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+  - `claude-stock-tools/03_colab_notebooks/india_stock_analysis.ipynb` (32.1KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+  - `claude-stock-tools/02_market_screeners/india_market_scan.py` (26.9KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/01_daily_reports/india_daily_report.py` (56.7KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **COMBINED** (16 files):
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1917.json` (591.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1917.html` (7.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1909.json` (572.0KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_US_20260626_1909.html` (3.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1906.json` (350.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1906.html` (6.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1847.json` (355.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1847.html` (7.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1845.json` (445.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1845.html` (38.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.json` (445.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1842.html` (38.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1832.json` (2.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/combined_IN_20260626_1832.html` (1.5KB, no git history found for this path)
+  - `global-stock-screener/combined_mailer.py` (3.8KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/combined_brief.html` (46.1KB, last touched 2026-07-12T14:54:29+05:30)
+- **BHAVCOPY** (16 files):
+  - `main-repo-clean/Downloads/data/wf_backtest/wf_backtest/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv` (591.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260611_F_0000.csv` (580.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260610_F_0000.csv` (582.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260609_F_0000.csv` (586.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_NSE_CM_0_0_0_20260608_F_0000.csv` (588.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260612_F_0000.CSV` (12.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260611_F_0000.CSV` (830.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/BhavCopy_BSE_CM_0_0_0_20260610_F_0000.CSV` (827.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260625_F_0000.csv` (591.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260624_F_0000.csv` (589.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260623_F_0000.csv` (588.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/backtest_results/backtest_results/BhavCopy_NSE_CM_0_0_0_20260622_F_0000.csv` (597.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/bhavcopy_store.py` (7.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/bhavcopy_history.py` (14.7KB, no git history found for this path)
+  - `global-stock-screener/bhavcopy_store.py` (7.6KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/bhavcopy_history.py` (14.6KB, last touched 2026-07-12T14:54:29+05:30)
+- **MARKET** (15 files):
+  - `main-repo-clean/backend/parsers/market_db.py` (9.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/market_performance.py` (4.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/market_data_cache.py` (28.0KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/market_calendar.py` (4.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/market_performance_5y.xlsx` (6.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/market_performance_5y.parquet` (8.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/market_liquidity.parquet` (6.7KB, no git history found for this path)
+  - `main-repo-clean/.github/workflows/market_movers.yml` (2.0KB, no git history found for this path)
+  - `global-stock-screener/market_performance.py` (4.6KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/market_memory.py` (15.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/market_holidays.py` (12.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/market_data_cache.py` (28.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/market_calendar.py` (4.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/market_performance_5y.parquet` (8.5KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/cache_seed/market_liquidity.parquet` (6.7KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **SCREENER** (14 files):
+  - `main-repo-clean/screener_extended_filters.py` (34.3KB, no git history found for this path)
+  - `main-repo-clean/SCREENER_UNIVERSAL_STANDARDS.csv` (1.8KB, no git history found for this path)
+  - `main-repo-clean/SCREENER_BASIS.md` (11.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/us_screener_output/us_screener_output/screener.db` (1.6MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/screener_kit.py` (10.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/screener_in.py` (4.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/screener_analysis.py` (51.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/SCREENER_LITERATURE_LOG.md` (24.5KB, no git history found for this path)
+  - `global-stock-screener/screener_kit.py` (10.8KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/screener_in_auth.py` (12.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/screener_in.py` (4.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/screener_history_collector.py` (8.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/screener_findings_mailer.py` (15.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/SCREENER_ACCESS.md` (2.6KB, last touched 2026-07-12T14:54:29+05:30)
+- **GLOBAL** (14 files):
+  - `main-repo-clean/stock-screener/global_market_fetcher.py` (15.2KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/GLOBAL_QUARTERLY_ACTION_PLAN_FII_DII.md` (27.0KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/GLOBAL_LUMP_SUM_VS_SIP_BACKTEST.md` (47.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/GLOBAL_INSTITUTIONAL_FLOWS_ANALYSIS_OUTSIDE_INDIA.md` (34.7KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/screener/global_20country_universe_screener.py` (19.6KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/docs/GLOBAL_EXPANSION_SCREENING_FRAMEWORK.md` (15.9KB, no git history found for this path)
+  - `main-repo-clean/docs/repo/global-market-scanners.html` (2.0KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/global_highlights.parquet` (8.0KB, no git history found for this path)
+  - `global-stock-screener/global_stocks_india_reinvestment_summary.csv` (1.6KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/global_20country_universe_screener.py` (20.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/data/global_universe_master.csv` (1.4MB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/global_highlights.parquet` (8.0KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/GLOBAL_EXPANSION_SCREENING_FRAMEWORK.md` (15.9KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/GLOBAL_20COUNTRY_DEPLOYMENT_SUMMARY.txt` (15.0KB, last touched 2026-07-12T14:54:29+05:30)
+- **STOCK** (13 files):
+  - `main-repo-clean/stock_metrics_nse.py` (19.4KB, no git history found for this path)
+  - `main-repo-clean/stock-extractor.pem.example` (176B, no git history found for this path)
+  - `main-repo-clean/Stock_reporting.ipynb` (126.2KB, no git history found for this path)
+  - `main-repo-clean/STOCK_ANALYSIS_SYSTEM.md` (34.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/us_screener_output/us_screener_output/stock_universe.csv` (363.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/stock_utils.py` (15.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/stock_enricher.py` (14.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/stock_daily_report_improved.py` (56.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/stock_daily_report.R` (35.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/notebooks/Stock_reporting.ipynb` (135.0KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/notebooks/Stock_Analysis_Colab.ipynb` (32.1KB, no git history found for this path)
+  - `global-stock-screener/stock_utils.py` (15.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/stock_daily_report.R` (35.3KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **INDIAN** (12 files):
+  - `main-repo-clean/nse_screener_reference/scan_results/indian_full_scan_latest.xlsx` (441.6KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/INDIAN_MARKET_DATA_DB.md` (11.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260626_0943.xlsx` (453.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260626_0907.xlsx` (438.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260625_0836.xlsx` (120.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260624_0837.xlsx` (122.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260623_0840.xlsx` (346.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260623_0838.xlsx` (461.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260622_0836.xlsx` (118.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1156.xlsx` (389.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1135.xlsx` (349.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/indian_full_scan_20260612_1120.xlsx` (6.1KB, no git history found for this path)
+- **FULL** (12 files):
+  - `main-repo-clean/FULL_UNIVERSE_IMPLEMENTATION_SUMMARY.txt` (20.5KB, no git history found for this path)
+  - `main-repo-clean/FULL_UNIVERSE_FILTER_EVALUATION.txt` (6.0KB, no git history found for this path)
+  - `main-repo-clean/FULL_MARKET_UNIVERSE_DEEP_ANALYSIS.md` (15.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/backtest_results/backtest_results/full_run_log.txt` (20.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/full_us_market_scan.py` (45.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/full_korea_market_scan.py` (27.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/full_japan_market_scan.py` (28.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/full_indian_market_scan.py` (46.0KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/full_european_market_scan.py` (29.5KB, no git history found for this path)
+  - `global-stock-screener/full_korea_market_scan.py` (27.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/full_japan_market_scan.py` (28.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/full_european_market_scan.py` (31.6KB, last touched 2026-07-12T14:54:29+05:30)
+- **DAMODARAN** (12 files):
+  - `main-repo-clean/backend/damodaran.py` (11.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/damodaran_roe.parquet` (8.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/damodaran_pe.parquet` (15.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/damodaran_margin.parquet` (29.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/damodaran_companies.parquet` (1.7MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/damodaran_beta.parquet` (23.7KB, no git history found for this path)
+  - `global-stock-screener/reference_seed/damodaran_roe.parquet` (8.9KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/reference_seed/damodaran_pe.parquet` (15.6KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/reference_seed/damodaran_margin.parquet` (29.6KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/reference_seed/damodaran_companies.parquet` (1.7MB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/reference_seed/damodaran_beta.parquet` (23.7KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `claude-stock-tools/05_enrichment/damodaran_enrichment.py` (16.3KB, last touched 2026-06-13T19:42:45+05:30)
+- **REQUIREMENTS** (11 files):
+  - `main-repo-clean/stock-screener/requirements.txt` (9.0KB, no git history found for this path)
+  - `main-repo-clean/stock-portfolio-evaluator/requirements.txt` (252B, no git history found for this path)
+  - `main-repo-clean/requirements_nse_bse.txt` (448B, no git history found for this path)
+  - `main-repo-clean/requirements.txt` (9.0KB, no git history found for this path)
+  - `main-repo-clean/put_call_parity/requirements.txt` (202B, no git history found for this path)
+  - `main-repo-clean/backend/requirements.txt` (905B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/requirements.txt` (966B, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/requirements-docker.txt` (240B, no git history found for this path)
+  - `global-stock-screener/requirements.txt` (1.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/requirements-docker.txt` (240B, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/requirements-ddd.txt` (295B, last touched 2026-07-12T14:54:29+05:30)
+- **QUICK** (11 files):
+  - `main-repo-clean/stock-screener/docs/QUICK_START.md` (4.5KB, no git history found for this path)
+  - `main-repo-clean/portfolio_b_deployment/QUICK_START.md` (5.7KB, no git history found for this path)
+  - `main-repo-clean/QUICK_START_GUIDE.txt` (15.5KB, no git history found for this path)
+  - `main-repo-clean/QUICK_START.md` (4.5KB, no git history found for this path)
+  - `main-repo-clean/QUICK_REFERENCE_GUIDE.md` (7.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/quick_reference.py` (30.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/Quick_Start_Guide.md` (8.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/QUICK_START.md` (7.2KB, no git history found for this path)
+  - `global-stock-screener/QUICK_START.md` (7.2KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/data-sources/QUICK_SOURCES_REFERENCE.txt` (17.0KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/quick_start.sh` (3.9KB, last touched 2026-07-12T10:29:24+05:30)
+- **GITIGNORE** (10 files):
+  - `main-repo-clean/stock-portfolio-evaluator/.gitignore` (116B, no git history found for this path)
+  - `main-repo-clean/repo-inventory/.gitignore` (9B, no git history found for this path)
+  - `main-repo-clean/nse_screener_reference/scan_results/.gitignore` (90B, no git history found for this path)
+  - `main-repo-clean/frontend/.gitignore` (6B, no git history found for this path)
+  - `main-repo-clean/.gitignore` (540B, no git history found for this path)
+  - `global-stock-screener/.gitignore` (2.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `fuel-retail-outlets/.gitignore` (35B, last touched 2026-07-12T10:29:24+05:30) **<- most recently touched**
+  - `toll-plaza-highways/.gitignore` (35B, last touched 2026-06-30T14:25:20+05:30)
+  - `india-trade-export-analysis/.gitignore` (35B, last touched 2026-06-30T14:25:25+05:30)
+  - `claude-stock-tools/.gitignore` (129B, last touched 2026-06-13T19:42:45+05:30)
+- **EXTRACT** (10 files):
+  - `main-repo-clean/api-data-integration/extract_cold_chain_data.py` (9.2KB, no git history found for this path)
+  - `main-repo-clean/api-data-integration/extract_bpcl_regional_dealerships.py` (16.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/extract attachment agent.json` (10.3KB, no git history found for this path)
+  - `global-stock-screener/extract attachment agent.json` (10.3KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/extract_ssri_complete_107k.py` (8.7KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/extract_cashatpos_from_pdf.py` (20.1KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/extract_bpcl_dealership_data.py` (16.0KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/extract_bpcl_by_zone_state_district.py` (16.0KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/extract_all_ssri_pumps.py` (26.3KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/extract_all_ssri_complete.py` (13.7KB, last touched 2026-07-12T10:29:24+05:30)
+- **DEPLOYMENT** (10 files):
+  - `main-repo-clean/stock-screener/docs/DEPLOYMENT_CHECKLIST.md` (13.9KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/DEPLOYMENT_GAPS_AND_ROADMAP.md` (16.0KB, no git history found for this path)
+  - `main-repo-clean/portfolio_b_deployment/DEPLOYMENT_COMPLETE.md` (7.3KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/docs/DEPLOYMENT_GUIDE.md` (11.9KB, no git history found for this path)
+  - `main-repo-clean/DEPLOYMENT_TEST_REPORT.md` (15.8KB, no git history found for this path)
+  - `main-repo-clean/DEPLOYMENT_RESULTS_GERMAN_MOMENTUM_BREAKOUT.txt` (12.5KB, no git history found for this path)
+  - `main-repo-clean/DEPLOYMENT_GUIDE_FULL_UNIVERSE.md` (12.3KB, no git history found for this path)
+  - `main-repo-clean/DEPLOYMENT_CHECKLIST.md` (13.9KB, no git history found for this path)
+  - `global-stock-screener/DEPLOYMENT_GUIDE.md` (11.9KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/DEPLOYMENT_COMPLETE.txt` (11.3KB, last touched 2026-07-12T14:54:29+05:30)
+- **BUILD** (9 files):
+  - `main-repo-clean/docs/_build_repo_pages.py` (9.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/build_market_seeds.py` (4.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/build_mailer.py` (21.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/build_europe_broad_list.py` (9.0KB, no git history found for this path)
+  - `global-stock-screener/build_warehouse.py` (2.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/build_universe.py` (4.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/build_market_seeds.py` (3.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/build_mailer.py` (28.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/build_email.py` (38.0KB, last touched 2026-07-12T14:54:29+05:30)
+- **REWARD** (8 files):
+  - `global-stock-screener/reward_screener_picks.py` (7.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/reward_screener_opt.py` (18.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/reward_screener_all.py` (4.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/reward_picks_mailer.py` (8.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/reward_overlay_mailer.py` (6.6KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/reports/reward_screeners_252d.csv` (1.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/reports/reward_screeners_126d.csv` (1.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/reports/reward_picks.csv` (3.5KB, last touched 2026-07-12T14:54:29+05:30)
+- **GERMAN** (8 files):
+  - `main-repo-clean/portfolio_b_deployment/GERMAN_MARKET_EXPANSION.md` (14.7KB, no git history found for this path)
+  - `main-repo-clean/german_quality_report.csv` (392B, no git history found for this path)
+  - `main-repo-clean/german_market/german_market_analysis.py` (9.1KB, no git history found for this path)
+  - `main-repo-clean/GERMAN_MOMENTUM_BREAKOUT_SCAN_RESULTS.md` (8.2KB, no git history found for this path)
+  - `main-repo-clean/GERMAN_MARKET_FINAL_STATUS.md` (6.0KB, no git history found for this path)
+  - `main-repo-clean/GERMAN_MARKET_DEPLOYMENT_READY.md` (5.7KB, no git history found for this path)
+  - `main-repo-clean/GERMAN_MARKET_DATA_QUALITY_REPORT.md` (4.7KB, no git history found for this path)
+  - `main-repo-clean/GERMAN_DATA_EXTRACTION_QUICKSTART.md` (6.9KB, no git history found for this path)
+- **DARVAS** (8 files):
+  - `main-repo-clean/backend/scanners/darvas.py` (4.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/strategies/darvas.py` (4.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/darvas_breakouts.py` (15.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/native/darvas_wrapper.py` (9.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/native/darvas_fast.so` (16.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/native/darvas_fast.c` (8.4KB, no git history found for this path)
+  - `global-stock-screener/strategies/darvas.py` (1.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/darvas_breakouts.py` (16.1KB, last touched 2026-07-12T14:54:29+05:30)
+- **COLAB** (8 files):
+  - `main-repo-clean/stock-screener/notebooks/COLAB_QUICK_CHECK.ipynb` (21.1KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/COLAB_PHASE1_SETUP.md` (18.5KB, no git history found for this path)
+  - `main-repo-clean/docs/repo/colab-experiments.html` (1.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/r/colab_r_setup.R` (4.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/colab_quickstart.ipynb` (6.5KB, no git history found for this path)
+  - `main-repo-clean/Colab_Stock_Analysis_Runner.ipynb` (8.3KB, no git history found for this path)
+  - `main-repo-clean/COLAB_QUICK_CHECK.ipynb` (21.1KB, no git history found for this path)
+  - `global-stock-screener/colab_quickstart.ipynb` (6.7KB, last touched 2026-07-12T14:54:29+05:30)
+- **BPCL** (8 files):
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_summary_20260624_081647.json` (537B, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_summary_20260624_081532.json` (718B, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081647.json` (71.4KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.json` (4.4KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/outlet_data_bpcl_complete/bpcl_complete_dealerships_20260624_081532.geojson` (45B, last touched 2026-07-12T10:29:24+05:30) **<- most recently touched**
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_summary_20260624_081300.json` (285B, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.json` (4.0KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_bpcl/bpcl_dealerships_20260624_081300.geojson` (45B, last touched 2026-07-12T10:29:24+05:30)
+- **SENTIMENT** (7 files):
+  - `main-repo-clean/Downloads/data/sentiment_results/sentiment_results/sentiment_IN_20260626_1823.json` (2.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_US_20260626_1817.xlsx` (1.8MB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_US_20260626_1815.xlsx` (1.8MB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/sentiment_link_results/sentiment_link_results/sentiment_link_IN_20260626_1819.xlsx` (3.5MB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/sentiment_price_link.py` (12.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/sentiment_pipeline.py` (29.0KB, no git history found for this path)
+  - `global-stock-screener/sentiment_pipeline.py` (33.6KB, last touched 2026-07-12T14:54:29+05:30)
+- **KAGGLE** (7 files):
+  - `main-repo-clean/KAGGLE_PANDAS_SETUP.md` (5.5KB, no git history found for this path)
+  - `main-repo-clean/KAGGLE_INTEGRATION_SUMMARY.txt` (14.2KB, no git history found for this path)
+  - `main-repo-clean/KAGGLE_INTEGRATION_GUIDE.md` (4.9KB, no git history found for this path)
+  - `main-repo-clean/KAGGLE_IMPLEMENTATION_SUMMARY.md` (9.3KB, no git history found for this path)
+  - `main-repo-clean/KAGGLE_DATASETS_INDIA_MAP.md` (10.5KB, no git history found for this path)
+  - `fuel-retail-outlets/api-data-integration/kaggle_loader.py` (10.6KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/KAGGLE_QUICK_START.md` (3.9KB, last touched 2026-07-12T10:29:24+05:30)
+- **EXPORT** (7 files):
+  - `main-repo-clean/backend/routers/export.py` (2.0KB, no git history found for this path)
+  - `global-stock-screener/export_company_list.py` (4.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `india-trade-export-analysis/export_opportunities.py` (4.3KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/export_insights.py` (5.7KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/export_extended_analysis.py` (10.4KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/export_analysis.py` (6.1KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/EXPORT_INSIGHTS_SUMMARY.md` (5.6KB, last touched 2026-06-30T14:25:25+05:30)
+- **SECTOR** (6 files):
+  - `main-repo-clean/global_expansion_screener_framework/screener/sector_geographic_analysis.py` (32.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/sector_results/sector_results/sector_analysis_US_20260626_1751.xlsx` (9.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/sector_results/sector_results/sector_analysis_IN_20260626_1827.xlsx` (10.0KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/sector_results/sector_results/sector_analysis_IN_20260626_1752.xlsx` (8.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/sector_analysis.py` (16.0KB, no git history found for this path)
+  - `global-stock-screener/sector_map.py` (6.6KB, last touched 2026-07-12T14:54:29+05:30)
+- **MORNING** (6 files):
+  - `main-repo-clean/stock-screener/morning_ocaml_routine.sh` (18.1KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/docs/MORNING_ROUTINE_SETUP.md` (11.6KB, no git history found for this path)
+  - `main-repo-clean/morning_ocaml_routine.sh` (18.1KB, no git history found for this path)
+  - `main-repo-clean/MORNING_ROUTINE_SETUP.md` (11.6KB, no git history found for this path)
+  - `global-stock-screener/schedule/morning_dashboard.sh` (4.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/morning_mailer.py` (8.0KB, last touched 2026-07-12T14:54:29+05:30)
+- **LIQUIDITY** (6 files):
+  - `main-repo-clean/stock-screener/liquidity_analysis_quarterly_rotation.py` (20.7KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/LIQUIDITY_AND_EXECUTION_ANALYSIS.md` (13.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/liquidity.py` (6.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/cache_seed/liquidity_index.parquet` (652.2KB, no git history found for this path)
+  - `global-stock-screener/liquidity.py` (7.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/liquidity_index.parquet` (652.2KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **EUROPEAN** (6 files):
+  - `main-repo-clean/data/samples/european_sample.csv` (1.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1538.xlsx` (21.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1537.xlsx` (20.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1409.xlsx` (21.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1408.xlsx` (21.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/european_scan/european_scan/european_market_scan_20260612_1407.xlsx` (11.0KB, no git history found for this path)
+- **SETUP** (5 files):
+  - `main-repo-clean/stock-screener/docs/SETUP_AND_REQUIREMENTS.md` (11.2KB, no git history found for this path)
+  - `main-repo-clean/stock-portfolio-evaluator/setup.py` (888B, no git history found for this path)
+  - `main-repo-clean/setup_daily_mailer.sh` (2.1KB, no git history found for this path)
+  - `main-repo-clean/SETUP_AND_REQUIREMENTS.md` (11.2KB, no git history found for this path)
+  - `global-stock-screener/setup_shared_data_symlinks.sh` (4.9KB, last touched 2026-07-12T14:54:29+05:30)
+- **REPO** (5 files):
+  - `global-stock-screener/repo_data_analyzer.py` (18.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/repo_dashboard.py` (12.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/REPO_INDEX_GUIDE.md` (8.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/REPO_INDEX.md` (19.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/REPO_INDEX.json` (74.5KB, last touched 2026-07-12T14:54:29+05:30)
+- **PROJECT** (5 files):
+  - `main-repo-clean/global_expansion_screener_framework/docs/PROJECT_STATUS_JULY_2026.md` (11.5KB, no git history found for this path)
+  - `main-repo-clean/PROJECT_STATUS.md` (7.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/PROJECT_SUMMARY.txt` (15.4KB, no git history found for this path)
+  - `global-stock-screener/PROJECT_SUMMARY.txt` (15.4KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+  - `global-stock-screener/PROJECT_STATUS_JULY_2026.md` (11.5KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **PRICE** (5 files):
+  - `main-repo-clean/global_expansion_screener_framework/screener/price_criterion_correlation_tracker.py` (16.0KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/screener/price_correlation_analysis.py` (15.6KB, no git history found for this path)
+  - `global-stock-screener/price_criterion_correlation_tracker.py` (16.6KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/price_correlation_analysis.py` (15.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/PRICE_CORRELATION_FINDINGS.md` (11.9KB, last touched 2026-07-12T14:54:29+05:30)
+- **INDEX** (5 files):
+  - `main-repo-clean/frontend/src/index.css` (141B, no git history found for this path)
+  - `main-repo-clean/frontend/index.html` (321B, no git history found for this path)
+  - `main-repo-clean/docs/index.html` (18.2KB, no git history found for this path)
+  - `fuel-retail-outlets/fuel-station-gap-analysis/index.html` (9.6KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/fuel-pump-locations-map/index.html` (8.6KB, last touched 2026-07-12T10:29:24+05:30)
+- **FINAL** (5 files):
+  - `main-repo-clean/stock-screener/FINAL_RESEARCH_SUMMARY.md` (16.9KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/FINAL_PROJECT_SUMMARY.md` (18.0KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/FINAL_PHASE_TEST_REPORT.md` (6.3KB, no git history found for this path)
+  - `main-repo-clean/FINAL_PROJECT_SUMMARY.md` (9.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/FINAL_DELIVERABLES.md` (11.1KB, no git history found for this path)
+- **EUROPE** (5 files):
+  - `main-repo-clean/data/europe_extended_list.csv` (13.3KB, no git history found for this path)
+  - `main-repo-clean/data/europe_all_list.csv` (49.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/data/europe_broad_list.csv` (51.1KB, no git history found for this path)
+  - `global-stock-screener/data/europe_broad_list.csv` (52.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `claude-stock-tools/02_market_screeners/europe_market_scan.py` (30.8KB, last touched 2026-06-13T19:42:45+05:30)
+- **DEBT** (5 files):
+  - `main-repo-clean/Downloads/code/python_files/strategies/debt_reduction.py` (1.9KB, no git history found for this path)
+  - `global-stock-screener/strategies/debt_reduction.py` (2.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/debt_expansion_analysis_template.csv` (4.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/public_screens/debt_reduction.parquet` (11.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `india-trade-export-analysis/DEBT_BORROWING_TRENDS_ANALYSIS.md` (15.9KB, last touched 2026-06-30T14:25:25+05:30)
+- **COMPREHENSIVE** (5 files):
+  - `main-repo-clean/stock-screener/docs/COMPREHENSIVE_STRATEGY_INSIGHTS.md` (11.8KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/COMPREHENSIVE_50_STOCK_GLOBAL_PORTFOLIO.md` (35.3KB, no git history found for this path)
+  - `main-repo-clean/german_market/comprehensive_extraction.py` (9.6KB, no git history found for this path)
+  - `main-repo-clean/COMPREHENSIVE_STOCK_ANALYSIS_2026.md` (20.9KB, no git history found for this path)
+  - `main-repo-clean/COMPREHENSIVE_DATA_SOURCE_INVENTORY.md` (13.8KB, no git history found for this path)
+- **CLAUDE** (5 files):
+  - `main-repo-clean/docs/repo/claude-stock-tools.html` (2.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/CLAUDE.md` (4.5KB, no git history found for this path)
+  - `main-repo-clean/CLAUDE.md` (11.7KB, no git history found for this path)
+  - `main-repo-clean/.claude.json.backup` (21.1KB, no git history found for this path)
+  - `global-stock-screener/CLAUDE.md` (4.5KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **CASH** (5 files):
+  - `main-repo-clean/german_market/cash_conversion_cycle_analysis.py` (14.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/strategies/cash_conversion_cycle.py` (2.1KB, no git history found for this path)
+  - `main-repo-clean/CASH_CONVERSION_CYCLE_FINAL_RESULTS.md` (5.6KB, no git history found for this path)
+  - `global-stock-screener/strategies/cash_conversion_cycle.py` (2.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/public_screens/cash_conversion_cycle.parquet` (11.5KB, last touched 2026-07-12T14:54:29+05:30)
+- **WEEKA** (4 files):
+  - `main-repo-clean/stock-screener/WEEK6A_MODERN_RESILIENCE_PORTFOLIO_ANALYSIS.md` (13.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK2A_STEP_BY_STEP_PORTFOLIO_IMPLEMENTATION.md` (13.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK2A_BENCHMARK_ANALYSIS_ALL_MARKETS.md` (14.8KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK2A_2008_CRISIS_BACKTEST.md` (14.1KB, no git history found for this path)
+- **WATCHLIST** (4 files):
+  - `main-repo-clean/portfolio_b_deployment/watchlist_strong_tier.csv` (397.8KB, no git history found for this path)
+  - `main-repo-clean/portfolio_b_deployment/watchlist_master.csv` (491.8KB, no git history found for this path)
+  - `main-repo-clean/portfolio_b_deployment/watchlist_fair_tier.csv` (23.6KB, no git history found for this path)
+  - `global-stock-screener/watchlist_delta.py` (5.2KB, last touched 2026-07-12T14:54:29+05:30)
+- **SYMBOLS** (4 files):
+  - `main-repo-clean/Downloads/data/us_full_scan/us_full_scan/.symbols_cache.json` (60.6KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/korea_scan/korea_scan/.symbols_cache.json` (453.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/japan_scan/japan_scan/.symbols_cache.json` (479.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/indian_full_scan/indian_full_scan/.symbols_cache.json` (57.3KB, no git history found for this path)
+- **SYMBOL** (4 files):
+  - `main-repo-clean/nse_screener_reference/symbol_master.parquet` (525.5KB, no git history found for this path)
+  - `main-repo-clean/backend/parsers/symbol_db.py` (3.0KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/symbol_master.py` (9.0KB, no git history found for this path)
+  - `global-stock-screener/symbol_master.py` (9.1KB, last touched 2026-07-12T14:54:29+05:30)
+- **SAMPLE** (4 files):
+  - `main-repo-clean/stock-screener/sample_portfolio_generator.py` (18.7KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/sample_portfolio.csv` (792B, no git history found for this path)
+  - `main-repo-clean/stock-portfolio-evaluator/examples/sample_analysis.py` (1.2KB, no git history found for this path)
+  - `main-repo-clean/SAMPLE_SCREENING_OUTPUT.txt` (20.3KB, no git history found for this path)
+- **REWARDS** (4 files):
+  - `main-repo-clean/stock-screener/rewards_optimization.py` (22.1KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/rewards_dashboard.html` (21.9KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/REWARDS_SYSTEM_SUMMARY.md` (16.4KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/REWARDS_OPTIMIZATION_GUIDE.md` (12.8KB, no git history found for this path)
+- **REPORT** (4 files):
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/report_us_v2.log` (14.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/report_us_today.log` (11.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/combined_report_results/combined_report_results/report_today.log` (10.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/stock_ddd/application/ports/report_writer.py` (1.8KB, no git history found for this path)
+- **QUARTERLY** (4 files):
+  - `main-repo-clean/global_expansion_screener_framework/screener/quarterly_data_analyzer.py` (14.1KB, no git history found for this path)
+  - `global-stock-screener/quarterly_data_collector.py` (13.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/quarterly_data_analyzer.py` (15.8KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/public_screens/quarterly_growers.parquet` (13.8KB, last touched 2026-07-12T14:54:29+05:30)
+- **PIOTROSKI** (4 files):
+  - `main-repo-clean/backend/scanners/piotroski.py` (3.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/strategies/piotroski.py` (2.4KB, no git history found for this path)
+  - `global-stock-screener/strategies/piotroski.py` (2.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/public_screens/piotroski_9.parquet` (12.2KB, last touched 2026-07-12T14:54:29+05:30)
+- **MAIN** (4 files):
+  - `main-repo-clean/put_call_parity/main.py` (5.7KB, no git history found for this path)
+  - `main-repo-clean/frontend/src/main.jsx` (234B, no git history found for this path)
+  - `main-repo-clean/backend/main.py` (2.7KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/latex/main.tex` (5.4KB, no git history found for this path)
+- **HYBRID** (4 files):
+  - `main-repo-clean/HYBRID_PROJECT_SUMMARY.md` (12.8KB, no git history found for this path)
+  - `main-repo-clean/HYBRID_EXECUTION_GUIDE.md` (9.5KB, no git history found for this path)
+  - `fuel-retail-outlets/api-data-integration/hybrid_aggregator.py` (16.4KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/HYBRID_IMPLEMENTATION_GUIDE.md` (8.1KB, last touched 2026-07-12T10:29:24+05:30)
+- **HIGH** (4 files):
+  - `global-stock-screener/cache_seed/public_screens/high_mv_investments.parquet` (13.0KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/public_screens/high_growth_high_roe_low_pe.parquet` (8.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `india-trade-export-analysis/HIGH_OPPORTUNITY_EXPORTS.csv` (28.2KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/HIGH_OPPORTUNITY_2026_PROJECTIONS.csv` (757.4KB, last touched 2026-06-30T14:25:25+05:30)
+- **FETCH** (4 files):
+  - `main-repo-clean/Downloads/code/python_files/fetch_market_ohlc.py` (5.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/fetch_and_analyze_cricket_data.R` (14.5KB, no git history found for this path)
+  - `global-stock-screener/fetch_market_ohlc.py` (5.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/fetch_and_analyze_cricket_data.R` (14.5KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **EXCHANGE** (4 files):
+  - `main-repo-clean/Downloads/code/python_files/EXCHANGE_COVERAGE.md` (3.4KB, no git history found for this path)
+  - `global-stock-screener/exchange_reference.py` (9.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/data/curated/exchange_reference.parquet` (222.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/EXCHANGE_COVERAGE.md` (3.4KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **DIVIDEND** (4 files):
+  - `main-repo-clean/stock-screener/DIVIDEND_YIELD_OPTIMIZATION_FILTER.md` (30.1KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/DIVIDEND_STRATEGY_BACKTEST_2021_2026.md` (27.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/strategies/dividend_yield.py` (1.4KB, no git history found for this path)
+  - `global-stock-screener/strategies/dividend_yield.py` (1.4KB, last touched 2026-07-12T14:54:29+05:30)
+- **DIJKSTRA** (4 files):
+  - `fuel-retail-outlets/api-data-integration/dijkstra_toll_retail_shortest_path.py` (18.3KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/dijkstra_filtered_service_outlets.py` (20.6KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/DIJKSTRA_SHORTEST_PATHS_20260624_100334.xlsx` (45.1KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/DIJKSTRA_SERVICE_OUTLETS_20260624_100732.xlsx` (15.4KB, last touched 2026-07-12T10:29:24+05:30)
+- **CREATE** (4 files):
+  - `main-repo-clean/api-data-integration/create_master_integrated_excel.py` (9.2KB, no git history found for this path)
+  - `fuel-retail-outlets/api-data-integration/create_toll_retail_map.py` (15.8KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/create_toll_retail_distance_map.py` (23.0KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/create_comprehensive_retail_summary.py` (13.1KB, last touched 2026-07-12T10:29:24+05:30)
+- **COFFEE** (4 files):
+  - `main-repo-clean/backend/scanners/coffee_can.py` (3.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/strategies/coffee_can.py` (1.8KB, no git history found for this path)
+  - `global-stock-screener/strategies/coffee_can.py` (1.8KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/public_screens/coffee_can.parquet` (14.8KB, last touched 2026-07-12T14:54:29+05:30)
+- **BASE** (4 files):
+  - `main-repo-clean/backend/fetchers/providers/base.py` (11.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/strategies/base.py` (2.8KB, no git history found for this path)
+  - `global-stock-screener/strategies/base.py` (2.8KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/src/shared/domain/base.py` (2.2KB, last touched 2026-07-12T14:54:29+05:30)
+- **WEEKC** (3 files):
+  - `main-repo-clean/stock-screener/WEEK6C_GLOBAL_MARKET_BACKTEST_RESULTS.md` (17.8KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK6C_FINAL_SUMMARY.md` (17.5KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK6C_EXPANDED_MARKET_DATA_COLLECTION.md` (17.6KB, no git history found for this path)
+- **WALK** (3 files):
+  - `main-repo-clean/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1305.xlsx` (955.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/wf_backtest/wf_backtest/walk_forward_20260626_1302.xlsx` (9.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/walk_forward_backtest.py` (66.8KB, no git history found for this path)
+- **VCRUD** (3 files):
+  - `global-stock-screener/vcrud_precheck.py` (3.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/vcrud_index_ltm.py` (2.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/.vcrud_bin/vcrud_manager.py` (14.4KB, last touched 2026-07-12T14:54:29+05:30)
+- **UNIFIED** (3 files):
+  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_summary_20260624_081357.json` (1.0KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_20260624_081357.json` (22.7MB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/unified_petrol_pump_database/unified_pumps_20260624_081357.geojson` (11.7MB, last touched 2026-07-12T10:29:24+05:30)
+- **STORAGE** (3 files):
+  - `main-repo-clean/storage_menu.sh` (6.6KB, no git history found for this path)
+  - `main-repo-clean/storage_analyzer.sh` (4.7KB, no git history found for this path)
+  - `main-repo-clean/storage.sh` (6.5KB, no git history found for this path)
+- **SEASONAL** (3 files):
+  - `main-repo-clean/Downloads/code/web/seasonal_analysis_dashboard.html` (12.1KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/seasonal_analysis_summary.json` (1.3KB, no git history found for this path)
+  - `global-stock-screener/seasonal_analysis_summary.json` (1.3KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **RETAIL** (3 files):
+  - `main-repo-clean/docs/repo/retail-outlet-data.html` (2.4KB, no git history found for this path)
+  - `fuel-retail-outlets/data-sources/RETAIL_OUTLETS_DATA_SOURCES.md` (12.0KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/RETAIL_OUTLETS_SUMMARY_20260624_093416.xlsx` (34.0KB, last touched 2026-07-12T10:29:24+05:30)
+- **QUICKSTART** (3 files):
+  - `main-repo-clean/global_expansion_screener_framework/QUICKSTART_BATCH_EXECUTION.md` (3.9KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/QUICKSTART_5YEAR_SPLITS.md` (9.7KB, no git history found for this path)
+  - `fuel-retail-outlets/fuel-station-gap-analysis/QUICKSTART.md` (7.8KB, last touched 2026-07-12T10:29:24+05:30)
+- **PIPELINE** (3 files):
+  - `main-repo-clean/Downloads/code/python_files/pipeline_news.py` (9.0KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/pipeline_historical.py` (5.7KB, no git history found for this path)
+  - `global-stock-screener/pipeline.py` (11.1KB, last touched 2026-07-12T14:54:29+05:30)
+- **PATTERNS** (3 files):
+  - `main-repo-clean/Downloads/data/pattern_results/pattern_results/patterns_IN_20260626_1732.xlsx` (46.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/pattern_results/pattern_results/patterns_ALL_20260626_1736.xlsx` (2.1MB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/pattern_results/pattern_results/patterns_ALL_20260626_1733.xlsx` (2.1MB, no git history found for this path)
+- **NEWS** (3 files):
+  - `main-repo-clean/backend/routers/news.py` (6.4KB, no git history found for this path)
+  - `main-repo-clean/backend/events/news_enricher.py` (5.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/news_picks.py` (6.4KB, no git history found for this path)
+- **MULTI** (3 files):
+  - `main-repo-clean/stock-screener/multi_market_index_framework.py` (26.7KB, no git history found for this path)
+  - `main-repo-clean/backend/fetchers/multi_source.py` (7.4KB, no git history found for this path)
+  - `india-trade-export-analysis/MULTI_SOURCE_INTEGRATION_ANALYSIS.md` (17.2KB, last touched 2026-06-30T14:25:25+05:30)
+- **MAGIC** (3 files):
+  - `main-repo-clean/Downloads/code/python_files/strategies/magic_formula.py` (1.9KB, no git history found for this path)
+  - `global-stock-screener/strategies/magic_formula.py` (1.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/public_screens/magic_formula.parquet` (14.3KB, last touched 2026-07-12T14:54:29+05:30)
+- **LOSS** (3 files):
+  - `main-repo-clean/Downloads/code/python_files/strategies/loss_to_profit.py` (1.6KB, no git history found for this path)
+  - `global-stock-screener/strategies/loss_to_profit.py` (1.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/public_screens/loss_to_profit.parquet` (13.0KB, last touched 2026-07-12T14:54:29+05:30)
+- **LAUNCH** (3 files):
+  - `main-repo-clean/global_expansion_screener_framework/docs/LAUNCH_CHECKLIST.md` (4.7KB, no git history found for this path)
+  - `global-stock-screener/LAUNCH_EXECUTIVE_SUMMARY.txt` (13.1KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/LAUNCH_CHECKLIST.md` (4.7KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **KOREA** (3 files):
+  - `main-repo-clean/Downloads/data/korea_scan/korea_scan/korea_market_scan_20260613_1547.xlsx` (312.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/korea_scan/korea_scan/korea_market_scan_20260613_1513.xlsx` (11.6KB, no git history found for this path)
+  - `claude-stock-tools/02_market_screeners/korea_market_scan.py` (27.6KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **JAPAN** (3 files):
+  - `main-repo-clean/Downloads/data/japan_scan/japan_scan/japan_market_scan_20260613_1517.xlsx` (452.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/japan_scan/japan_scan/japan_market_scan_20260613_1507.xlsx` (14.7KB, no git history found for this path)
+  - `claude-stock-tools/02_market_screeners/japan_market_scan.py` (28.6KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **INTRADAY** (3 files):
+  - `main-repo-clean/Downloads/data/intraday_results/intraday_results/intraday_20260626_15m.json` (6.4KB, no git history found for this path)
+  - `main-repo-clean/Downloads/data/intraday_results/intraday_results/intraday_20260626.xlsx` (7.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/intraday_monitor.py` (28.6KB, no git history found for this path)
+- **INTEGRATED** (3 files):
+  - `main-repo-clean/stock-screener/docs/INTEGRATED_SYSTEM_SUMMARY.md` (16.8KB, no git history found for this path)
+  - `main-repo-clean/INTEGRATED_SYSTEM_SUMMARY.md` (16.8KB, no git history found for this path)
+  - `main-repo-clean/INTEGRATED_MAILER_SUMMARY.txt` (17.1KB, no git history found for this path)
+- **IMPLEMENT** (3 files):
+  - `main-repo-clean/stock-screener/implement_universal_screener.py` (17.2KB, no git history found for this path)
+  - `main-repo-clean/implement_universal_screener.py` (17.2KB, no git history found for this path)
+  - `global-stock-screener/implement_deduplication.sh` (4.9KB, last touched 2026-07-12T14:54:29+05:30)
+- **GROWW** (3 files):
+  - `main-repo-clean/global_expansion_screener_framework/groww_data_pipeline.py` (12.9KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/groww_api_test.py` (5.7KB, no git history found for this path)
+  - `global-stock-screener/groww_source.py` (5.5KB, last touched 2026-07-12T14:54:29+05:30)
+- **GITATTRIBUTES** (3 files):
+  - `main-repo-clean/.gitattributes` (531B, no git history found for this path)
+  - `global-stock-screener/.gitattributes` (404B, last touched 2026-07-12T14:54:29+05:30)
+  - `fuel-retail-outlets/.gitattributes` (1.1KB, last touched 2026-07-12T10:29:24+05:30)
+- **FILTER** (3 files):
+  - `main-repo-clean/stock-screener/docs/FILTER_MARKET_INSIGHTS_ANALYSIS.md` (29.8KB, no git history found for this path)
+  - `main-repo-clean/FILTER_MARKET_INSIGHTS_ANALYSIS.md` (29.8KB, no git history found for this path)
+  - `main-repo-clean/FILTER_INSIGHTS_VISUAL_SUMMARY.txt` (18.9KB, no git history found for this path)
+- **EXECUTIVE** (3 files):
+  - `main-repo-clean/portfolio_b_deployment/EXECUTIVE_SUMMARY_GAPS_ASSUMPTIONS.txt` (15.0KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/EXECUTIVE_SUMMARY.md` (12.3KB, no git history found for this path)
+  - `india-trade-export-analysis/EXECUTIVE_SUMMARY_COMPREHENSIVE.md` (35.6KB, last touched 2026-06-30T14:25:25+05:30)
+- **DOCKERIGNORE** (3 files):
+  - `main-repo-clean/Downloads/code/python_files/.dockerignore` (239B, no git history found for this path)
+  - `main-repo-clean/.dockerignore` (583B, no git history found for this path)
+  - `global-stock-screener/.dockerignore` (239B, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **DOCKERFILE** (3 files):
+  - `main-repo-clean/Downloads/code/python_files/Dockerfile` (1.2KB, no git history found for this path)
+  - `main-repo-clean/Dockerfile` (6.2KB, no git history found for this path)
+  - `global-stock-screener/Dockerfile` (1.8KB, last touched 2026-07-12T14:54:29+05:30)
+- **CONFIG** (3 files):
+  - `main-repo-clean/put_call_parity/config.py` (5.2KB, no git history found for this path)
+  - `main-repo-clean/docs/_config.yml` (507B, no git history found for this path)
+  - `main-repo-clean/bms/config.py` (3.4KB, no git history found for this path)
+- **CASHATPOS** (3 files):
+  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_summary_20260624_082138.json` (674B, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_20260624_082138.json` (159.9KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/outlet_data_cashatpos/cashatpos_fuel_stations_20260624_082138.csv` (50.5KB, last touched 2026-07-12T10:29:24+05:30)
+- **BLUEST** (3 files):
+  - `main-repo-clean/Downloads/code/python_files/strategies/bluest_blue_chips.py` (1.8KB, no git history found for this path)
+  - `global-stock-screener/strategies/bluest_blue_chips.py` (1.8KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/public_screens/bluest_blue_chips.parquet` (10.8KB, last touched 2026-07-12T14:54:29+05:30)
+- **BEAR** (3 files):
+  - `main-repo-clean/stock-screener/BEAR_MARKET_EVALUATION.md` (15.2KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/BEAR_MARKET_ANALYSIS.py` (18.0KB, no git history found for this path)
+  - `main-repo-clean/bear_market_stress_test.py` (27.6KB, no git history found for this path)
+- **ANALYSIS** (3 files):
+  - `main-repo-clean/stock-screener/ANALYSIS_COMPLETE_SUMMARY.txt` (12.6KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/ANALYSIS_COMPLETE_SUMMARY.md` (8.7KB, no git history found for this path)
+  - `main-repo-clean/portfolio_b_deployment/ANALYSIS_METHODOLOGY_SUMMARY.md` (45.6KB, no git history found for this path)
+- **YEAR** (2 files):
+  - `main-repo-clean/global_expansion_screener_framework/docs/15YEAR_GEOGRAPHIC_TREND_SUMMARY.md` (18.7KB, no git history found for this path)
+  - `india-trade-export-analysis/YEAR_ON_YEAR_TRENDS_DETERIORATION_ANALYSIS.md` (32.4KB, last touched 2026-06-30T14:25:25+05:30)
+- **WEEKB** (2 files):
+  - `main-repo-clean/stock-screener/WEEK6B_MODERN_RESILIENCE_INTERNATIONAL_VALIDATION.md` (15.1KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/WEEK2B_2000_DOTCOM_CRISIS_IMPLEMENTATION.md` (26.1KB, no git history found for this path)
+- **WARM** (2 files):
+  - `main-repo-clean/Downloads/data/dl_strategy_results/dl_strategy_results/warm_india.log` (4.3KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/warm_india_cache.py` (2.9KB, no git history found for this path)
+- **VERSION** (2 files):
+  - `main-repo-clean/VERSION` (7B, no git history found for this path)
+  - `global-stock-screener/VERSION` (6B, last touched 2026-07-12T14:54:29+05:30)
+- **VALUE** (2 files):
+  - `main-repo-clean/Downloads/code/stock_ddd/domain/shared/value_objects.py` (7.4KB, no git history found for this path)
+  - `global-stock-screener/cache_seed/public_screens/value_stocks.parquet` (12.3KB, last touched 2026-07-12T14:54:29+05:30)
+- **VALIDATE** (2 files):
+  - `fuel-retail-outlets/api-data-integration/validate_service_outlets_against_pdf.py` (15.6KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/validate_outlets_against_ssri.py` (13.7KB, last touched 2026-07-12T10:29:24+05:30)
+- **UPDATE** (2 files):
+  - `global-stock-screener/update_bhavcopy_daily.py` (4.5KB, last touched 2026-07-12T14:54:29+05:30)
+  - `toll-plaza-highways/update_toll_visualization.py` (6.9KB, last touched 2026-06-30T14:25:20+05:30)
+- **UNIVERSE** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/universe_sources.py` (11.1KB, no git history found for this path)
+  - `global-stock-screener/universe_sources.py` (12.4KB, last touched 2026-07-12T14:54:29+05:30)
+- **TOGAF** (2 files):
+  - `main-repo-clean/TOGAF_ARCHITECTURE_BLUEPRINT.md` (39.2KB, no git history found for this path)
+  - `global-stock-screener/TOGAF.md` (5.5KB, last touched 2026-07-12T14:54:29+05:30)
+- **STRATEGY** (2 files):
+  - `main-repo-clean/put_call_parity/strategy.py` (13.0KB, no git history found for this path)
+  - `main-repo-clean/STRATEGY_ANALYSIS_INDEX.md` (11.9KB, no git history found for this path)
+- **START** (2 files):
+  - `main-repo-clean/stock-screener/START_HERE_GAPS.md` (9.8KB, no git history found for this path)
+  - `fuel-retail-outlets/fuel-station-gap-analysis/start_server.sh` (1.3KB, last touched 2026-07-12T10:29:24+05:30)
+- **SSRN** (2 files):
+  - `main-repo-clean/Downloads/code/backtesting/ssrn-3945468.pdf` (396.8KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/backtesting/ssrn-3374195.pdf` (4.0MB, no git history found for this path)
+- **SEND** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/send_mailer.py` (2.1KB, no git history found for this path)
+  - `global-stock-screener/send_mailer.py` (3.7KB, last touched 2026-07-12T14:54:29+05:30)
+- **SECURITY** (2 files):
+  - `main-repo-clean/.github/workflows/security-scan.yml` (2.1KB, no git history found for this path)
+  - `global-stock-screener/SECURITY.md` (3.0KB, last touched 2026-07-12T14:54:29+05:30)
+- **SCAN** (2 files):
+  - `main-repo-clean/backend/routers/scan.py` (2.2KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/python_files/scan_bhavcopy.py` (5.5KB, no git history found for this path)
+- **REPOSITORIES** (2 files):
+  - `main-repo-clean/Downloads/code/stock_ddd/domain/market_data/repositories.py` (4.6KB, no git history found for this path)
+  - `global-stock-screener/src/market_data/domain/repositories.py` (2.4KB, last touched 2026-07-12T14:54:29+05:30)
+- **REGIME** (2 files):
+  - `main-repo-clean/stock-screener/gap_analysis/regime_stability_analysis.json` (9.1KB, no git history found for this path)
+  - `global-stock-screener/regime_picks.py` (10.6KB, last touched 2026-07-12T14:54:29+05:30)
+- **REFERENCE** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/reference_data.py` (9.6KB, no git history found for this path)
+  - `global-stock-screener/reference_data.py` (9.5KB, last touched 2026-07-12T14:54:29+05:30)
+- **RANDOM** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/random_numbers_using_dirichlet.py` (2.3KB, no git history found for this path)
+  - `subscription-model-revenue/random_numbers_using_dirichlet.py` (2.2KB, last touched 2026-06-26T23:34:42+05:30)
+- **QUERY** (2 files):
+  - `main-repo-clean/query_market_data.py` (10.1KB, no git history found for this path)
+  - `global-stock-screener/query.py` (4.9KB, last touched 2026-07-12T14:54:29+05:30)
+- **PROGRAM** (2 files):
+  - `global-stock-screener/program_summary_mailer.py` (13.4KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/program_summary.html` (25.0KB, last touched 2026-07-12T14:54:29+05:30)
+- **PHASED** (2 files):
+  - `main-repo-clean/global_expansion_screener_framework/screener/phased_expansion_screener_11d.py` (21.8KB, no git history found for this path)
+  - `global-stock-screener/phased_expansion_screener_11d.py` (22.1KB, last touched 2026-07-12T14:54:29+05:30)
+- **PATTERN** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/pattern_discovery.py` (20.8KB, no git history found for this path)
+  - `global-stock-screener/pattern_discovery.py` (20.8KB, last touched 2026-07-12T14:54:29+05:30)
+- **PAPER** (2 files):
+  - `main-repo-clean/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models.pdf` (640.5KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/backtesting/Paper_45-Comprehensive_Analysis_of_Machine_and_Deep_Learning_Models (1).pdf` (640.5KB, no git history found for this path)
+- **NOTIFICATION** (2 files):
+  - `main-repo-clean/Downloads/code/web/notification.html` (41.9KB, no git history found for this path)
+  - `main-repo-clean/Downloads/code/web/notification (1).html` (41.9KB, no git history found for this path)
+- **NIFTY** (2 files):
+  - `main-repo-clean/stock-screener/nifty_composite_indices_comparison.py` (12.7KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/NIFTY_COMPOSITE_PORTFOLIO_COMPARISON.md` (10.6KB, no git history found for this path)
+- **MOMENTUM** (2 files):
+  - `main-repo-clean/german_market/momentum_breakout_scan.py` (13.1KB, no git history found for this path)
+  - `claude-stock-tools/04_strategy_reference/momentum_strategy_reference.py` (30.3KB, last touched 2026-06-13T19:42:45+05:30) **<- most recently touched**
+- **MODERN** (2 files):
+  - `main-repo-clean/stock-screener/modern_resilience_scorer.py` (17.9KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/MODERN_RESILIENCE_250_BACKTEST_TIMING.md` (37.5KB, no git history found for this path)
+- **MODELS** (2 files):
+  - `main-repo-clean/stock-portfolio-evaluator/stock_evaluator/models.py` (7.3KB, no git history found for this path)
+  - `global-stock-screener/src/market_data/domain/models.py` (4.8KB, last touched 2026-07-12T14:54:29+05:30)
+- **MODEL** (2 files):
+  - `main-repo-clean/global_expansion_screener_framework/docs/MODEL_ENHANCEMENT_ANALYSIS.md` (10.6KB, no git history found for this path)
+  - `global-stock-screener/MODEL_ENHANCEMENT_ANALYSIS.md` (10.6KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **MEGA** (2 files):
+  - `main-repo-clean/stock-screener/MEGA_250_STOCK_GLOBAL_PORTFOLIO.md` (38.2KB, no git history found for this path)
+  - `india-trade-export-analysis/MEGA_GROWTH_EXPORTS.csv` (576B, last touched 2026-06-30T14:25:25+05:30)
+- **MARKITDOWN** (2 files):
+  - `india-trade-export-analysis/markitdown-preprocessor.py` (6.5KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/MARKITDOWN_PREPROCESSING_GUIDE.md` (7.8KB, last touched 2026-06-30T14:25:25+05:30)
+- **MAILER** (2 files):
+  - `main-repo-clean/stock-screener/docs/MAILER_INTEGRATION_GUIDE.md` (15.7KB, no git history found for this path)
+  - `main-repo-clean/MAILER_INTEGRATION_GUIDE.md` (15.7KB, no git history found for this path)
+- **LOCATIONS** (2 files):
+  - `fuel-retail-outlets/fuel-pump-locations-map/locations-map.js` (8.9KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/fuel-pump-locations-map/locations-data.js` (12.3MB, last touched 2026-07-12T10:29:24+05:30) **<- most recently touched**
+- **LOAD** (2 files):
+  - `main-repo-clean/load_market_data_to_postgres.py` (20.0KB, no git history found for this path)
+  - `main-repo-clean/api-data-integration/load_kaggle_indian_oil_outlets.py` (13.0KB, no git history found for this path)
+- **LIVE** (2 files):
+  - `main-repo-clean/backend/routers/live.py` (6.3KB, no git history found for this path)
+  - `main-repo-clean/backend/fetchers/live.py` (12.0KB, no git history found for this path)
+- **INVENTORY** (2 files):
+  - `main-repo-clean/repo-inventory/inventory.py` (7.5KB, no git history found for this path)
+  - `global-stock-screener/inventory_all_data.py` (13.7KB, last touched 2026-07-12T14:54:29+05:30)
+- **INTEGRITY** (2 files):
+  - `global-stock-screener/integrity.py` (4.6KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/.github/workflows/integrity.yml` (672B, last touched 2026-07-12T14:54:29+05:30)
+- **INTEGRATE** (2 files):
+  - `fuel-retail-outlets/api-data-integration/integrate_toll_retail_database.py` (18.9KB, last touched 2026-07-12T10:29:24+05:30)
+  - `fuel-retail-outlets/api-data-integration/integrate_multi_source_database.py` (15.7KB, last touched 2026-07-12T10:29:24+05:30)
+- **INGEST** (2 files):
+  - `main-repo-clean/stock-portfolio-evaluator/stock_evaluator/ingest.py` (19.6KB, no git history found for this path)
+  - `global-stock-screener/ingest_gate.py` (4.7KB, last touched 2026-07-12T14:54:29+05:30)
+- **INDICES** (2 files):
+  - `main-repo-clean/stock-screener/indices_vs_screener_analysis.py` (14.7KB, no git history found for this path)
+  - `main-repo-clean/stock-screener/INDICES_COMPARISON_SUMMARY.txt` (15.2KB, no git history found for this path)
+- **IMPORT** (2 files):
+  - `india-trade-export-analysis/import_export_comparison.py` (12.3KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/IMPORT_EXPORT_ANALYSIS_2025_26.md` (13.7KB, last touched 2026-06-30T14:25:25+05:30)
+- **GROWTH** (2 files):
+  - `global-stock-screener/cache_seed/public_screens/growth_without_dilution.parquet` (14.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/public_screens/growth_stocks.parquet` (12.4KB, last touched 2026-07-12T14:54:29+05:30)
+- **GRAHAM** (2 files):
+  - `global-stock-screener/cache_seed/public_screens/graham_buffett.parquet` (14.3KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/public_screens/graham_10y_earnings.parquet` (9.0KB, last touched 2026-07-12T14:54:29+05:30)
+- **GOLDEN** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/strategies/golden_crossover.py` (1.1KB, no git history found for this path)
+  - `global-stock-screener/strategies/golden_crossover.py` (1.2KB, last touched 2026-07-12T14:54:29+05:30)
+- **GEOGRAPHIC** (2 files):
+  - `main-repo-clean/global_expansion_screener_framework/screener/geographic_factor_regression.py` (25.6KB, no git history found for this path)
+  - `main-repo-clean/global_expansion_screener_framework/docs/GEOGRAPHIC_WEIGHTED_EXPANSION_MODEL.md` (29.0KB, no git history found for this path)
+- **GENERATE** (2 files):
+  - `global-stock-screener/generate_repo_index.py` (13.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `fuel-retail-outlets/api-data-integration/generate_ppac_comparison_excel.py` (14.4KB, last touched 2026-07-12T10:29:24+05:30)
+- **GARP** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/strategies/garp.py` (1.9KB, no git history found for this path)
+  - `global-stock-screener/strategies/garp.py` (1.6KB, last touched 2026-07-12T14:54:29+05:30)
+- **FRENCH** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/reference_seed/french_ff3.parquet` (18.3KB, no git history found for this path)
+  - `global-stock-screener/reference_seed/french_ff3.parquet` (18.3KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **FILE** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/FILE_INDEX.txt` (10.9KB, no git history found for this path)
+  - `global-stock-screener/FILE_INDEX.txt` (10.9KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **EXTENDED** (2 files):
+  - `india-trade-export-analysis/EXTENDED_COMPARISON_2020_2026.md` (10.2KB, last touched 2026-06-30T14:25:25+05:30)
+  - `india-trade-export-analysis/EXTENDED_ANALYSIS_2020_2026.csv` (1.5MB, last touched 2026-06-30T14:25:25+05:30)
+- **EXPANSION** (2 files):
+  - `main-repo-clean/global_expansion_screener_framework/docs/EXPANSION_SCREENING_DEPLOYMENT_SUMMARY.md` (15.7KB, no git history found for this path)
+  - `global-stock-screener/EXPANSION_SCREENING_DEPLOYMENT_SUMMARY.md` (15.7KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **EVENTS** (2 files):
+  - `main-repo-clean/Downloads/code/stock_ddd/domain/shared/events.py` (7.0KB, no git history found for this path)
+  - `global-stock-screener/src/shared/domain/events.py` (3.2KB, last touched 2026-07-12T14:54:29+05:30)
+- **EVENT** (2 files):
+  - `main-repo-clean/backend/events/event_bus.py` (2.1KB, no git history found for this path)
+  - `global-stock-screener/src/shared/infrastructure/event_bus.py` (3.3KB, last touched 2026-07-12T14:54:29+05:30)
+- **EUREX** (2 files):
+  - `main-repo-clean/german_market/eurex_graphql.py` (7.0KB, no git history found for this path)
+  - `main-repo-clean/EUREX_DATA_EXTRACTION_COMPLETE.md` (7.9KB, no git history found for this path)
+- **ENHANCED** (2 files):
+  - `main-repo-clean/enhanced_outlet_map_with_coordinates.html` (7.8MB, no git history found for this path)
+  - `main-repo-clean/api-data-integration/enhanced_geo_map_with_kaggle.py` (13.3KB, no git history found for this path)
+- **EMERGING** (2 files):
+  - `main-repo-clean/stock-screener/EMERGING_MARKETS_STRUCTURAL_RISK_ANALYSIS.md` (13.9KB, no git history found for this path)
+  - `global-stock-screener/emerging_fundamentals.py` (13.6KB, last touched 2026-07-12T14:54:29+05:30)
+- **DOCKER** (2 files):
+  - `main-repo-clean/docker-compose.yml` (6.2KB, no git history found for this path)
+  - `global-stock-screener/.github/workflows/docker.yml` (1.1KB, last touched 2026-07-12T14:54:29+05:30)
+- **DISCOM** (2 files):
+  - `main-repo-clean/docs/discom-calculator.html` (11.8KB, no git history found for this path)
+  - `subscription-model-revenue/discom_debt_calculator.py` (13.1KB, last touched 2026-06-26T23:34:42+05:30)
+- **DEPLOY** (2 files):
+  - `main-repo-clean/global_expansion_screener_framework/screener/deploy_expansion_screener.py` (14.8KB, no git history found for this path)
+  - `global-stock-screener/deploy_expansion_screener.py` (15.1KB, last touched 2026-07-12T14:54:29+05:30)
+- **DEOLDIFY** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/deoldify.py` (2.0KB, no git history found for this path)
+  - `colab-experiments/deoldify.py` (2.0KB, last touched 2026-06-26T22:47:40+05:30)
+- **DELIVERY** (2 files):
+  - `main-repo-clean/stock-screener/DELIVERY_SUMMARY.md` (13.3KB, no git history found for this path)
+  - `global-stock-screener/delivery_signal.py` (6.8KB, last touched 2026-07-12T14:54:29+05:30)
+- **CUSTOM** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/custom_screener.py` (7.7KB, no git history found for this path)
+  - `global-stock-screener/custom_screener.py` (7.8KB, last touched 2026-07-12T14:54:29+05:30)
+- **COMPANY** (2 files):
+  - `global-stock-screener/cache_seed/company_list.parquet` (749.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/cache_seed/company_list.csv` (3.2MB, last touched 2026-07-12T14:54:29+05:30)
+- **COLD** (2 files):
+  - `main-repo-clean/cold_chain_outlet_integrated_map.html` (40.5KB, no git history found for this path)
+  - `main-repo-clean/api-data-integration/cold_chain_outlet_map.py` (9.1KB, no git history found for this path)
+- **CHANGELOG** (2 files):
+  - `main-repo-clean/CHANGELOG.md` (17.1KB, no git history found for this path)
+  - `claude-stock-tools/CHANGELOG.md` (4.8KB, last touched 2026-06-13T19:42:45+05:30)
+- **CELL** (2 files):
+  - `main-repo-clean/bms/cell_model.py` (7.1KB, no git history found for this path)
+  - `main-repo-clean/bms/cell_balancer.py` (3.8KB, no git history found for this path)
+- **CASSANDRA** (2 files):
+  - `main-repo-clean/backend/routers/cassandra_router.py` (19.0KB, no git history found for this path)
+  - `main-repo-clean/backend/db/cassandra_client.py` (7.3KB, no git history found for this path)
+- **CALCULATE** (2 files):
+  - `main-repo-clean/calculate_dsc_optimized.py` (20.5KB, no git history found for this path)
+  - `main-repo-clean/calculate_dsc_all_markets.py` (18.9KB, no git history found for this path)
+- **BULK** (2 files):
+  - `main-repo-clean/backend/db/bulk_fetcher.py` (9.6KB, no git history found for this path)
+  - `global-stock-screener/bulk_seed.py` (5.8KB, last touched 2026-07-12T14:54:29+05:30)
+- **BUFFETT** (2 files):
+  - `claude-stock-tools/04_strategy_reference/buffett_methodology.md` (12.0KB, last touched 2026-06-13T19:42:45+05:30)
+  - `claude-stock-tools/02_market_screeners/buffett_value_screener.py` (18.1KB, last touched 2026-06-13T19:42:45+05:30)
+- **BLOOMBERG** (2 files):
+  - `main-repo-clean/Downloads/code/python_files/BLOOMBERG_SOURCES.md` (3.8KB, no git history found for this path)
+  - `global-stock-screener/BLOOMBERG_SOURCES.md` (3.8KB, last touched 2026-07-12T14:54:29+05:30) **<- most recently touched**
+- **BACKLOG** (2 files):
+  - `global-stock-screener/backlog.py` (6.9KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/backlog.json` (5.1KB, last touched 2026-07-12T14:54:29+05:30)
+- **AUTO** (2 files):
+  - `global-stock-screener/auto_screener.py` (16.2KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/AUTO_SCREENER.md` (6.3KB, last touched 2026-07-12T14:54:29+05:30)
+- **ARCHITECTURE** (2 files):
+  - `global-stock-screener/architecture.svg` (6.7KB, last touched 2026-07-12T14:54:29+05:30)
+  - `global-stock-screener/ARCHITECTURE.md` (4.4KB, last touched 2026-07-12T14:54:29+05:30)
+
+## Branch staleness vs base
+
+| Branch | Ahead | Behind | Last commit | Triage |
+|---|---:|---:|---|---|
+| `origin/claude/event-driven-stock-news-msv0cq` | 8 | 1 | 2026-07-13T09:42:21+05:30 | recent -- review for a real merge decision |
+

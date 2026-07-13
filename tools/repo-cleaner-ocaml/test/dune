@@ -1,0 +1,3 @@
+(executable
+ (name test_repo_cleaner)
+ (libraries repo_cleaner_lib unix))

@@ -4,6 +4,7 @@ Comprehensive Data Source Validation
 Tests: Bhavcopy, yfinance, repo cache, Screener.in, SEC EDGAR, FRED
 """
 
+import os
 import requests
 import pandas as pd
 import yfinance as yf
@@ -274,7 +275,9 @@ print("-" * 80)
 
 print("Testing FRED API (Federal Reserve data):\n")
 
-fred_api_key = 'eb0870595b95a815d6343b3a4ff803af'
+fred_api_key = os.getenv('FRED_API_KEY')
+if not fred_api_key:
+    raise SystemExit("Set FRED_API_KEY in .env.local before running this test.")
 
 try:
     series_list = ['DFF', 'UNRATE', 'CPIAUCSL']  # Fed Funds, Unemployment, CPI

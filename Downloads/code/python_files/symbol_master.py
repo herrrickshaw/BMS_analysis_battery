@@ -4,9 +4,11 @@
 # tradeable stock's ticker ↔ company name ↔ exchange ↔ yfinance suffix.
 #
 # Sources (company names come free from the bhavcopy "FinInstrmNm" column):
-#   NSE  — nse-library equityBhavcopy   (SctySrs == EQ)
-#   BSE  — bse-library bhavcopyReport    (equity groups)
-#   US   — SEC EDGAR company_tickers_exchange.json
+#   NSE    — nse-library equityBhavcopy   (SctySrs == EQ)
+#   BSE    — bse-library bhavcopyReport    (equity groups)
+#   US     — SEC EDGAR company_tickers_exchange.json
+#   JAPAN  — JPX data_j.xls (TSE equities, ETF/REIT categories excluded)
+#   KOREA  — FinanceDataReader StockListing(KOSPI/KOSDAQ)
 #
 # Output:  ~/Downloads/market_cache/symbol_master.parquet
 #   columns: symbol, name, name_clean, exchange, suffix, yf_symbol
@@ -122,6 +124,77 @@ def _bse_names(nse_symbols: set) -> list:
     return rows
 
 
+def _japan_names() -> list:
+    """
+    TSE equities via JPX's own data_j.xls (same source as run_app.sh's Japan
+    refresh). Unlike NSE/BSE, symbol is stored PRE-SUFFIXED ("7203.T") with
+    suffix="" -- matches CLAUDE.md's stated ticker-format convention for
+    Japan/Korea (pre-suffixed already, no suffix to append), and
+    market_correlation_scan.py's fetch_universe_prices() already guards
+    against double-suffixing anything containing a "." .
+    """
+    rows = []
+    try:
+        import xlrd
+        import requests
+        r = requests.get(
+            "https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xls",
+            timeout=60,
+        )
+        if r.ok:
+            wb = xlrd.open_workbook(file_contents=r.content)
+            ws = wb.sheet_by_index(0)
+            etf_cats = {"ETF・ETN", "REIT・インフラファンド"}
+            for i in range(1, ws.nrows):
+                code_raw = ws.cell_value(i, 1)
+                name = str(ws.cell_value(i, 2)).strip()
+                market_cat = str(ws.cell_value(i, 3)).strip()
+                if not code_raw or not name or market_cat in etf_cats:
+                    continue
+                try:
+                    code = str(int(float(code_raw))).zfill(4)
+                except Exception:
+                    code = str(code_raw).strip()
+                if code.isdigit():
+                    rows.append({"symbol": f"{code}.T", "name": name,
+                                 "exchange": "JAPAN", "suffix": ""})
+    except ImportError:
+        pass
+    except Exception:
+        pass
+    return rows
+
+
+def _korea_names() -> list:
+    """
+    KOSPI + KOSDAQ via FinanceDataReader (same source as run_app.sh's Korea
+    refresh). KOSPI and KOSDAQ get distinct `exchange` values (mirroring how
+    NASDAQ/NYSE are two exchange values under the "US" market grouping) so
+    market_correlation_scan.py's --market KOREA can combine both the same
+    way MARKET_EXCHANGES["US"] combines NASDAQ+NYSE. Pre-suffixed symbols
+    (.KS / .KQ), suffix="" -- same reasoning as _japan_names().
+    """
+    rows = []
+    try:
+        import warnings as _w
+        _w.filterwarnings("ignore")
+        import FinanceDataReader as fdr
+        for mkt, sfx, exch in [("KOSPI", ".KS", "KOSPI"), ("KOSDAQ", ".KQ", "KOSDAQ")]:
+            try:
+                df = fdr.StockListing(mkt)
+            except Exception:
+                continue
+            for _, x in df.iterrows():
+                sym = str(x.get("Code", x.get("Symbol", ""))).strip().zfill(6)
+                name = str(x.get("Name", "")).strip()
+                if sym and name:
+                    rows.append({"symbol": f"{sym}{sfx}", "name": name,
+                                 "exchange": exch, "suffix": ""})
+    except ImportError:
+        pass
+    return rows
+
+
 def _us_names() -> list:
     rows = []
     try:
@@ -154,9 +227,12 @@ def build_master(refresh: bool = False, include_us: bool = True) -> pd.DataFrame
     nse_syms = {r["symbol"] for r in nse}
     bse = _bse_names(nse_syms)
     us  = _us_names() if include_us else []
-    print(f"  NSE: {len(nse)} | BSE-only: {len(bse)} | US: {len(us)}")
+    japan = _japan_names()
+    korea = _korea_names()
+    print(f"  NSE: {len(nse)} | BSE-only: {len(bse)} | US: {len(us)} | "
+          f"Japan: {len(japan)} | Korea: {len(korea)}")
 
-    df = pd.DataFrame(nse + bse + us)
+    df = pd.DataFrame(nse + bse + us + japan + korea)
     if df.empty:
         print("  ⚠️  No symbols fetched."); return df
     df = df.drop_duplicates(subset=["symbol","exchange"])

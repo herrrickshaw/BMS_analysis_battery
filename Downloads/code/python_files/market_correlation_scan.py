@@ -1,25 +1,28 @@
 #!/usr/bin/env python3
 """
-nse_correlation_scan.py
-========================
-Full-universe correlation scan: which NSE stocks move together?
+market_correlation_scan.py
+============================
+Full-universe correlation scan: which stocks in a given market move
+together? (Originally nse_correlation_scan.py -- generalized to cover any
+market in symbol_master, e.g. NSE or US/NASDAQ+NYSE.)
 
-Builds a correlation matrix across the whole NSE symbol_master universe
+Builds a correlation matrix across a whole market's symbol_master universe
 (or any provided symbol list), then reports which stocks cluster together
 (connected components at a given correlation threshold) -- the same
 correlation-network technique in portfolio_analysis.plot_correlation_network,
 extended to run over an entire market instead of a hand-picked basket.
 
-At full-universe scale (~2,370 NSE stocks) a node-and-edge chart of
+At full-universe scale (thousands of stocks) a node-and-edge chart of
 everything isn't legible, so this reports the real numbers as data (full
 correlation matrix CSV + a text cluster report) and only charts the
 top-N largest clusters, reusing plot_correlation_network's existing
 rendering for each one.
 
 Usage:
-    python3 nse_correlation_scan.py                       # full NSE universe
-    python3 nse_correlation_scan.py --sample 300           # a 300-stock sample
-    python3 nse_correlation_scan.py --threshold 0.6 --top-clusters 5
+    python3 market_correlation_scan.py --market NSE              # full NSE universe
+    python3 market_correlation_scan.py --market US                # full US (NASDAQ+NYSE) universe
+    python3 market_correlation_scan.py --market US --sample 300   # a 300-stock US sample
+    python3 market_correlation_scan.py --market NSE --threshold 0.6 --top-clusters 5
 """
 from __future__ import annotations
 
@@ -34,12 +37,24 @@ import yfinance as yf
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))  # repo root, for portfolio_analysis
 
+# Per CLAUDE.md's ticker-format table: India stores bare NSE symbols (needs
+# .NS appended for yfinance); US stores bare symbols already usable as-is.
+MARKET_EXCHANGES = {
+    "NSE": ["NSE"],
+    "US": ["NASDAQ", "NYSE"],
+}
+MARKET_YF_SUFFIX = {
+    "NSE": ".NS",
+    "US": "",
+}
 
-def load_nse_universe() -> list:
-    """Full NSE symbol list from the symbol_master cache (see symbol_master.py)."""
+
+def load_universe(market: str) -> list:
+    """Full symbol list for *market* from the symbol_master cache (see symbol_master.py)."""
     from symbol_master import load_master
     df = load_master(auto_refresh=False)
-    return df[df["exchange"] == "NSE"]["symbol"].tolist()
+    exchanges = MARKET_EXCHANGES[market]
+    return df[df["exchange"].isin(exchanges)]["symbol"].tolist()
 
 
 def fetch_universe_prices(
@@ -47,6 +62,7 @@ def fetch_universe_prices(
     period: str = "1y",
     batch_size: int = 50,
     min_history: int = 100,
+    yf_suffix: str = ".NS",
 ) -> pd.DataFrame:
     """
     Batched yf.download across the whole *symbols* list (same "batches of 50"
@@ -60,7 +76,7 @@ def fetch_universe_prices(
     n_batches = (len(symbols) + batch_size - 1) // batch_size
     for i in range(0, len(symbols), batch_size):
         batch = symbols[i:i + batch_size]
-        yf_symbols = [f"{s}.NS" if "." not in s else s for s in batch]
+        yf_symbols = [f"{s}{yf_suffix}" if yf_suffix and "." not in s else s for s in batch]
         batch_num = i // batch_size + 1
         print(f"  [{batch_num}/{n_batches}] fetching {len(batch)} symbols...", flush=True)
         try:
@@ -124,6 +140,7 @@ def top_pairs(corr: pd.DataFrame, n: int = 20) -> pd.DataFrame:
 
 
 def run(
+    market: str = "NSE",
     symbols: list = None,
     sample: int = None,
     period: str = "1y",
@@ -131,26 +148,29 @@ def run(
     top_clusters_to_chart: int = 4,
     output_dir: str = ".",
 ) -> dict:
+    market = market.upper()
     if symbols is None:
-        symbols = load_nse_universe()
+        symbols = load_universe(market)
     if sample:
         import random
         random.seed(0)
         symbols = random.sample(symbols, min(sample, len(symbols)))
 
-    print(f"Scanning {len(symbols)} NSE symbols (period={period})...", flush=True)
-    prices = fetch_universe_prices(symbols, period=period)
+    yf_suffix = MARKET_YF_SUFFIX[market]
+    print(f"Scanning {len(symbols)} {market} symbols (period={period})...", flush=True)
+    prices = fetch_universe_prices(symbols, period=period, yf_suffix=yf_suffix)
     print(f"{prices.shape[1]}/{len(symbols)} symbols resolved with usable history", flush=True)
 
     corr, clusters = compute_correlation_clusters(prices, threshold=threshold)
 
     out = Path(output_dir)
-    corr.to_csv(out / "nse_correlation_matrix.csv")
+    prefix = market.lower()
+    corr.to_csv(out / f"{prefix}_correlation_matrix.csv")
     pairs_df = top_pairs(corr, n=30)
-    pairs_df.to_csv(out / "nse_top_correlated_pairs.csv", index=False)
+    pairs_df.to_csv(out / f"{prefix}_top_correlated_pairs.csv", index=False)
 
-    with open(out / "nse_correlation_clusters.txt", "w") as f:
-        f.write(f"NSE correlation scan -- {prices.shape[1]} symbols, period={period}, "
+    with open(out / f"{prefix}_correlation_clusters.txt", "w") as f:
+        f.write(f"{market} correlation scan -- {prices.shape[1]} symbols, period={period}, "
                 f"threshold={threshold}\n\n")
         f.write(f"{len(clusters)} clusters found (size > 1):\n\n")
         for c in clusters:
@@ -167,7 +187,7 @@ def run(
             cluster_symbols = sorted(cluster)
             pa.plot_correlation_network(
                 cluster_symbols, prices[cluster_symbols], edge_threshold=threshold,
-                save_path=str(out / f"nse_cluster_{idx + 1}.png"),
+                save_path=str(out / f"{prefix}_cluster_{idx + 1}.png"),
             )
 
     print(f"\nDone. {len(clusters)} clusters, {prices.shape[1]} symbols with data.", flush=True)
@@ -175,9 +195,10 @@ def run(
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="Full-universe NSE correlation scan")
+    ap = argparse.ArgumentParser(description="Full-universe market correlation scan")
+    ap.add_argument("--market", choices=["NSE", "US"], default="NSE")
     ap.add_argument("--sample", type=int, default=None,
-                     help="Scan a random sample of this many NSE symbols instead of the full universe")
+                     help="Scan a random sample of this many symbols instead of the full universe")
     ap.add_argument("--period", default="1y")
     ap.add_argument("--threshold", type=float, default=0.55)
     ap.add_argument("--top-clusters", type=int, default=4,
@@ -185,5 +206,5 @@ if __name__ == "__main__":
     ap.add_argument("--output-dir", default=".")
     args = ap.parse_args()
 
-    run(sample=args.sample, period=args.period, threshold=args.threshold,
+    run(market=args.market, sample=args.sample, period=args.period, threshold=args.threshold,
         top_clusters_to_chart=args.top_clusters, output_dir=args.output_dir)

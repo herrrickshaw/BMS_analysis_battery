@@ -7,7 +7,7 @@
 #   - Auto-caches Ticker data to prevent duplicate HTTP calls.
 #
 # Pipeline:
-#   Stage 1 & 2 — Bulk download 1-year OHLC for all 50 tickers in one batch.
+#   Stage 1 & 2 — Bulk download 1-year OHLC (batched when --universe is large).
 #   Stage 3 — Compute Darvas Box & 200-day MA trend locally (instant).
 #   Stage 4 — Run parallel fundamental scans (Piotroski + Coffee Can + PEGY) on breakouts only.
 #   Stage 5 — Save a beautifully styled Excel workbook.
@@ -16,6 +16,10 @@
 #   python full_european_market_scan.py
 #   python full_european_market_scan.py --top 10      # Test run first 10
 #   python full_european_market_scan.py --no-scans    # Skip fundamental scans
+#   python full_european_market_scan.py --universe data/europe_broad_list.csv --label broad --batch 150
+#       # Broader universe (1,039 tickers / 24 exchanges) instead of the built-in
+#       # EURO STOXX 50 — CSV columns: yf_ticker,name,index,exchange. Output filename
+#       # gets the --label suffix: european_market_scan_broad_<ts>.xlsx
 #
 # Install:
 #   pip install yfinance pandas openpyxl requests
@@ -97,6 +101,50 @@ EURO_STOXX_50_META = {
     "VOW.DE": ("Volkswagen", "Consumer Cyclical"),
     "WKL.AS": ("Wolters Kluwer", "Professional Services")
 }
+
+# ── Broader universe loader ────────────────────────────────────────────────────
+def load_universe(path: str) -> dict:
+    """Load a broader Europe universe CSV (yf_ticker,name,index,exchange) into the
+    same {ticker: (name, sector)} shape as EURO_STOXX_50_META. The broad CSV has
+    no per-stock sector, so sector is left as "—" (build_mailer.py derives a
+    display exchange name from the ticker suffix separately)."""
+    df = pd.read_csv(path)
+    meta = {}
+    for _, r in df.iterrows():
+        tkr = str(r.get("yf_ticker", "")).strip()
+        if not tkr:
+            continue
+        name = str(r.get("name", tkr)).strip() or tkr
+        meta[tkr] = (name, "—")
+    return meta
+
+
+def bulk_download(symbols: list, batch_size: int) -> dict:
+    """Batched yfinance bulk OHLC download — {ticker: DataFrame}. Used whenever the
+    universe is larger than one safe yf.download() call (broad Europe: ~1,000+)."""
+    frames = {}
+    batches = [symbols[i:i + batch_size] for i in range(0, len(symbols), batch_size)]
+    print(f"  Downloading OHLC for {len(symbols)} tickers in {len(batches)} batches …")
+    for idx, batch in enumerate(batches, 1):
+        print(f"    Batch {idx}/{len(batches)} ({len(batch)}) …", end=" ", flush=True)
+        try:
+            raw = yf.download(batch, period="1y", group_by="ticker", auto_adjust=True,
+                              threads=True, progress=False)
+        except Exception as e:
+            print(f"FAILED ({e})")
+            continue
+        got = 0
+        for sym in batch:
+            try:
+                df = raw[sym].dropna() if isinstance(raw.columns, pd.MultiIndex) else raw.dropna()
+                if not df.empty:
+                    frames[sym] = df
+                    got += 1
+            except Exception:
+                pass
+        print(f"OK ({got}/{len(batch)})")
+    return frames
+
 
 # ── Financials Extractors ─────────────────────────────────────────────────────
 def _first_df(ticker, *attrs):
@@ -387,26 +435,47 @@ def style_excel_sheet(ws):
 
 # ── Main Scanner ──────────────────────────────────────────────────────────────
 def main():
-    parser = argparse.ArgumentParser(description="Optimized Euro Stoxx 50 Scanner")
+    parser = argparse.ArgumentParser(description="Euro Stoxx 50 / broader-Europe Scanner")
     parser.add_argument("--top", type=int, default=0, help="Scan only first N tickers")
     parser.add_argument("--no-scans", action="store_true", default=False, help="Skip Stage 4 fundamental scans")
+    parser.add_argument("--universe", type=str, default=None,
+                        help="CSV (yf_ticker,name,index,exchange) for a broader universe "
+                             "instead of the built-in EURO STOXX 50, e.g. data/europe_broad_list.csv")
+    parser.add_argument("--label", type=str, default=None,
+                        help="Suffix for the output filename, e.g. --label broad")
+    parser.add_argument("--batch", type=int, default=150,
+                        help="Batch size for bulk OHLC download with --universe (default 150)")
     args = parser.parse_args()
 
-    symbols = list(EURO_STOXX_50_META.keys())
+    meta = load_universe(args.universe) if args.universe else EURO_STOXX_50_META
+    symbols = list(meta.keys())
     if args.top:
         symbols = symbols[:args.top]
 
+    label = f"OPTIMIZED EURO STOXX 50 SCANNER" if not args.universe else f"BROADER EUROPE SCANNER ({args.universe})"
     print(f"\n{'#'*60}")
-    print(f"  OPTIMIZED EURO STOXX 50 SCANNER")
+    print(f"  {label}")
     print(f"  Started: {datetime.now().strftime('%d %b %Y  %H:%M:%S')}")
     print(f"{'#'*60}")
 
-    # Stage 1 & 2: Bulk OHLC download (1 request for all 50 tickers - extremely fast)
+    # Stage 1 & 2: Bulk OHLC download. Single call for the small built-in universe;
+    # batched when scanning a large --universe.
     print(f"\nStage 1 & 2 — Bulk downloading 1y history for {len(symbols)} stocks …")
-    try:
-        raw_ohlc = yf.download(symbols, period="1y", group_by="ticker", auto_adjust=True, threads=True, progress=False)
-    except Exception as e:
-        sys.exit(f"❌ Failed to download bulk OHLC data: {e}")
+    if args.universe:
+        stock_frames = bulk_download(symbols, args.batch)
+    else:
+        try:
+            raw_ohlc = yf.download(symbols, period="1y", group_by="ticker", auto_adjust=True, threads=True, progress=False)
+        except Exception as e:
+            sys.exit(f"❌ Failed to download bulk OHLC data: {e}")
+        stock_frames = {}
+        for sym in symbols:
+            try:
+                df = raw_ohlc[sym].dropna() if isinstance(raw_ohlc.columns, pd.MultiIndex) else raw_ohlc.dropna()
+                if not df.empty:
+                    stock_frames[sym] = df
+            except Exception:
+                pass
 
     # Stage 3: Technical Scan (Local pandas math - instant)
     print("\nStage 3 — Computing Darvas Box & 200-day MA Trend locally …")
@@ -415,8 +484,8 @@ def main():
 
     for sym in symbols:
         try:
-            df = raw_ohlc[sym].dropna() if isinstance(raw_ohlc.columns, pd.MultiIndex) else raw_ohlc.dropna()
-            if df.empty or len(df) < 20:
+            df = stock_frames.get(sym)
+            if df is None or df.empty or len(df) < 20:
                 continue
 
             closes  = pd.to_numeric(df["Close"], errors="coerce").dropna()
@@ -431,7 +500,7 @@ def main():
 
             # Darvas Box
             darv = compute_darvas_box(df)
-            name, sector = EURO_STOXX_50_META.get(sym, (sym, "—"))
+            name, sector = meta.get(sym, (sym, "—"))
 
             all_stocks_map[sym] = {
                 "Symbol":             sym,
@@ -526,7 +595,8 @@ def main():
     darvas_signals = [s for s in all_stocks if s["Darvas_Signal"] in ("BREAKOUT_BUY", "BREAKDOWN_SELL")]
 
     date_str = datetime.today().strftime("%Y%m%d_%H%M")
-    excel_path = DOWNLOAD_DIR / f"european_market_scan_{date_str}.xlsx"
+    label_suffix = f"{args.label}_" if args.label else ""
+    excel_path = DOWNLOAD_DIR / f"european_market_scan_{label_suffix}{date_str}.xlsx"
 
     with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
         def write_sheet(rows, name, sort_col=None):

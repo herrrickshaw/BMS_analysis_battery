@@ -10,13 +10,6 @@ META = {"name": "Debt Reduction", "slug": "debt_reduction", "category": "fundame
         "needs": "fundamentals"}
 
 
-def _decreasing(series):
-    vals = [safe(x) for x in series]
-    vals = [v for v in vals if v is not None]
-    return len(vals) >= 2 and all(earlier > later for earlier, later in zip(vals, vals[1:]))
-    # series is newest-first → newest < older means debt fell
-
-
 def screen(s: StockData) -> Result | None:
     g = s.f
     debt = g("debt_history") or []              # newest-first list

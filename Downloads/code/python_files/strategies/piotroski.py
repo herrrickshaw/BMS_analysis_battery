@@ -33,7 +33,12 @@ def screen(s: StockData) -> Result | None:
     add("Accrual(CFO>NI)", cfo is not None and ni is not None and cfo > ni)
     add("dLeverage<0", lev is not None and lev_p is not None and lev < lev_p)
     add("dCurrentRatio>0", cr is not None and cr_p is not None and cr > cr_p)
-    add("NoDilution", sh is not None and sh_p is not None and sh <= sh_p)
+    # Matches the "no dilution" convention used by every production scan file
+    # (full_us/full_indian/full_european_market_scan.py): benefit of the doubt
+    # when share-count history is unavailable, rather than penalizing missing
+    # data. Keeping this consistent so the same stock doesn't score differently
+    # depending on which Piotroski implementation evaluated it.
+    add("NoDilution", (sh <= sh_p) if (sh is not None and sh_p is not None) else True)
     add("dGrossMargin>0", gm is not None and gm_p is not None and gm > gm_p)
     add("dAssetTurnover>0", at is not None and at_p is not None and at > at_p)
     return Result(s.symbol, META["slug"], passed=pts >= STRONG, score=pts,

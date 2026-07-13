@@ -397,9 +397,10 @@ async def geography_status():
         ).one()
         mkt_quotes[market] = int(r[0]) if r else 0
 
-    # ── exchange breakdown from CSVs ─────────────────────────────────────────
-    import csv as _csv
+    # ── exchange breakdown from DuckDB ────────────────────────────────────────
     import os
+
+    import duckdb
 
     DATA = os.path.join(os.path.dirname(__file__), '..', '..', 'data')
 
@@ -424,12 +425,16 @@ async def geography_status():
     }
 
     eu_counts: dict[str, int] = {}
-    eu_path = os.path.join(DATA, 'europe_all_list.csv')
-    if os.path.exists(eu_path):
-        with open(eu_path, newline='', encoding='utf-8') as f:
-            for row in _csv.DictReader(f):
-                exch = row.get('exchange', 'Unknown')
-                eu_counts[exch] = eu_counts.get(exch, 0) + 1
+    duckdb_path = os.path.join(DATA, 'market_data.duckdb')
+    if os.path.exists(duckdb_path):
+        con = duckdb.connect(duckdb_path, read_only=True)
+        try:
+            for exch, count in con.execute(
+                "SELECT exchange, COUNT(*) FROM europe_all_list GROUP BY exchange"
+            ).fetchall():
+                eu_counts[exch or 'Unknown'] = count
+        finally:
+            con.close()
 
     # ── build rows ────────────────────────────────────────────────────────────
     rows: list[dict] = []

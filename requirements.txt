@@ -38,6 +38,7 @@ selenium>=4.0.0            # Browser automation (optional, for SEBI scraping)
 cassandra-driver>=3.25.0   # Cassandra Python driver (OPTIONAL)
 # Note: Only needed if using Cassandra for data persistence
 # For local testing, can skip or use SQLite instead
+duckdb>=1.4.0               # Embedded relational DB for data/*.csv → market_data.duckdb (see scripts/csv_to_db.py)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # VISUALIZATION & REPORTING

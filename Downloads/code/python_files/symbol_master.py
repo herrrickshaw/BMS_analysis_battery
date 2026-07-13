@@ -132,7 +132,26 @@ def _japan_names() -> list:
     Japan/Korea (pre-suffixed already, no suffix to append), and
     market_correlation_scan.py's fetch_universe_prices() already guards
     against double-suffixing anything containing a "." .
+
+    Uses an INCLUDE-list of the genuine common-equity market categories,
+    not an exclude-list of fund/ETF categories. run_app.sh's original
+    Japan-fetch logic used an exclude-list checking for the literal string
+    "REIT・インフラファンド" -- but JPX's actual current label for that
+    category is "REIT・ベンチャーファンド・カントリーファンド・インフラ
+    ファンド" (confirmed by enumerating every real category value in the
+    live file), so that exclusion silently never matched anything and 63
+    J-REITs/funds were leaking into the "stock" universe undetected (found
+    this via a real correlation scan: a 56-member "cluster" that turned out
+    to be entirely J-REITs moving together on rate sentiment, not
+    operating companies). An include-list of the 3 known board tiers
+    (Prime/Standard/Growth, domestic) is robust to JPX renaming or adding
+    fund categories in the future, where an exclude-list silently isn't.
     """
+    _INCLUDE_CATEGORIES = {
+        "プライム（内国株式）",   # Prime (domestic stock)
+        "スタンダード（内国株式）",  # Standard (domestic stock)
+        "グロース（内国株式）",   # Growth (domestic stock)
+    }
     rows = []
     try:
         import xlrd
@@ -144,12 +163,11 @@ def _japan_names() -> list:
         if r.ok:
             wb = xlrd.open_workbook(file_contents=r.content)
             ws = wb.sheet_by_index(0)
-            etf_cats = {"ETF・ETN", "REIT・インフラファンド"}
             for i in range(1, ws.nrows):
                 code_raw = ws.cell_value(i, 1)
                 name = str(ws.cell_value(i, 2)).strip()
                 market_cat = str(ws.cell_value(i, 3)).strip()
-                if not code_raw or not name or market_cat in etf_cats:
+                if not code_raw or not name or market_cat not in _INCLUDE_CATEGORIES:
                     continue
                 try:
                     code = str(int(float(code_raw))).zfill(4)

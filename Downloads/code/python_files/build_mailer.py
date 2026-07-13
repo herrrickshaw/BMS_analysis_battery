@@ -205,26 +205,36 @@ def _market_snapshot_html() -> str:
         yf = None
     cells = []
     for tkr, name in idx:
-        last = dma = None
-        stance, col = "n/a", "#888"
+        last = dma50 = dma200 = None
+        stance200, col200 = "n/a", "#888"
+        stance50, col50 = "n/a", "#888"
+        cross_note = ""
         if yf is not None:
             try:
                 h = yf.download(tkr, period="1y", progress=False, auto_adjust=True)
                 closes = pd.to_numeric(h["Close"].squeeze(), errors="coerce").dropna()
                 if len(closes):
                     last = float(closes.iloc[-1])
+                    if len(closes) >= 50:
+                        dma50 = float(closes.rolling(50).mean().iloc[-1])
+                        stance50 = "above 50-DMA" if last > dma50 else "below 50-DMA"
+                        col50 = "#2e7d32" if last > dma50 else "#c62828"
                     if len(closes) >= 200:
-                        dma = float(closes.rolling(200).mean().iloc[-1])
-                        stance = "above 200-DMA (bullish)" if last > dma else "below 200-DMA (cautious)"
-                        col = "#2e7d32" if last > dma else "#c62828"
+                        dma200 = float(closes.rolling(200).mean().iloc[-1])
+                        stance200 = "above 200-DMA (bullish)" if last > dma200 else "below 200-DMA (cautious)"
+                        col200 = "#2e7d32" if last > dma200 else "#c62828"
+                    if dma50 is not None and dma200 is not None:
+                        cross_note = " · Golden Cross" if dma50 > dma200 else " · Death Cross"
             except Exception:
                 pass
         cells.append(
             f"<td style='padding:8px 12px;vertical-align:top'>"
             f"<div style='font-size:12px;color:#888'>{name}</div>"
             f"<div style='font-size:17px;font-weight:700'>{'n/a' if last is None else f'{last:,.0f}'}</div>"
-            f"<div style='font-size:11px;color:{col}'>{stance} · 200-DMA "
-            f"{'n/a' if dma is None else f'{dma:,.0f}'}</div></td>")
+            f"<div style='font-size:11px;color:{col200}'>{stance200} · 200-DMA "
+            f"{'n/a' if dma200 is None else f'{dma200:,.0f}'}</div>"
+            f"<div style='font-size:11px;color:{col50}'>{stance50} · 50-DMA "
+            f"{'n/a' if dma50 is None else f'{dma50:,.0f}'}{cross_note}</div></td>")
     return f"<table style='border-collapse:collapse;width:100%'><tr>{''.join(cells)}</tr></table>"
 
 

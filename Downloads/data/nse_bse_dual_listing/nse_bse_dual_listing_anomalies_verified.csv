@@ -1,0 +1,121 @@
+symbol,correlation,common_days,nse_last_close,bse_last_close,price_gap_pct,nse_name,bse_name,same_company
+ARIHANT,-0.1603,63,816.65,815.2,0.178,Arihant Foundations & Housing Limited,Arihant Foundations & Housing Limited,True
+SAYAJIHOTL,-0.1353,63,310.0,314.2,-1.337,Sayaji Hotels Limited,Sayaji Hotels Limited,True
+BATLIBOI,-0.0913,62,83.76,83.58,0.215,Batliboi Limited,Batliboi Limited,True
+RAJPALAYAM,0.0252,62,822.55,821.75,0.097,Rajapalayam Mills Limited,Rajapalayam Mills Limited,True
+GOODYEAR,0.0356,62,786.3,783.3,0.383,Goodyear India Limited,Goodyear India Limited,True
+SICAGEN,0.1001,62,52.61,52.38,0.439,Sicagen India Limited,Sicagen India Limited,True
+GLOBE,0.1412,237,2.15,36.53,-94.114,Globe Enterprises (India) Limited,Confidence Futuristic Energetech Limited,False
+KOVAI,0.1809,63,5995.5,5998.0,-0.042,Kovai Medical Center and Hospital Limited,Kovai Medical Center and Hospital Limited,True
+ARENTERP,0.1879,246,36.9,37.0,-0.27,Rajdarshan Industries Limited,Rajdarshan Industries Limited,True
+NKIND,0.201,245,66.18,52.42,26.25,N.K Industries Limited,N.K Industries Limited,True
+SIGMA,0.2145,246,38.02,37.99,0.079,Sigma Solve Limited,Sigma Solve Limited,True
+SILVERTUC,0.256,247,188.08,187.6,0.256,Silver Touch Technologies Limited,Silver Touch Technologies Limited,True
+AQYLON,0.2896,247,39.35,39.17,0.46,Aqylon Nexus Limited,Aqylon Nexus Limited,True
+TECILCHEM,0.3081,246,9.36,9.77,-4.197,Tecil Chemicals and Hydro Power Ltd.,,
+HEXATRADEX,0.3149,246,161.35,161.6,-0.155,Hexa Tradex Limited,Hexa Tradex Limited,True
+INFOMEDIA,0.3265,246,5.71,5.52,3.442,Infomedia Press Limited,Infomedia Press Limited,True
+ICDSLTD,0.3295,246,40.0,41.98,-4.717,ICDS Limited,ICDS Limited,True
+PALASHSECU,0.3408,246,90.36,90.37,-0.011,Palash Securities Limited,,
+SRGHFL,0.3535,245,306.3,281.15,8.945,SRG Housing Finance Limited,SRG Housing Finance Limited,True
+REGENCERAM,0.3691,246,39.29,39.6,-0.783,Regency Ceramics Limited,Regency Ceramics Limited,True
+BIMETAL,0.3695,62,714.85,714.4,0.063,Bimetal Bearings Limited,Bimetal Bearings Limited,True
+BSLSENETFG,0.3828,245,78.11,78.05,0.077,Aditya Birla Sun Life S&P BSE Sensex ETF,Aditya Birla Sun Life Sensex ETF,True
+SKMEGGPROD,0.3835,246,360.9,362.2,-0.359,SKM Egg Products Export (India) Limited,SKM Egg Products Export (India) Limited,True
+WORTHPERI,0.397,183,134.63,131.65,2.264,Worth Peripherals Limited,Worth Peripherals Limited,True
+SHIVATEX,0.4016,245,153.2,152.95,0.163,Shiva Texyarn Limited,Shiva Texyarn Limited,True
+HALDER,0.4238,118,227.74,224.9,1.263,Halder Venture Limited,Halder Venture Limited,True
+LICNETFSEN,0.4367,245,872.1,878.8,-0.762,LIC MF BSE Sensex ETF,LIC MF ETF Sensex,True
+GRAUWEIL,0.4527,63,79.89,79.76,0.163,Grauer & Weil (India) Limited,Grauer & Weil (India) Limited,True
+NOVARTIND,0.455,62,1664.8,1668.75,-0.237,Novartis India Limited,Novartis India Limited,True
+LICNFNHGP,0.4588,245,276.47,276.94,-0.17,LIC MF Nifty 100 ETF,LIC MF ETF Nifty 100,True
+OBCL,0.4747,246,53.62,52.09,2.937,OBCL Limited,OBCL Limited,True
+SALONA,0.4821,246,255.4,246.3,3.695,Salona Cotspin Limited,Salona Cotspin Limited,True
+GANGESSECU,0.497,246,117.26,117.15,0.094,Ganges Securities Limited,,
+WILLAMAGOR,0.505,245,26.26,26.02,0.922,Williamson Magor & Co. Limited,Williamson Magor & Co. Limited,True
+CURAA,0.5093,246,73.81,72.6,1.667,,Cura Technologies Limited,
+21STCENMGM,0.5162,246,31.33,31.89,-1.756,Twentyfirst Century Management Services Limited,Twentyfirst Century Management Services Limited,True
+KARMAENG,0.5192,246,39.98,39.17,2.068,Karma Energy Limited,Karma Energy Limited,True
+3PLAND,0.5201,246,32.65,32.0,2.031,3P Land Holdings Ltd,3P Land Holdings Limited,True
+MODTHREAD,0.5299,246,47.5,46.2,2.814,Modern Threads (India) Limited,,
+MFML,0.5303,246,19.88,20.32,-2.165,Mahalaxmi Fabric Mills Limited,Mahalaxmi Fabric Mills Limited,True
+SURAJLTD,0.5348,246,221.79,222.5,-0.319,Suraj Limited,Suraj Limited,True
+DGCONTENT,0.548,246,26.0,26.01,-0.038,Digicontent Limited,Digicontent Limited,True
+INCREDIBLE,0.5554,246,33.32,34.29,-2.829,Incredible Industries Limited,Incredible Industries Limited,True
+HAVISHA,0.5618,246,1.21,1.23,-1.626,Sri Havisha Hospitality and Infrastructure Limited,Sri Havisha Hospitality and Infrastructure Limited,True
+LOYALTEX,0.5644,246,210.0,209.0,0.478,Loyal Textile Mills Limited,Loyal Textile Mills Limited,True
+ORIENTLTD,0.5706,246,73.74,71.72,2.817,Orient Press Limited,Orient Press Limited,True
+NEXTMEDIA,0.5732,246,3.96,4.0,-1.0,Next Mediaworks Limited,Next Mediaworks Limited,True
+MADHAV,0.5783,246,35.22,36.64,-3.876,Madhav Marbles and Granites Limited,Madhav Marbles and Granites Limited,True
+ELDEHSG,0.5932,246,788.05,786.75,0.165,Eldeco Housing and Industries Limited,Eldeco Housing and Industries Limited,True
+SPECTRUM,0.6009,246,2005.5,2008.5,-0.149,,Spectrum Electrical Industries Limited,
+RADAAN,0.6036,246,2.94,3.04,-3.289,Radaan Mediaworks India Limited,Radaan Mediaworks India Limited,True
+TOP15IETF,0.6057,243,9.86,9.86,0.0,Icici Prudential Mutual Fund - Nifty Top 15 Equal Weight ETF,Icici Prudential Mutual Fund - Nifty Top 15 Equal Weight ETF,True
+CREATIVEYE,0.6079,246,6.0,5.82,3.093,Creative Eye Limited,Creative Eye Limited,True
+SECMARK,0.6159,245,125.83,135.0,-6.793,SecMark Consultancy Limited,SecMark Consultancy Limited,True
+WEALTH,0.619,189,958.5,966.25,-0.802,Wealth First Portfolio Managers Limited,Wealth First Portfolio Managers Limited,True
+HALEOSLABS,0.6289,246,1587.3,1576.6,0.679,Haleos Labs Limited,Haleos Labs Limited,True
+SHAHALLOYS,0.6324,246,71.93,72.02,-0.125,Shah Alloys Limited,Shah Alloys Limited,True
+HISARMETAL,0.6435,245,152.79,153.7,-0.592,Hisar Metal Industries Limited,,
+NORBTEAEXP,0.6444,245,71.0,69.0,2.899,Norben Tea & Exports Limited,Norben Tea & Exports Limited,True
+MODIS,0.6463,162,348.8,349.45,-0.186,Modi's Navnirman Limited,Modi's Navnirman Limited,True
+NAHARCAP,0.6565,246,250.65,248.6,0.825,Nahar Capital and Financial Services Limited,Nahar Capital and Financial Services Limited,True
+SURYALAXMI,0.6575,246,60.03,58.93,1.867,Suryalakshmi Cotton Mills Limited,Suryalakshmi Cotton Mills Limited,True
+KEEPLEARN,0.6593,246,1.87,1.84,1.63,DSJ Keep Learning Limited,DSJ Keep Learning Limited,True
+SREEL,0.6735,246,211.76,210.45,0.622,Sreeleathers Limited,Sreeleathers Limited,True
+PNC,0.6744,246,20.4,20.64,-1.163,Pritish Nandy Communications Ltd,Pritish Nandy Communications Ltd,True
+APCL,0.6759,246,105.0,103.9,1.059,Anjani Portland Cement Limited,Anjani Portland Cement Limited,True
+HPIL,0.6802,247,121.14,120.15,0.824,Hindprakash Industries Limited,Hindprakash Industries Limited,True
+ISHANCH,0.6893,246,55.36,57.9,-4.387,Ishan Dyes and Chemicals Limited,Ishan Dyes and Chemicals Limited,True
+LICNETFN50,0.6921,245,271.0,272.04,-0.382,LIC MF Nifty 50 ETF,LIC MF ETF Nifty 50,True
+DIGJAMLMTD,0.7035,246,44.09,43.1,2.297,Digjam Limited,Digjam Limited,True
+TFL,0.7052,246,11.35,11.59,-2.071,Transwarranty Finance Limited,Transwarranty Finance Limited,True
+AHLEAST,0.7068,246,142.32,146.65,-2.953,Asian Hotels (East) Limited,Asian Hotels (East) Limited,True
+KREBSBIO,0.7085,246,54.92,56.0,-1.929,Krebs Biochemicals & Industries Limited,Krebs Biochemicals & Industries Limited,True
+KIRLFER,0.7087,63,472.55,472.7,-0.032,Kirloskar Ferrous Industries Limited,Kirloskar Ferrous Industries Limited,True
+SELMC,0.7089,246,29.02,28.5,1.825,SEL Manufacturing Company Limited,,
+DELTAMAGNT,0.709,246,59.56,58.6,1.638,Delta Manufacturing Limited,Delta Manufacturing Limited,True
+TEAMGTY,0.7185,246,231.19,232.35,-0.499,Team India Guaranty Limited,Team India Guaranty Limited,True
+RADIOCITY,0.7192,246,6.07,6.04,0.497,Music Broadcast Limited,Music Broadcast Limited,True
+LYPSAGEMS,0.7201,246,4.63,4.62,0.216,Aurus Gem Corporation Limited,Aurus Gem Corporation Limited,True
+HEADSUP,0.7209,246,6.91,7.0,-1.286,Heads UP Ventures Limited,Heads UP Ventures Limited,True
+EUROBOND,0.7236,232,168.16,165.8,1.423,,Euro Panel Products Limited,
+STARTECK,0.7246,246,271.35,274.8,-1.255,Starteck Finance Limited,Starteck Finance Limited,True
+PODDARMENT,0.7303,246,240.33,249.95,-3.849,Poddar Pigments Limited,,
+RVTH,0.7305,246,714.8,711.15,0.513,Revathi Equipment India Limited,Revathi Equipment India Limited,True
+BEDMUTHA,0.7312,246,109.98,108.6,1.271,Bedmutha Industries Limited,Bedmutha Industries Limited,True
+TNTELE,0.7324,246,9.46,9.69,-2.374,Tamilnadu Telecommunications Limited,Tamilnadu Telecommunications Limited,True
+RHL,0.7352,246,173.91,176.1,-1.244,Robust Hotels Limited,Robust Hotels Limited,True
+SIGIND,0.7356,246,47.47,47.34,0.275,Signet Industries Limited,,
+PIONEEREMB,0.7395,247,23.42,23.88,-1.926,Pioneer Embroideries Limited,Pioneer Embroideries Limited,True
+SUPREMEINF,0.7402,246,79.14,78.45,0.88,Supreme Infrastructure India Limited,Supreme Infrastructure India Limited,True
+MHLXMIRU,0.7491,246,136.42,137.25,-0.605,Mahalaxmi Rubtech Limited,Mahalaxmi Rubtech Limited,True
+CREST,0.7541,245,370.75,369.35,0.379,Crest Ventures Limited,Crest Ventures Limited,True
+S&SPOWER,0.7561,246,361.0,374.5,-3.605,S&S Power Switchgear Limited,S&S Power Switchgear Limited,True
+CINEVISTA,0.757,246,15.73,15.95,-1.379,Cinevista Limited,Cinevista Limited,True
+SILINV,0.7578,246,420.85,413.2,1.851,SIL Investments Limited,SIL Investments Limited,True
+TREEHOUSE,0.7581,246,6.47,6.38,1.411,Tree House Education & Accessories Limited,Tree House Education & Accessories Limited,True
+MOHITIND,0.7591,246,22.89,22.91,-0.087,Mohit Industries Limited,Mohit Industries Limited,True
+DIGIDRIVE,0.7597,246,18.98,18.78,1.065,Digidrive Distributors Limited,Digidrive Distributors Limited,True
+NAGREEKEXP,0.7598,246,24.37,24.5,-0.531,Nagreeka Exports Limited,Nagreeka Exports Limited,True
+HGM,0.7675,246,51.26,50.76,0.985,Handson Global Management (HGM) Limited,Handson Global Management (HGM) Limited,True
+IMPAL,0.7706,246,1153.5,1151.3,0.191,India Motor Parts & Accessories Limited,India Motor Parts & Accessories Limited,True
+GILLANDERS,0.7731,246,89.33,90.77,-1.586,Gillanders Arbuthnot and Company Limited,Gillanders Arbuthnot and Company Limited,True
+SUPERHOUSE,0.776,246,157.2,157.05,0.096,Superhouse Limited,Superhouse Limited,True
+GCSL,0.7762,210,511.4,510.55,0.166,Gretex Corporate Services Limited,Gretex Corporate Services Ltd,True
+LAL,0.7768,246,8.79,8.71,0.918,Lorenzini Apparels Limited,Lorenzini Apparels Limited,True
+GATECHDVR,0.7789,246,0.44,0.44,0.0,GACM Technologies Limited,GACM Technologies Limited,True
+BBTCL,0.7803,246,214.45,214.55,-0.047,B&B Triplewall Containers Limited,B&B Triplewall Containers Limited,True
+INNOVANA,0.7834,246,331.7,327.0,1.437,,Innovana Thinklabs Limited,
+AMNPLST,0.7847,246,206.84,205.75,0.53,Amines & Plasticizers Limited,Amines & Plasticizers Limited,True
+ARCHIDPLY,0.7862,246,80.2,82.88,-3.234,Archidply Industries Limited,Archidply Industries Limited,True
+MAGNUM,0.7895,246,19.6,19.35,1.292,Magnum Ventures Limited,Magnum Ventures Limited,True
+KALYANIFRG,0.7914,246,613.05,612.45,0.098,Kalyani Forge Limited,Kalyani Forge Limited,True
+CCHHL,0.7916,246,13.08,12.77,2.428,Country Club Hospitality & Holidays Limited,Country Club Hospitality & Holidays Limited,True
+RKDL,0.7917,246,18.67,18.66,0.054,Ravi Kumar Distilleries Limited,Ravi Kumar Distilleries Limited,True
+TGBHOTELS,0.7923,246,8.72,8.72,0.0,TGB Banquets and Hotels Limited,TGB Banquets and Hotels Limited,True
+GLOSTERLTD,0.7928,246,677.4,676.05,0.2,Gloster Limited,Gloster Limited,True
+RELCHEMQ,0.7935,247,130.71,131.0,-0.221,Reliance Chemotex Industries Limited,Reliance Chemotex Industries Limited,True
+SANDESH,0.7953,246,994.5,1000.0,-0.55,The Sandesh Limited,The Sandesh Limited,True
+BALKRISHNA,0.7974,246,18.03,18.12,-0.497,Balkrishna Paper Mills Limited,Balkrishna Paper Mills Limited,True
+BANG,0.7999,246,28.93,28.93,0.0,Bang Overseas Limited,Bang Overseas Limited,True

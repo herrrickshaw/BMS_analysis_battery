@@ -190,6 +190,41 @@ def _talk_rows(data: dict, cap: int = 10):
 _DARVAS_LABEL = {"IN": "🇮🇳 India", "US": "🇺🇸 US", "EU": "🇪🇺 Europe"}
 
 
+def _ccc_rows(top: int = 12):
+    """India Cash Conversion Cycle screen — screener.in/screens/228040. Lowest/
+    negative CCC = collects from customers before paying suppliers (strong
+    working-capital efficiency). Live-scrapes each run (refreshing the local
+    cache); falls back to the cached parquet if the live fetch fails."""
+    cdf = pd.DataFrame()
+    try:
+        import screener_in as sin
+        cdf = sin.ccc_screen()
+        if not cdf.empty:
+            cdf.to_parquet("cache_seed/india_ccc_screen.parquet", index=False)
+    except Exception:
+        pass
+    if cdf.empty:
+        try:
+            cdf = pd.read_parquet("cache_seed/india_ccc_screen.parquet")
+        except Exception:
+            return []
+    if cdf.empty or "Cash_Cycle" not in cdf.columns:
+        return []
+    cdf = cdf.copy()
+    cdf["Cash_Cycle"] = pd.to_numeric(cdf["Cash_Cycle"], errors="coerce")
+    cdf = cdf.dropna(subset=["Cash_Cycle"])
+    cdf["Market"] = "IN"
+    cdf = liq.annotate(cdf)
+    cdf = cdf[cdf["Liquidity"].isin(["High", "Medium"])].sort_values("Cash_Cycle").head(top)
+    rows = []
+    for _, r in cdf.iterrows():
+        rows.append(f"<tr><td style='padding:4px 8px'><b>{r.Symbol}</b></td>"
+                    f"<td>{r.get('Name','')}</td><td>{r.Cash_Cycle:.1f}</td>"
+                    f"<td>{r.get('ROCE','')}</td>"
+                    f"<td style='color:{_COL.get(r.Liquidity,'#777')};font-weight:600'>{r.Liquidity}</td></tr>")
+    return rows
+
+
 def _darvas_section(market: str, cap: int = 15) -> str:
     """Fresh Darvas breakouts for one market, capped to `cap` rows for readability
     (a full-universe scan can surface 100+ "fresh" breakouts — the header still
@@ -279,19 +314,8 @@ def build():
     us_picks_rows = _market_picks_rows(us_data, "US")
     eu_picks_rows = _eu_picks_rows()
 
-    # 2. India CCC screen (screener.in)
-    ccc_rows = []
-    try:
-        cdf = pd.read_parquet("cache_seed/india_ccc_screen.parquet")
-        cdf["Cash_Cycle"] = pd.to_numeric(cdf["Cash_Cycle"], errors="coerce")
-        cdf = cdf[cdf["Liquidity"].isin(["High", "Medium"])].sort_values("Cash_Cycle").head(10)
-        for _, r in cdf.iterrows():
-            ccc_rows.append(f"<tr><td style='padding:4px 8px'><b>{r.Symbol}</b></td>"
-                            f"<td>{r.get('Name','')}</td><td>{r.Cash_Cycle:.1f}</td>"
-                            f"<td>{r.get('ROCE','')}</td>"
-                            f"<td style='color:{_COL.get(r.Liquidity,'#777')};font-weight:600'>{r.Liquidity}</td></tr>")
-    except Exception:
-        pass
+    # 2. India CCC screen (screener.in 228040)
+    ccc_rows = _ccc_rows()
 
     # 3. Convergence (fundamentals + street agree)
     convergence_html = _convergence_html("🇮🇳 India", ind_data) + _convergence_html("🇺🇸 US", us_data)

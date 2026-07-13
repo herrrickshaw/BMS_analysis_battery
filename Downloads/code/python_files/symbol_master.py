@@ -9,6 +9,8 @@
 #   US     — SEC EDGAR company_tickers_exchange.json
 #   JAPAN  — JPX data_j.xls (TSE equities, ETF/REIT categories excluded)
 #   KOREA  — FinanceDataReader StockListing(KOSPI/KOSDAQ)
+#   CHINA  — akshare stock_info_a_code_name() (SSE+SZSE A-shares; Beijing
+#            Stock Exchange codes excluded, yfinance has no data for them)
 #
 # Output:  ~/Downloads/market_cache/symbol_master.parquet
 #   columns: symbol, name, name_clean, exchange, suffix, yf_symbol
@@ -213,6 +215,51 @@ def _korea_names() -> list:
     return rows
 
 
+def _china_names() -> list:
+    """
+    SSE + SZSE A-shares via akshare's stock_info_a_code_name() (same source as
+    run_app.sh's China refresh). Pre-suffixed symbols (.SS / .SZ), suffix=""
+    -- same reasoning as _japan_names()/_korea_names().
+
+    run_app.sh's suffix rule is `.SS if code.startswith('6') else .SZ`, which
+    silently mis-suffixes the ~327 Beijing Stock Exchange codes (prefix "9",
+    e.g. "920000") as .SZ. Checked live: yfinance has NO data at all for BJSE
+    tickers regardless of suffix (both 920000.BJ and a real BJSE ticker
+    830799.BJ return HTTP 404 "Quote not found") -- Yahoo Finance simply
+    doesn't carry this exchange. So instead of mis-suffixing them, BJSE codes
+    are excluded outright here (same rationale as _japan_names() excluding
+    J-REITs: don't feed the correlation scan symbols that can only ever
+    fail their price fetch). SSE (prefix "6", includes the 688xxx STAR
+    Market sub-board) and SZSE (prefix "0" main board / "3" ChiNext) are
+    both confirmed live against yfinance (000001.SZ, 600000.SS, 000002.SZ
+    all returned real CNY-denominated quotes).
+    """
+    rows = []
+    try:
+        import warnings as _w
+        _w.filterwarnings("ignore")
+        import akshare as ak
+        df = ak.stock_info_a_code_name()
+        for _, x in df.iterrows():
+            code = str(x.get("code", "")).strip().zfill(6)
+            name = str(x.get("name", "")).strip()
+            if not code or not name or not code.isdigit():
+                continue
+            if code.startswith("6"):
+                sfx, exch = ".SS", "SSE"
+            elif code.startswith(("0", "3")):
+                sfx, exch = ".SZ", "SZSE"
+            else:
+                continue  # Beijing Stock Exchange (prefix "9") -- no yfinance data
+            rows.append({"symbol": f"{code}{sfx}", "name": name,
+                         "exchange": exch, "suffix": ""})
+    except ImportError:
+        pass
+    except Exception:
+        pass
+    return rows
+
+
 def _us_names() -> list:
     rows = []
     try:
@@ -247,10 +294,11 @@ def build_master(refresh: bool = False, include_us: bool = True) -> pd.DataFrame
     us  = _us_names() if include_us else []
     japan = _japan_names()
     korea = _korea_names()
+    china = _china_names()
     print(f"  NSE: {len(nse)} | BSE-only: {len(bse)} | US: {len(us)} | "
-          f"Japan: {len(japan)} | Korea: {len(korea)}")
+          f"Japan: {len(japan)} | Korea: {len(korea)} | China: {len(china)}")
 
-    df = pd.DataFrame(nse + bse + us + japan + korea)
+    df = pd.DataFrame(nse + bse + us + japan + korea + china)
     if df.empty:
         print("  ⚠️  No symbols fetched."); return df
     df = df.drop_duplicates(subset=["symbol","exchange"])

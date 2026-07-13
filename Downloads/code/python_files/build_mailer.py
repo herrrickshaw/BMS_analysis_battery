@@ -25,8 +25,27 @@ warnings.filterwarnings("ignore")
 import liquidity as liq
 import run_global_analysis as rga
 import market_performance as mp
+import news_picks as npk
 
 _COL = {"High": "#1b7f37", "Medium": "#b8860b", "Low": "#b00"}
+_SENT_COL = {"POSITIVE": "#1b7f37", "NEGATIVE": "#b00", "NEUTRAL": "#777"}
+
+
+def _news_rows(market: str, top: int = 8):
+    try:
+        picks = npk.news_picks(market, top=top)
+    except Exception:
+        return []
+    rows = []
+    for p in picks:
+        rows.append(
+            f"<tr><td style='padding:4px 8px'><b>{p['symbol']}</b></td>"
+            f"<td>{p['name']}</td>"
+            f"<td style='color:{_SENT_COL.get(p['label'], '#777')};font-weight:600'>{p['label']} ({p['score']:+.2f})</td>"
+            f"<td>{p['mentions']}</td>"
+            f"<td style='color:#555'>{p['headline']}</td></tr>"
+        )
+    return rows
 
 
 def _tv(x):
@@ -95,6 +114,10 @@ def build():
     except Exception:
         pass
 
+    # 3c. Share Market News Picks — India + US (stocks the street is talking about today)
+    in_news_rows = _news_rows("IN")
+    us_news_rows = _news_rows("US")
+
     # 4. 5y scoreboard
     p5 = mp.load()
     p_rows = [f"<tr><td style='padding:4px 8px'>{r.Market}</td><td>{r.Index}</td>"
@@ -110,6 +133,12 @@ def build():
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">💵 India — Cash Conversion Cycle (screener.in 228040)</h2>
 <p style="font-size:12px;color:#555">Lowest/negative CCC = collects from customers before paying suppliers. Tradable (High/Medium) only.</p>
 {_table(["Symbol","Name","CCC days","ROCE","Liquidity"], ccc_rows) if ccc_rows else "<p>n/a</p>"}
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🔥 Share Market News Picks — India</h2>
+<p style="font-size:12px;color:#555">Stocks the street is talking about today (headline mentions + sentiment), independent of the screeners. News buzz, NOT a recommendation.</p>
+{_table(["Symbol","Name","Sentiment","Mentions","Headline"], in_news_rows) if in_news_rows else "<p>n/a</p>"}
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🔥 Share Market News Picks — US</h2>
+<p style="font-size:12px;color:#555">Stocks the street is talking about today (headline mentions + sentiment), independent of the screeners. News buzz, NOT a recommendation.</p>
+{_table(["Symbol","Name","Sentiment","Mentions","Headline"], us_news_rows) if us_news_rows else "<p>n/a</p>"}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🌍 Global Momentum — Top 15 (20 markets)</h2>
 {_table(["Mkt","Symbol","6mo %","RSI"], g_rows)}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🗺️ Other Markets — top tradable mover each</h2>

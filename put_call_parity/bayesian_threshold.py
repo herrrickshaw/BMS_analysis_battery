@@ -111,3 +111,22 @@ class BayesianThresholdTracker:
         """
         self._trades.clear()
         self._multiplier = 1.0
+
+
+def build_trackers_for_all_instruments() -> "dict[str, BayesianThresholdTracker]":
+    """
+    One tracker per configured instrument (config.INSTRUMENTS) -- this
+    subsystem's actual "universe" is the 3 tradeable instruments (BankNifty,
+    CrudeOil, Silver), not the broader stock market, so expanding this module
+    means covering all of them rather than just the single example instrument
+    used during development.
+
+    Each tracker starts at its instrument's static config.min_deviation and
+    is independent -- a losing streak on Silver shouldn't tighten BankNifty's
+    threshold.
+    """
+    from . import config
+    return {
+        key: BayesianThresholdTracker(base_threshold=inst.min_deviation)
+        for key, inst in config.INSTRUMENTS.items()
+    }

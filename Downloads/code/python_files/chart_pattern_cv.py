@@ -285,6 +285,59 @@ def detect_patterns(prices: pd.Series) -> List[dict]:
     ]
 
 
+def scan_universe(
+    symbols: List[str],
+    period: str = "1y",
+    min_confidence: float = 0.6,
+    batch_size: int = 50,
+    yf_suffix: str = ".NS",
+) -> List[dict]:
+    """
+    Run detect_patterns() across an entire market universe, not just one
+    symbol -- the same "batches of 50" yf.download strategy db/bulk_fetcher.py
+    already uses for the platform's full-universe OHLCV prefetch, so this
+    scales the same way the existing daily Darvas/Piotroski scan does.
+
+    *symbols* are bare tickers (e.g. from symbol_master's NSE/BSE rows);
+    yf_suffix is appended for exchanges that need it (empty string for US).
+
+    Returns hits across all symbols with confidence >= min_confidence, sorted
+    by confidence, each carrying its 'symbol'. Designed for reuse by
+    scanners/daily_scanner.py-style callers: a symbol whose OHLCV a caller
+    already has (e.g. from Cassandra's price_history table) doesn't need
+    this to re-fetch -- call detect_patterns(prices) directly per symbol
+    instead, same as this function does internally.
+    """
+    import yfinance as yf
+
+    all_hits: List[dict] = []
+    for i in range(0, len(symbols), batch_size):
+        batch = symbols[i:i + batch_size]
+        yf_symbols = [f"{s}{yf_suffix}" if yf_suffix and "." not in s else s for s in batch]
+        try:
+            raw = yf.download(yf_symbols, period=period, auto_adjust=True,
+                               progress=False, group_by="ticker")
+        except Exception as exc:
+            print(f"  [scan_universe] batch {i // batch_size} download failed: {exc}")
+            continue
+
+        for sym, yf_sym in zip(batch, yf_symbols):
+            try:
+                close = (raw[yf_sym]["Close"] if len(yf_symbols) > 1
+                         else raw["Close"])
+            except (KeyError, TypeError):
+                continue
+            close = close.dropna()
+            if close.empty:
+                continue
+            for hit in detect_patterns(close):
+                if hit["confidence"] >= min_confidence:
+                    all_hits.append({**hit, "symbol": sym})
+
+    all_hits.sort(key=lambda h: h["confidence"], reverse=True)
+    return all_hits
+
+
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser(description="CV-based chart pattern detector")

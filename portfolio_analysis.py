@@ -800,6 +800,88 @@ def plot_correlation_network(
     return corr
 
 
+def scan_universe_for_seasonality(
+    symbols: list,
+    years: int = 8,
+    min_years: int = 4,
+    top_n: int = 20,
+    yf_suffix: str = ".NS",
+    batch_size: int = 50,
+) -> pd.DataFrame:
+    """
+    Rank a market universe (not just one stock) by seasonal reliability --
+    the same batched yf.download strategy scan_universe() in
+    chart_pattern_cv.py uses, applied to plot_seasonality_spiral's underlying
+    per-stock computation.
+
+    For each stock, finds the single calendar month whose historical returns
+    are most consistently one-directional, scored like a t-statistic:
+    |mean return| / (std error across the years observed) -- a large,
+    noisy effect scores lower than a smaller but highly consistent one.
+
+    Returns a DataFrame (symbol, best_month, mean_return_pct, years_observed,
+    reliability_score), sorted by reliability_score descending, capped at
+    top_n rows. Stocks with fewer than min_years of data for their best month
+    are excluded -- a single lucky year isn't a seasonal effect.
+    """
+    import yfinance as yf
+
+    rows = []
+    for i in range(0, len(symbols), batch_size):
+        batch = symbols[i:i + batch_size]
+        yf_symbols = [f"{s}{yf_suffix}" if yf_suffix and "." not in s else s for s in batch]
+        try:
+            raw = yf.download(yf_symbols, period=f"{years}y", auto_adjust=True,
+                               progress=False, group_by="ticker")
+        except Exception as exc:
+            print(f"  [scan_universe_for_seasonality] batch {i // batch_size} download failed: {exc}")
+            continue
+
+        for sym, yf_sym in zip(batch, yf_symbols):
+            try:
+                close = (raw[yf_sym]["Close"] if len(yf_symbols) > 1 else raw["Close"])
+            except (KeyError, TypeError):
+                continue
+            close = close.dropna()
+            if len(close) < 60:
+                continue
+
+            monthly = close.resample("ME").last()
+            monthly_ret = monthly.pct_change().dropna() * 100
+            if monthly_ret.empty:
+                continue
+
+            by_month = pd.DataFrame({
+                "month": [d.month for d in monthly_ret.index],
+                "ret": monthly_ret.values,
+            }).groupby("month")["ret"].agg(["mean", "std", "count"])
+            by_month = by_month[by_month["count"] >= min_years]
+            if by_month.empty:
+                continue
+
+            # t-stat-like reliability score: bigger & more consistent wins.
+            by_month["score"] = (
+                by_month["mean"].abs()
+                / (by_month["std"] / by_month["count"] ** 0.5).replace(0, float("nan"))
+            )
+            best = by_month["score"].idxmax()
+            if pd.isna(by_month.loc[best, "score"]):
+                continue
+            rows.append({
+                "symbol": sym,
+                "best_month": best,
+                "mean_return_pct": round(float(by_month.loc[best, "mean"]), 2),
+                "years_observed": int(by_month.loc[best, "count"]),
+                "reliability_score": round(float(by_month.loc[best, "score"]), 3),
+            })
+
+    if not rows:
+        return pd.DataFrame(columns=["symbol", "best_month", "mean_return_pct",
+                                      "years_observed", "reliability_score"])
+    result = pd.DataFrame(rows).sort_values("reliability_score", ascending=False)
+    return result.head(top_n).reset_index(drop=True)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # DISPLAY HELPERS
 # ─────────────────────────────────────────────────────────────────────────────

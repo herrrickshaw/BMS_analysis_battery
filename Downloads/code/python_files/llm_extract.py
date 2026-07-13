@@ -83,12 +83,24 @@ def _extract_json(text: str) -> dict:
     return json.loads(match.group(0))
 
 
+def _normalize_whitespace(s: str) -> str:
+    return re.sub(r"\s+", " ", s).strip()
+
+
+def _verify_citation(span: object, source_text: str) -> bool:
+    """True if *span* appears verbatim (allowing whitespace differences) in source_text."""
+    if not isinstance(span, str) or not span.strip():
+        return False
+    return _normalize_whitespace(span) in _normalize_whitespace(source_text)
+
+
 def extract_structured(
     text: str,
     schema: dict,
     instructions: str = "",
     provider: str = "groq",
     fallback_provider: Optional[str] = "gemini",
+    require_citations: bool = True,
 ) -> dict:
     """
     Extract a JSON object matching *schema* out of unstructured *text* using
@@ -96,19 +108,65 @@ def extract_structured(
     there (used verbatim in the prompt, not validated as a JSON-schema spec --
     kept simple since every caller here just wants a flat field->value dict).
 
+    require_citations (default True): also asks the model for a verbatim
+    source-text span backing each non-null field, then verifies that span
+    actually appears in *text* before trusting it -- citation-grounding, one
+    of the few concretely effective mitigations in the literature on LLM
+    extraction from financial documents. That literature is sobering: on
+    FinanceBench (real 10-Ks/10-Qs/8-Ks), GPT-4-Turbo with retrieval got 81%
+    of questions wrong; FinTagging found the best model only 17% accurate at
+    linking extracted facts to correct XBRL taxonomy concepts. Single-shot
+    "trust the JSON" extraction is not a safe default for this domain.
+
+    Adds a "_grounding" key to the result: {field: {"grounded": bool, "span":
+    str|None}}. An ungrounded field is NOT dropped from the result -- it's
+    still returned as extracted -- but is flagged grounded=False so callers
+    can decide whether to trust it (e.g. skip it, flag it for manual review,
+    or log it). This catches the class of hallucination where the model
+    invents a value with no textual basis in the document at all, which
+    schema-only prompting (require_citations=False, the original behavior)
+    can't catch.
+
+    KNOWN LIMITATION, confirmed by testing: grounding only verifies the
+    cited SPAN is real text copied from the document -- it does not verify
+    that a COMPUTED/DERIVED value is actually correct given that span. E.g.
+    asking for a "price_band_midpoint" (an arithmetic mean the model must
+    calculate, not a literal quote) got grounded=True because the model
+    correctly cited the real "Rs. 210 to Rs. 222" span -- but nothing here
+    checks that 216 is actually the midpoint of 210 and 222. For
+    computed/derived fields, add a separate correctness check (e.g.
+    recompute simple arithmetic yourself from the grounded raw values rather
+    than trusting the model's derived one).
+
     Falls back to *fallback_provider* if the primary provider's call or JSON
     parse fails, then raises if that fails too -- callers should catch and
     degrade gracefully (e.g. skip the field, don't crash a whole report).
     """
     schema_lines = "\n".join(f'  "{k}": {v}' for k, v in schema.items())
-    prompt = (
-        "Extract the following fields from the document text below. "
-        "Respond with ONLY a single JSON object -- no prose, no markdown fences. "
-        "Use null for any field not present in the text.\n\n"
-        f"Fields:\n{schema_lines}\n\n"
-        f"{instructions}\n\n"
-        f"Document text:\n{text}"
-    )
+
+    if require_citations:
+        prompt = (
+            "Extract the following fields from the document text below. "
+            "Respond with ONLY a single JSON object with exactly two top-level keys, "
+            '"fields" and "citations" -- no prose, no markdown fences.\n\n'
+            f'"fields" must have these keys:\n{schema_lines}\n'
+            "Use null for any field not present in the text.\n\n"
+            '"citations" must have the SAME keys as "fields". For each non-null field, '
+            "the value must be the exact verbatim substring of the document text below "
+            "that supports the extracted value (copy it exactly, do not paraphrase or "
+            "summarize). For null fields, use null.\n\n"
+            f"{instructions}\n\n"
+            f"Document text:\n{text}"
+        )
+    else:
+        prompt = (
+            "Extract the following fields from the document text below. "
+            "Respond with ONLY a single JSON object -- no prose, no markdown fences. "
+            "Use null for any field not present in the text.\n\n"
+            f"Fields:\n{schema_lines}\n\n"
+            f"{instructions}\n\n"
+            f"Document text:\n{text}"
+        )
 
     providers = [provider] + ([fallback_provider] if fallback_provider else [])
     last_error = None
@@ -120,7 +178,23 @@ def extract_structured(
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0,
             )
-            return _extract_json(resp.choices[0].message.content)
+            parsed = _extract_json(resp.choices[0].message.content)
+            if not require_citations:
+                return parsed
+
+            fields = parsed.get("fields", {})
+            citations = parsed.get("citations", {})
+            grounding = {}
+            for key in schema:
+                value = fields.get(key)
+                span = citations.get(key)
+                grounding[key] = {
+                    "grounded": (value is None) or _verify_citation(span, text),
+                    "span": span,
+                }
+            result = dict(fields)
+            result["_grounding"] = grounding
+            return result
         except Exception as exc:
             last_error = exc
             continue

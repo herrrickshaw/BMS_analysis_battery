@@ -1,0 +1,276 @@
+US correlation scan -- 6420 symbols, period=1y, threshold=0.55
+
+216 clusters found (size > 1):
+
+  (2379) ['A', 'AA', 'AAL', 'AAOI', 'AAON', 'AAT', 'ABAT', 'ABCB', 'ABCL', 'ABEV', 'ABG', 'ABNB', 'ABSI', 'ABVX', 'ACA', 'ACGL', 'ACGLN', 'ACGLO', 'ACHR', 'ACIW', 'ACLS', 'ACMR', 'ACN', 'ACNB', 'ACP', 'ACRE', 'ACT', 'ACV', 'ADAM', 'ADBE', 'ADC', 'ADI', 'ADNT', 'ADP', 'ADSK', 'ADX', 'AEC', 'AEE', 'AEF', 'AEFC', 'AEG', 'AEHR', 'AEIS', 'AEM', 'AEO', 'AEP', 'AER', 'AERO', 'AEVA', 'AFB', 'AFG', 'AFGB', 'AFGC', 'AFGD', 'AFGE', 'AFL', 'AFRM', 'AG', 'AGCO', 'AGD', 'AGI', 'AGNC', 'AGNT', 'AGO', 'AGQ', 'AGX', 'AHR', 'AIN', 'AIO', 'AIP', 'AIR', 'AIRO', 'AIT', 'AIXC', 'AIZ', 'AJG', 'AKR', 'ALAB', 'ALFUU', 'ALG', 'ALGM', 'ALGN', 'ALGT', 'ALH', 'ALK', 'ALKT', 'ALL', 'ALLE', 'ALLY', 'ALNT', 'ALOT', 'ALOVU', 'ALRM', 'ALRS', 'ALSN', 'ALTO', 'ALV', 'AM', 'AMAL', 'AMAT', 'AMBA', 'AMBQ', 'AMCR', 'AMD', 'AME', 'AMG', 'AMGN', 'AMH', 'AMJB', 'AMKR', 'AMP', 'AMPL', 'AMPX', 'AMPY', 'AMRC', 'AMRZ', 'AMSC', 'AMSF', 'AMTB', 'AMUB', 'AMX', 'AMZN', 'AN', 'ANRO', 'ANY', 'AOD', 'AOMR', 'AON', 'AOS', 'AOSL', 'APA', 'APAM', 'APG', 'APH', 'APLD', 'APLE', 'APO', 'APOG', 'APPN', 'APTV', 'AR', 'ARCB', 'ARCC', 'ARDC', 'ARES', 'ARHS', 'ARI', 'ARIS', 'ARM', 'AROW', 'ARQQ', 'ARR', 'ARTNA', 'ARW', 'AS', 'ASA', 'ASAN', 'ASB', 'ASBP', 'ASG', 'ASIX', 'ASM', 'ASML', 'ASPI', 'ASR', 'ASST', 'ASTC', 'ASTE', 'ASTS', 'ASX', 'ATEN', 'ATI', 'ATKR', 'ATLC', 'ATLO', 'ATMU', 'ATO', 'ATRO', 'AU', 'AUB', 'AUGO', 'AUR', 'AUST', 'AVA', 'AVAV', 'AVB', 'AVBH', 'AVGO', 'AVK', 'AVNT', 'AVPT', 'AVT', 'AVTR', 'AVX', 'AVY', 'AWF', 'AWI', 'AWK', 'AWP', 'AWR', 'AX', 'AXIA', 'AXP', 'AXS', 'AXTA', 'AYA', 'AYI', 'AZN', 'AZZ', 'B', 'BA', 'BA-PA', 'BABA', 'BAC', 'BALL', 'BAM', 'BANC', 'BANF', 'BANR', 'BAR', 'BAX', 'BBAI', 'BBAR', 'BBCP', 'BBCQW', 'BBD', 'BBDC', 'BBDO', 'BBN', 'BBT', 'BBVA', 'BC', 'BCAL', 'BCAT', 'BCBP', 'BCC', 'BCH', 'BCML', 'BCS', 'BCSF', 'BCV', 'BCX', 'BDC', 'BDCX', 'BDCZ', 'BDJ', 'BDN', 'BE', 'BEAM', 'BELFA', 'BELFB', 'BEN', 'BERZ', 'BETA', 'BFC', 'BFH', 'BFS', 'BFST', 'BGH', 'BGR', 'BGT', 'BGX', 'BGY', 'BHB', 'BHE', 'BHP', 'BHRB', 'BIDU', 'BILI', 'BILL', 'BIRD', 'BIRK', 'BIT', 'BITB', 'BITW', 'BKE', 'BKH', 'BKHAU', 'BKKT', 'BKNG', 'BKR', 'BKSY', 'BKT', 'BKU', 'BKV', 'BL', 'BLDR', 'BLK', 'BLKB', 'BLSH', 'BLUWU', 'BLW', 'BMA', 'BME', 'BMEZ', 'BMM', 'BMNR', 'BMO', 'BMRC', 'BMY', 'BN', 'BNKD', 'BNKU', 'BNL', 'BNO', 'BNS', 'BNT', 'BNY', 'BOBS', 'BOE', 'BOH', 'BOIL', 'BOKF', 'BORR', 'BOW', 'BOX', 'BOXL', 'BP', 'BPOP', 'BPRN', 'BR', 'BRBS', 'BRK-A', 'BRK-B', 'BRKR', 'BRKRP', 'BRO', 'BRRR', 'BRSP', 'BRT', 'BRX', 'BRZE', 'BSAC', 'BSBR', 'BSM', 'BSOL', 'BSRR', 'BST', 'BSTZ', 'BSVN', 'BSY', 'BTBT', 'BTC', 'BTCS', 'BTDR', 'BTE', 'BTG', 'BTGO', 'BTO', 'BTOG', 'BTQ', 'BTX', 'BTZ', 'BUD', 'BULL', 'BULLW', 'BULZ', 'BUSE', 'BV', 'BVN', 'BWA', 'BWB', 'BWFG', 'BWG', 'BWMN', 'BWOW', 'BWXT', 'BX', 'BXC', 'BXMT', 'BXP', 'BXSL', 'BY', 'BZH', 'C', 'C-PR', 'CAAP', 'CAC', 'CAF', 'CAG', 'CAH', 'CAL', 'CAMT', 'CAN', 'CARD', 'CARE', 'CARR', 'CARS', 'CARU', 'CASH', 'CASS', 'CASY', 'CAT', 'CATY', 'CB', 'CBAN', 'CBFV', 'CBK', 'CBNK', 'CBRE', 'CBSH', 'CBT', 'CBU', 'CBZ', 'CC', 'CCAP', 'CCB', 'CCBG', 'CCD', 'CCIIU', 'CCIXU', 'CCJ', 'CCK', 'CCL', 'CCNE', 'CCS', 'CCTG', 'CCU', 'CDE', 'CDP', 'CE', 'CEF', 'CEFD', 'CENX', 'CEPU', 'CET', 'CEV', 'CEVA', 'CF', 'CFBK', 'CFFI', 'CFFN', 'CFG', 'CFND', 'CFR', 'CG', 'CGAU', 'CGBD', 'CGNX', 'CGO', 'CHAI', 'CHCO', 'CHCT', 'CHH', 'CHI', 'CHMG', 'CHOW', 'CHRD', 'CHRW', 'CHW', 'CHY', 'CHYM', 'CI', 'CIB', 'CIEN', 'CIFR', 'CIG', 'CIGI', 'CII', 'CIK', 'CIM', 'CINF', 'CION', 'CIVB', 'CLB', 'CLBK', 'CLBT', 'CLDT', 'CLM', 'CLNK', 'CLS', 'CLSK', 'CM', 'CMC', 'CMCL', 'CMCO', 'CMI', 'CMRC', 'CMS', 'CMSA', 'CMSC', 'CMSD', 'CNA', 'CNH', 'CNL', 'CNM', 'CNO', 'CNOB', 'CNP', 'CNQ', 'CNS', 'CNX', 'CNXC', 'COF', 'COFS', 'COHR', 'COHU', 'COIN', 'COLB', 'COLM', 'COMP', 'COP', 'COR', 'CORZ', 'CPA', 'CPB', 'CPER', 'CPF', 'CPK', 'CPOP', 'CPRI', 'CPS', 'CPT', 'CQP', 'CR', 'CRAI', 'CRBG', 'CRBU', 'CRC', 'CRCL', 'CRDO', 'CRESY', 'CRF', 'CRGY', 'CRH', 'CRK', 'CRL', 'CRM', 'CRML', 'CRNT', 'CRS', 'CRSP', 'CRUS', 'CRVL', 'CRWD', 'CRWV', 'CSAN', 'CSGP', 'CSL', 'CSQ', 'CSTM', 'CSW', 'CSWC', 'CTBI', 'CTGO', 'CTNT', 'CTO', 'CTRE', 'CTRI', 'CTS', 'CTSH', 'CUBE', 'CUBI', 'CURB', 'CUZ', 'CVBF', 'CVCO', 'CVE', 'CVI', 'CVLG', 'CVNA', 'CVX', 'CW', 'CWBC', 'CWD', 'CWH', 'CWK', 'CWT', 'CX', 'CXM', 'CXT', 'CYPH', 'CZFS', 'CZNC', 'CZWI', 'D', 'DAL', 'DAN', 'DAVA', 'DAVE', 'DB', 'DBB', 'DBC', 'DBE', 'DBO', 'DBP', 'DBX', 'DC', 'DCH', 'DCI', 'DCO', 'DCOM', 'DD', 'DDOG', 'DE', 'DEA', 'DECK', 'DEFI', 'DEFT', 'DEI', 'DELL', 'DFDV', 'DFH', 'DFP', 'DGICA', 'DGII', 'DGP', 'DGXX', 'DHCNI', 'DHF', 'DHI', 'DHR', 'DIA', 'DINO', 'DIOD', 'DJP', 'DK', 'DKI', 'DKL', 'DLX', 'DLY', 'DMAAU', 'DMB', 'DMLP', 'DNLI', 'DNN', 'DNP', 'DOCN', 'DOCU', 'DOO', 'DORM', 'DOV', 'DOW', 'DOX', 'DPG', 'DPRO', 'DRD', 'DRH', 'DRS', 'DSGR', 'DSGX', 'DSL', 'DSM', 'DSU', 'DSY', 'DT', 'DTB', 'DTE', 'DTG', 'DTM', 'DTSQU', 'DTW', 'DUK', 'DUKB', 'DULL', 'DUOT', 'DV', 'DVN', 'DX', 'DXC', 'DXPE', 'DXST', 'DY', 'E', 'EAD', 'EAI', 'EBC', 'EBF', 'EBMT', 'ECAT', 'ECF', 'ECG', 'ECL', 'ED', 'EDD', 'EDIT', 'EDN', 'EEA', 'EFC', 'EFOR', 'EFR', 'EFSC', 'EFSI', 'EFT', 'EFTY', 'EFX', 'EG', 'EGBN', 'EGHT', 'EGO', 'EGP', 'EGY', 'EHI', 'EIM', 'EIX', 'ELAN', 'ELBM', 'ELC', 'ELE', 'ELPC', 'ELPW', 'ELS', 'EMA', 'EMBJ', 'EMD', 'EME', 'EMF', 'EMN', 'EMO', 'EMP', 'EMPD', 'EMPG', 'EMR', 'ENB', 'ENIC', 'ENO', 'ENS', 'ENTG', 'ENVA', 'ENVX', 'EOD', 'EOG', 'EOI', 'EOS', 'EPAC', 'EPAM', 'EPD', 'EPM', 'EPR', 'EPRT', 'EPSM', 'EQBK', 'EQH', 'EQNR', 'EQR', 'EQT', 'EQX', 'ERC', 'ERH', 'ERO', 'ES', 'ESAB', 'ESBA', 'ESE', 'ESI', 'ESNT', 'ESQ', 'ESRT', 'ESS', 'ESTC', 'ET', 'ETB', 'ETD', 'ETG', 'ETH', 'ETHA', 'ETHE', 'ETHW', 'ETJ', 'ETN', 'ETO', 'ETR', 'ETV', 'ETW', 'ETY', 'EU', 'EUO', 'EURKU', 'EVC', 'EVEX', 'EVF', 'EVG', 'EVN', 'EVR', 'EVRG', 'EVT', 'EVTL', 'EVV', 'EWBC', 'EXC', 'EXE', 'EXG', 'EXK', 'EXLS', 'EXP', 'EXPD', 'EXPE', 'EXPO', 'EXR', 'F', 'FAC', 'FAF', 'FANG', 'FAST', 'FAX', 'FBIN', 'FBIZ', 'FBK', 'FBLA', 'FBNC', 'FBP', 'FBRT', 'FCBC', 'FCCO', 'FCF', 'FCNCA', 'FCPT', 'FCX', 'FDBC', 'FDS', 'FDUS', 'FDX', 'FE', 'FELE', 'FER', 'FERG', 'FET', 'FFA', 'FFBC', 'FFC', 'FFIN', 'FG', 'FGDL', 'FGMCU', 'FGNX', 'FHB', 'FHI', 'FHN', 'FIBK', 'FIRY', 'FIS', 'FISI', 'FISV', 'FITB', 'FIVN', 'FIX', 'FJET', 'FLC', 'FLEX', 'FLG', 'FLO', 'FLS', 'FLY', 'FLYD', 'FLYU', 'FMAO', 'FMBH', 'FMN', 'FMNB', 'FN', 'FNB', 'FND', 'FNF', 'FNGD', 'FNGO', 'FNGS', 'FNGU', 'FNLC', 'FNUC', 'FNV', 'FOF', 'FOR', 'FORM', 'FPF', 'FPS', 'FR', 'FRA', 'FRAF', 'FRME', 'FRSH', 'FRST', 'FRT', 'FSBC', 'FSBW', 'FSK', 'FSM', 'FSOL', 'FSS', 'FSUN', 'FTAI', 'FTF', 'FTHM', 'FTHY', 'FTI', 'FTNT', 'FTRE', 'FTS', 'FTV', 'FUL', 'FULT', 'FUN', 'FUNC', 'FUND', 'FURY', 'FVCB', 'FWDI', 'FXA', 'FXB', 'FXC', 'FXE', 'FXF', 'FXNC', 'FXY', 'G', 'GAB', 'GABC', 'GAIN', 'GAM', 'GAP', 'GAU', 'GBAB', 'GBCI', 'GBDC', 'GBTC', 'GBUG', 'GCBC', 'GCMG', 'GCO', 'GCV', 'GDDY', 'GDLC', 'GDOG', 'GDS', 'GDV', 'GDXD', 'GDXU', 'GDYN', 'GE', 'GEF', 'GEF-B', 'GEHC', 'GEL', 'GEMI', 'GEN', 'GENC', 'GENVR', 'GEV', 'GF', 'GFF', 'GFI', 'GFR', 'GFS', 'GGAL', 'GGB', 'GGG', 'GGN', 'GGZ', 'GHM', 'GHY', 'GIB', 'GIII', 'GIS', 'GIWWU', 'GL', 'GLAD', 'GLD', 'GLDG', 'GLDI', 'GLDM', 'GLL', 'GLNK', 'GLO', 'GLOB', 'GLP', 'GLPI', 'GLQ', 'GLTR', 'GLU', 'GLV', 'GLW', 'GLXY', 'GM', 'GNRC', 'GNT', 'GNTX', 'GNW', 'GO', 'GOF', 'GOOD', 'GOOG', 'GOOGL', 'GORO', 'GPC', 'GPI', 'GPJA', 'GPOR', 'GRAL', 'GRBK', 'GRC', 'GRMN', 'GRNT', 'GROY', 'GS', 'GSBC', 'GSBD', 'GSG', 'GSIT', 'GSK', 'GSOL', 'GSUI', 'GTE', 'GTES', 'GTLB', 'GTM', 'GTY', 'GVA', 'GWH', 'GWRE', 'GWW', 'GXO', 'GXRP', 'H', 'HAFC', 'HAL', 'HAO', 'HAPN', 'HAYW', 'HBAN', 'HBANP', 'HBANZ', 'HBCP', 'HBM', 'HBNC', 'HBT', 'HCKT', 'HD', 'HDLB', 'HEI', 'HEI-A', 'HEQ', 'HESM', 'HFWA', 'HG', 'HGV', 'HIG', 'HIO', 'HIVE', 'HIW', 'HIX', 'HKIT', 'HL', 'HLI', 'HLIO', 'HLIT', 'HLMN', 'HLNE', 'HLT', 'HLX', 'HMC', 'HMN', 'HMY', 'HNI', 'HNVR', 'HOMB', 'HON', 'HOOD', 'HOPE', 'HOV', 'HP', 'HPE', 'HPF', 'HPI', 'HPK', 'HPP', 'HPQ', 'HPS', 'HQH', 'HQL', 'HR', 'HRI', 'HSBC', 'HSDT', 'HST', 'HTB', 'HTD', 'HTGC', 'HTH', 'HTLD', 'HTO', 'HUBB', 'HUBG', 'HUBS', 'HUN', 'HURC', 'HURN', 'HUT', 'HVT', 'HWBK', 'HWC', 'HWM', 'HXHX', 'HXL', 'HY', 'HYI', 'HYMC', 'HYT', 'HZO', 'IAE', 'IAF', 'IAG', 'IAU', 'IAUM', 'IAUX', 'IBCP', 'IBIT', 'IBKR', 'IBOC', 'IBP', 'ICCM', 'ICE', 'ICHR', 'ICLR', 'IDA', 'IDE', 'IDR', 'IE', 'IESC', 'IEX', 'IFED', 'IFF', 'IGA', 'IGD', 'IGR', 'IHD', 'IHG', 'IHT', 'IIM', 'IMMP', 'IMO', 'IMSR', 'INBK', 'INDB', 'INDP', 'INFQ', 'INFY', 'ING', 'INLF', 'INN', 'INR', 'INTA', 'INTC', 'INTR', 'INTU', 'INVH', 'INVX', 'IONQ', 'IOSP', 'IOT', 'IP', 'IPGP', 'IPI', 'IQI', 'IQV', 'IR', 'IREN', 'IRS', 'IRT', 'ISD', 'ISOU', 'ISPC', 'ISTR', 'IT', 'ITIC', 'ITRG', 'ITT', 'ITUB', 'ITW', 'IVR', 'IVT', 'IVZ', 'IWDL', 'IWFL', 'IWML', 'IX', 'JAKK', 'JBHT', 'JBI', 'JBL', 'JBLU', 'JBTM', 'JCE', 'JCI', 'JD', 'JEF', 'JELD', 'JETD', 'JETU', 'JFR', 'JGH', 'JHI', 'JHX', 'JKHY', 'JLL', 'JMSB', 'JOBY', 'JOF', 'JPC', 'JPM', 'JQC', 'JRI', 'JRS', 'JXN', 'JZ', 'KAI', 'KALU', 'KBDC', 'KBH', 'KC', 'KE', 'KEEL', 'KELYA', 'KELYB', 'KEY', 'KEYS', 'KF', 'KFIIU', 'KFY', 'KGC', 'KGEI', 'KHC', 'KIM', 'KIO', 'KKR', 'KKRS', 'KLAC', 'KLAR', 'KLIC', 'KMI', 'KMT', 'KN', 'KNF', 'KNSL', 'KNTK', 'KNX', 'KOLD', 'KOPN', 'KOS', 'KRC', 'KREF', 'KRG', 'KRMN', 'KRNY', 'KRO', 'KRP', 'KTF', 'KTOS', 'KULR', 'KVYO', 'KWR', 'KYN', 'L', 'LAD', 'LADR', 'LAES', 'LARK', 'LASR', 'LATAU', 'LAZ', 'LCII', 'LCNB', 'LDP', 'LEA', 'LECO', 'LEG', 'LEGH', 'LEN', 'LEN-B', 'LEO', 'LEU', 'LEVI', 'LFUS', 'LGI', 'LGIH', 'LGN', 'LII', 'LIND', 'LITE', 'LITS', 'LKFN', 'LKQ', 'LNC', 'LNG', 'LNN', 'LNT', 'LOAR', 'LOB', 'LOGI', 'LOMA', 'LOW', 'LPLA', 'LPX', 'LRCX', 'LRN', 'LSCC', 'LSPD', 'LSTR', 'LTBR', 'LTC', 'LTM', 'LUNR', 'LUV', 'LXFR', 'LXP', 'LXU', 'LYB', 'LYG', 'LZ', 'LZB', 'MAA', 'MAC', 'MAIN', 'MAKO', 'MAN', 'MANH', 'MAR', 'MARA', 'MAS', 'MATV', 'MATX', 'MBAI', 'MBC', 'MBIN', 'MBUU', 'MBWM', 'MBX', 'MC', 'MCB', 'MCBS', 'MCFT', 'MCHB', 'MCHP', 'MCHPP', 'MCK', 'MCN', 'MCO', 'MCRI', 'MCY', 'MDB', 'MDLZ', 'MDY', 'MEDP', 'MEGI', 'MEOH', 'MET', 'META', 'METC', 'METCB', 'MFA', 'MFC', 'MFG', 'MFIC', 'MFIN', 'MFM', 'MGA', 'MGEE', 'MGR', 'MGRB', 'MGRD', 'MGRE', 'MGY', 'MHD', 'MHK', 'MHO', 'MIDD', 'MINE', 'MIR', 'MITT', 'MKC', 'MKC-V', 'MKL', 'MKSI', 'MLAAU', 'MLCI', 'MLI', 'MLKN', 'MLM', 'MLPB', 'MLPR', 'MMD', 'MMI', 'MMM', 'MMU', 'MNDY', 'MNRO', 'MNSB', 'MOD', 'MOG-A', 'MORN', 'MOV', 'MP', 'MPA', 'MPB', 'MPC', 'MPLX', 'MPWR', 'MQY', 'MRBK', 'MRCY', 'MRK', 'MRSH', 'MRTN', 'MRVL', 'MS', 'MS-PK', 'MS-PL', 'MS-PO', 'MS-PP', 'MS-PQ', 'MSA', 'MSBI', 'MSCI', 'MSD', 'MSDL', 'MSEX', 'MSFT', 'MSM', 'MSTR', 'MT', 'MTA', 'MTB', 'MTC', 'MTCH', 'MTD', 'MTDR', 'MTG', 'MTH', 'MTRN', 'MTRX', 'MTSI', 'MTUL', 'MTUS', 'MTVA', 'MTW', 'MTX', 'MTZ', 'MU', 'MUA', 'MUC', 'MUFG', 'MUJ', 'MUR', 'MUX', 'MUZEU', 'MVBF', 'MVRL', 'MWA', 'MWH', 'MXE', 'MXF', 'MXL', 'MYFW', 'MYI', 'MYN', 'MYRG', 'NABL', 'NAC', 'NAD', 'NAKA', 'NAN', 'NATL', 'NB', 'NBB', 'NBBK', 'NBH', 'NBHC', 'NBIS', 'NBR', 'NBTB', 'NBXG', 'NCDL', 'NCIQ', 'NCLH', 'NCNO', 'NCV', 'NCZ', 'NDAQ', 'NDMO', 'NDSN', 'NE', 'NEA', 'NECB', 'NEE', 'NEM', 'NEWP', 'NEWT', 'NEXA', 'NFBK', 'NFGC', 'NFJ', 'NG', 'NGG', 'NGVT', 'NHI', 'NI', 'NIC', 'NICE', 'NIE', 'NJR', 'NKLR', 'NKSH', 'NKX', 'NLY', 'NMAI', 'NMCO', 'NMFC', 'NMG', 'NMIH', 'NML', 'NMR', 'NMRK', 'NMZ', 'NNE', 'NNI', 'NNN', 'NOG', 'NOV', 'NOVT', 'NOVTU', 'NOW', 'NPB', 'NPCE', 'NPFD', 'NPO', 'NRDS', 'NRGD', 'NRGU', 'NRIM', 'NRK', 'NRO', 'NRUC', 'NSA', 'NSIT', 'NSP', 'NTAP', 'NTB', 'NTCT', 'NTLA', 'NTNX', 'NTR', 'NTRS', 'NTRSO', 'NTSK', 'NTST', 'NU', 'NUE', 'NUV', 'NUVL', 'NUW', 'NVDA', 'NVEC', 'NVG', 'NVMI', 'NVR', 'NVS', 'NVST', 'NVT', 'NWBI', 'NWE', 'NWFL', 'NWG', 'NWN', 'NWPX', 'NX', 'NXE', 'NXP', 'NXPI', 'NXRT', 'NYXH', 'NZF', 'O', 'OBDC', 'OBE', 'OBK', 'OBT', 'OBTC', 'OC', 'OCFC', 'OCSL', 'ODFL', 'ODV', 'OEC', 'OFG', 'OFLX', 'OGC', 'OGE', 'OGS', 'OHI', 'OI', 'OIA', 'OII', 'OILD', 'OILU', 'OIS', 'OKE', 'OKLO', 'OKTA', 'OLN', 'OLP', 'OMAB', 'OMF', 'ON', 'ONB', 'ONDS', 'ONEW', 'ONTO', 'OPAD', 'OPBK', 'OPTU', 'OPY', 'OR', 'ORC', 'ORI', 'ORLA', 'ORN', 'ORRF', 'OSBC', 'OSK', 'OSPN', 'OSW', 'OTEX', 'OTF', 'OUNZ', 'OUST', 'OVLY', 'OVV', 'OWL', 'OXY', 'OYSEU', 'OZK', 'PAA', 'PAACU', 'PAAS', 'PAC', 'PACB', 'PACK', 'PAG', 'PAGP', 'PAGS', 'PALL', 'PAM', 'PANW', 'PAR', 'PARR', 'PATH', 'PATK', 'PAX', 'PAXS', 'PAYC', 'PAYX', 'PB', 'PBA', 'PBF', 'PBK', 'PBR', 'PBR-A', 'PCAR', 'PCB', 'PCG', 'PCN', 'PCOR', 'PCQ', 'PCTY', 'PCVX', 'PD', 'PDFS', 'PDI', 'PDLB', 'PDM', 'PDO', 'PDS', 'PDT', 'PDYN', 'PEB', 'PEBK', 'PEBO', 'PECO', 'PEG', 'PEGA', 'PENG', 'PEO', 'PFBC', 'PFD', 'PFE', 'PFG', 'PFH', 'PFIS', 'PFL', 'PFLT', 'PFN', 'PFO', 'PFS', 'PFSI', 'PGACU', 'PGC', 'PGP', 'PGR', 'PGY', 'PGZ', 'PH', 'PHIN', 'PHK', 'PHM', 'PHOE', 'PHYS', 'PICS', 'PII', 'PINE', 'PIPR', 'PJT', 'PK', 'PKBK', 'PKG', 'PKOH', 'PL', 'PLBC', 'PLD', 'PLG', 'PLMKU', 'PLMR', 'PLOW', 'PLPC', 'PLTM', 'PLTR', 'PLTS', 'PLXS', 'PML', 'PMM', 'PMO', 'PMT', 'PMTS', 'PNC', 'PNFP', 'PNI', 'PNNT', 'PNR', 'PNW', 'PONY', 'POOL', 'POR', 'POWI', 'POWL', 'PPG', 'PPL', 'PPLT', 'PPTA', 'PR', 'PRGO', 'PRGS', 'PRH', 'PRI', 'PRK', 'PRKS', 'PRLB', 'PRME', 'PRS', 'PRSU', 'PRU', 'PSA', 'PSF', 'PSLV', 'PSNL', 'PSTL', 'PSX', 'PTA', 'PTC', 'PTEN', 'PTY', 'PUK', 'PUSA', 'PVH', 'PWP', 'PWR', 'PZG', 'Q', 'QBTS', 'QCOM', 'QCRH', 'QLYS', 'QMMM', 'QQQ', 'QQQX', 'QRVO', 'QS', 'QSI', 'QTWO', 'QUBT', 'QULL', 'QXO', 'R', 'RA', 'RAL', 'RANG', 'RBB', 'RBC', 'RBCAA', 'RBRK', 'RCAT', 'RCL', 'RDAC', 'RDACU', 'RDN', 'RDVT', 'RDW', 'RDWR', 'REG', 'REI', 'RELX', 'REPX', 'RES', 'REXR', 'RF', 'RF-PE', 'RFAIU', 'RFI', 'RFM', 'RFMZ', 'RGA', 'RGEN', 'RGLD', 'RGT', 'RGTI', 'RH', 'RHI', 'RHP', 'RIG', 'RIO', 'RIOT', 'RITM', 'RIV', 'RIVN', 'RJF', 'RKLB', 'RKT', 'RKTO', 'RL', 'RLI', 'RLJ', 'RLTY', 'RM', 'RMBI', 'RMBS', 'RMM', 'RMNI', 'RMT', 'RNG', 'RNGR', 'RNP', 'RNR', 'RNST', 'ROAD', 'ROCK', 'ROG', 'ROK', 'ROP', 'RPC', 'RPD', 'RPM', 'RQI', 'RR', 'RRBI', 'RRC', 'RRX', 'RS', 'RUM', 'RUSHA', 'RUSHB', 'RVSB', 'RVT', 'RVTY', 'RWAY', 'RWT', 'RXO', 'RXRX', 'RY', 'RYAAY', 'RYAN', 'RYN', 'RYZ', 'S', 'SA', 'SAFE', 'SAFT', 'SAH', 'SAIA', 'SAIL', 'SAN', 'SANM', 'SAP', 'SAR', 'SARO', 'SATA', 'SATL', 'SBCF', 'SBET', 'SBFG', 'SBI', 'SBRA', 'SBS', 'SBSI', 'SBSW', 'SCAG', 'SCCO', 'SCD', 'SCDL', 'SCHW', 'SCL', 'SCM', 'SCO', 'SCSC', 'SCZM', 'SD', 'SDGR', 'SDHC', 'SDHY', 'SDRL', 'SEIC', 'SERV', 'SES', 'SEZL', 'SF', 'SF-PD', 'SFB', 'SFBS', 'SFNC', 'SFST', 'SGI', 'SGOL', 'SHBI', 'SHEL', 'SHNY', 'SHO', 'SHOE', 'SHOO', 'SHOP', 'SHW', 'SID', 'SIDU', 'SIG', 'SIGI', 'SIGIP', 'SII', 'SIMO', 'SITE', 'SITM', 'SIVR', 'SJM', 'SKE', 'SKT', 'SKWD', 'SKY', 'SKYA', 'SKYT', 'SKYW', 'SLAB', 'SLB', 'SLDP', 'SLG', 'SLGN', 'SLM', 'SLRC', 'SLSR', 'SLV', 'SLVO', 'SM', 'SMA', 'SMBC', 'SMBK', 'SMFG', 'SMG', 'SMHB', 'SMP', 'SMR', 'SMTC', 'SMX', 'SN', 'SNA', 'SNDK', 'SNDR', 'SNFCA', 'SNN', 'SNOW', 'SNX', 'SO', 'SOBO', 'SOEZ', 'SOFI', 'SOJC', 'SOJD', 'SOJE', 'SOJF', 'SOLC', 'SOMN', 'SON', 'SOUN', 'SPB', 'SPE', 'SPFI', 'SPG', 'SPGI', 'SPH', 'SPIR', 'SPPP', 'SPSC', 'SPT', 'SPXC', 'SPXX', 'SPY', 'SQNS', 'SR', 'SRCE', 'SRE', 'SREA', 'SRJN', 'SRTA', 'SSB', 'SSD', 'SSNC', 'SSRM', 'SSYS', 'ST', 'STAG', 'STBA', 'STC', 'STEL', 'STEP', 'STEW', 'STHO', 'STI', 'STK', 'STKE', 'STLD', 'STM', 'STNE', 'STRC', 'STRD', 'STRF', 'STRK', 'STRL', 'STT', 'STWD', 'STX', 'SU', 'SUI', 'SUIG', 'SUN', 'SUNC', 'SUPV', 'SVAQU', 'SVM', 'SW', 'SWIM', 'SWK', 'SWKS', 'SWX', 'SXI', 'SYBT', 'SYF', 'SYNA', 'T', 'T-PA', 'T-PC', 'TALO', 'TAOX', 'TBB', 'TBBK', 'TBLD', 'TCBI', 'TCBK', 'TCBX', 'TCPA', 'TCPC', 'TD', 'TDF', 'TDG', 'TDOC', 'TDOG', 'TDW', 'TDWDU', 'TDY', 'TEAM', 'TECH', 'TECK', 'TEI', 'TEL', 'TEM', 'TENB', 'TEO', 'TER', 'TEX', 'TFC', 'TFII', 'TFIN', 'TFPM', 'TFSL', 'TGB', 'TGHL', 'TGLS', 'TGS', 'THFF', 'THG', 'THM', 'THO', 'THQ', 'THRM', 'THW', 'TILE', 'TIMB', 'TKR', 'TM', 'TMC', 'TMCWW', 'TMHC', 'TMO', 'TMP', 'TMUS', 'TNC', 'TNET', 'TNL', 'TOL', 'TOST', 'TPC', 'TPG', 'TPVG', 'TREX', 'TRGP', 'TRI', 'TRIN', 'TRMB', 'TRMK', 'TRNO', 'TROW', 'TROX', 'TRP', 'TRST', 'TRTX', 'TRU', 'TRV', 'TRX', 'TS', 'TSBK', 'TSEM', 'TSLA', 'TSLX', 'TSM', 'TT', 'TTAM', 'TTAN', 'TTC', 'TTD', 'TTE', 'TTMI', 'TWI', 'TWLO', 'TWLV', 'TWN', 'TWO', 'TWST', 'TX', 'TXG', 'TXN', 'TXO', 'TXT', 'TY', 'TYL', 'UAL', 'UAMY', 'UAN', 'UBER', 'UBS', 'UBSI', 'UCB', 'UCO', 'UCTT', 'UDN', 'UDR', 'UE', 'UEC', 'UFCS', 'UFPI', 'UGA', 'UGL', 'UGP', 'UHT', 'ULCC', 'ULE', 'ULH', 'UMAC', 'UMBF', 'UMH', 'UNG', 'UNL', 'UNM', 'UNMA', 'UNTY', 'UPBD', 'UPS', 'UPST', 'UPXI', 'URG', 'URI', 'UROY', 'USA', 'USAC', 'USAR', 'USAS', 'USAU', 'USB', 'USCB', 'USCI', 'USGO', 'USL', 'USML', 'USO', 'USOI', 'USPH', 'UTF', 'UTL', 'UUUU', 'UVSP', 'UWMC', 'VABK', 'VAC', 'VAL', 'VALE', 'VAVX', 'VC', 'VCTR', 'VECO', 'VEEV', 'VERU', 'VERX', 'VET', 'VFC', 'VFL', 'VG', 'VGI', 'VGM', 'VGZ', 'VIAV', 'VICI', 'VICR', 'VIK', 'VINP', 'VIST', 'VIV', 'VIVS', 'VKI', 'VKQ', 'VLO', 'VLRS', 'VLT', 'VLY', 'VMC', 'VMI', 'VMO', 'VNET', 'VNO', 'VNOM', 'VNT', 'VOXR', 'VOYA', 'VOYG', 'VPG', 'VRNS', 'VRRM', 'VRSK', 'VRT', 'VRTS', 'VSEC', 'VSECU', 'VSH', 'VSME', 'VSOL', 'VSXY', 'VTEX', 'VTMX', 'VTR', 'VTS', 'VVV', 'VYLD', 'VYX', 'VZ', 'VZLA', 'W', 'WAB', 'WABC', 'WAFD', 'WAL', 'WASH', 'WAT', 'WBS', 'WCC', 'WDAY', 'WDC', 'WDI', 'WDS', 'WEAV', 'WEC', 'WELL', 'WERN', 'WES', 'WEX', 'WEYS', 'WFC', 'WFG', 'WFRD', 'WGO', 'WH', 'WHD', 'WKEY', 'WLFC', 'WLK', 'WMB', 'WMS', 'WNEB', 'WOK', 'WOR', 'WPC', 'WPM', 'WRB', 'WRD', 'WRN', 'WS', 'WSBC', 'WSBF', 'WSC', 'WSFS', 'WSM', 'WSO', 'WTBA', 'WTFC', 'WTI', 'WTID', 'WTIU', 'WTRG', 'WTS', 'WTTR', 'WTW', 'WULF', 'WWD', 'WWR', 'WWW', 'WXM', 'WY', 'WYFI', 'XCH', 'XEL', 'XELLL', 'XHG', 'XHR', 'XOM', 'XP', 'XPO', 'XPRO', 'XRAY', 'XRP', 'XRPZ', 'XXI', 'XYL', 'YCL', 'YCS', 'YCY', 'YETI', 'YMM', 'YORW', 'YOUL', 'YPF', 'Z', 'ZENA', 'ZETA', 'ZG', 'ZGN', 'ZION', 'ZKPU', 'ZM', 'ZS', 'ZSL', 'ZTR', 'ZWS']
+  (27) ['ASC', 'BWLP', 'CMBT', 'CMRE', 'DAC', 'DHT', 'DSX', 'ECO', 'FRO', 'GNK', 'GSL', 'HAFN', 'HSHP', 'INSW', 'LPG', 'NAT', 'NMM', 'NVGS', 'SB', 'SBLK', 'SFL', 'SHIP', 'STNG', 'TEN', 'TK', 'TNK', 'TRMD']
+  (20) ['AIMD', 'BRIA', 'BYAH', 'CEPS', 'CNTX', 'CPSH', 'CUPR', 'GSHRU', 'INHD', 'ITOC', 'KVACU', 'MBAV', 'MBAVU', 'MPAA', 'NPT', 'RGNT', 'SCPQU', 'SMTK', 'SUNE', 'TDACU']
+  (15) ['ACB', 'BQ', 'CGC', 'CRON', 'ENTA', 'GLAS', 'GRWG', 'HITI', 'MLTX', 'OGI', 'SNDL', 'TLRY', 'TRLV', 'VFF', 'YCBD']
+  (9) ['CMPX', 'ELSE', 'FFAI', 'HTCO', 'IRHOU', 'MANE', 'QH', 'WSO-B', 'YAAS']
+  (9) ['CANF', 'CEPO', 'DXF', 'FTFT', 'IQMX', 'LHAI', 'LMFA', 'TC', 'XAIR']
+  (9) ['CPAC', 'RILY', 'RILYG', 'RILYL', 'RILYN', 'RILYP', 'RILYT', 'RILYZ', 'VMAR']
+  (8) ['CHD', 'CL', 'CLX', 'HLN', 'KMB', 'KO', 'PG', 'UL']
+  (8) ['CETX', 'GPCR', 'KYMR', 'NRIX', 'ORKT', 'TWG', 'WBUY', 'WVE']
+  (8) ['BGL', 'CICB', 'CRNX', 'ITHAU', 'PTORU', 'SVAC', 'SVACU', 'SXTP']
+  (8) ['AVNW', 'EMBC', 'EVER', 'FSEA', 'HSTM', 'MAX', 'MED', 'QNST']
+  (7) ['CYTK', 'HWH', 'IONS', 'LAWR', 'MLYS', 'UTHR', 'UUU']
+  (7) ['ACM', 'BAH', 'CACI', 'J', 'KBR', 'LDOS', 'SAIC']
+  (7) ['AIIR', 'BRC', 'GOVX', 'MI', 'RAMP', 'SACH', 'SBFM']
+  (7) ['CRVO', 'KTWOU', 'LPRO', 'OBAI', 'RIBBU', 'RNGTU', 'SLBT']
+  (6) ['GD', 'HII', 'LHX', 'LMT', 'NOC', 'RTX']
+  (6) ['BJRI', 'CAKE', 'DIN', 'DRI', 'LOCO', 'TXRH']
+  (6) ['BW-PA', 'BWNB', 'FRMM', 'GDOT', 'GEVO', 'RDNW']
+  (6) ['AMST', 'CNEY', 'GIXXU', 'INM', 'KRSP', 'NXXT']
+  (6) ['ARCIU', 'FXHO', 'KRAQU', 'LHSW', 'LUCY', 'SEER']
+  (6) ['BAYAU', 'BPACU', 'MYND', 'PCTTU', 'PRFX', 'STG']
+  (5) ['CNC', 'CVS', 'ELV', 'MOH', 'UNH']
+  (5) ['CNI', 'CP', 'CSX', 'NSC', 'UNP']
+  (5) ['CEG', 'NRG', 'TLN', 'UTG', 'VST']
+  (5) ['FVN', 'GMM', 'IACOU', 'JLHL', 'VOD']
+  (5) ['BF-A', 'BF-B', 'SAM', 'STZ', 'TAP']
+  (5) ['AMR', 'BTU', 'CNR', 'HCC', 'SXC']
+  (5) ['HVII', 'HVIIU', 'ITGR', 'MSAI', 'SCNX']
+  (5) ['CLPT', 'LAC', 'QURE', 'SHFS', 'SLI']
+  (5) ['COOT', 'GNPX', 'OMER', 'PFAI', 'TOVX']
+  (5) ['FGMC', 'GETY', 'NXTS', 'SSTK', 'TNON']
+  (5) ['AHT', 'ASPC', 'ASPCU', 'BBGI', 'FCT']
+  (5) ['AACBU', 'MACIU', 'TJGC', 'WCT', 'XOS']
+  (5) ['CORN', 'DBA', 'SOYB', 'TAGS', 'WEAT']
+  (5) ['BHFAL', 'BHFAM', 'BHFAN', 'BHFAO', 'BHFAP']
+  (4) ['HDB', 'IBN', 'IFN', 'IIF']
+  (4) ['ROL', 'RSG', 'WCN', 'WM']
+  (4) ['CHTR', 'CMCSA', 'LBRDA', 'LBRDK']
+  (4) ['BTAI', 'IDXX', 'TONX', 'VISN']
+  (4) ['ARRY', 'FSLR', 'NXT', 'SHLS']
+  (4) ['ALB', 'LAR', 'SGML', 'SQM']
+  (4) ['FUTU', 'RFAMU', 'TIGR', 'XCBEU']
+  (4) ['BNC', 'CELC', 'PFSA', 'VWAV']
+  (4) ['OPEN', 'OPENL', 'OPENW', 'OPENZ']
+  (4) ['CVSA', 'LOPE', 'PRDO', 'STRA']
+  (4) ['ACDC', 'AESI', 'LBRT', 'PUMP']
+  (4) ['DBRG', 'TGL', 'WHLR', 'WHLRD']
+  (4) ['BEBE', 'BRLS', 'KD', 'ZKP']
+  (4) ['AGIO', 'MAGH', 'NUVB', 'WSHP']
+  (4) ['AQMS', 'AWX', 'GWAV', 'NVA']
+  (4) ['KRKR', 'ORBS', 'RAPP', 'SNTG']
+  (4) ['ECC', 'EIC', 'OCCI', 'OXLC']
+  (4) ['AHMA', 'BLUW', 'CNCK', 'FLYE']
+  (4) ['AIRE', 'DYNC', 'DYNCU', 'PMN']
+  (4) ['RYET', 'SDST', 'SQFT', 'TROO']
+  (4) ['ARBK', 'ONMD', 'SKYE', 'SPRB']
+  (4) ['LSTA', 'NAMM', 'NAMMW', 'PAVM']
+  (4) ['CELZ', 'GIBO', 'JEM', 'LGCL']
+  (4) ['AUID', 'CJMB', 'MLEC', 'SPHL']
+  (4) ['GS-PA', 'GS-PC', 'GS-PD', 'MS-PA']
+  (3) ['JBDI', 'ORCL', 'WLDS']
+  (3) ['DLR', 'EQIX', 'IRM']
+  (3) ['HCA', 'THC', 'UHS']
+  (3) ['AMT', 'CCI', 'SBAC']
+  (3) ['LLYVA', 'LLYVK', 'LYV']
+  (3) ['BDX', 'STE', 'ZBH']
+  (3) ['RECT', 'RMSG', 'RVMD']
+  (3) ['KB', 'SHG', 'WF']
+  (3) ['ICUI', 'LAMR', 'OUT']
+  (3) ['CZR', 'MGM', 'PENN']
+  (3) ['GMED', 'NATR', 'ORGO']
+  (3) ['GILT', 'TSAT', 'VSAT']
+  (3) ['RCKY', 'XWEL', 'YOU']
+  (3) ['AROC', 'KGS', 'NGS']
+  (3) ['GTN', 'NXST', 'SBGI']
+  (3) ['CNSP', 'GBTG', 'SKK']
+  (3) ['ENGN', 'PLNT', 'TRDA']
+  (3) ['BLDP', 'FCEL', 'PLUG']
+  (3) ['CSTL', 'TCMD', 'UFPT']
+  (3) ['COCH', 'DMRA', 'TMQ']
+  (3) ['AGPU', 'CYCN', 'TH']
+  (3) ['FINV', 'LX', 'QFIN']
+  (3) ['FMC', 'INTS', 'TDAY']
+  (3) ['ACRS', 'CRVS', 'IVF']
+  (3) ['PRLD', 'RHLD', 'TGE']
+  (3) ['FTH', 'RXT', 'VHCP']
+  (3) ['CSIQ', 'DQ', 'JKS']
+  (3) ['CHECU', 'CRSR', 'RIME']
+  (3) ['ARTL', 'BUR', 'SST']
+  (3) ['DSP', 'LFS', 'PUBM']
+  (3) ['AIIO', 'QUCY', 'TDIC']
+  (3) ['FLZH', 'FNRN', 'OBAWU']
+  (3) ['CREG', 'IPHA', 'LESL']
+  (3) ['AKTX', 'POLEU', 'QTEX']
+  (3) ['HCTI', 'LIDR', 'LIDRW']
+  (3) ['CODX', 'DZZ', 'QTI']
+  (3) ['AFJK', 'AFJKU', 'OCG']
+  (3) ['DUKR', 'PRSO', 'SYNX']
+  (3) ['GELS', 'GLXG', 'SPKLU']
+  (3) ['FAMI', 'TNMG', 'UPC']
+  (3) ['ARTCU', 'GJR', 'VTAK']
+  (3) ['UZD', 'UZE', 'UZF']
+  (2) ['COST', 'WMT']
+  (2) ['MA', 'V']
+  (2) ['BTI', 'PM']
+  (2) ['MCD', 'YUM']
+  (2) ['ROST', 'TJX']
+  (2) ['MDT', 'SYK']
+  (2) ['CDNS', 'SNPS']
+  (2) ['AZO', 'ORLY']
+  (2) ['FMX', 'KOF']
+  (2) ['ADM', 'BG']
+  (2) ['ACI', 'KR']
+  (2) ['BAP', 'IFS']
+  (2) ['LVS', 'WYNN']
+  (2) ['LB', 'TPL']
+  (2) ['IMVT', 'ROIV']
+  (2) ['DG', 'DLTR']
+  (2) ['DGX', 'LH']
+  (2) ['BEP', 'BEPC']
+  (2) ['FOX', 'FOXA']
+  (2) ['FWONA', 'FWONK']
+  (2) ['PFGC', 'USFD']
+  (2) ['DKNG', 'FLUT']
+  (2) ['NWS', 'NWSA']
+  (2) ['ARE', 'DOC']
+  (2) ['BTSG', 'BTSGU']
+  (2) ['ENLT', 'KEN']
+  (2) ['COLD', 'LINE']
+  (2) ['CSV', 'SCI']
+  (2) ['APGE', 'DFTX']
+  (2) ['EZPW', 'FCFS']
+  (2) ['COGT', 'NTWOU']
+  (2) ['GSIW', 'XENE']
+  (2) ['EEIQ', 'NAVN']
+  (2) ['BYD', 'RRR']
+  (2) ['APPF', 'WK']
+  (2) ['ANF', 'URBN']
+  (2) ['ENPH', 'SEDG']
+  (2) ['BIP', 'BIPC']
+  (2) ['NAMS', 'NAMSW']
+  (2) ['CXW', 'GEO']
+  (2) ['AD', 'TDS']
+  (2) ['BATRA', 'BATRK']
+  (2) ['LBTYA', 'LBTYK']
+  (2) ['CNK', 'MCS']
+  (2) ['MREO', 'RARE']
+  (2) ['UA', 'UAA']
+  (2) ['CLFD', 'HIMX']
+  (2) ['GBX', 'TRN']
+  (2) ['LINC', 'UTI']
+  (2) ['CENT', 'CENTA']
+  (2) ['HCWB', 'PIII']
+  (2) ['ATAI', 'CMPS']
+  (2) ['ECPG', 'PRAA']
+  (2) ['IMKTA', 'WMK']
+  (2) ['MOBX', 'ZD']
+  (2) ['GSHD', 'TWFG']
+  (2) ['ERII', 'WD']
+  (2) ['BVC', 'UFG']
+  (2) ['INBX', 'WGRX']
+  (2) ['GPRE', 'REX']
+  (2) ['LILA', 'LILAK']
+  (2) ['CNMD', 'ENOV']
+  (2) ['BH', 'BH-A']
+  (2) ['CAPR', 'KITT']
+  (2) ['AORT', 'VREX']
+  (2) ['AVNS', 'SNAL']
+  (2) ['CERT', 'SLP']
+  (2) ['KDK', 'KDKRW']
+  (2) ['FSCO', 'FSSL']
+  (2) ['GLIBA', 'GLIBK']
+  (2) ['CCXI', 'CCXIU']
+  (2) ['RGR', 'SWBI']
+  (2) ['CCIXW', 'TMS']
+  (2) ['CRD-A', 'CRD-B']
+  (2) ['EVMN', 'QNCX']
+  (2) ['ARTV', 'RANI']
+  (2) ['IMXI', 'TLS']
+  (2) ['FPI', 'LAND']
+  (2) ['RTAC', 'RTACU']
+  (2) ['BNED', 'IMMR']
+  (2) ['TACO', 'TACOU']
+  (2) ['AGMH', 'DCX']
+  (2) ['NSLR', 'SSSS']
+  (2) ['CHARU', 'UCFI']
+  (2) ['MCGA', 'MCGAU']
+  (2) ['FC', 'HCICU']
+  (2) ['AIXI', 'RCMT']
+  (2) ['OLB', 'SMJF']
+  (2) ['IPDN', 'YDES']
+  (2) ['ELME', 'ILLR']
+  (2) ['BWEN', 'BZFD']
+  (2) ['BOLD', 'CIRC']
+  (2) ['CDLX', 'SLMT']
+  (2) ['LASE', 'TVAIU']
+  (2) ['HOLO', 'MLGO']
+  (2) ['EICA', 'UCAR']
+  (2) ['EVTV', 'LVLU']
+  (2) ['CMIIU', 'PSIG']
+  (2) ['TMDE', 'TPET']
+  (2) ['FGI', 'TURB']
+  (2) ['MYSE', 'ONFO']
+  (2) ['NXL', 'XBIO']
+  (2) ['BGMS', 'KAPA']
+  (2) ['DTST', 'NUWE']
+  (2) ['AEMD', 'APM']
+  (2) ['HODO', 'TBH']
+  (2) ['MSW', 'PMA']
+  (2) ['FSHPU', 'RANGU']
+  (2) ['FCNCO', 'FCNCP']
+  (2) ['BNH', 'BNJ']
+  (2) ['TMUSI', 'TMUSZ']
+  (2) ['AGNCO', 'AGNCP']
+  (2) ['BEPH', 'BEPI']
+  (2) ['EGHAU', 'LCCCU']
+
+Top 30 correlated pairs:
+stock_a stock_b     corr
+   HODO     TBH 0.999981
+   NSLR    SSSS 0.999936
+    PMA     MSW 0.999920
+   GBTC    BITB 0.999899
+   ETHE     ETH 0.999875
+   GBTC     BTC 0.999873
+   BITB     BTC 0.999868
+    GLD     IAU 0.999858
+    IAU    GLDM 0.999844
+   SGOL    GLDM 0.999839
+    IAU    SGOL 0.999837
+    SLV    SIVR 0.999833
+   SGOL    IAUM 0.999819
+    IAU    OUNZ 0.999808
+    IAU     BAR 0.999802
+   GBTC    BRRR 0.999781
+   BITB    BRRR 0.999779
+    GLD    GLDM 0.999777
+   GBTC    IBIT 0.999777
+   BITB    IBIT 0.999775
+   GLDM    IAUM 0.999763
+   ETHE    ETHW 0.999754
+   SGOL    OUNZ 0.999748
+    GLD     BAR 0.999748
+   ETHW     ETH 0.999746
+   VSOL    SOLC 0.999739
+    IAU    IAUM 0.999737
+    GLD    SGOL 0.999731
+   OUNZ    GLDM 0.999726
+   IBIT     BTC 0.999725
+=====================================================================
+ADDENDUM: notes on the raw scan
+=====================================================================
+Same pattern as the NSE scan: the raw top-correlated-pairs list is
+dominated by pairs tracking the literal same underlying asset (Bitcoin
+ETFs/trusts GBTC/BITB/IBIT/BRRR all >0.999; gold ETFs GLD/IAU/SGOL/GLDM/
+BAR/OUNZ/IAUM all >0.999; Ethereum ETHE/ETH/ETHW >0.999; silver SLV/SIVR)
+-- trivial by construction, not a "which stocks move together" finding.
+
+Unlike the NSE scan, though, the cluster list here is already rich with
+clean, real, economically sensible sector groupings well below the giant
+2,379-symbol "everything correlates via market beta" component (37% of
+resolved symbols -- smaller proportionally than NSE's 57%, but the same
+underlying artifact per Random Matrix Theory: a dominant market-mode
+eigenvalue inflates most pairwise correlations at full-universe scale).
+Notable clean clusters (see full cluster list above for exact membership):
+  Shipping/tankers (27), consumer staples (8: CHD/CL/CLX/HLN/KMB/KO/PG/UL),
+  cannabis (15), defense primes (6: GD/HII/LHX/LMT/NOC/RTX), defense IT
+  services (7: ACM/BAH/CACI/J/KBR/LDOS/SAIC), major railroads (5: CNI/CP/
+  CSX/NSC/UNP), managed-care insurers (5: CNC/CVS/ELV/MOH/UNH), restaurant
+  chains (6), independent power producers (5: CEG/NRG/TLN/UTG/VST),
+  alcohol/beverages (5: BF-A/BF-B/SAM/STZ/TAP), coal miners (5), waste
+  management (4: ROL/RSG/WCN/WM), lithium producers (4), solar (4).

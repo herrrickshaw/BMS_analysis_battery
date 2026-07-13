@@ -24,5 +24,13 @@ nse>=3.0             # NSE/BSE bhavcopy EOD files
 feedparser>=6.0      # RSS feeds (Moneycontrol/ET/CNBC/...)
 vaderSentiment>=3.3  # sentiment scoring
 
+# LLM structured extraction (llm_extract.py) — Groq primary / Gemini fallback,
+# both OpenAI-compatible endpoints, keys read from ~/.env.local
+openai>=1.0
+
+# CV-based chart pattern detection (chart_pattern_cv.py)
+matplotlib>=3.7
+scipy>=1.10
+
 # European universe discovery (Investing.com lists; price API blocked)
 investpy>=1.0.8

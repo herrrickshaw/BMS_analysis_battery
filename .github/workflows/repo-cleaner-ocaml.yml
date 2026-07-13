@@ -1,0 +1,45 @@
+name: repo-cleaner-ocaml CI
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'tools/repo-cleaner-ocaml/**'
+      - '.github/workflows/repo-cleaner-ocaml.yml'
+  pull_request:
+    paths:
+      - 'tools/repo-cleaner-ocaml/**'
+      - '.github/workflows/repo-cleaner-ocaml.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/repo-cleaner-ocaml
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Branch_analyzer's tests need real git history to diff against
+
+      - name: Set up OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: '5.1'
+
+      - name: Configure git identity (needed by the Branch_analyzer/Recency tests, which commit into throwaway repos)
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI"
+
+      - name: Install dune
+        run: opam install -y dune
+
+      - name: Build
+        run: opam exec -- dune build
+
+      - name: Test
+        run: opam exec -- dune exec test/test_repo_cleaner.exe

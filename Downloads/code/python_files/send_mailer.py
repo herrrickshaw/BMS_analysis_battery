@@ -32,9 +32,9 @@ def send(subject: str, text: str, html: str) -> bool:
     user = os.environ.get("GMAIL_USER")
     pw = os.environ.get("GMAIL_APP_PASSWORD")
     to = os.environ.get("MAIL_TO", user)
-    if not (user and pw):
+    if not (user and pw) or len(pw) < 16 or "PUT-YOUR" in pw:
         Path("brief_today.html").write_text(html)
-        print("  no GMAIL_USER/GMAIL_APP_PASSWORD set — saved brief_today.html instead of sending")
+        print("  no valid GMAIL_APP_PASSWORD set — saved brief_today.html instead of sending")
         return False
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject

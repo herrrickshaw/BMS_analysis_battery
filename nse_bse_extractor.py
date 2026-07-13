@@ -19,12 +19,22 @@ from datetime import datetime, timedelta
 from io import StringIO
 from typing import Dict, List, Optional, Tuple
 
+import duckdb
 import numpy as np
 import pandas as pd
 import requests
 import warnings
 
 warnings.filterwarnings("ignore")
+
+
+def _write_duckdb_table(output_dir: str, table: str, df: pd.DataFrame) -> None:
+    """Write a DataFrame into data/market_data.duckdb, replacing the table."""
+    con = duckdb.connect(os.path.join(output_dir, "market_data.duckdb"))
+    try:
+        con.execute(f"CREATE OR REPLACE TABLE {table} AS SELECT * FROM df")
+    finally:
+        con.close()
 
 # ── optional dependencies ─────────────────────────────────────
 try:
@@ -662,10 +672,7 @@ def main():
         tech_df = pd.concat(tech_dfs, ignore_index=True) if tech_dfs else pd.DataFrame()
 
         if not fund_df.empty:
-            fund_df.to_csv(
-                f"{args.output_dir}/{exchange.lower()}_stocks_fundamental.csv",
-                index=False,
-            )
+            _write_duckdb_table(args.output_dir, f"{exchange.lower()}_stocks_fundamental", fund_df)
             logger.info("Saved %d %s fundamental rows", len(fund_df), exchange)
         if not tech_df.empty:
             tech_df.to_csv(
@@ -709,9 +716,8 @@ def main():
     else:
         merged = combined_fund
 
-    out = f"{args.output_dir}/all_stocks_combined.csv"
-    merged.to_csv(out, index=False)
-    logger.info("\nFinal combined CSV: %s  (%d stocks)", out, len(merged))
+    _write_duckdb_table(args.output_dir, "all_stocks_combined", merged)
+    logger.info("\nFinal combined table: all_stocks_combined  (%d stocks)", len(merged))
 
     # Quick summary
     by_exc = merged.groupby("exchange").size().to_dict()

@@ -116,14 +116,13 @@ Cassandra (local)  ←→  db/cassandra_client.py
 
 | File | Contents |
 |---|---|
-| `data/europe_all_list.csv` | 966 European stocks (yf_ticker, name, index, exchange) |
-| `data/frankfurt_list.csv` | DAX40 + MDAX50 + SDAX70 (142 stocks, `.F` suffix) |
-| `data/london_list.csv` | FTSE100 + FTSE250 + SmallCap (436 stocks, `.L` suffix) |
-| `data/europe_extended_list.csv` | 11-index intermediate build artifact |
+| `data/market_data.duckdb` | Tracked reference tables (`europe_all_list`, `frankfurt_list`, `london_list`, `europe_extended_list`, `all_stocks_combined`, `nse_stocks_fundamental`, `bse_stocks_fundamental`, sample fixtures) — one table per former CSV, see below |
 | `data/us_list.csv` | ~7,000 US equities (NASDAQ trader, refreshed daily) |
 | `data/japan_list.csv` | TSE equities from JPX (refreshed daily) |
 | `data/korea_list.csv` | KOSPI + KOSDAQ from FinanceDataReader (refreshed daily) |
 | `data/nse_equity_list.csv` | NSE EQUITY_L.csv (refreshed daily) |
+
+The daily-refreshed lists above stay as loose CSVs (gitignored, rebuilt by `run_app.sh` on every startup) — a persistent DB table would just be overwritten hours later, so there's no benefit to migrating them. Everything else that used to live in `data/*.csv` — 966 European stocks (`europe_all_list`), DAX40+MDAX50+SDAX70 (`frankfurt_list`, 142 stocks, `.F` suffix), FTSE100+FTSE250+SmallCap (`london_list`, 436 stocks, `.L` suffix), the orphaned `europe_extended_list` build artifact, and the NSE/BSE fundamental exports consumed by `pegu_sarvas_analysis.R` — now lives in `data/market_data.duckdb`, one table per former file with the schema unchanged.
 
 ### Bulk Fetch Strategy
 
@@ -218,4 +217,5 @@ Broker credentials go in `put_call_parity/config.py` (not committed).
 - **Cost-adjusted signals**: Put-call parity deviations are only acted on after accounting for STT, exchange charges, brokerage, GST, and SEBI fees.
 - **Position persistence**: `positions.json` is written after every order so the strategy survives restarts.
 - **R for scoring**: The Pegu/Sarvas pipeline deliberately uses R (not Python) for statistical scoring and visualization.
-- **Europe list cache**: `europe_all_list.csv` is rebuilt at startup only if missing or >30 days old (Wikipedia scraping takes ~60s).
+- **Europe list cache**: `europe_all_list` (in `data/market_data.duckdb`) is rebuilt at startup only if missing or >30 days old (Wikipedia scraping takes ~60s), tracked via a `build_meta` table instead of file mtime.
+- **Tracked tabular data goes in DuckDB, not loose CSVs**: any new small/medium reference CSV added to `data/` should be loaded with `scripts/csv_to_db.py` into `data/market_data.duckdb` (one table per file, schema preserved) rather than committed as a standalone `.csv`. Run `python3 scripts/csv_to_db.py` after adding a file, `--verify` to check row/column parity against the source before deleting it, and `--to-postgres DSN` to mirror tables into a Postgres database for external tools. Exception: CSVs that `run_app.sh` regenerates every startup from an external source (`us_list.csv`, `japan_list.csv`, `korea_list.csv`, `nse_equity_list.csv`, etc.) stay as gitignored loose files — they're a same-day cache, not durable data, so a DB table would just be stale hours later.

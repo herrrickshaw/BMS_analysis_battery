@@ -557,15 +557,24 @@ def fundamental_scan(symbol: str, yf_suffix: str = ".NS") -> dict:
 
         mcap_cr = mcap / 1e7
         ni_s    = series(inc, "Net Income")
+        # FCF>0 criterion — was previously missing here, making India's Coffee
+        # Can a 5-criterion test vs. 6 in the US/Europe scans for the identically
+        # named screen. Same fallback pattern as those two: prefer the FCF row,
+        # else OCF - |CapEx|.
+        fcf_s   = series(cf, "Free Cash Flow")
+        ocf_s   = series(cf, "Operating Cash Flow", "Total Cash From Operating Activities")
+        capex_s = series(cf, "Capital Expenditure", "Capital Expenditures")
+        fcf_pos = (fcf_s[0] > 0) if fcf_s else ((ocf_s[0] - abs(capex_s[0])) > 0 if (ocf_s and capex_s) else False)
         cc_bits = [
             1 if (cagr    and cagr    > 10)  else 0,
             1 if (avg_roce and avg_roce > 15) else 0,
             1 if (de is not None and de < 1)  else 0,
             1 if mcap_cr >= 500               else 0,
             1 if (ni_s and all(n > 0 for n in ni_s)) else 0,
+            1 if fcf_pos                      else 0,
         ]
-        out["qualifies_cc"] = sum(cc_bits) == 5
-        out["cc_score"]     = f"{sum(cc_bits)}/5"
+        out["qualifies_cc"] = sum(cc_bits) == 6
+        out["cc_score"]     = f"{sum(cc_bits)}/6"
         out["Revenue_CAGR_%"] = round(cagr,     2) if cagr     is not None else None
         out["ROCE_avg_%"]     = round(avg_roce,  2) if avg_roce is not None else None
 

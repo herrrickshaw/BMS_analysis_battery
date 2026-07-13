@@ -187,14 +187,39 @@ def _talk_rows(data: dict, cap: int = 10):
     return rows
 
 
-def _darvas_section(market: str) -> str:
+_DARVAS_LABEL = {"IN": "🇮🇳 India", "US": "🇺🇸 US", "EU": "🇪🇺 Europe"}
+
+
+def _darvas_section(market: str, cap: int = 15) -> str:
+    """Fresh Darvas breakouts for one market, capped to `cap` rows for readability
+    (a full-universe scan can surface 100+ "fresh" breakouts — the header still
+    reports the true Tier-1/Tier-2 totals, only the table is truncated)."""
     if dbrk is None:
         return "<p style='color:#777'>Darvas fragment unavailable (darvas_breakouts.py not importable).</p>"
+    label = _DARVAS_LABEL.get(market, market)
     try:
-        frag, _ = dbrk.build(market, write_csv=False)
-        return frag
+        _, df = dbrk.build(market, write_csv=False)
     except Exception as e:
         return f"<p style='color:#777'>Darvas fragment for {market} unavailable ({e}).</p>"
+    if df.empty:
+        return (f'<h3>📈 {label} — Darvas Breakouts</h3>'
+                f'<p style="color:#777">No fresh breakouts in the latest scan.</p>')
+    n1 = int((df["Tier"] == 1).sum())
+    n2 = int((df["Tier"] == 2).sum())
+    shown_note = f", top {cap} of {len(df)} shown" if len(df) > cap else ""
+    head = ("<tr><th>Tier</th><th>Symbol</th><th>Name</th><th>Exch</th>"
+            "<th>LTP</th><th>Day</th><th>Box Pos</th><th>Upside</th>"
+            "<th>50/200</th><th>GC</th></tr>")
+    body = dbrk.rows_html(df.head(cap), market)
+    return (
+        f'<h3>📈 {label} — Darvas Breakouts '
+        f'<span style="font-weight:400;color:#777">({n1} Tier-1 · {n2} Tier-2{shown_note})</span></h3>'
+        f'<div class="trail" style="overflow-x:auto">'
+        f'<table style="border-collapse:collapse;width:100%;font-size:12.5px">'
+        f'{head}{body}</table></div>'
+        f'<p style="font-size:11px;color:#888;margin-top:4px">Tier 1 = Golden Cross + '
+        f'Darvas breakout, box position ≤130%. Tier 2 = box position 100–120%, above '
+        f'200-DMA, up day, ≥250 daily bars. "Box Pos" &gt;100% = trading above the box.</p>')
 
 
 def _market_snapshot_html() -> str:

@@ -23,9 +23,12 @@ def screen(s: StockData) -> Result | None:
         return None
     if peg is None and growth not in (None, 0):
         peg = pe / growth
+    # (pe <= PE_MAX) deliberately NOT part of this OR — it's already the hard
+    # outer ceiling below. Including it here made "reasonable" true whenever the
+    # ceiling was satisfied regardless of PEG, so the PEG<=1 "classic Lynch test"
+    # was almost never the binding constraint.
     reasonable = (peg is not None and peg <= PEG_MAX) or \
-                 (industry_pe is not None and pe <= industry_pe) or \
-                 (pe <= PE_MAX)
+                 (industry_pe is not None and pe <= industry_pe)
     passed = growth >= GROWTH_MIN and reasonable and pe <= PE_MAX
     return Result(s.symbol, META["slug"], passed=passed,
                   score=round(peg, 2) if peg is not None else None,   # lower PEG = better

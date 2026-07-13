@@ -25,13 +25,36 @@
     <key>GMAIL_USER</key><string>umashankartd1991@gmail.com</string>
     <key>GMAIL_APP_PASSWORD</key><string>PUT-YOUR-16-CHAR-APP-PASSWORD-HERE</string>
     <key>MAIL_TO</key><string>umashankartd1991@gmail.com</string>
-    <key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>PATH</key><string>/Users/umashankar/Downloads/code/python_files/.venv/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
   </dict>
   <key>StartCalendarInterval</key>
-  <dict>
-    <key>Hour</key><integer>7</integer>
-    <key>Minute</key><integer>35</integer>
-  </dict>
+  <array>
+    <dict>
+      <key>Weekday</key><integer>1</integer>
+      <key>Hour</key><integer>7</integer>
+      <key>Minute</key><integer>35</integer>
+    </dict>
+    <dict>
+      <key>Weekday</key><integer>2</integer>
+      <key>Hour</key><integer>7</integer>
+      <key>Minute</key><integer>35</integer>
+    </dict>
+    <dict>
+      <key>Weekday</key><integer>3</integer>
+      <key>Hour</key><integer>7</integer>
+      <key>Minute</key><integer>35</integer>
+    </dict>
+    <dict>
+      <key>Weekday</key><integer>4</integer>
+      <key>Hour</key><integer>7</integer>
+      <key>Minute</key><integer>35</integer>
+    </dict>
+    <dict>
+      <key>Weekday</key><integer>5</integer>
+      <key>Hour</key><integer>7</integer>
+      <key>Minute</key><integer>35</integer>
+    </dict>
+  </array>
   <key>WorkingDirectory</key><string>/Users/umashankar/Downloads/code/python_files</string>
   <key>StandardOutPath</key><string>/Users/umashankar/Downloads/code/python_files/launchd_out.log</string>
   <key>StandardErrorPath</key><string>/Users/umashankar/Downloads/code/python_files/launchd_err.log</string>

@@ -23,6 +23,8 @@ bse>=3.3.0           # BSE bhavcopy (symbol_master.py's _bse_names() imports `bs
                      # 0 rows via its own `except ImportError: pass` every time
 bseindia>=1.1        # BSE symbols (full_indian_market_scan.py)
 nse>=3.0             # NSE/BSE bhavcopy EOD files
+finance-datareader>=0.9.0  # symbol_master.py's _korea_names() (KOSPI/KOSDAQ);
+                     # PyPI package is `finance-datareader`, imported as `FinanceDataReader`
 
 # news sentiment (local lexicon — NOT an LLM)
 feedparser>=6.0      # RSS feeds (Moneycontrol/ET/CNBC/...)

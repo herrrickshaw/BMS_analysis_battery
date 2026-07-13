@@ -22,6 +22,8 @@ Usage:
     python3 market_correlation_scan.py --market NSE              # full NSE universe
     python3 market_correlation_scan.py --market US                # full US (NASDAQ+NYSE) universe
     python3 market_correlation_scan.py --market BSE               # full BSE-only universe
+    python3 market_correlation_scan.py --market JAPAN             # full TSE universe
+    python3 market_correlation_scan.py --market KOREA             # full KOSPI+KOSDAQ universe
     python3 market_correlation_scan.py --market US --sample 300   # a 300-stock US sample
     python3 market_correlation_scan.py --market NSE --threshold 0.6 --top-clusters 5
 
@@ -48,15 +50,22 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))  # repo root, for portfolio_analysis
 
 # Per CLAUDE.md's ticker-format table: India stores bare NSE symbols (needs
-# .NS appended for yfinance); US stores bare symbols already usable as-is.
+# .NS appended for yfinance); US/Japan/Korea store symbols already
+# pre-suffixed/usable as-is (yf_suffix="" for all three -- Japan and Korea's
+# symbol_master rows already embed .T/.KS/.KQ, same reasoning as US's bare
+# tickers needing nothing appended).
 MARKET_EXCHANGES = {
     "NSE": ["NSE"],
     "US": ["NASDAQ", "NYSE"],
     "BSE": ["BSE"],
+    "JAPAN": ["JAPAN"],
+    "KOREA": ["KOSPI", "KOSDAQ"],
 }
 MARKET_YF_SUFFIX = {
     "NSE": ".NS",
     "US": "",
+    "JAPAN": "",
+    "KOREA": "",
     "BSE": ".BO",
 }
 
@@ -287,7 +296,7 @@ def run(
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Full-universe market correlation scan")
-    ap.add_argument("--market", choices=["NSE", "US", "BSE"], default="NSE")
+    ap.add_argument("--market", choices=["NSE", "US", "BSE", "JAPAN", "KOREA"], default="NSE")
     ap.add_argument("--sample", type=int, default=None,
                      help="Scan a random sample of this many symbols instead of the full universe")
     ap.add_argument("--period", default="1y")

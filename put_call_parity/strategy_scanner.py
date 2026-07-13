@@ -210,6 +210,13 @@ def fetch_option_chain(symbol: str, expiry: Optional[str] = None) -> dict:
     }
 
 
+# yfinance's `impliedVolatility` field is frequently a stale/placeholder value
+# (observed as low as 0.00001) rather than a genuine quote, especially for
+# thinly-traded strikes — well below any real-world IV. Treat anything below
+# this floor as missing rather than trusting it at face value.
+_MIN_PLAUSIBLE_IV = 0.01   # 1%
+
+
 def compute_atm_iv(chain_data: dict) -> float:
     """
     Estimate the ATM implied volatility from the option chain.
@@ -225,17 +232,19 @@ def compute_atm_iv(chain_data: dict) -> float:
     # Find the strike closest to spot
     atm = min(chain, key=lambda r: abs(r['strike'] - spot))
 
-    # Prefer IV directly from the chain metadata (yfinance provides this)
+    # Prefer IV directly from the chain metadata (yfinance provides this) —
+    # but reject implausibly small values rather than trusting them at face
+    # value (see _MIN_PLAUSIBLE_IV above).
     for iv_key in ('ce_iv', 'pe_iv'):
         iv = atm.get(iv_key)
-        if iv and float(iv) > 0:
+        if iv and float(iv) >= _MIN_PLAUSIBLE_IV:
             return float(iv)
 
     # Fallback: back-solve from ATM call price
     ce_price = atm.get('ce_price', 0)
     if ce_price and float(ce_price) > 0:
         iv = implied_volatility(float(ce_price), spot, atm['strike'], T, RISK_FREE_RATE, 'CE')
-        if iv:
+        if iv and iv >= _MIN_PLAUSIBLE_IV:
             return iv
 
     return _DEFAULT_IV

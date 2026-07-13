@@ -1,13 +1,27 @@
 #!/usr/bin/env python3
 # build_mailer.py
 # ===============
-# Assemble the Daily Market Brief HTML (+ plain-text summary) from the latest
-# cached outputs, so the morning job / any run produces a consistent mailer:
-#   1. India screener (liquid picks, with liquidity tier)
-#   2. India Cash Conversion Cycle screen (screener.in 228040, low-CCC + liquidity)
-#   3. Global momentum top-15 (all markets)
-#   4. 20-market 5-year scoreboard
+# Assemble the Daily Market Brief HTML (+ plain-text summary) — the ONE
+# assembler for the live daily_pipeline.sh -> send_mailer.py path.
+#
+# Merged 2026-07-13 with the previously-separate, unused-on-this-branch
+# build_email.py to avoid two overlapping report builders. This file now
+# covers everything build_email.py did, plus what build_mailer.py already
+# had:
+#   1. Market snapshot (India/US/Europe vs 200-DMA)
+#   2. India / US / Europe — fundamentals screener picks
+#   3. India Cash Conversion Cycle (screener.in 228040)
+#   4. Convergence (fundamentals + positive/negative news agree)
+#   5. Share Market News Picks — India + US (headline-driven, screener-independent)
+#   6. Talk on the Street — per-ticker sentiment for the fundamental picks
+#   7. Darvas Breakouts — India / US / Europe fresh-breakout fragments
+#   8. Global momentum top-15 + "other markets" world tour
+#   9. 20-market 5-year scoreboard
 #   + educational-only / NOT-investment-advice disclaimer.
+#
+# Every section degrades gracefully to "n/a" / an empty-state message when
+# its source data (a scan xlsx / combined JSON / darvas_breakouts.py) hasn't
+# been generated yet — nothing here is fatal to the rest of the report.
 #
 #   from build_mailer import build; subj, text, html = build()
 
@@ -27,8 +41,33 @@ import run_global_analysis as rga
 import market_performance as mp
 import news_picks as npk
 
+try:
+    import darvas_breakouts as dbrk
+except Exception:
+    dbrk = None
+
 _COL = {"High": "#1b7f37", "Medium": "#b8860b", "Low": "#b00"}
 _SENT_COL = {"POSITIVE": "#1b7f37", "NEGATIVE": "#b00", "NEUTRAL": "#777"}
+
+
+def _tv(x):
+    return f"${x/1e6:.1f}M" if pd.notna(x) else "—"
+
+
+def _table(headers, rows):
+    h = "".join(f"<th align='left' style='padding:5px 8px'>{x}</th>" for x in headers)
+    return (f"<table style='border-collapse:collapse;width:100%;font-size:13px'>"
+            f"<tr style='background:#eef'>{h}</tr>{''.join(rows)}</table>")
+
+
+def _load_combined(market: str) -> dict:
+    files = sorted(glob.glob(f"combined_report_results/combined_{market}_*.json"))
+    if not files:
+        return {}
+    try:
+        return json.load(open(files[-1]))
+    except Exception:
+        return {}
 
 
 def _news_rows(market: str, top: int = 8):
@@ -48,32 +87,162 @@ def _news_rows(market: str, top: int = 8):
     return rows
 
 
-def _tv(x):
-    return f"${x/1e6:.1f}M" if pd.notna(x) else "—"
+def _market_picks_rows(data: dict, market: str, cap: int = 12):
+    """Fundamentals-screener picks rows for India/US, liquidity-annotated."""
+    picks = data.get("picks") or []
+    if not picks:
+        return []
+    p = pd.DataFrame(picks)
+    p["Market"] = market
+    p = liq.annotate(p)
+    rank = {"Triple Hit": 0, "Multi-Screen": 1, "Single-Screen": 2}
+    lr = {"High": 0, "Medium": 1, "Low": 2, "Unknown": 3}
+    p["_o"] = p["Tier"].map(rank).fillna(3)
+    p["_l"] = p["Liquidity"].map(lr).fillna(3)
+    rows = []
+    for _, r in p.sort_values(["_o", "_l"]).head(cap).iterrows():
+        rows.append(f"<tr><td style='padding:4px 8px'><b>{r.Symbol}</b></td>"
+                    f"<td>{r.Tier}</td><td>{r.Screens}</td><td>{_tv(r.get('Turnover_USD'))}</td>"
+                    f"<td style='color:{_COL.get(r.Liquidity,'#777')};font-weight:600'>{r.Liquidity}</td></tr>")
+    return rows
 
 
-def _table(headers, rows):
-    h = "".join(f"<th align='left' style='padding:5px 8px'>{x}</th>" for x in headers)
-    return (f"<table style='border-collapse:collapse;width:100%;font-size:13px'>"
-            f"<tr style='background:#eef'>{h}</tr>{''.join(rows)}</table>")
+def _eu_picks_rows(top: int = 15):
+    """Europe has no combined JSON — read the EU scan's Fundamentals sheet directly."""
+    files = sorted(glob.glob("european_scan/european_market_scan*.xlsx"))
+    if not files:
+        return []
+    try:
+        xl = pd.ExcelFile(files[-1])
+        if "Fundamentals" not in xl.sheet_names:
+            return []
+        fd = pd.read_excel(files[-1], sheet_name="Fundamentals")
+    except Exception:
+        return []
+
+    def _pio(v):
+        try:
+            return int(float(v))
+        except Exception:
+            return None
+
+    cands = []
+    for _, r in fd.iterrows():
+        pio = _pio(r.get("Piotroski_Score"))
+        cc = str(r.get("CoffeeCan_Class", "")).upper() == "PASS"
+        if not ((pio is not None and pio >= 7) or cc):
+            continue
+        cands.append((pio, cc, r))
+    cands.sort(key=lambda x: -(x[0] if x[0] is not None else -1))
+
+    rows = []
+    for pio, cc, r in cands[:top]:
+        sym = str(r.get("Symbol", "")).strip()
+        name = str(r.get("Name", "") or sym).split(",")[0]
+        tier = "Triple Hit" if (pio is not None and pio >= 7 and cc) else "Multi-Screen"
+        screens = "+".join(s for s, ok in (("Piotroski", pio is not None and pio >= 7),
+                                            ("CoffeeCan", cc)) if ok) or "—"
+        rows.append(f"<tr><td style='padding:4px 8px'><b>{sym}</b></td><td>{name}</td>"
+                    f"<td>{tier}</td><td>{screens}</td>"
+                    f"<td>{'n/a' if pio is None else pio}</td></tr>")
+    return rows
+
+
+def _convergence_html(label: str, data: dict) -> str:
+    conv = data.get("convergence") or []
+    both = [c for c in conv if "BOTH BULLISH" in str(c.get("Convergence", ""))]
+    caut = [c for c in conv if "NEGATIVE" in str(c.get("Convergence", ""))]
+    if not both and not caut:
+        return f"<p style='color:#777;font-size:13px'>{label}: no fundamental picks had matching news coverage today.</p>"
+    parts = []
+    if both:
+        parts.append(f"<p style='font-size:13px'><b>🎯 {label} high-conviction</b> "
+                     "(strong fundamentals AND positive news):</p><ul style='font-size:13px;margin:4px 0 8px 18px'>")
+        for c in both:
+            parts.append(f"<li><b>{c.get('Symbol')}</b> [{c.get('Tier')}] — news "
+                        f"{float(c.get('News_Score', 0)):+.2f} ({c.get('N_Articles', 0)} articles): "
+                        f"{c.get('Top_Headline', '')}</li>")
+        parts.append("</ul>")
+    if caut:
+        parts.append(f"<p style='font-size:13px'><b>⚠️ {label} caution</b> "
+                     "(strong fundamentals BUT negative news):</p><ul style='font-size:13px;margin:4px 0 8px 18px'>")
+        for c in caut:
+            parts.append(f"<li><b>{c.get('Symbol')}</b> — news {float(c.get('News_Score', 0)):+.2f}: "
+                        f"{c.get('Top_Headline', '')}</li>")
+        parts.append("</ul>")
+    return "".join(parts)
+
+
+def _talk_rows(data: dict, cap: int = 10):
+    talk = data.get("talk") or {}
+    scored = [(s, t) for s, t in talk.items()
+              if isinstance(t, dict) and t.get("label") not in (None, "NO_DATA")]
+    scored.sort(key=lambda kv: -float(kv[1].get("score", 0)))
+    rows = []
+    for sym, t in scored[:cap]:
+        col = _SENT_COL.get(t.get("label"), "#777")
+        rows.append(f"<tr><td style='padding:4px 8px'><b>{sym}</b></td>"
+                    f"<td style='color:{col};font-weight:600'>{t.get('label')}</td>"
+                    f"<td>{float(t.get('score', 0)):+.2f}</td><td>{t.get('n_articles', 0)}</td></tr>")
+    return rows
+
+
+def _darvas_section(market: str) -> str:
+    if dbrk is None:
+        return "<p style='color:#777'>Darvas fragment unavailable (darvas_breakouts.py not importable).</p>"
+    try:
+        frag, _ = dbrk.build(market, write_csv=False)
+        return frag
+    except Exception as e:
+        return f"<p style='color:#777'>Darvas fragment for {market} unavailable ({e}).</p>"
+
+
+def _market_snapshot_html() -> str:
+    idx = [("^NSEI", "Nifty 50"), ("^GSPC", "S&P 500"), ("^STOXX50E", "Euro Stoxx 50")]
+    try:
+        import yfinance as yf
+    except Exception:
+        yf = None
+    cells = []
+    for tkr, name in idx:
+        last = dma = None
+        stance, col = "n/a", "#888"
+        if yf is not None:
+            try:
+                h = yf.download(tkr, period="1y", progress=False, auto_adjust=True)
+                closes = pd.to_numeric(h["Close"].squeeze(), errors="coerce").dropna()
+                if len(closes):
+                    last = float(closes.iloc[-1])
+                    if len(closes) >= 200:
+                        dma = float(closes.rolling(200).mean().iloc[-1])
+                        stance = "above 200-DMA (bullish)" if last > dma else "below 200-DMA (cautious)"
+                        col = "#2e7d32" if last > dma else "#c62828"
+            except Exception:
+                pass
+        cells.append(
+            f"<td style='padding:8px 12px;vertical-align:top'>"
+            f"<div style='font-size:12px;color:#888'>{name}</div>"
+            f"<div style='font-size:17px;font-weight:700'>{'n/a' if last is None else f'{last:,.0f}'}</div>"
+            f"<div style='font-size:11px;color:{col}'>{stance} · 200-DMA "
+            f"{'n/a' if dma is None else f'{dma:,.0f}'}</div></td>")
+    return f"<table style='border-collapse:collapse;width:100%'><tr>{''.join(cells)}</tr></table>"
 
 
 def build():
     today = _dt.date.today().strftime("%d %b %Y")
 
-    # 1. India screener
-    cj = sorted(glob.glob("combined_report_results/combined_IN_*.json"))
-    picks_rows, mood = [], {"mood": "n/a", "score": 0, "n_articles": 0}
-    if cj:
-        d = json.load(open(cj[-1])); mood = d["mood"]
-        p = pd.DataFrame(d["picks"]); p["Market"] = "IN"; p = liq.annotate(p)
-        rank = {"Triple Hit": 0, "Multi-Screen": 1, "Single-Screen": 2}
-        lr = {"High": 0, "Medium": 1, "Low": 2, "Unknown": 3}
-        p["_o"] = p["Tier"].map(rank).fillna(3); p["_l"] = p["Liquidity"].map(lr)
-        for _, r in p.sort_values(["_o", "_l"]).head(12).iterrows():
-            picks_rows.append(f"<tr><td style='padding:4px 8px'><b>{r.Symbol}</b></td>"
-                              f"<td>{r.Tier}</td><td>{r.Screens}</td><td>{_tv(r.get('Turnover_USD'))}</td>"
-                              f"<td style='color:{_COL.get(r.Liquidity,'#777')};font-weight:600'>{r.Liquidity}</td></tr>")
+    ind_data = _load_combined("IN")
+    us_data = _load_combined("US")
+    mood = ind_data.get("mood") or {"mood": "n/a", "score": 0, "n_articles": 0}
+    us_mood = us_data.get("mood") or {"mood": "n/a", "score": 0, "n_articles": 0}
+
+    # 0. Market snapshot
+    snapshot_html = _market_snapshot_html()
+
+    # 1. India / US / Europe fundamentals screener picks
+    ind_picks_rows = _market_picks_rows(ind_data, "IN")
+    us_picks_rows = _market_picks_rows(us_data, "US")
+    eu_picks_rows = _eu_picks_rows()
 
     # 2. India CCC screen (screener.in)
     ccc_rows = []
@@ -89,13 +258,29 @@ def build():
     except Exception:
         pass
 
-    # 3. Global momentum (top 15 overall)
+    # 3. Convergence (fundamentals + street agree)
+    convergence_html = _convergence_html("🇮🇳 India", ind_data) + _convergence_html("🇺🇸 US", us_data)
+
+    # 4. Share Market News Picks — India + US
+    in_news_rows = _news_rows("IN")
+    us_news_rows = _news_rows("US")
+
+    # 5. Talk on the Street — per-ticker sentiment for the fundamental picks
+    in_talk_rows = _talk_rows(ind_data)
+    us_talk_rows = _talk_rows(us_data)
+
+    # 6. Darvas Breakouts — India / US / Europe
+    darvas_in = _darvas_section("IN")
+    darvas_us = _darvas_section("US")
+    darvas_eu = _darvas_section("EU")
+
+    # 7. Global momentum (top 15 overall)
     allh = rga.load_highlights()
     g = allh.head(15)
     g_rows = [f"<tr><td style='padding:4px 8px'>{r.Market}</td><td>{r.Symbol}</td>"
               f"<td>{r.ret_126:+.0f}</td><td>{r.rsi14}</td></tr>" for _, r in g.iterrows()]
 
-    # 3b. Other markets — top tradable mover per market (world tour, ex-IN/US)
+    # 7b. Other markets — top tradable mover per market (world tour, ex-IN/US)
     other_rows = []
     try:
         h = liq.annotate(allh.copy())
@@ -114,31 +299,52 @@ def build():
     except Exception:
         pass
 
-    # 3c. Share Market News Picks — India + US (stocks the street is talking about today)
-    in_news_rows = _news_rows("IN")
-    us_news_rows = _news_rows("US")
-
-    # 4. 5y scoreboard
+    # 8. 5y scoreboard
     p5 = mp.load()
     p_rows = [f"<tr><td style='padding:4px 8px'>{r.Market}</td><td>{r.Index}</td>"
               f"<td>{r['CAGR%']}</td><td>{r['Return_1y%']}</td><td>{r.Sharpe}</td></tr>"
               for _, r in p5.iterrows()]
 
-    html = f"""<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:740px;color:#1a1a1a">
+    html = f"""<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:820px;color:#1a1a1a">
+<style>
+h3{{font-size:14px;margin:14px 0 6px;color:#333}}
+.trail{{overflow-x:auto;margin:6px 0}}
+.trail table{{border-collapse:collapse;width:100%;font-size:12.5px}}
+.trail th{{background:#eef;text-align:left;padding:5px 8px}}
+.trail td{{padding:4px 8px;border-bottom:1px solid #f0f0f0}}
+</style>
 <h1 style="font-size:21px;margin:0 0 2px">📈 Daily Market Brief — {today}</h1>
-<p style="color:#666;font-size:13px;margin:0 0 14px">India screener + cash-conversion-cycle + global momentum + 5-year scoreboard · data as of last close</p>
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px">🇮🇳 India — Daily Screener (most tradable)</h2>
-{_table(["Symbol","Tier","Screens","Turnover","Liquidity"], picks_rows) if picks_rows else "<p>no picks</p>"}
-<p style="font-size:11px;color:#666;margin:3px 0">Mood: <b style="color:#2e7d32">{mood['mood']} ({mood['score']:+.2f})</b> from {mood.get('n_articles',0)} articles. Liquidity (India): High ≥$5M/day · Medium $0.5–5M · Low &lt;$0.5M.</p>
+<p style="color:#666;font-size:13px;margin:0 0 14px">India · US · Europe fundamentals + Darvas breakouts + convergence + news picks + global momentum + 5-year scoreboard · data as of last close</p>
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px">🌍 Market Snapshot</h2>
+{snapshot_html}
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇮🇳 India — Daily Screener (most tradable)</h2>
+{_table(["Symbol","Tier","Screens","Turnover","Liquidity"], ind_picks_rows) if ind_picks_rows else "<p>no picks</p>"}
+<p style="font-size:11px;color:#666;margin:3px 0">Mood: <b style="color:#2e7d32">{mood['mood']} ({mood['score']:+.2f})</b> from {mood.get('n_articles',0)} articles. Liquidity: High ≥$5M/day · Medium $0.5–5M · Low &lt;$0.5M.</p>
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇺🇸 US — Daily Screener (most tradable)</h2>
+{_table(["Symbol","Tier","Screens","Turnover","Liquidity"], us_picks_rows) if us_picks_rows else "<p>no picks (run daily_combined_report.py --market US)</p>"}
+<p style="font-size:11px;color:#666;margin:3px 0">Mood: <b style="color:#2e7d32">{us_mood['mood']} ({us_mood['score']:+.2f})</b> from {us_mood.get('n_articles',0)} articles.</p>
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇪🇺 Europe — Fundamentals Picks</h2>
+{_table(["Symbol","Name","Tier","Screens","Piotroski"], eu_picks_rows) if eu_picks_rows else "<p>no European scan available today</p>"}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">💵 India — Cash Conversion Cycle (screener.in 228040)</h2>
 <p style="font-size:12px;color:#555">Lowest/negative CCC = collects from customers before paying suppliers. Tradable (High/Medium) only.</p>
 {_table(["Symbol","Name","CCC days","ROCE","Liquidity"], ccc_rows) if ccc_rows else "<p>n/a</p>"}
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">⭐ Convergence — Fundamentals &amp; The Street Agree</h2>
+{convergence_html}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🔥 Share Market News Picks — India</h2>
 <p style="font-size:12px;color:#555">Stocks the street is talking about today (headline mentions + sentiment), independent of the screeners. News buzz, NOT a recommendation.</p>
 {_table(["Symbol","Name","Sentiment","Mentions","Headline"], in_news_rows) if in_news_rows else "<p>n/a</p>"}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🔥 Share Market News Picks — US</h2>
 <p style="font-size:12px;color:#555">Stocks the street is talking about today (headline mentions + sentiment), independent of the screeners. News buzz, NOT a recommendation.</p>
 {_table(["Symbol","Name","Sentiment","Mentions","Headline"], us_news_rows) if us_news_rows else "<p>n/a</p>"}
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🗞️ Talk on the Street — per-ticker sentiment (fundamental picks)</h2>
+<h3>🇮🇳 India</h3>
+{_table(["Symbol","Sentiment","Score","Articles"], in_talk_rows) if in_talk_rows else "<p style='color:#777'>No per-ticker news matches today.</p>"}
+<h3>🇺🇸 US</h3>
+{_table(["Symbol","Sentiment","Score","Articles"], us_talk_rows) if us_talk_rows else "<p style='color:#777'>No per-ticker news matches today.</p>"}
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">📈 Darvas Breakouts</h2>
+{darvas_in}
+{darvas_us}
+{darvas_eu}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🌍 Global Momentum — Top 15 (20 markets)</h2>
 {_table(["Mkt","Symbol","6mo %","RSI"], g_rows)}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🗺️ Other Markets — top tradable mover each</h2>
@@ -146,12 +352,13 @@ def build():
 {_table(["Market","Symbol","6mo %","Liquidity"], other_rows) if other_rows else "<p>n/a</p>"}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🗓️ 20-Market 5-Year Scoreboard</h2>
 {_table(["Mkt","Index","5y CAGR%","1y %","Sharpe"], p_rows)}
-<p style="font-size:11px;color:#bf360c;border-top:1px solid #eee;padding-top:10px;margin-top:18px">⚠️ Educational/research only. NOT investment advice. Screener results are mechanical filters, not buy/sell signals. Liquidity/CCC are estimates; index figures price-only, local currency. Past performance does not guarantee future returns. Consult a SEBI-registered investment advisor.</p>
+<p style="font-size:11px;color:#bf360c;border-top:1px solid #eee;padding-top:10px;margin-top:18px">⚠️ Educational/research only. NOT investment advice. Screener/Darvas/Convergence results are mechanical filters, not buy/sell signals. Liquidity/CCC are estimates; index figures price-only, local currency. Past performance does not guarantee future returns. Consult a SEBI-registered investment advisor.</p>
 </div>"""
 
     text = (f"Daily Market Brief — {today}\n"
-            f"India mood: {mood['mood']} ({mood['score']:+.2f}).\n"
-            f"India CCC screen (screener.in 228040) + global momentum + 20-market 5y scoreboard.\n"
+            f"India mood: {mood['mood']} ({mood['score']:+.2f}). US mood: {us_mood['mood']} ({us_mood['score']:+.2f}).\n"
+            f"India/US/Europe screener picks + CCC + convergence + news picks + Darvas breakouts + "
+            f"global momentum + 20-market 5y scoreboard.\n"
             f"Educational/research only. NOT investment advice.")
     subject = f"📈 Daily Market Brief — {today}"
     return subject, text, html

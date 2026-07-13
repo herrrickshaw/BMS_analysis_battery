@@ -147,7 +147,11 @@ def _name_tokens(name) -> set:
     return {t for t in up.split() if t and t not in _NAME_FILLER_TOKENS and len(t) >= 2}
 
 
-def verify_dual_listing_names(anomalies: pd.DataFrame, sleep_between: float = 0.0) -> pd.DataFrame:
+def verify_dual_listing_names(
+    anomalies: pd.DataFrame,
+    sleep_between: float = 0.5,
+    max_retries: int = 3,
+) -> pd.DataFrame:
     """
     For each row in *anomalies* (typically the low-correlation subset from
     compute_dual_listing_correlations), fetches both exchanges' company
@@ -159,27 +163,42 @@ def verify_dual_listing_names(anomalies: pd.DataFrame, sleep_between: float = 0.
     both looked like "different companies" under plain substring
     containment despite being the identical entity).
 
+    yfinance's per-ticker `.info` call (needed for longName) is far more
+    rate-limit-prone than the batched `.download()` used elsewhere in this
+    script -- a real full-universe run hit YFRateLimitError on ~93% of
+    lookups (112/120) with sleep_between=0 and no retry, silently degrading
+    almost every row to "unverifiable" instead of a real verdict. Default
+    sleep_between=0.5s plus a short retry-with-backoff on failure is the
+    fix; don't set sleep_between back to 0 for a real run, only for quick
+    tests against a handful of symbols.
+
     Adds two columns: nse_name, bse_name, same_company (True/False/None --
-    None means at least one side's name couldn't be fetched, not verified
-    either way). A low correlation with same_company=False is the genuine
-    signal worth investigating (a real ticker collision between two
-    unrelated companies, not a data/liquidity artifact); same_company=True
-    means the low correlation is coming from somewhere else (illiquidity,
-    stale quotes on one side, a corporate action reflected asynchronously).
+    None means at least one side's name genuinely couldn't be fetched after
+    retrying, not verified either way). A low correlation with
+    same_company=False is the genuine signal worth investigating (a real
+    ticker collision between two unrelated companies, not a data/liquidity
+    artifact); same_company=True means the low correlation is coming from
+    somewhere else (illiquidity, stale quotes on one side, a corporate
+    action reflected asynchronously).
     """
     import time
     import yfinance as yf
 
+    def _fetch_name(ticker: str) -> str:
+        for attempt in range(max_retries):
+            try:
+                return yf.Ticker(ticker).info.get("longName", "") or ""
+            except Exception:
+                if attempt < max_retries - 1:
+                    time.sleep(sleep_between * (2 ** attempt))  # exponential backoff
+        return ""
+
     rows = []
     for symbol in anomalies["symbol"]:
-        try:
-            ns_name = yf.Ticker(f"{symbol}.NS").info.get("longName", "")
-        except Exception:
-            ns_name = ""
-        try:
-            bo_name = yf.Ticker(f"{symbol}.BO").info.get("longName", "")
-        except Exception:
-            bo_name = ""
+        ns_name = _fetch_name(f"{symbol}.NS")
+        if sleep_between:
+            time.sleep(sleep_between)
+        bo_name = _fetch_name(f"{symbol}.BO")
         rows.append({"symbol": symbol, "nse_name": ns_name, "bse_name": bo_name})
         if sleep_between:
             time.sleep(sleep_between)

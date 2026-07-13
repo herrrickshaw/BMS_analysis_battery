@@ -9,6 +9,10 @@
 #   US     — SEC EDGAR company_tickers_exchange.json
 #   JAPAN  — JPX data_j.xls (TSE equities, ETF/REIT categories excluded)
 #   KOREA  — FinanceDataReader StockListing(KOSPI/KOSDAQ)
+#   CHINA  — akshare stock_info_a_code_name() (SSE+SZSE A-shares; Beijing
+#            Stock Exchange codes excluded, yfinance has no data for them)
+#   HK     — FinanceDataReader StockListing('HKEX') (dual RMB-counter dupes
+#            and US-megacap HDR trackers excluded, see _hongkong_names())
 #
 # Output:  ~/Downloads/market_cache/symbol_master.parquet
 #   columns: symbol, name, name_clean, exchange, suffix, yf_symbol
@@ -213,6 +217,100 @@ def _korea_names() -> list:
     return rows
 
 
+def _china_names() -> list:
+    """
+    SSE + SZSE A-shares via akshare's stock_info_a_code_name() (same source as
+    run_app.sh's China refresh). Pre-suffixed symbols (.SS / .SZ), suffix=""
+    -- same reasoning as _japan_names()/_korea_names().
+
+    run_app.sh's suffix rule is `.SS if code.startswith('6') else .SZ`, which
+    silently mis-suffixes the ~327 Beijing Stock Exchange codes (prefix "9",
+    e.g. "920000") as .SZ. Checked live: yfinance has NO data at all for BJSE
+    tickers regardless of suffix (both 920000.BJ and a real BJSE ticker
+    830799.BJ return HTTP 404 "Quote not found") -- Yahoo Finance simply
+    doesn't carry this exchange. So instead of mis-suffixing them, BJSE codes
+    are excluded outright here (same rationale as _japan_names() excluding
+    J-REITs: don't feed the correlation scan symbols that can only ever
+    fail their price fetch). SSE (prefix "6", includes the 688xxx STAR
+    Market sub-board) and SZSE (prefix "0" main board / "3" ChiNext) are
+    both confirmed live against yfinance (000001.SZ, 600000.SS, 000002.SZ
+    all returned real CNY-denominated quotes).
+    """
+    rows = []
+    try:
+        import warnings as _w
+        _w.filterwarnings("ignore")
+        import akshare as ak
+        df = ak.stock_info_a_code_name()
+        for _, x in df.iterrows():
+            code = str(x.get("code", "")).strip().zfill(6)
+            name = str(x.get("name", "")).strip()
+            if not code or not name or not code.isdigit():
+                continue
+            if code.startswith("6"):
+                sfx, exch = ".SS", "SSE"
+            elif code.startswith(("0", "3")):
+                sfx, exch = ".SZ", "SZSE"
+            else:
+                continue  # Beijing Stock Exchange (prefix "9") -- no yfinance data
+            rows.append({"symbol": f"{code}{sfx}", "name": name,
+                         "exchange": exch, "suffix": ""})
+    except ImportError:
+        pass
+    except Exception:
+        pass
+    return rows
+
+
+def _hongkong_names() -> list:
+    """
+    HKEX via FinanceDataReader's StockListing('HKEX') (same source as
+    run_app.sh's Hong Kong refresh). Pre-suffixed symbols (.HK), suffix=""
+    -- same reasoning as _japan_names()/_korea_names()/_china_names().
+
+    Checked live against the real FDR listing (2,838 rows) and found two
+    contamination sources run_app.sh's simpler logic doesn't filter:
+
+    1. 25 "8"-prefixed codes (e.g. 80700) are exact-duplicate alternate
+       trading counters of an already-included "0"-prefixed code (e.g.
+       00700) -- same company, same `Name` field, verified by grouping on
+       duplicated names. Including both would trivially self-correlate
+       (same underlying price series twice) and inflate cluster sizes for
+       no real reason. Excluded via a plain `not symbol.startswith("8")`.
+
+    2. All 7 codes in the "04xxx" block (04332/04333/04335/04336/04337/
+       04338/04621) are HKEX's newer Hong Kong Depositary Receipt (HDR)
+       products tracking US megacaps directly (Microsoft, Cisco, Intel,
+       Applied Materials, Amgen, Starbucks, a CH Cinda preferred share) --
+       not genuine HK-operating companies. Their price mechanically
+       tracks the US underlying, so they'd only ever show "correlates
+       with the US market", not real HK-market structure. No genuine
+       HK company currently occupies the 04xxx block (all 7 rows in it
+       are HDRs), so excluding that whole prefix is safe today.
+    """
+    rows = []
+    try:
+        import warnings as _w
+        _w.filterwarnings("ignore")
+        import FinanceDataReader as fdr
+        df = fdr.StockListing("HKEX")
+        for _, x in df.iterrows():
+            sym = str(x.get("Symbol", "")).strip()
+            name = str(x.get("Name", "")).strip()
+            if not sym or not name or not sym.isdigit():
+                continue
+            if sym.startswith("8") or sym.startswith("04"):
+                continue  # dual RMB-counter dupe or US-megacap HDR tracker
+            code = sym.zfill(4)
+            rows.append({"symbol": f"{code}.HK", "name": name,
+                         "exchange": "HKEX", "suffix": ""})
+    except ImportError:
+        pass
+    except Exception:
+        pass
+    return rows
+
+
 def _us_names() -> list:
     rows = []
     try:
@@ -247,10 +345,13 @@ def build_master(refresh: bool = False, include_us: bool = True) -> pd.DataFrame
     us  = _us_names() if include_us else []
     japan = _japan_names()
     korea = _korea_names()
+    china = _china_names()
+    hk = _hongkong_names()
     print(f"  NSE: {len(nse)} | BSE-only: {len(bse)} | US: {len(us)} | "
-          f"Japan: {len(japan)} | Korea: {len(korea)}")
+          f"Japan: {len(japan)} | Korea: {len(korea)} | China: {len(china)} | "
+          f"HK: {len(hk)}")
 
-    df = pd.DataFrame(nse + bse + us + japan + korea)
+    df = pd.DataFrame(nse + bse + us + japan + korea + china + hk)
     if df.empty:
         print("  ⚠️  No symbols fetched."); return df
     df = df.drop_duplicates(subset=["symbol","exchange"])

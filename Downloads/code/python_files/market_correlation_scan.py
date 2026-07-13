@@ -21,8 +21,18 @@ rendering for each one.
 Usage:
     python3 market_correlation_scan.py --market NSE              # full NSE universe
     python3 market_correlation_scan.py --market US                # full US (NASDAQ+NYSE) universe
+    python3 market_correlation_scan.py --market BSE               # full BSE-only universe
     python3 market_correlation_scan.py --market US --sample 300   # a 300-stock US sample
     python3 market_correlation_scan.py --market NSE --threshold 0.6 --top-clusters 5
+
+Note on --market BSE: symbol_master's BSE rows are BSE-ONLY listings --
+_bse_names() deliberately excludes any symbol also listed on NSE (dual
+listings are represented once, under their NSE row). So --market BSE scans
+distinct, single-exchange BSE companies, NOT the dual-listed ones. For
+whether NSE/BSE dual-listed stocks move together, see
+nse_bse_dual_listing_correlation.py instead -- a different question this
+module's per-market scan can't answer, since a dual-listed stock's BSE
+quote never appears here as a separate row to correlate against its NSE one.
 """
 from __future__ import annotations
 
@@ -42,10 +52,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))  # repo root, for p
 MARKET_EXCHANGES = {
     "NSE": ["NSE"],
     "US": ["NASDAQ", "NYSE"],
+    "BSE": ["BSE"],
 }
 MARKET_YF_SUFFIX = {
     "NSE": ".NS",
     "US": "",
+    "BSE": ".BO",
 }
 
 
@@ -275,7 +287,7 @@ def run(
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Full-universe market correlation scan")
-    ap.add_argument("--market", choices=["NSE", "US"], default="NSE")
+    ap.add_argument("--market", choices=["NSE", "US", "BSE"], default="NSE")
     ap.add_argument("--sample", type=int, default=None,
                      help="Scan a random sample of this many symbols instead of the full universe")
     ap.add_argument("--period", default="1y")

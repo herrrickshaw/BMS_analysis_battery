@@ -17,7 +17,11 @@ openpyxl>=3.1        # read/write .xlsx scan outputs
 # market data sources
 yfinance>=0.2.40     # global OHLC (with stooq fallback in data_sources.py)
 nsepython>=2.9       # NSE live + holiday calendar
-bseindia>=1.1        # BSE symbols
+bse>=3.3.0           # BSE bhavcopy (symbol_master.py's _bse_names() imports `bse`, not `bseindia` --
+                     # bseindia below is a DIFFERENT package used by full_indian_market_scan.py;
+                     # bse was missing from this file entirely, so _bse_names() silently returned
+                     # 0 rows via its own `except ImportError: pass` every time
+bseindia>=1.1        # BSE symbols (full_indian_market_scan.py)
 nse>=3.0             # NSE/BSE bhavcopy EOD files
 
 # news sentiment (local lexicon — NOT an LLM)

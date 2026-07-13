@@ -25,6 +25,7 @@ Usage:
     python3 market_correlation_scan.py --market JAPAN             # full TSE universe
     python3 market_correlation_scan.py --market KOREA             # full KOSPI+KOSDAQ universe
     python3 market_correlation_scan.py --market CHINA             # full SSE+SZSE A-share universe
+    python3 market_correlation_scan.py --market HK                # full HKEX universe
     python3 market_correlation_scan.py --market US --sample 300   # a 300-stock US sample
     python3 market_correlation_scan.py --market NSE --threshold 0.6 --top-clusters 5
 
@@ -62,12 +63,14 @@ MARKET_EXCHANGES = {
     "JAPAN": ["JAPAN"],
     "KOREA": ["KOSPI", "KOSDAQ"],
     "CHINA": ["SSE", "SZSE"],
+    "HK": ["HKEX"],
 }
 MARKET_YF_SUFFIX = {
     "NSE": ".NS",
     "US": "",
     "JAPAN": "",
     "KOREA": "",
+    "HK": "",
     "BSE": ".BO",
     "CHINA": "",
 }
@@ -299,7 +302,7 @@ def run(
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Full-universe market correlation scan")
-    ap.add_argument("--market", choices=["NSE", "US", "BSE", "JAPAN", "KOREA", "CHINA"], default="NSE")
+    ap.add_argument("--market", choices=["NSE", "US", "BSE", "JAPAN", "KOREA", "CHINA", "HK"], default="NSE")
     ap.add_argument("--sample", type=int, default=None,
                      help="Scan a random sample of this many symbols instead of the full universe")
     ap.add_argument("--period", default="1y")

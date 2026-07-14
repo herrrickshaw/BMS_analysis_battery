@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 from pathlib import Path
 
 import networkx as nx
@@ -90,6 +91,7 @@ def fetch_universe_prices(
     batch_size: int = 50,
     min_history: int = 100,
     yf_suffix: str = ".NS",
+    sleep_between: float = 0.0,
 ) -> pd.DataFrame:
     """
     Batched yf.download across the whole *symbols* list (same "batches of 50"
@@ -98,6 +100,17 @@ def fetch_universe_prices(
     to fetch or don't have at least *min_history* daily observations are
     silently dropped -- expected at this scale (delistings, illiquid/renamed
     tickers), not a bug.
+
+    *sleep_between* (seconds, default 0 = no change to prior behavior): pause
+    after every batch. yfinance's bulk downloader swallows per-ticker
+    rate-limit errors internally (YFRateLimitError) rather than raising at
+    the top level, so a burst of ~1,100+ requests can silently degrade an
+    entire scan to 0 resolved symbols with no exception to catch -- seen
+    live on the HK scan (5,203-symbol China scan run immediately before it
+    exhausted the window; a same-day retry still failed after ~23 clean
+    batches). A fixed inter-batch delay is the simple fix; a fancier
+    detect-and-backoff-on-empty-batch scheme isn't needed for a scan that
+    is already run interactively/in the background, not on a deadline.
     """
     frames = []
     n_batches = (len(symbols) + batch_size - 1) // batch_size
@@ -111,6 +124,8 @@ def fetch_universe_prices(
                                progress=False, group_by="ticker", threads=True)
         except Exception as exc:
             print(f"    batch failed: {exc}", flush=True)
+            if sleep_between:
+                time.sleep(sleep_between)
             continue
         for sym, yf_sym in zip(batch, yf_symbols):
             try:
@@ -120,6 +135,9 @@ def fetch_universe_prices(
             close = close.dropna()
             if len(close) >= min_history:
                 frames.append(close.rename(sym))
+
+        if sleep_between and batch_num < n_batches:
+            time.sleep(sleep_between)
 
     if not frames:
         return pd.DataFrame()
@@ -236,6 +254,7 @@ def run(
     clustering: str = "threshold",
     top_clusters_to_chart: int = 4,
     output_dir: str = ".",
+    sleep_between: float = 0.0,
 ) -> dict:
     market = market.upper()
     if symbols is None:
@@ -253,7 +272,8 @@ def run(
 
     yf_suffix = MARKET_YF_SUFFIX[market]
     print(f"Scanning {len(symbols)} {market} symbols (period={period})...", flush=True)
-    prices = fetch_universe_prices(symbols, period=period, yf_suffix=yf_suffix)
+    prices = fetch_universe_prices(symbols, period=period, yf_suffix=yf_suffix,
+                                    sleep_between=sleep_between)
     print(f"{prices.shape[1]}/{len(symbols)} symbols resolved with usable history", flush=True)
 
     if clustering == "mst":
@@ -317,7 +337,12 @@ if __name__ == "__main__":
     ap.add_argument("--top-clusters", type=int, default=4,
                      help="Chart only this many of the largest clusters (full-universe graphs aren't legible)")
     ap.add_argument("--output-dir", default=".")
+    ap.add_argument("--sleep-between", type=float, default=0.0,
+                     help="Seconds to pause after every batch (default 0 = no pause). Use when "
+                          "yfinance's rate limiter silently degrades a scan to 0 resolved symbols "
+                          "-- see fetch_universe_prices' docstring")
     args = ap.parse_args()
 
     run(market=args.market, sample=args.sample, period=args.period, threshold=args.threshold,
-        clustering=args.clustering, top_clusters_to_chart=args.top_clusters, output_dir=args.output_dir)
+        clustering=args.clustering, top_clusters_to_chart=args.top_clusters, output_dir=args.output_dir,
+        sleep_between=args.sleep_between)

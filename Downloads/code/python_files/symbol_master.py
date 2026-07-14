@@ -13,6 +13,10 @@
 #            Stock Exchange codes excluded, yfinance has no data for them)
 #   HK     — FinanceDataReader StockListing('HKEX') (dual RMB-counter dupes
 #            and US-megacap HDR trackers excluded, see _hongkong_names())
+#   EUROPE — data/market_data.duckdb's europe_all_list table (falls back to
+#            data/europe_all_list.csv if the table/file isn't there -- see
+#            _europe_names(), matches backend/parsers/market_db.py's own
+#            DuckDB-then-CSV fallback for the same underlying data)
 #
 # Output:  ~/Downloads/market_cache/symbol_master.parquet
 #   columns: symbol, name, name_clean, exchange, suffix, yf_symbol
@@ -326,6 +330,66 @@ def _hongkong_names() -> list:
     return rows
 
 
+def _europe_names() -> list:
+    """
+    966 stocks across 17 European exchanges, from run_app.sh's own Europe
+    refresh (Wikipedia index scraping, rebuilt only if missing/>30 days old
+    -- see CLAUDE.md). Symbols are pre-suffixed (e.g. "ADMIE.AT"), suffix=""
+    -- same reasoning as _japan_names()/_korea_names()/_china_names()/
+    _hongkong_names().
+
+    Two repo branches currently disagree on where this data lives: `main`
+    still has the original data/europe_all_list.csv (LFS-tracked), while the
+    feature branch migrated it into data/market_data.duckdb's
+    europe_all_list table and deleted the CSV outright (a different,
+    concurrent change to this repo, not made as part of the market-scan
+    work in this file). Tries DuckDB first, falls back to the CSV --
+    mirrors backend/parsers/market_db.py's own DuckDB-then-CSV fallback for
+    this exact table, so this function keeps working regardless of which
+    branch/merge state it runs against.
+
+    `exchange` here is the 17 raw per-venue values already in the source
+    data (e.g. "Euronext Paris", "Nasdaq Stockholm"), not CLAUDE.md's
+    8 grouped "Exchange groups" rows -- passed through as-is rather than
+    re-bucketed, consistent with every other _xxx_names() function just
+    reshaping its source's columns rather than inventing new grouping.
+    """
+    rows = []
+    root = Path(__file__).resolve().parents[3]
+
+    try:
+        import duckdb
+        con = duckdb.connect(str(root / "data" / "market_data.duckdb"), read_only=True)
+        try:
+            df = con.execute("SELECT yf_ticker, name, exchange FROM europe_all_list").fetchdf()
+        finally:
+            con.close()
+        for _, x in df.iterrows():
+            yf_ticker = str(x["yf_ticker"]).strip()
+            name = str(x["name"]).strip()
+            exch = str(x["exchange"]).strip()
+            if yf_ticker and name:
+                rows.append({"symbol": yf_ticker, "name": name, "exchange": exch, "suffix": ""})
+        if rows:
+            return rows
+    except Exception:
+        pass
+
+    try:
+        csv_path = root / "data" / "europe_all_list.csv"
+        if csv_path.exists():
+            df = pd.read_csv(csv_path)
+            for _, x in df.iterrows():
+                yf_ticker = str(x["yf_ticker"]).strip()
+                name = str(x["name"]).strip()
+                exch = str(x["exchange"]).strip()
+                if yf_ticker and name:
+                    rows.append({"symbol": yf_ticker, "name": name, "exchange": exch, "suffix": ""})
+    except Exception:
+        pass
+    return rows
+
+
 def _us_names() -> list:
     rows = []
     try:
@@ -362,11 +426,12 @@ def build_master(refresh: bool = False, include_us: bool = True) -> pd.DataFrame
     korea = _korea_names()
     china = _china_names()
     hk = _hongkong_names()
+    europe = _europe_names()
     print(f"  NSE: {len(nse)} | BSE-only: {len(bse)} | US: {len(us)} | "
           f"Japan: {len(japan)} | Korea: {len(korea)} | China: {len(china)} | "
-          f"HK: {len(hk)}")
+          f"HK: {len(hk)} | Europe: {len(europe)}")
 
-    df = pd.DataFrame(nse + bse + us + japan + korea + china + hk)
+    df = pd.DataFrame(nse + bse + us + japan + korea + china + hk + europe)
     if df.empty:
         print("  ⚠️  No symbols fetched."); return df
     df = df.drop_duplicates(subset=["symbol","exchange"])

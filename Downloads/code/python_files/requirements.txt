@@ -26,6 +26,8 @@ nse>=3.0             # NSE/BSE bhavcopy EOD files
 finance-datareader>=0.9.0  # symbol_master.py's _korea_names() (KOSPI/KOSDAQ);
                      # PyPI package is `finance-datareader`, imported as `FinanceDataReader`
 akshare>=1.18        # symbol_master.py's _china_names() (SSE/SZSE A-shares)
+duckdb>=1.4.0        # symbol_master.py's _europe_names() reads data/market_data.duckdb's
+                     # europe_all_list table (falls back to the legacy CSV if absent)
 
 # news sentiment (local lexicon — NOT an LLM)
 feedparser>=6.0      # RSS feeds (Moneycontrol/ET/CNBC/...)

@@ -1,6 +1,8 @@
 # 🚀 Quick Start Guide
 **Get the morning routine running in 5 minutes**
 
+> **⚠️ RECONCILED 2026-07-14.** The 22.4% return figure and "BEST-IN-CLASS" framing below rest on the same unvalidated 272-stock "Piotroski dominance" claim reconciled in [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md). The mechanics of running the script may still work; the performance numbers should not be trusted as-is.
+
 ---
 
 ## TL;DR
@@ -199,7 +201,7 @@ tail -100 /Users/umashankar/logs/morning_routine_*.log
 
 ---
 
-## Status: ✅ PRODUCTION READY
+## Status: 🔴 SUPERSEDED (2026-07-14) — see reconciliation banner at top; original claim was ✅ PRODUCTION READY
 
 Everything is built, tested, and ready to run.
 

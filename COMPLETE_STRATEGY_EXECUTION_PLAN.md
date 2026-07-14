@@ -1,6 +1,9 @@
 # 📊 Complete Stock Strategy Execution Plan
 **From Analysis to Live Trading (July - August 2026)**
 
+> **⚠️ RECONCILED 2026-07-14 — do not execute this plan as written.**
+> The "Piotroski F-Score quality dominates all markets" premise and the 22.4%→24.1%+ objective below rest on a 272-stock variance observation, not a validated return edge. The repo's actual point-in-time backtest contradicts this for the US (Piotroski inverted standalone) and shows quality works only as a breakout-confirmation overlay in most other markets. See [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md) before moving any of this to live trading.
+
 ---
 
 ## 🎯 Executive Summary

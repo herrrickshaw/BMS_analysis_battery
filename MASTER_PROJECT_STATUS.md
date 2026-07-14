@@ -1,9 +1,11 @@
 # 🎯 Master Project Status
 **Global Stock Strategy Analysis & Multi-Market Optimization**
 
+> **⚠️ RECONCILED 2026-07-14.** The 272-stock validation and 22.4%→24.1%→26-28% escalating return projections in this document were never confirmed against the repo's actual rigorous point-in-time backtest, which reaches the opposite conclusion on Piotroski for the US. See [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md) for the reconciled findings; treat "Phase 1 COMPLETE" below as a superseded status.
+
 **Date**: July 6, 2026  
 **Session Duration**: Single extended session  
-**Overall Status**: ✅ Phase 1 COMPLETE | 🟢 Phase 2 EXTENDED | 📈 LFS Analysis READY
+**Overall Status**: 🔴 SUPERSEDED (2026-07-14) — original claim: ✅ Phase 1 COMPLETE | 🟢 Phase 2 EXTENDED | 📈 LFS Analysis READY
 
 ---
 

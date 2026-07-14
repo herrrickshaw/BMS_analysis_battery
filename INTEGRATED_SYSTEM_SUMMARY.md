@@ -1,6 +1,9 @@
 # 🚀 Integrated Global Stock Screening System
 **Production-Ready Multi-Market Analysis with OCaml, Universal Screens & Validation Framework**
 
+> **⚠️ RECONCILED 2026-07-14 — "production-ready" and "22.4% expected annual return" are not validated.**
+> Both trace back to a 272-stock "Piotroski dominates" sample that the repo's actual rigorous point-in-time backtest contradicts. See [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md) for the reconciled, source-linked findings.
+
 ---
 
 ## Executive Summary
@@ -514,7 +517,7 @@ You have built a **global stock screening system** that:
 ✅ Triggers quarterly earnings recalibration  
 ✅ Produces professional 8-section email  
 
-**Expected result:** 22.4% annual return with best-in-class Sharpe ratio
+**Expected result:** 🔴 unvalidated — see reconciliation banner at top of this file
 
-**Status:** ✅ **PRODUCTION READY**
+**Status:** 🔴 SUPERSEDED (2026-07-14) — original claim: ✅ PRODUCTION READY
 

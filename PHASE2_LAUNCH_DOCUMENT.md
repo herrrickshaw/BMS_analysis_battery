@@ -1,8 +1,10 @@
 # 🚀 PHASE 2 LAUNCH DOCUMENT
 **Comprehensive Backtest Execution - Ready to Begin**
 
+> **ℹ️ 2026-07-14 note:** the 272-stock dataset referenced below is a data-inventory record, not a performance claim — flagging only because it's the same dataset behind the now-reconciled "Piotroski dominates all markets" claim in [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md). The Phase 2 backtest this document proposes was never actually run; if resumed, run it against the repo's real PIT warehouse instead.
+
 **Date**: July 6, 2026  
-**Status**: ✅ ALL SYSTEMS READY  
+**Status**: 🟡 Phase 2 as scoped here was never executed — original claim: ✅ ALL SYSTEMS READY  
 **Start Date**: July 8, 2026  
 **Go-Live Target**: August 1, 2026
 

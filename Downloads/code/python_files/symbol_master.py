@@ -287,6 +287,21 @@ def _hongkong_names() -> list:
        with the US market", not real HK-market structure. No genuine
        HK company currently occupies the 04xxx block (all 7 rows in it
        are HDRs), so excluding that whole prefix is safe today.
+
+    3. FDR's raw `Symbol` field is already 5-digit zero-padded (e.g.
+       "00700" for Tencent), but the real yfinance/Yahoo Finance HK
+       ticker is 4-digit ("0700.HK", not "00700.HK") -- confirmed live:
+       00700.HK / 08321.HK / 09988.HK all 404, while the 4-digit
+       0700.HK / 8321.HK / 9988.HK all resolved real HKD quotes. A
+       plain `.zfill(4)` on an already-5-char string is a no-op, so it
+       silently preserved the wrong-width code for every single HK row
+       -- this is why the very first full HK scan attempt resolved
+       0/2,805 symbols and looked exactly like sustained rate-limiting
+       (yfinance's bulk downloader reports "possibly delisted" for a
+       plain 404, indistinguishable from a real rate-limit response in
+       the printed log) when it was actually every request 404'ing on
+       ticker format. Normalizing via `str(int(sym)).zfill(4)` strips
+       the excess padding before re-padding to exactly 4 digits.
     """
     rows = []
     try:
@@ -301,7 +316,7 @@ def _hongkong_names() -> list:
                 continue
             if sym.startswith("8") or sym.startswith("04"):
                 continue  # dual RMB-counter dupe or US-megacap HDR tracker
-            code = sym.zfill(4)
+            code = str(int(sym)).zfill(4)
             rows.append({"symbol": f"{code}.HK", "name": name,
                          "exchange": "HKEX", "suffix": ""})
     except ImportError:

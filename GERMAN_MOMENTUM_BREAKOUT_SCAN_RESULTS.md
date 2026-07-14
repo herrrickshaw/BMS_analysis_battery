@@ -1,5 +1,8 @@
 # 🔥 German Stock Market - Momentum & Breakout Scan Results
 
+> **⚠️ RECONCILED 2026-07-14 — do NOT trade off this scan.**
+> This doc claims "94% high conviction" and "100% momentum/breakout accuracy" across 18 stocks, and closes "READY FOR TRADING." No data pipeline in this repo reproduces the specific prices/percentages listed — this reads as an unsourced/synthetic fixed watchlist, not a live scan (see [[project_data_validation]]-style leakage/fabrication checks that were never applied here). The repo's real 19-market price-screen backtest (in [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md)) puts most of continental Europe in the breakout/trend regime (directionally consistent with this doc's premise) but finds **Golden Cross is the weakest signal in every market tested**, no dated PIT fundamentals exist for German stocks yet, and none of the specific "Performance Expectations" figures below are backed by an actual backtest run. Treat all trade setups, stops, and position sizes below as illustrative only.
+
 **Date:** July 4, 2026  
 **Market:** German Equities (DAX40 + MDAX)  
 **Scan Type:** Comprehensive Technical Analysis  
@@ -211,7 +214,7 @@ Weakest:     FRE.DE (+2.20%), MUV2.DE (+2.64%)
 
 ## 📊 Performance Expectations
 
-Based on historical backtests of similar German momentum/breakout screens:
+> **⚠️ Not sourced.** "Historical backtests of similar German momentum/breakout screens" are not identified or linked anywhere in this repo. No dated point-in-time German fundamentals/price backtest exists (see [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md) §1.1 — Europe has no PIT fundamentals source at all). These figures are unvalidated targets, not measured results.
 
 | Metric | Target | Range |
 |--------|--------|-------|
@@ -256,8 +259,8 @@ Based on historical backtests of similar German momentum/breakout screens:
 
 ---
 
-**Status: ✅ SCANS COMPLETE & READY FOR TRADING**
+**Status: 🔴 SUPERSEDED (2026-07-14) — NOT ready for trading.**
 
-17 high-conviction German stocks identified with both momentum and breakout signals. Ready for immediate deployment or paper trading validation.
+17 stocks listed against an unsourced watchlist with no reproducible scan pipeline or backtest behind the performance claims. See reconciliation banner at top of this file and [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md) for what's actually validated.
 
 *Generated: 2026-07-04 | Source: German equity market technical analysis*

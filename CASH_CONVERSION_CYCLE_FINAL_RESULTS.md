@@ -1,6 +1,9 @@
 # 💰 Cash Conversion Cycle Analysis - Final Results
 
-**Status:** ✅ COMPLETE & DEPLOYED  
+> **⚠️ RECONCILED 2026-07-14 — do NOT deploy off this document.**
+> This report was marked "PRODUCTION READY - DEPLOY NOW" with specific position sizes, but the 17-stock CCC figures below are an unsourced fixed watchlist (no data pipeline in this repo reproduces them), and the "65-70% win rate after CCC filter" claim has no backtest behind it. The repo's actual validated finding on CCC/quality overlays (see [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md)) is that quality signals work as a *confirmation overlay* on a price breakout, not as a standalone allocation-sizing tool the way this document uses them, and no dated/point-in-time German fundamentals source exists yet to backtest CCC in Germany specifically. Treat this as a retired draft.
+
+**Status:** 🔴 SUPERSEDED — not deployed, not validated (see banner above). Original claim: ✅ COMPLETE & DEPLOYED  
 **Date:** July 4, 2026  
 **Coverage:** 17 German Momentum/Breakout Stocks
 
@@ -165,11 +168,9 @@
 
 ---
 
-**Status: ✅ PRODUCTION READY - DEPLOY NOW**
+**Status: 🔴 SUPERSEDED (2026-07-14) — NOT production ready, do not deploy.**
 
-All 17 stocks analyzed. CCC integrated with momentum strategy. Portfolio allocation optimized.
-
-Ready for live deployment with enhanced quality filtering.
+All 17 stocks analyzed against an unsourced watchlist with no reproducible data pipeline. See reconciliation banner at top of this file and [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md) for the validated alternative (quality as a confirmation overlay, not a standalone allocation tool).
 
 ---
 

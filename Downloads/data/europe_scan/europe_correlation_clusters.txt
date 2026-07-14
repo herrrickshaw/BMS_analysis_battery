@@ -1,0 +1,67 @@
+EUROPE correlation scan -- 864 symbols, period=1y, threshold=0.55, clustering=threshold
+
+30 clusters found (size > 1):
+
+  (336) ['A2A.MI', 'AAL.L', 'AAS.L', 'ABB.ST', 'ABBN.SW', 'ABDN.L', 'ABN.AS', 'AC.PA', 'ACA.PA', 'ACS.MC', 'ACX.MC', 'ADDT-B.ST', 'AGN.AS', 'AGT.L', 'AIR.F', 'AIR.PA', 'AIXA.F', 'ALFA.ST', 'ALPHA.AT', 'ALV.F', 'ALW.L', 'ANTO.L', 'ASHM.L', 'ASL.L', 'ASM.AS', 'ASML.AS', 'ASRNL.AS', 'ASSA-B.ST', 'AT1.F', 'ATCO-A.ST', 'ATR.L', 'ATT.L', 'ATYM.L', 'AV.L', 'AZM.MI', 'BAMI.MI', 'BARC.L', 'BBOX.L', 'BBVA.MC', 'BBY.L', 'BC.MI', 'BCP.LS', 'BESI.AS', 'BG.VI', 'BGEO.L', 'BGEU.L', 'BGFD.L', 'BGS.L', 'BKG.L', 'BKT.MC', 'BLND.L', 'BMED.MI', 'BMPS.MI', 'BMW.F', 'BNKR.L', 'BNP.PA', 'BOL.ST', 'BPE.MI', 'BPT.L', 'BRBY.L', 'BREE.L', 'BRGE.L', 'BRSC.L', 'BRWM.L', 'BTRW.L', 'BUT.L', 'BWY.L', 'BYG.L', 'BZU.MI', 'CABK.MC', 'CAP.PA', 'CBG.L', 'CBK.F', 'CFR.SW', 'CNA.L', 'COL.MC', 'CS.PA', 'CTY.L', 'CYN.L', 'DANSKE.CO', 'DBK.F', 'DG.PA', 'DLN.L', 'DSCV.L', 'DTG.F', 'EBS.VI', 'EDIN.L', 'EDV.L', 'ELE.MC', 'ELG.F', 'ELM.L', 'EN.PA', 'ENEL.MI', 'ENGI.PA', 'ENR.F', 'EPI-A.ST', 'EQT.ST', 'ESCT.L', 'ETE.AT', 'EUROB.AT', 'EWI.L', 'EXO.AS', 'EXPN.L', 'FAN.L', 'FAS.L', 'FBK.MI', 'FCIT.L', 'FCSS.L', 'FEML.L', 'FER.MC', 'FEV.L', 'FGT.L', 'FORT.L', 'FRES.L', 'FSV.L', 'G.MI', 'GEBN.SW', 'GEKTERNA.AT', 'GEN.L', 'GFTU.L', 'GLE.PA', 'GLEN.L', 'GPE.L', 'GRI.L', 'GSCT.L', 'GYC.F', 'HEI.F', 'HER.MI', 'HFEL.L', 'HILS.L', 'HMSO.L', 'HNR1.F', 'HOC.L', 'HOLN.SW', 'HOT.F', 'HRI.L', 'HSBA.L', 'HSL.L', 'HUH1V.HE', 'HWDN.L', 'IAD.L', 'IAG.L', 'IAG.MC', 'IBE.MC', 'IBST.L', 'ICG.L', 'IEM.L', 'IFX.F', 'IG.MI', 'IHG.L', 'IMI.L', 'INCH.L', 'INDU-C.ST', 'INF.L', 'INGA.AS', 'INVE-B.ST', 'INVP.L', 'ISP.MI', 'JAM.L', 'JCH.L', 'JEDT.L', 'JEGI.L', 'JEMI.L', 'JEN.F', 'JFJ.L', 'JGGI.L', 'JMGI.L', 'JUP.L', 'JYSK.CO', 'KALMAR.HE', 'KCR.HE', 'KEMIRA.HE', 'KER.PA', 'KGF.L', 'KIE.L', 'LAND.L', 'LEG.F', 'LGEN.L', 'LHA.F', 'LIFCO-B.ST', 'LLOY.L', 'LMP.L', 'LR.PA', 'LSEG.L', 'LWDB.L', 'LWI.L', 'MAP.MC', 'MB.MI', 'MBG.F', 'MBK.WA', 'MC.PA', 'METSO.HE', 'MGAM.L', 'MGNS.L', 'ML.PA', 'MMIT.L', 'MNDI.L', 'MNG.L', 'MNKS.L', 'MONC.MI', 'MRC.L', 'MRCH.L', 'MRL.MC', 'MRO.L', 'MSLH.L', 'MT.AS', 'MTS.MC', 'MTX.F', 'MUT.L', 'MUV2.F', 'MWY.L', 'MYI.L', 'N91.L', 'NDA-FI.HE', 'NDA-SE.ST', 'NDA.F', 'NG.L', 'NKT.CO', 'NN.AS', 'NRR.L', 'NWG.L', 'OSB.L', 'OUT1V.HE', 'OXIG.L', 'PAF.L', 'PAG.L', 'PAH3.F', 'PCT.L', 'PEO.WA', 'PGHN.SW', 'PHI.L', 'PHP.L', 'PKO.WA', 'PNL.L', 'PNN.L', 'PPC.AT', 'PRU.L', 'PRX.AS', 'PRY.MI', 'PSH.L', 'PSN.L', 'PUB.PA', 'PZU.WA', 'QLT.L', 'RACE.MI', 'RBI.VI', 'REL.L', 'REN.AS', 'RENE.LS', 'RHIM.L', 'RIO.L', 'RMS.PA', 'RR.L', 'RSW.L', 'RWE.F', 'SAB.MC', 'SAF.PA', 'SAFE.L', 'SAIN.L', 'SAN.MC', 'SAND.ST', 'SAP.F', 'SCA-B.ST', 'SCF.L', 'SCYR.MC', 'SDLF.L', 'SDP.L', 'SEB-A.ST', 'SGE.L', 'SGO.PA', 'SGRO.L', 'SHB-A.ST', 'SHC.L', 'SIE.F', 'SIKA.SW', 'SKA-B.ST', 'SKF-B.ST', 'SLHN.SW', 'SMIN.L', 'SMT.L', 'SOI.L', 'SPX.L', 'SRE.L', 'SREN.SW', 'SRG.MI', 'SSE.L', 'STAN.L', 'STERV.HE', 'STJ.L', 'STMMI.MI', 'STMPA.PA', 'SU.PA', 'SUPR.L', 'SVS.L', 'SVT.L', 'SWED-A.ST', 'SZG.F', 'TBCG.L', 'TEM.L', 'THRL.L', 'TITC.AT', 'TMPL.L', 'TPEIR.AT', 'TPK.L', 'TRN.MI', 'TRY.L', 'TUI1.F', 'TW.L', 'UBSG.SW', 'UCG.MI', 'UNI.MC', 'UNI.MI', 'UPM.HE', 'UQA.VI', 'URW.PA', 'USA.L', 'UU.L', 'VALMT.HE', 'VIE.PA', 'VIG.VI', 'VNA.F', 'VOE.VI', 'VOLV-B.ST', 'VOW3.F', 'VSVS.L', 'VTY.L', 'WEIR.L', 'WIE.VI', 'WIX.L', 'WIZZ.L', 'WKL.AS', 'WKP.L', 'WPP.L', 'WRT1V.HE', 'XPS.L', 'ZURN.SW']
+  (12) ['BP.L', 'ENI.MI', 'GALP.LS', 'HBR.L', 'ITH.L', 'NESTE.HE', 'OMV.VI', 'PKN.WA', 'REP.MC', 'SHEL.L', 'SHELL.AS', 'TTE.PA']
+  (10) ['BA.L', 'BAB.L', 'CHG.L', 'FCT.MI', 'HAG.F', 'HO.PA', 'LDO.MI', 'QQ.L', 'RHM.F', 'SAAB-B.ST']
+  (4) ['ANA.MC', 'ANE.MC', 'EDP.LS', 'EDPR.LS']
+  (4) ['AZN.L', 'AZN.ST', 'GSK.L', 'NOVN.SW']
+  (3) ['CPR.MI', 'DGE.L', 'RI.PA']
+  (3) ['RNO.PA', 'STLAM.MI', 'STLAP.PA']
+  (3) ['BAS.F', 'EVK.F', 'LXS.F']
+  (3) ['DSFIR.AS', 'GIVN.SW', 'SY1.F']
+  (3) ['CCEP.L', 'CCH.L', 'HEIA.AS']
+  (3) ['HAS.L', 'PAGE.L', 'RAND.AS']
+  (3) ['3IN.L', 'HICL.L', 'INPP.L']
+  (3) ['ELISA.HE', 'KNEBV.HE', 'TEL2-B.ST']
+  (2) ['CLNX.MC', 'INW.MI']
+  (2) ['BNR.F', 'IMCD.AS']
+  (2) ['KPN.AS', 'ORA.PA']
+  (2) ['ULVR.L', 'UNA.AS']
+  (2) ['ALTR.LS', 'NVG.LS']
+  (2) ['AIE.L', 'JIGI.L']
+  (2) ['AUTO.L', 'RMV.L']
+  (2) ['BATS.L', 'IMB.L']
+  (2) ['PCGH.L', 'WWH.L']
+  (2) ['SBRY.L', 'TSCO.L']
+  (2) ['SPI.L', 'TATE.L']
+  (2) ['TRIG.L', 'UKW.L']
+  (2) ['VEIL.L', 'VOF.L']
+  (2) ['DEMANT.CO', 'SOON.SW']
+  (2) ['DSV.CO', 'KNIN.SW']
+  (2) ['SAMPO.HE', 'TRYG.CO']
+  (2) ['FORTUM.HE', 'VER.VI']
+
+Top 30 correlated pairs:
+  stock_a   stock_b     corr
+ STMMI.MI  STMPA.PA 0.999729
+ STLAM.MI  STLAP.PA 0.999268
+   MTS.MC     MT.AS 0.998412
+   IAG.MC     IAG.L 0.988183
+   REN.AS     REL.L 0.985978
+ SHELL.AS    SHEL.L 0.976264
+   ABB.ST   ABBN.SW 0.958078
+    AZN.L    AZN.ST 0.951824
+   UNA.AS    ULVR.L 0.931866
+    SVT.L      UU.L 0.918468
+   PEO.WA    PKO.WA 0.907432
+    ATT.L     PCT.L 0.901381
+NDA-FI.HE NDA-SE.ST 0.897353
+    AIR.F    AIR.PA 0.894298
+   JMGI.L     TEM.L 0.887302
+    PHI.L     TEM.L 0.873362
+    SDP.L     TEM.L 0.868736
+   BLND.L    LAND.L 0.865083
+   JMGI.L     SDP.L 0.863688
+    SDP.L     SOI.L 0.863108
+   BRGE.L     FEV.L 0.857530
+   JMGI.L     SOI.L 0.856170
+INDU-C.ST INVE-B.ST 0.851592
+    AAL.L    ANTO.L 0.849655
+    IAD.L     SDP.L 0.848171
+  BMPS.MI     MB.MI 0.843149
+   JMGI.L     PHI.L 0.842686
+    SOI.L     TEM.L 0.842555
+    CTY.L    MRCH.L 0.839308
+    CTY.L     FSV.L 0.835964

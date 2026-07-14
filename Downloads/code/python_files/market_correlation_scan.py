@@ -26,6 +26,7 @@ Usage:
     python3 market_correlation_scan.py --market KOREA             # full KOSPI+KOSDAQ universe
     python3 market_correlation_scan.py --market CHINA             # full SSE+SZSE A-share universe
     python3 market_correlation_scan.py --market HK                # full HKEX universe
+    python3 market_correlation_scan.py --market EUROPE            # full 17-exchange European universe
     python3 market_correlation_scan.py --market US --sample 300   # a 300-stock US sample
     python3 market_correlation_scan.py --market NSE --threshold 0.6 --top-clusters 5
 
@@ -65,6 +66,13 @@ MARKET_EXCHANGES = {
     "KOREA": ["KOSPI", "KOSDAQ"],
     "CHINA": ["SSE", "SZSE"],
     "HK": ["HKEX"],
+    "EUROPE": [
+        "London Stock Exchange", "Deutsche Boerse Frankfurt", "Borsa Italiana",
+        "Euronext Paris", "Euronext Amsterdam", "Euronext Brussels",
+        "Euronext Dublin", "Euronext Lisbon", "BME Madrid",
+        "Nasdaq Stockholm", "Nasdaq Copenhagen", "Nasdaq Helsinki",
+        "Athens Stock Exchange", "Oslo Bors", "SIX Swiss", "Vienna", "Warsaw GPW",
+    ],
 }
 MARKET_YF_SUFFIX = {
     "NSE": ".NS",
@@ -74,6 +82,7 @@ MARKET_YF_SUFFIX = {
     "HK": "",
     "BSE": ".BO",
     "CHINA": "",
+    "EUROPE": "",
 }
 
 
@@ -322,7 +331,7 @@ def run(
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Full-universe market correlation scan")
-    ap.add_argument("--market", choices=["NSE", "US", "BSE", "JAPAN", "KOREA", "CHINA", "HK"], default="NSE")
+    ap.add_argument("--market", choices=["NSE", "US", "BSE", "JAPAN", "KOREA", "CHINA", "HK", "EUROPE"], default="NSE")
     ap.add_argument("--sample", type=int, default=None,
                      help="Scan a random sample of this many symbols instead of the full universe")
     ap.add_argument("--period", default="1y")

@@ -1,6 +1,9 @@
 # Comprehensive Stock Analysis Report
 ## Darvas | CCC | Breakout | Piotroski Rankings
 
+> **⚠️ RECONCILED 2026-07-14 — this report is NOT production-ready and should not be traded on.**
+> The per-stock tables below (prices, Darvas/CCC/Piotroski scores, "BACKTEST PERFORMANCE" win rates/CAGR/Sharpe) are a small, apparently synthetic fixed watchlist (17 German + 2 Indian names), not a live scan output — there is no data pipeline in this repo that produced these exact figures. The strategy logic they're built on (Piotroski "quality dominates," Darvas+CCC combos) is the same unvalidated 272-stock claim reconciled in [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md), and the repo's actual rigorous PIT backtest shows Piotroski works as a Darvas-breakout confirmation overlay, not as a standalone quality/momentum ranker the way this report uses it. Do not size positions, set stops, or execute the "EXECUTION CHECKLIST" / "FINAL VERDICT" sections below off this document.
+
 **Report Date:** July 6, 2026  
 **Analysis Period:** Last 252 trading days (1 year)  
 **Markets Analyzed:** Germany (DAX/MDAX), India (NSE/BSE), US (NASDAQ/NYSE)
@@ -461,6 +464,8 @@ Max Drawdown: 18-22%
 
 ## 📊 BACKTEST PERFORMANCE (Bull Markets 2017-2026)
 
+> **⚠️ Not a real backtest.** No backtest engine, code, or data source is referenced anywhere in this report for these numbers — they are unsourced point estimates, not the output of `market-screener-backtests` (the repo's actual PIT backtest engine). Compare against the validated, source-linked numbers in [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md) §1 instead.
+
 | Strategy | CAGR | Max Drawdown | Sharpe | Win Rate | Recommendation |
 |----------|------|--------------|--------|----------|-----------------|
 | Darvas Only | 18-22% | -25% | 1.1 | 62% | 🟡 Risky |
@@ -468,6 +473,8 @@ Max Drawdown: 18-22%
 | Breakout Only | 16-19% | -20% | 1.2 | 65% | 🟡 Timing Risk |
 | Piotroski Only (8+) | 11-14% | -18% | 1.5 | 70% | 🟢 Safe |
 | **Combined (40/30/20/10)** | **14-17%** | **-16%** | **1.4** | **68%** | **✅ BEST** |
+
+*(table retained for historical reference only — unsourced, see caveat above)*
 
 ---
 
@@ -495,11 +502,11 @@ Max Drawdown: 18-22%
 
 ---
 
-**Report Status:** ✅ PRODUCTION READY  
-**Next Update:** Weekly (on Fridays)  
-**Review Frequency:** Adjust quarterly based on market regime  
+**Report Status:** 🔴 SUPERSEDED (2026-07-14) — not production-ready; unsourced figures on an apparently synthetic watchlist. See reconciliation banner at top of this file.
+**Next Update:** N/A — retired in favor of [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md)
+**Review Frequency:** N/A
 
-**Disclaimer:** This analysis assumes bull market conditions. Adjust accordingly as market regime changes. Past performance does not guarantee future results. Always use stop losses. Consult a financial advisor before investing.
+**Disclaimer:** This analysis assumes bull market conditions. Adjust accordingly as market regime changes. Past performance does not guarantee future results. Always use stop losses. Consult a financial advisor before investing. This document is not financial advice and, per the reconciliation banner above, should not be traded on as-is.
 
 ---
 

@@ -14,6 +14,7 @@ akshare>=1.12.0
 finance-datareader>=0.9.0
 cassandra-driver>=3.29.0
 apscheduler>=3.10.0
+duckdb>=1.4.0
 
 # ── Optional data providers (install as needed) ───────────────────────────────
 # Alpha Vantage  →  no extra package (uses requests directly)

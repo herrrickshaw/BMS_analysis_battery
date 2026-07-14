@@ -137,20 +137,25 @@ PYEOF
 # Europe – build comprehensive list if missing (966 stocks across all major exchanges)
 python3 - << 'PYEOF'
 import os, csv, io, time
+import duckdb
 import requests
 
 ROOT = os.environ.get('ROOT', '.')
 data_dir = os.path.join(ROOT, 'data')
-out_path = os.path.join(data_dir, 'europe_all_list.csv')
+db_path = os.path.join(data_dir, 'market_data.duckdb')
+con = duckdb.connect(db_path)
+con.execute("CREATE TABLE IF NOT EXISTS build_meta (table_name VARCHAR PRIMARY KEY, built_at_epoch DOUBLE)")
 
-# Skip if file exists and was built within 30 days
-if os.path.exists(out_path):
-    age_days = (time.time() - os.path.getmtime(out_path)) / 86400
+# Skip if table exists and was built within 30 days
+meta_row = con.execute(
+    "SELECT built_at_epoch FROM build_meta WHERE table_name = 'europe_all_list'"
+).fetchone()
+if meta_row:
+    age_days = (time.time() - meta_row[0]) / 86400
     if age_days < 30:
-        import csv as _csv
-        with open(out_path) as f:
-            count = sum(1 for _ in _csv.DictReader(f))
+        count = con.execute("SELECT COUNT(*) FROM europe_all_list").fetchone()[0]
         print(f"  Europe list: {count} stocks (cached, {age_days:.0f}d old)")
+        con.close()
         exit(0)
 
 print("  Europe list: building from Wikipedia indices...")
@@ -224,24 +229,31 @@ for sym, nm in [('ALPHA','Alpha Bank'),('TPEIR','Piraeus Financial Holdings'),('
     ('GEKTERNA','GEK Terna'),('NKAS','Nikos Kazantzakis Airport'),('GEBKA','Gebka'),('FLEXO','Flexopack')]:
     add(sym+'.AT', nm, 'FTSEATHEX', 'Athens Stock Exchange')
 
-# Frankfurt list
-for path, exch in [
-    (os.path.join(data_dir, 'frankfurt_list.csv'), 'Deutsche Boerse Frankfurt'),
-    (os.path.join(data_dir, 'london_list.csv'), 'London Stock Exchange'),
+# Frankfurt / London lists — read from DuckDB tables (migrated from frankfurt_list.csv / london_list.csv)
+for table, exch in [
+    ('frankfurt_list', 'Deutsche Boerse Frankfurt'),
+    ('london_list', 'London Stock Exchange'),
 ]:
-    if os.path.exists(path):
-        with open(path) as f:
-            for row in csv.DictReader(f):
-                add(row['yf_ticker'], row['name'], row['index'], exch)
+    try:
+        for yf_ticker, name, idx in con.execute(f'SELECT yf_ticker, name, "index" FROM {table}').fetchall():
+            add(yf_ticker, name, idx, exch)
+    except duckdb.Error:
+        pass
 
 if europe:
     rows = sorted(europe.values(), key=lambda x: x['exchange']+x['yf_ticker'])
-    with open(out_path, 'w', newline='', encoding='utf-8') as f:
-        w = csv.DictWriter(f, fieldnames=['yf_ticker','name','index','exchange'])
-        w.writeheader(); w.writerows(rows)
+    con.execute("DROP TABLE IF EXISTS europe_all_list")
+    con.execute('CREATE TABLE europe_all_list (yf_ticker VARCHAR, name VARCHAR, "index" VARCHAR, exchange VARCHAR)')
+    con.executemany(
+        "INSERT INTO europe_all_list VALUES (?, ?, ?, ?)",
+        [(r['yf_ticker'], r['name'], r['index'], r['exchange']) for r in rows],
+    )
+    con.execute("DELETE FROM build_meta WHERE table_name = 'europe_all_list'")
+    con.execute("INSERT INTO build_meta VALUES ('europe_all_list', ?)", [time.time()])
     print(f"  Europe list: {len(rows)} stocks (rebuilt)")
 else:
     print("  (warning: could not build Europe list)")
+con.close()
 PYEOF
 
 # China – akshare A-shares

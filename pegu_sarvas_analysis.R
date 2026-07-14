@@ -10,9 +10,9 @@
 #                Multi-criteria screen blending technicals + fundamentals.
 #                Produces a Sarvas Score (0–100) and BUY/SELL signal.
 #
-#  Inputs  (from nse_bse_extractor.py):
-#    data/all_stocks_combined.csv  — preferred
-#    data/nse_stocks_fundamental.csv  +  data/bse_stocks_fundamental.csv
+#  Inputs  (from nse_bse_extractor.py, via data/market_data.duckdb):
+#    all_stocks_combined table       — preferred
+#    nse_stocks_fundamental  +  bse_stocks_fundamental tables
 #
 #  Outputs (→ reports/):
 #    pegu_sarvas_all_stocks.csv   — full scored universe
@@ -37,6 +37,8 @@ suppressPackageStartupMessages({
   library(tidyr)
   library(readr)
   library(scales)
+  library(duckdb)
+  library(DBI)
 })
 
 # ── CLI arguments ─────────────────────────────────────────────
@@ -59,18 +61,24 @@ cat("=============================================================\n\n")
 # 1. LOAD DATA
 # ─────────────────────────────────────────────────────────────
 load_data <- function(data_dir) {
-  combined <- file.path(data_dir, "all_stocks_combined.csv")
-  if (file.exists(combined)) {
-    cat(sprintf("[LOAD] %s\n", combined))
-    return(read_csv(combined, show_col_types = FALSE))
+  db_path <- file.path(data_dir, "market_data.duckdb")
+  if (!file.exists(db_path)) stop("No market_data.duckdb found in: ", data_dir)
+  con <- dbConnect(duckdb(), db_path, read_only = TRUE)
+  on.exit(dbDisconnect(con, shutdown = TRUE))
+
+  if ("all_stocks_combined" %in% dbListTables(con)) {
+    cat(sprintf("[LOAD] %s :: all_stocks_combined\n", db_path))
+    return(dbReadTable(con, "all_stocks_combined"))
   }
   parts <- lapply(c("nse", "bse"), function(x) {
-    f <- file.path(data_dir, sprintf("%s_stocks_fundamental.csv", x))
-    if (file.exists(f)) { cat(sprintf("[LOAD] %s\n", f)); read_csv(f, show_col_types = FALSE) }
-    else NULL
+    table <- sprintf("%s_stocks_fundamental", x)
+    if (table %in% dbListTables(con)) {
+      cat(sprintf("[LOAD] %s :: %s\n", db_path, table))
+      dbReadTable(con, table)
+    } else NULL
   })
   parts <- Filter(Negate(is.null), parts)
-  if (length(parts) == 0) stop("No data CSVs found in: ", data_dir)
+  if (length(parts) == 0) stop("No fundamental tables found in: ", db_path)
   bind_rows(parts)
 }
 

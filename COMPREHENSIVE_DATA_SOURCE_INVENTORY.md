@@ -1,10 +1,12 @@
 # 📊 Comprehensive Data Source Inventory
 **All Available Repositories & APIs for Phase 2 Analysis**
 
+> **ℹ️ 2026-07-14 note:** the "272 stocks" entry below is a data-inventory record, not a performance claim — flagging only because it's the same dataset behind the now-reconciled "Piotroski dominates all markets" claim in [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md). The "Potential Return Impact" line below is an unsourced estimate, not a backtested figure.
+
 **Date**: July 6, 2026  
-**Status**: ✅ COMPLETE INVENTORY CREATED  
+**Status**: ✅ COMPLETE INVENTORY CREATED (inventory itself is fine — only the downstream return claims elsewhere in the repo are reconciled)  
 **Additional Sources Found**: 8+ new data repositories  
-**Potential Return Impact**: +0.5-2% from additional sources
+**Potential Return Impact**: unsourced estimate, not validated
 
 ---
 

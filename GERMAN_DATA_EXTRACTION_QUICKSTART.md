@@ -2,6 +2,8 @@
 
 **Quick Start:** Extract all German stocks with one command
 
+> **⚠️ RECONCILED 2026-07-14.** The "Expected CAGR: 15-25% (historical)" figure later in this doc is an unsourced target, not a measured backtest — no dated point-in-time German fundamentals source exists in this repo to test it (see [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md)). The extraction commands themselves are unaffected by this caveat.
+
 ---
 
 ## 1️⃣ Register (5 minutes)
@@ -265,7 +267,7 @@ Day 4+:
 
 ---
 
-**Status: ✅ READY FOR DEPLOYMENT**
+**Status: 🔴 SUPERSEDED (2026-07-14) — original claim: ✅ READY FOR DEPLOYMENT (see reconciliation banner at top)**
 
 *Generate all data → Apply filters → Import to broker → Go live*
 

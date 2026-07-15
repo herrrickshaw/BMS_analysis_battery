@@ -1,0 +1,49 @@
+# Multi-market screener toolkit — dependencies
+# Install:  pip install -r requirements.txt
+# (Google Colab already ships pandas/numpy/pyarrow/requests/openpyxl; the rest
+#  are the niche ones — see colab_quickstart.ipynb for the exact Colab cell.)
+
+# core data
+pandas>=2.0
+numpy>=1.24
+pyarrow>=14.0
+requests>=2.31
+
+# fast NoSQL OHLCV store + reference-data readers
+lmdb>=1.4
+xlrd>=2.0            # read Damodaran .xls industry datasets
+openpyxl>=3.1        # read/write .xlsx scan outputs
+
+# market data sources
+yfinance>=0.2.40     # global OHLC (with stooq fallback in data_sources.py)
+nsepython>=2.9       # NSE live + holiday calendar
+bse>=3.3.0           # BSE bhavcopy (symbol_master.py's _bse_names() imports `bse`, not `bseindia` --
+                     # bseindia below is a DIFFERENT package used by full_indian_market_scan.py;
+                     # bse was missing from this file entirely, so _bse_names() silently returned
+                     # 0 rows via its own `except ImportError: pass` every time
+bseindia>=1.1        # BSE symbols (full_indian_market_scan.py)
+nse>=3.0             # NSE/BSE bhavcopy EOD files
+pykrx>=1.0.0         # full_korea_market_scan.py: KOSPI/KOSDAQ universe + native KRX OHLC.
+                     # Was UNDECLARED and missing 2026-07-15 -> the Korea scan aborted with
+                     # "pip install pykrx" and silently produced no output for the day.
+finance-datareader>=0.9.0  # symbol_master.py's _korea_names() (KOSPI/KOSDAQ);
+                     # PyPI package is `finance-datareader`, imported as `FinanceDataReader`
+akshare>=1.18        # symbol_master.py's _china_names() (SSE/SZSE A-shares)
+duckdb>=1.4.0        # symbol_master.py's _europe_names() reads data/market_data.duckdb's
+                     # europe_all_list table (falls back to the legacy CSV if absent)
+
+# news sentiment (local lexicon — NOT an LLM)
+feedparser>=6.0      # RSS feeds (Moneycontrol/ET/CNBC/...)
+vaderSentiment>=3.3  # sentiment scoring
+
+# LLM structured extraction (llm_extract.py) — Groq primary / Gemini fallback,
+# both OpenAI-compatible endpoints, keys read from ~/.env.local
+openai>=1.0
+
+# CV-based chart pattern detection (chart_pattern_cv.py)
+matplotlib>=3.7
+scipy>=1.10
+
+# European universe discovery (Investing.com lists; price API blocked)
+investpy>=1.0.8
+networkx

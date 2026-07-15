@@ -166,17 +166,41 @@ def _at(s, c):
 def score(ticker) -> dict:
     """Piotroski F (0-9) + ROCE block (0-3) for one yfinance Ticker.
 
+    Thin wrapper around score_from_statements() — see that function for the full
+    contract. Exists so callers that only have a Ticker object (not pre-fetched
+    frames) don't need to know the attribute names.
+    """
+    try:
+        inc, bal, cfs = ticker.income_stmt, ticker.balance_sheet, ticker.cashflow
+    except Exception:
+        return {}
+    return score_from_statements(inc, bal, cfs)
+
+
+def score_from_statements(inc, bal, cfs) -> dict:
+    """Piotroski F (0-9) + ROCE block (0-3) from already-fetched income_stmt /
+    balance_sheet / cashflow DataFrames (yfinance's own frame shape: rows are line
+    items, columns are period-end dates, newest first).
+
+    Split out from score() so a caller that fetches statements itself — e.g. via a
+    fallback chain across yfinance's inconsistent attribute names across versions
+    ("income_stmt" vs "financials") — can score from what it already has instead
+    of triggering a second, possibly-different fetch through a live Ticker. This
+    is the fix for a real bug: full_us_market_scan.py had its OWN inline 9-test
+    formula that scored a MISSING field as a FAILED test (0), not a skipped one —
+    so any stock with a sparse yfinance balance sheet floored at f_score=1.0
+    regardless of its actual fundamentals (proven on COLL: SEC EDGAR shows FY2025
+    net income $62.9M, CFO $329.3M, EBIT $179.6M, 5 straight years of revenue
+    growth — plainly not a 1/9 company). Routing both pipelines through this one
+    function, with its `_ran()` skip-not-fail discipline, fixes it at the source
+    instead of patching the symptom in two places that will drift apart again.
+
     Returns f_score/f_tested and plus_score/plus_tested. Tests whose inputs are
     absent are SKIPPED and counted, never scored 0 — a missing gross-margin line
     is not evidence of a falling gross margin, and silently zeroing it would drag
     every affected company toward "weak". Callers should read f_score against
     f_tested, not against a presumed 9.
     """
-    try:
-        inc, bal, cfs = ticker.income_stmt, ticker.balance_sheet, ticker.cashflow
-    except Exception:
-        return {}
-
     ebit = _series(inc, "EBIT", "Operating Income", "OperatingIncome")
     ta = _series(bal, "Total Assets")
     cl = _series(bal, "Current Liabilities", "Total Current Liabilities")

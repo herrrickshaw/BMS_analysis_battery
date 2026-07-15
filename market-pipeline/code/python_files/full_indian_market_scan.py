@@ -457,6 +457,7 @@ def compute_golden_crossover(df: pd.DataFrame) -> dict:
 
 # Shared helpers (see stock_utils.py) — aliased to keep existing call sites.
 from stock_utils import first_df as _first_df, row as _row
+import piotroski_plus as PP
 
 
 def fundamental_scan(symbol: str, yf_suffix: str = ".NS") -> dict:
@@ -500,34 +501,23 @@ def fundamental_scan(symbol: str, yf_suffix: str = ".NS") -> dict:
     # SCREENER 1 + 2: Piotroski F-Score & Coffee Can (annual statements)
     # ─────────────────────────────────────────────────────────────────────────
     if inc is not None:
-        ni0 = _row(inc, "Net Income", col=0);  a0 = _row(bal, "Total Assets", col=0)
-        ni1 = _row(inc, "Net Income", col=1);  a1 = _row(bal, "Total Assets", col=1)
-        roa0 = (ni0 / a0) if (ni0 and a0) else None
-        roa1 = (ni1 / a1) if (ni1 and a1) else None
-        ocf0 = _row(cf, "Operating Cash Flow", "Total Cash From Operating Activities")
-        ltd0 = _row(bal, "Long Term Debt", col=0) or 0
-        ltd1 = _row(bal, "Long Term Debt", col=1) or 0
-        ca0  = _row(bal, "Current Assets", "Total Current Assets", col=0)
-        cl0  = _row(bal, "Current Liabilities", "Total Current Liabilities", col=0)
-        ca1  = _row(bal, "Current Assets", "Total Current Assets", col=1)
-        cl1  = _row(bal, "Current Liabilities", "Total Current Liabilities", col=1)
-        sh0  = _row(bal, "Share Issued", col=0); sh1 = _row(bal, "Share Issued", col=1)
-        rev0 = _row(inc, "Total Revenue", col=0); gp0 = _row(inc, "Gross Profit", col=0)
-        rev1 = _row(inc, "Total Revenue", col=1); gp1 = _row(inc, "Gross Profit", col=1)
+        a0  = _row(bal, "Total Assets", col=0)                                   # reused below for cap_emp
+        cl0 = _row(bal, "Current Liabilities", "Total Current Liabilities", col=0)  # reused below for cap_emp
 
-        f_score = (
-            (1 if (roa0 and roa0 > 0) else 0) +
-            (1 if (ocf0 and ocf0 > 0) else 0) +
-            (1 if (roa0 and roa1 and roa0 > roa1) else 0) +
-            (1 if (ocf0 and a0 and roa0 and (ocf0/a0) > roa0) else 0) +
-            (1 if (a0 and a1 and (ltd0/a0) < (ltd1/a1)) else 0) +
-            (1 if (ca0 and cl0 and ca1 and cl1 and (ca0/cl0) > (ca1/cl1)) else 0) +
-            ((1 if sh0 <= sh1 else 0) if (sh0 and sh1) else 1) +
-            (1 if (gp0 and rev0 and gp1 and rev1 and (gp0/rev0) > (gp1/rev1)) else 0) +
-            (1 if (rev0 and a0 and rev1 and a1 and (rev0/a0) > (rev1/a1)) else 0)
-        )
+        # Scored via piotroski_plus.score_from_statements(), NOT an inline formula.
+        # The inline version this replaced counted a MISSING field as a FAILED
+        # test rather than a skipped one, so any stock with a sparse yfinance
+        # balance sheet floored at f_score=1.0 regardless of its real fundamentals
+        # — the same bug fixed in full_us_market_scan.py (proven there on COLL:
+        # SEC EDGAR showed a real F-score of 7, not the 1.0 this formula gave it).
+        # See piotroski_plus.score_from_statements()'s docstring for the full story.
+        pp = PP.score_from_statements(inc, bal, cf)
+        f_tested = pp.get("f_tested") or 0
+        f_raw = pp.get("f_score")
+        f_score = round(f_raw / f_tested * 9, 1) if (f_raw is not None and f_tested >= 6) else None
         out["f_score"]  = f_score
-        out["f_strong"] = f_score >= 7
+        out["f_tested"] = f_tested
+        out["f_strong"] = bool(f_score is not None and f_score >= 7)
 
         # Coffee Can
         def series(df, *rows):

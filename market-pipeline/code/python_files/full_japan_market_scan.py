@@ -37,6 +37,8 @@ import pandas as pd
 import requests
 import yfinance as yf
 
+import piotroski_plus as PP
+
 # ── percentile re-tier (adaptive_liquidity) ──────────────────────────────────
 # scan_gate() assigned ABSOLUTE tiers, which cannot discriminate within a market:
 # the first US sweep landed 94% of its sample in one tier because bands tuned to
@@ -404,40 +406,21 @@ def fundamental_scan(yf_ticker: str) -> dict:
         return result
 
     # ── Piotroski F-Score ─────────────────────────────────────────────────────
+    # Scored via piotroski_plus.score_from_statements(), NOT an inline formula.
+    # The inline version this replaced counted a MISSING field as a FAILED test
+    # rather than a skipped one, so any stock with a sparse yfinance balance
+    # sheet floored near f_score=0-1 regardless of its real fundamentals — the
+    # same bug fixed in full_us_market_scan.py (proven there on COLL: SEC EDGAR
+    # showed a real F-score of 7, not the 1.0 the old formula gave it). See
+    # piotroski_plus.score_from_statements()'s docstring for the full story.
     try:
-        ni0 = _row(inc, "Net Income", col=0);  a0 = _row(bal, "Total Assets", col=0)
-        ni1 = _row(inc, "Net Income", col=1);  a1 = _row(bal, "Total Assets", col=1)
-        roa0 = (ni0 / a0) if (ni0 and a0) else None
-        roa1 = (ni1 / a1) if (ni1 and a1) else None
-        ocf0 = _row(cf, "Operating Cash Flow", "Total Cash From Operating Activities")
-
-        f1 = 1 if (roa0 and roa0 > 0)              else 0
-        f2 = 1 if (ocf0 and ocf0 > 0)              else 0
-        f3 = 1 if (roa0 and roa1 and roa0 > roa1)  else 0
-        f4 = 1 if (ocf0 and a0 and roa0 and (ocf0 / a0) > roa0) else 0
-
-        ltd0 = _row(bal, "Long Term Debt", col=0) or 0
-        ltd1 = _row(bal, "Long Term Debt", col=1) or 0
-        f5 = 1 if (a0 and a1 and (ltd0 / a0) < (ltd1 / a1)) else 0
-
-        ca0 = _row(bal, "Current Assets", "Total Current Assets", col=0)
-        cl0 = _row(bal, "Current Liabilities", "Total Current Liabilities", col=0)
-        ca1 = _row(bal, "Current Assets", "Total Current Assets", col=1)
-        cl1 = _row(bal, "Current Liabilities", "Total Current Liabilities", col=1)
-        f6 = 1 if (ca0 and cl0 and ca1 and cl1 and (ca0 / cl0) > (ca1 / cl1)) else 0
-
-        sh0 = _row(bal, "Share Issued", col=0)
-        sh1 = _row(bal, "Share Issued", col=1)
-        f7 = (1 if sh0 <= sh1 else 0) if (sh0 and sh1) else 1
-
-        rev0 = _row(inc, "Total Revenue", col=0); gp0 = _row(inc, "Gross Profit", col=0)
-        rev1 = _row(inc, "Total Revenue", col=1); gp1 = _row(inc, "Gross Profit", col=1)
-        f8 = 1 if (gp0 and rev0 and gp1 and rev1 and (gp0 / rev0) > (gp1 / rev1)) else 0
-        f9 = 1 if (rev0 and a0 and rev1 and a1 and (rev0 / a0) > (rev1 / a1)) else 0
-
-        f_score = f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9
+        pp = PP.score_from_statements(inc, bal, cf)
+        f_tested = pp.get("f_tested") or 0
+        f_raw = pp.get("f_score")
+        f_score = round(f_raw / f_tested * 9, 1) if (f_raw is not None and f_tested >= 6) else None
         result["f_score"]  = f_score
-        result["f_strong"] = f_score >= PIOTROSKI_STRONG
+        result["f_tested"] = f_tested
+        result["f_strong"] = bool(f_score is not None and f_score >= PIOTROSKI_STRONG)
     except Exception:
         return result
 

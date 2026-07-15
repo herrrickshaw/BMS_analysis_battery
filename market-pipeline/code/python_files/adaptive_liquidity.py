@@ -64,10 +64,40 @@ import pandas as pd
 # SEPARATE rule and not a cost term.
 MAX_ADV_PCT = 15.0
 
-# The user's standing floor, in USD. Below this a name is untradeable at any size and
-# is usually not an operating equity at all (in India this alone removed corporate debt,
-# liquid-fund ETFs and REIT/InvITs without any instrument-type rule).
-ABSOLUTE_FLOOR_USD = 120_000        # ~ Rs 1 crore/day
+# ── country-specific floors ───────────────────────────────────────────────────
+# DO NOT apply India's gate to other markets. Measured, markets are not comparable in
+# USD depth (median daily turnover, 60-session median per name):
+#     US   $650k      IN   $166k      JP   $493k      KR   $396k
+# The US median stock is 4x deeper than India's. So India's Rs 1 crore ($120k) gate is:
+#     India  47th percentile   <- its own market, where it was chosen
+#     US     35th              JP  32nd            KR  23rd
+# One constant, four different filters. Applied to Korea it removes a quarter of the
+# market where in India it removes half — it stops being a liquidity rule and becomes a
+# currency artefact.
+#
+# Each market's floor is therefore set at the SAME STRINGENCY as India's own gate (the
+# 47th percentile of its own distribution), which is the user's chosen level expressed
+# in each market's native depth rather than in rupees:
+MARKET_FLOOR_USD = {
+    "IN": 120_000,     # Rs 1 crore/day — the user's explicit gate. Also removes, with no
+                       # instrument-type rule, corporate debt (875NHAI29 ~Rs 2.7L/day),
+                       # liquid-fund ETFs (LIQUIDSBI) and REIT/InvITs from the equity list.
+    "US": 475_000,     # 47th pctile of US
+    "JP": 381_000,     # 47th pctile of JP
+    "KR": 349_000,     # 47th pctile of KR
+}
+DEFAULT_FLOOR_USD = 120_000   # unmeasured market: fall back to the India gate and SAY SO
+
+
+def market_floor(market: str) -> float:
+    """Floor for one market, in USD/day. Never silently guesses."""
+    m = (market or "").strip().upper()[:2]
+    return MARKET_FLOOR_USD.get(m, DEFAULT_FLOOR_USD)
+
+
+# Kept for callers that predate market_floor(). It is India's gate — do not treat it as
+# universal.
+ABSOLUTE_FLOOR_USD = MARKET_FLOOR_USD["IN"]
 
 # Percentile cuts, applied WITHIN each market. Names below the floor are excluded before
 # ranking, so the tiers describe the TRADEABLE universe rather than being dragged down by
@@ -90,10 +120,19 @@ class Gate:
     def min_adv_usd(self) -> float:
         """Smallest ADV this capital can trade without breaching the execution ceiling.
 
-        Never below the absolute floor: a name too thin for anyone stays excluded even
-        for a tiny account.
+        Two rules, both binding, and they answer different questions:
+          * CAPITAL floor (universal rule, market-specific outcome): position / 15% ADV.
+            "Can I build this position?" The RULE is the same everywhere; the set of
+            names it admits differs by market because the distributions differ. That is
+            the right kind of universality.
+          * MARKET floor (country-specific): the depth below which a name is not a
+            sensible candidate IN ITS OWN MARKET. India's Rs 1cr gate is one of these,
+            not a global constant.
+
+        max() of the two: a name must clear both your execution constraint AND its own
+        market's floor.
         """
-        return max(self.position_usd / (MAX_ADV_PCT / 100.0), ABSOLUTE_FLOOR_USD)
+        return max(self.position_usd / (MAX_ADV_PCT / 100.0), market_floor(self.market))
 
 
 def classify(df: pd.DataFrame, gate: Gate, adv_col: str = "adv_usd") -> pd.DataFrame:

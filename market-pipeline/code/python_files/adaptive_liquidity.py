@@ -97,6 +97,28 @@ MAX_ADV_PCT = 15.0
 # computed on the LIVE universe: delisted names BELONG in a backtest panel (they are what
 # makes it survivorship-free) and MUST NOT be in a live-tradeability percentile. Same
 # panel, two uses, two filters.
+# THREE FLOORS, THREE JOBS. Collapsing them into one constant is what produced the
+# fabricated numbers — a single $120k did all three jobs badly and answered none of the
+# questions honestly.
+#
+#   1. STRUCTURAL — "is this a traded security at all?"  Absolute, tiny, universal.
+#      Measured: removing any floor admits 3,106 US names of which 1,343 trade under
+#      $10k/day (SPAC units, warrants, dormant shells). Below ~$10k/day a listing is not
+#      something anyone transacts in, in ANY market. This is a weak claim about
+#      existence, not a strong claim about investability — which is why it can be one
+#      number for everywhere while a POLICY floor cannot.
+#
+#   2. POLICY — "what does the owner of this repo refuse to buy?"  Per market, and ONLY
+#      where a human actually chose. India = Rs 1 crore. There is no US policy because
+#      nobody set one, and inventing it is the bug this replaced.
+#
+#   3. CAPITAL — "can MY money build this position?"  position / MAX_ADV_PCT. The
+#      constraint that actually binds, and the one a SCAN cannot apply because a scan
+#      does not know your capital. It belongs to the consumer (Gate.min_adv_usd).
+#
+# A scan applies max(STRUCTURAL, POLICY) and stops. Capital is filtered downstream.
+STRUCTURAL_FLOOR_USD = 10_000
+
 MARKET_FLOOR_USD = {
     # India only, because India is the only market where a floor was actually chosen.
     # Rs 1 crore/day. Stated as a policy choice, NOT as a percentile — on the live
@@ -104,6 +126,17 @@ MARKET_FLOOR_USD = {
     # choice, not a justification for it.
     "IN": 120_000,
 }
+
+
+def scan_floor(market: str) -> float:
+    """Floor a SCAN should apply: structural, plus policy where one was chosen.
+
+    Deliberately EXCLUDES the capital floor. A scan produces a universe; only the
+    consumer knows how much money is being deployed. Baking a capital assumption into a
+    scan is how one person's portfolio size became four markets' definition of
+    "liquid".
+    """
+    return max(STRUCTURAL_FLOOR_USD, market_floor(market))
 # No default floor. An unmeasured market gets the CAPITAL floor only — which is the
 # honest answer, because we have not chosen a policy for it. Inventing a constant is
 # what produced the fabricated numbers above.

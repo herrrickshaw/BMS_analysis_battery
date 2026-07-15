@@ -162,7 +162,23 @@ def amihud_illiq(df, ticker: str, fx: Dict[str, float], min_days: int = 60):
 # standard per country. Tier cuts are the USD equivalents of the India bands.
 #
 # Median (not mean) turnover, so one block deal can't lift a dead stock over the bar.
-SCAN_FLOOR_USD = 120_000                      # ~ Rs 1 cr/day
+# 🔴 WAS a single global 120_000 — India's Rs 1 crore gate applied to every market.
+# Measured, it is a completely different filter in each: India 47th percentile, US 35th,
+# JP 32nd, KR 23rd. One constant, four filters — a currency artefact, not a rule.
+# adaptive_liquidity.scan_floor() splits the job: a STRUCTURAL floor ($10k/day — below
+# which a listing is not transacted in ANY market) plus a POLICY floor only where a human
+# chose one (India). The CAPITAL floor is deliberately NOT here: a scan does not know the
+# consumer's capital, and baking one in is how a single portfolio size became four
+# markets' definition of "liquid".
+def _scan_floor(market: str = "") -> float:
+    try:
+        import adaptive_liquidity as _AL
+        return _AL.scan_floor(market)
+    except Exception:
+        return 120_000.0        # legacy behaviour if the module is unavailable
+
+
+SCAN_FLOOR_USD = 120_000                      # legacy constant; prefer _scan_floor(market)
 SCAN_TIERS_USD = ((12_000_000, "T1_MEGA"),    # ~ >= Rs 100 cr/day
                   (3_000_000,  "T2_LARGE"),   # ~ Rs 25-100 cr
                   (600_000,    "T3_MID"),     # ~ Rs 5-25 cr
@@ -175,7 +191,7 @@ def measurable(df) -> bool:
             and "Close" in df.columns and "Volume" in df.columns)
 
 
-def scan_gate(df, ticker: str, fx: Dict[str, float]):
+def scan_gate(df, ticker: str, fx: Dict[str, float], market_hint: str = ""):
     """(median daily turnover USD, tier) — tier is None when below the floor.
 
     Currency comes from the ticker suffix, so this is safe on mixed-currency
@@ -195,7 +211,7 @@ def scan_gate(df, ticker: str, fx: Dict[str, float]):
     if not fx.get(base):
         return 0.0, "UNKNOWN"
     tv = turnover_usd_for(df, ticker, fx)
-    if tv < SCAN_FLOOR_USD:
+    if tv < _scan_floor(market_hint):
         return tv, None
     for lo, name in SCAN_TIERS_USD:
         if tv >= lo:

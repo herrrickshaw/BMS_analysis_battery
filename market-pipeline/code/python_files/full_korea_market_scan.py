@@ -171,9 +171,48 @@ def _normalise_krx_cols(df: pd.DataFrame) -> pd.DataFrame:
 
 def fetch_krx_ohlc(universe: list[dict], months: int = 3) -> dict[str, pd.DataFrame]:
     """
-    Fetch per-ticker OHLC via pykrx.get_market_ohlcv_by_date (uses Naver Finance
-    under the hood — fast and reliable). Returns dict: code → DataFrame.
+    OHLC for the KRX universe, keyed by code.
+
+    Reads through ohlcv_cache (batched + incremental) and falls back to the
+    original per-ticker pykrx loop below if that's unavailable.
+
+    WHY: pykrx here fetches ONE TICKER PER HTTP CALL and sleeps 0.3s between each.
+    At 2,637 tickers that is ~13 min of pure sleeping plus ~13 min of requests —
+    measured 28 min on 2026-07-14 and ~31 min projected, by far the slowest step in
+    the pipeline (Europe 3 min, Japan 4 min). pykrx's bulk API
+    (get_market_ohlcv_by_ticker, all tickers for one date) would fix it in 2 calls,
+    but it is BROKEN at pykrx 1.0.51 — the newest version — failing on every date
+    with KeyError on the Korean OHLC columns because KRX changed their response
+    format. So the fix is to batch via yfinance instead: 53 calls of 50 instead of
+    2,637 of 1, and incremental thereafter.
+
+    Data equivalence verified 2026-07-15 before switching: on the SAME date
+    (2026-07-14 close) pykrx and yfinance agree EXACTLY — Samsung 263,000 /
+    SK Hynix 1,913,000 / Kakao 33,850 / LG Chem 255,000, all 0.000% apart. (An
+    earlier 4.6-12.2% "disagreement" was my own error: KRX was open, so yfinance
+    was returning a live Jul-15 tick against pykrx's Jul-14 close.)
+
+    The Korea correlation scan reads the same cache, so it now costs no fetch.
     """
+    try:
+        import ohlcv_cache as _oc
+        codes = [s["code"] for s in universe]
+        sfx = {s["code"]: s.get("yf_suffix", ".KS") for s in universe}
+        # ohlcv_cache keys by the yfinance ticker; map back to bare KRX codes.
+        yf_syms = [f"{c}{sfx.get(c, '.KS')}" for c in codes]
+        got = _oc.get("KOREA", yf_syms, yf_suffix="", period=f"{max(months,12)}mo")
+        out: dict[str, pd.DataFrame] = {}
+        for c in codes:
+            df = got.get(f"{c}{sfx.get(c, '.KS')}")
+            if df is not None and len(df) >= DARVAS_CONFIRM + 5:
+                out[c] = df
+        if out:
+            print(f"  ohlcv_cache: {len(out)}/{len(codes)} tickers with usable OHLC")
+            return out
+        print("  (ohlcv_cache returned nothing — falling back to per-ticker pykrx)")
+    except Exception as _e:
+        print(f"  (ohlcv_cache unavailable: {str(_e)[:60]} — per-ticker pykrx)")
+
     end_date   = datetime.today()
     start_date = end_date - timedelta(days=months * 31)
     from_str   = start_date.strftime("%Y%m%d")

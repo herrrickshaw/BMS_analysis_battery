@@ -203,8 +203,16 @@ def build_ticker_universe() -> list[dict]:
 
 # ── Bulk OHLC ─────────────────────────────────────────────────────────────────
 
-def bulk_download_ohlc(tickers: list[str], period: str = "3mo") -> dict[str, pd.DataFrame]:
+def bulk_download_ohlc(tickers: list[str], period: str = "1y") -> dict[str, pd.DataFrame]:
     """Bulk OHLC for the TSE universe.
+
+    period is 1y, not 3mo. The scan reports 200_Day_MA / Distance_to_200MA% /
+    Trend_Signal, but 3 months is ~62 trading days and a 200-day MA needs 200 — so
+    those columns were NEVER computable. Measured 2026-07-15:
+    200_Day_MA populated 0/2,050, and Trend_Signal read "Insufficient History" for
+    all 2,050 rows. Korea had the identical bug ("Need 200+ days", 0/1,879).
+    The cost of the wider window is one-off: ohlcv_cache seeds 1y once, then
+    fetches only new dates.
 
     Reads through ohlcv_cache first. Japan was re-downloading 3 months of history
     for ~3,700 tickers on every run to learn one new bar, and the Japan correlation
@@ -543,7 +551,9 @@ def main():
 
     # Stage 2 — Bulk OHLC
     print(f"\nStage 2 — Bulk OHLC download ({len(all_yf_tickers)} tickers) …")
-    ohlc = bulk_download_ohlc(all_yf_tickers, period="3mo")
+    # 1y, not 3mo: the 200-day MA / Trend_Signal this scan reports needs 200 bars,
+    # and 3mo is ~62 — those columns were 0/2,050 populated. See bulk_download_ohlc.
+    ohlc = bulk_download_ohlc(all_yf_tickers, period="1y")
     print(f"  → {len(ohlc)} tickers with usable OHLC data")
 
     # Stage 3 — Darvas Box + 200-day MA

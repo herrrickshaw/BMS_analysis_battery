@@ -99,6 +99,62 @@ def turnover_usd_for(df, ticker: str, fx: Dict[str, float]) -> float:
     return tv / rate
 
 
+# ── Amihud (2002) price impact ────────────────────────────────────────────────
+# ILLIQ = mean( |daily return| / daily USD turnover ), the field-standard measure
+# of price impact: "the daily price response associated with one dollar of
+# trading volume" (Amihud 2002, J. Financial Markets 5:31-56).
+#
+# WHY BOTH THIS AND TURNOVER: they answer different questions. Turnover is a size
+# proxy — how much money changes hands. ILLIQ is a COST proxy — how far the price
+# moves when it does. Two stocks can turn over the same USD while one absorbs an
+# order silently and the other gaps 4%. The gate below (which the user set at
+# Rs 1 crore/day) is trying to control the second thing using the first, so ILLIQ
+# is what the gate actually means. It needs no new data: Close and Volume only,
+# which every market already carries.
+#
+# Amihud's own finding is why this matters here: illiquid stocks earn HIGHER
+# returns (the illiquidity premium), and the effect is strongest in small firms.
+# So a screener that ranks on raw momentum will keep steering into the illiquid
+# tail and calling it alpha. ILLIQ makes that visible as a cost rather than
+# leaving it to look like an edge.
+#
+# Scaled by 1e6 so values land in readable units rather than 1e-9.
+ILLIQ_SCALE = 1e6
+
+
+def amihud_illiq(df, ticker: str, fx: Dict[str, float], min_days: int = 60):
+    """Amihud ILLIQ (price impact per USD1m traded). None when unmeasurable.
+
+    Days with zero volume are dropped, not treated as zero impact — an untraded
+    day carries no information about price impact, and keeping it as 0 would make
+    a stock that barely trades look like the most liquid name in the book.
+    """
+    if not measurable(df):
+        return None
+    try:
+        close = pd.to_numeric(df["Close"], errors="coerce")
+        vol = pd.to_numeric(df["Volume"], errors="coerce")
+        ret = close.pct_change().abs()
+        dvol = close * vol
+        ok = ret.notna() & (dvol > 0) & dvol.notna()
+        if int(ok.sum()) < min_days:
+            return None
+        ccy = currency_for(ticker)
+        div = 1.0
+        if ccy in SUBUNIT:
+            ccy, div = SUBUNIT[ccy]
+        rate = fx.get(ccy)
+        if not rate or rate <= 0:
+            return None
+        dvol_usd = dvol[ok] / div / rate
+        illiq = float((ret[ok] / dvol_usd).mean() * ILLIQ_SCALE)
+    except Exception:
+        return None
+    if illiq != illiq or illiq < 0:
+        return None
+    return illiq
+
+
 # ── scan-facing gate ──────────────────────────────────────────────────────────
 # One USD bar across every market, so "tradeable" means the same thing whether the
 # stock is in Mumbai or Tokyo. Anchored to the India floor the user chose

@@ -37,6 +37,16 @@ import pandas as pd
 import requests
 import yfinance as yf
 
+# 50/200-DMA golden cross — one shared implementation (golden_cross.py). This scan
+# previously computed only price-vs-200DMA ("Above 200MA"), never the CROSS, so the
+# golden-crossover strategy the brief presents as cross-market ran on US+India only.
+try:
+    from golden_cross import row_fields as _gc_fields
+except Exception:                                    # pragma: no cover
+    def _gc_fields(df):
+        return {}
+
+
 # Liquidity gate (shared, currency-aware). Lazy so the scan still runs if the
 # module is unavailable; _LiqStub then tags everything UNKNOWN rather than
 # gating the whole universe out.
@@ -591,6 +601,7 @@ def main():
             "Turnover_USD":       round(tv_usd),
             "Liquidity_Tier":     liq_tier,
             "200_Day_MA":         ma200,
+            **_gc_fields(df),
             "Distance_to_200MA%": dist_ma,
             "Trend_Signal":       trend,
             "Darvas_Signal":      darv.get("signal"),

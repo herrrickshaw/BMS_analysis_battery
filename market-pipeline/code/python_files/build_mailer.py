@@ -36,8 +36,10 @@ import ast
 import datetime as _dt
 import glob
 import json
+import os
 import re
 import warnings
+from pathlib import Path
 
 import pandas as pd
 
@@ -405,6 +407,64 @@ def _corr_section(top_n: int = 3) -> str:
     return "".join(blocks)
 
 
+def _as_of_html() -> str:
+    """State the data vintage explicitly: what closed when, and when we looked.
+
+    Every price here is a LAST OFFICIAL CLOSE, not a live quote — but the brief is
+    read hours later, often with the market already open. Measured 2026-07-15 at
+    09:15 IST, live quotes had already drifted from the closes in that morning's
+    brief: HDFCBANK 809.4 -> 812.0, ICICIBANK 1407.7 -> 1417.0, INFY 1092.9 ->
+    1077.0 (1.5%). "Data as of last close" doesn't convey that. This does.
+    """
+    import datetime as _d
+    gen = _d.datetime.now()
+    rows = []
+
+    # India: authoritative — the bhavcopy cache's own max trade date
+    try:
+        import os as _os
+        import duckdb as _dd
+        p = Path(_os.environ.get("BHAV_CACHE",
+                                 Path.home() / "Downloads" / "data" / "bhavcopy_cache")) / "cleaned_long.parquet"
+        if p.exists():
+            d = _dd.connect().execute(
+                f"SELECT max(Date) FROM read_parquet('{p}')").fetchone()[0]
+            rows.append(("🇮🇳 India (NSE/BSE)", f"{d:%d %b %Y} close", "official bhavcopy"))
+    except Exception:
+        pass
+
+    # Other markets: report when their scan ran; the prices in it are that run's
+    # last available close.
+    for label, pat in (("🇺🇸 US", "us_full_scan/us_full_scan_*.xlsx"),
+                       ("🇪🇺 Europe", "european_scan/european_market_scan*.xlsx"),
+                       ("🇯🇵 Japan", "japan_scan/japan_market_scan_*.xlsx"),
+                       ("🇰🇷 Korea", "korea_scan/korea_market_scan_*.xlsx")):
+        try:
+            fs = sorted(glob.glob(pat))
+            if fs:
+                m = _dt.datetime.fromtimestamp(os.path.getmtime(fs[-1]))
+                rows.append((label, "last close at scan time", f"scanned {m:%d %b %H:%M}"))
+        except Exception:
+            continue
+
+    if not rows:
+        return ""
+    body = "".join(
+        f"<tr><td style='padding:2px 10px 2px 0'>{a}</td>"
+        f"<td style='padding:2px 10px 2px 0'><b>{b}</b></td>"
+        f"<td style='padding:2px 0;color:#777'>{c}</td></tr>" for a, b, c in rows)
+    return (
+        "<div style='background:#fffbe6;border-left:3px solid #f9a825;padding:8px 11px;"
+        "margin:0 0 14px;font-size:11.5px;color:#444'>"
+        f"<b>⏱ Prices are last official closes — not live.</b> This brief was generated "
+        f"<b>{gen:%d %b %Y, %H:%M}</b> and the figures below were accurate as of that moment. "
+        f"Markets move: once trading reopens, live quotes will differ from every price here "
+        f"(on 15 Jul, quotes had already moved up to ~1.5% from the morning's closes by 09:15). "
+        f"Nothing here reflects intraday activity after the close shown."
+        f"<table style='margin-top:6px;font-size:11px;border-collapse:collapse'>{body}</table>"
+        "</div>")
+
+
 def _market_snapshot_html() -> str:
     idx = [("^NSEI", "Nifty 50"), ("^GSPC", "S&P 500"), ("^STOXX50E", "Euro Stoxx 50")]
     try:
@@ -455,6 +515,7 @@ def build():
     us_mood = us_data.get("mood") or {"mood": "n/a", "score": 0, "n_articles": 0}
 
     # 0. Market snapshot
+    as_of_html = _as_of_html()
     snapshot_html = _market_snapshot_html()
 
     # 1. India / US / Europe / Japan / Korea fundamentals screener picks
@@ -542,7 +603,8 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 .trail td{{padding:4px 8px;border-bottom:1px solid #f0f0f0}}
 </style>
 <h1 style="font-size:21px;margin:0 0 2px">📈 Daily Market Brief — {today}</h1>
-<p style="color:#666;font-size:13px;margin:0 0 14px">One block per market — screener, fundamentals, news and breakouts together · then global context · data as of last close</p>
+<p style="color:#666;font-size:13px;margin:0 0 10px">One block per market — screener, fundamentals, news and breakouts together · then global context</p>
+{as_of_html}
 <p style="font-size:11px;color:#555;margin:0 0 14px;background:#f6f8fc;border-left:3px solid #1a73e8;padding:6px 9px">Every pick clears a liquidity floor (~₹1cr/day in India, ~$120k elsewhere) — untradable microcaps, ETFs and bonds are excluded. <b>Tier</b>: T1 mega ≥$12M/day · T2 large ≥$3M · T3 mid ≥$600k · T4 small ≥$120k.</p>
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px">🌍 Market Snapshot</h2>
 {snapshot_html}
@@ -599,6 +661,8 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 </div>"""
 
     text = (f"Daily Market Brief — {today}\n"
+            f"Prices are last official closes, accurate as of generation "
+            f"({_dt.datetime.now():%d %b %Y %H:%M}). Live quotes will differ.\n"
             f"India mood: {mood['mood']} ({mood['score']:+.2f}). US mood: {us_mood['mood']} ({us_mood['score']:+.2f}).\n"
             f"India/US/Europe/Japan/Korea screener picks + CCC + convergence + news picks + Darvas breakouts + "
             f"global momentum + 20-market 5y scoreboard + market correlation highlights.\n"

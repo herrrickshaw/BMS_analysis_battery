@@ -94,11 +94,27 @@ def tests(cur, prv, hist) -> dict:
     lv = cur.borrowings / cur.ta if pd.notna(cur.borrowings) and cur.ta else None
     lv_p = prv.borrowings / prv.ta if pd.notna(prv.borrowings) and prv.ta else None
     d["5_leverage_falling"] = bool(lv < lv_p) if None not in (lv, lv_p) else None
-    ca = sum(x for x in (cur.receivables, cur.inventory, cur.cash) if pd.notna(x))
-    ca_p = sum(x for x in (prv.receivables, prv.inventory, prv.cash) if pd.notna(x))
-    cr = ca / cur.other_liab if pd.notna(cur.other_liab) and cur.other_liab else None
-    cr_p = ca_p / prv.other_liab if pd.notna(prv.other_liab) and prv.other_liab else None
-    d["6_current_ratio_rising"] = bool(cr > cr_p) if None not in (cr, cr_p) else None
+    # TEST 6 IS DROPPED — the proxy FAILED validation and was never trustworthy.
+    #
+    # The proxy was (receivables+inventory+cash) / other_liab, because screener.in's
+    # balance sheet has no current/non-current split. It was justified on the argument
+    # that Piotroski test 6 only needs the SIGN of the change, so a stable level bias
+    # would cancel in the delta. That argument was never tested — it was asserted.
+    #
+    # Measured (validate_current_ratio_proxy.py, reconstructed from yfinance since
+    # screener.in blocked us; other_liab := total_assets - equity - debt, screener's
+    # own definition), 237 company-years / 60 liquid Indian tickers:
+    #     LEVEL: true median 1.37 vs proxy median 0.68  — off by ~2x
+    #     SIGN : 62.1% agreement vs a 57.6% majority-guess baseline
+    # A 4.5pp edge over guessing, on n=177. The bias is NOT stable, so it does NOT
+    # cancel in the delta. The decision rule (>=80 sound / 65-80 marginal / <65 drop)
+    # was fixed BEFORE the measurement precisely so this could not be rationalised
+    # afterwards. 62.1% -> DROP.
+    #
+    # Skipped, not zeroed: weigh() removes it from both numerator and denominator, so
+    # India scores on 8 tests and stays comparable to US scores on 9. Scoring it 0
+    # would silently penalise every Indian company for a data gap.
+    d["6_current_ratio_rising"] = None
     d["7_no_dilution"] = (bool(cur.shares <= prv.shares * 1.01)
                           if pd.notna(cur.shares) and pd.notna(prv.shares) and prv.shares else None)
     d["8_gross_margin_rising"] = None          # no COGS line — skipped, never guessed

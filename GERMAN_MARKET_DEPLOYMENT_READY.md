@@ -1,6 +1,8 @@
 # 🇩🇪 German Market Expansion - Deployment Ready
 
-**Status:** ✅ **PRODUCTION READY**  
+> **⚠️ RECONCILED 2026-07-14.** The "15-25% CAGR, 0.8-1.2 Sharpe" figures in this doc are unsourced targets, not a measured backtest — no dated point-in-time German fundamentals source exists in this repo to actually test them (see [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md)). The API/data-extraction test results below may still be technically accurate; the return projection is not.
+
+**Status:** 🔴 SUPERSEDED (2026-07-14) — original claim: ✅ **PRODUCTION READY**  
 **Date:** July 4, 2026  
 **Test Completion:** PASSED
 
@@ -223,7 +225,7 @@ Benefit: Better European diversification, EUR/USD exposure
 
 ---
 
-**Status: ✅ READY FOR DEPLOYMENT**
+**Status: 🔴 SUPERSEDED (2026-07-14) — original claim: ✅ READY FOR DEPLOYMENT (see reconciliation banner at top)**
 
 All 4 scripts tested and working. German market expansion resolves 95% yfinance gap (860 → 2,000-5,000 qualified stocks).
 

@@ -9,27 +9,34 @@
 # covers everything build_email.py did, plus what build_mailer.py already
 # had:
 #   1. Market snapshot (India/US/Europe vs 200-DMA)
-#   2. India / US / Europe — fundamentals screener picks
+#   2. India / US / Europe / Japan / Korea — fundamentals screener picks
 #   3. India Cash Conversion Cycle (screener.in 228040)
 #   4. Convergence (fundamentals + positive/negative news agree)
 #   5. Share Market News Picks — India + US (headline-driven, screener-independent)
 #   6. Talk on the Street — per-ticker sentiment for the fundamental picks
 #   7. Darvas Breakouts — India / US / Europe fresh-breakout fragments
+#      (Japan/Korea skipped: darvas_breakouts.py has no scan-glob support for
+#      those markets yet)
 #   8. Global momentum top-15 + "other markets" world tour
 #   9. 20-market 5-year scoreboard
+#   10. Market Correlation Highlights — top clusters per market from
+#       market_correlation_scan.py (NSE/US/Europe/Japan/Korea)
 #   + educational-only / NOT-investment-advice disclaimer.
 #
 # Every section degrades gracefully to "n/a" / an empty-state message when
-# its source data (a scan xlsx / combined JSON / darvas_breakouts.py) hasn't
-# been generated yet — nothing here is fatal to the rest of the report.
+# its source data (a scan xlsx / combined JSON / darvas_breakouts.py /
+# correlation_scan/*.txt) hasn't been generated yet — nothing here is fatal
+# to the rest of the report.
 #
 #   from build_mailer import build; subj, text, html = build()
 
 from __future__ import annotations
 
+import ast
 import datetime as _dt
 import glob
 import json
+import re
 import warnings
 
 import pandas as pd
@@ -148,6 +155,93 @@ def _eu_picks_rows(top: int = 15):
     return rows
 
 
+def _jp_picks_rows(top: int = 15):
+    """Japan has no combined JSON — read the JP scan's Fundamentals sheet directly.
+    Mirrors _eu_picks_rows(); Japan's sheet uses Piotroski_Strong (YES/NO) and a
+    plain CoffeeCan (PASS/FAIL) column rather than EU's *_Class columns."""
+    files = sorted(glob.glob("japan_scan/japan_market_scan*.xlsx"))
+    if not files:
+        return []
+    try:
+        xl = pd.ExcelFile(files[-1])
+        if "Fundamentals" not in xl.sheet_names:
+            return []
+        fd = pd.read_excel(files[-1], sheet_name="Fundamentals")
+    except Exception:
+        return []
+
+    def _pio(v):
+        try:
+            return int(float(v))
+        except Exception:
+            return None
+
+    cands = []
+    for _, r in fd.iterrows():
+        pio = _pio(r.get("Piotroski_Score"))
+        strong = str(r.get("Piotroski_Strong", "")).upper() == "YES"
+        cc = str(r.get("CoffeeCan", "")).upper() == "PASS"
+        if not (strong or cc or (pio is not None and pio >= 7)):
+            continue
+        cands.append((pio, strong, cc, r))
+    cands.sort(key=lambda x: -(x[0] if x[0] is not None else -1))
+
+    rows = []
+    for pio, strong, cc, r in cands[:top]:
+        code = str(r.get("Code", "") or r.get("YF_Ticker", "") or "").strip()
+        name = str(r.get("Name", "") or code).split(",")[0]
+        pio_ok = strong or (pio is not None and pio >= 7)
+        tier = "Triple Hit" if (pio_ok and cc) else "Multi-Screen"
+        screens = "+".join(s for s, ok in (("Piotroski", pio_ok), ("CoffeeCan", cc)) if ok) or "—"
+        rows.append(f"<tr><td style='padding:4px 8px'><b>{code}</b></td><td>{name}</td>"
+                    f"<td>{tier}</td><td>{screens}</td>"
+                    f"<td>{'n/a' if pio is None else pio}</td></tr>")
+    return rows
+
+
+def _kr_picks_rows(top: int = 15):
+    """Korea has no combined JSON — read the KR scan's Fundamentals sheet directly.
+    Same shape as _jp_picks_rows() (Piotroski_Strong YES/NO + CoffeeCan PASS/FAIL)."""
+    files = sorted(glob.glob("korea_scan/korea_market_scan*.xlsx"))
+    if not files:
+        return []
+    try:
+        xl = pd.ExcelFile(files[-1])
+        if "Fundamentals" not in xl.sheet_names:
+            return []
+        fd = pd.read_excel(files[-1], sheet_name="Fundamentals")
+    except Exception:
+        return []
+
+    def _pio(v):
+        try:
+            return int(float(v))
+        except Exception:
+            return None
+
+    cands = []
+    for _, r in fd.iterrows():
+        pio = _pio(r.get("Piotroski_Score"))
+        strong = str(r.get("Piotroski_Strong", "")).upper() == "YES"
+        cc = str(r.get("CoffeeCan", "")).upper() == "PASS"
+        if not (strong or cc or (pio is not None and pio >= 7)):
+            continue
+        cands.append((pio, strong, cc, r))
+    cands.sort(key=lambda x: -(x[0] if x[0] is not None else -1))
+
+    rows = []
+    for pio, strong, cc, r in cands[:top]:
+        code = str(r.get("Code", "") or r.get("YF_Ticker", "") or "").strip()
+        name = str(r.get("Name", "") or code).split(",")[0]
+        pio_ok = strong or (pio is not None and pio >= 7)
+        tier = "Triple Hit" if (pio_ok and cc) else "Multi-Screen"
+        screens = "+".join(s for s, ok in (("Piotroski", pio_ok), ("CoffeeCan", cc)) if ok) or "—"
+        rows.append(f"<tr><td style='padding:4px 8px'><b>{code}</b></td><td>{name}</td>"
+                    f"<td>{tier}</td><td>{screens}</td>"
+                    f"<td>{'n/a' if pio is None else pio}</td></tr>")
+    return rows
+
+
 def _convergence_html(label: str, data: dict) -> str:
     conv = data.get("convergence") or []
     both = [c for c in conv if "BOTH BULLISH" in str(c.get("Convergence", ""))]
@@ -257,6 +351,60 @@ def _darvas_section(market: str, cap: int = 15) -> str:
         f'200-DMA, up day, ≥250 daily bars. "Box Pos" &gt;100% = trading above the box.</p>')
 
 
+_CORR_MARKETS = [
+    ("nse", "🇮🇳 India (NSE)"),
+    ("us", "🇺🇸 US"),
+    ("europe", "🇪🇺 Europe"),
+    ("japan", "🇯🇵 Japan"),
+    ("korea", "🇰🇷 Korea"),
+]
+
+
+def _corr_section(top_n: int = 3) -> str:
+    """🔗 Market Correlation Highlights — top clusters per market, read from
+    market_correlation_scan.py's plain-text cluster report
+    (correlation_scan/<market>_correlation_clusters.txt). Each market is parsed
+    independently; a missing/malformed file for one market degrades to an
+    'n/a' line for that market only, never raises."""
+    blocks = []
+    for key, label in _CORR_MARKETS:
+        try:
+            files = sorted(glob.glob(f"correlation_scan/{key}_correlation_clusters.txt"))
+            if not files:
+                blocks.append(f"<p style='font-size:12px;margin:6px 0'><b>{label}</b>: "
+                              f"n/a (no correlation scan yet)</p>")
+                continue
+            text = open(files[-1]).read()
+            header = next((l for l in text.splitlines() if "symbols" in l and "period=" in l), "")
+            m = re.search(r"([\d,]+)\s+symbols", header)
+            n_sym = m.group(1) if m else "?"
+            cl_lines = [l.strip() for l in text.splitlines() if l.strip().startswith("(")]
+            items = []
+            for l in cl_lines[:top_n]:
+                mm = re.match(r"\((\d+)\)\s+(\[.*\])", l)
+                if not mm:
+                    continue
+                size = mm.group(1)
+                try:
+                    members = ast.literal_eval(mm.group(2))
+                except Exception:
+                    members = []
+                shown = ", ".join(str(x) for x in members[:8]) + (" …" if len(members) > 8 else "")
+                items.append(f"<li>({size}) {shown}</li>")
+            if not items:
+                blocks.append(f"<p style='font-size:12px;margin:6px 0'><b>{label}</b>: "
+                              f"{n_sym} symbols scanned, no clusters &gt;1 found</p>")
+            else:
+                blocks.append(
+                    f"<p style='font-size:12px;margin:8px 0 2px'><b>{label}</b> "
+                    f"({n_sym} symbols, {len(cl_lines)} clusters found)</p>"
+                    f"<ul style='font-size:12px;margin:2px 0 6px 18px'>{''.join(items)}</ul>")
+        except Exception:
+            blocks.append(f"<p style='font-size:12px;margin:6px 0'><b>{label}</b>: "
+                          f"n/a (error reading correlation scan)</p>")
+    return "".join(blocks)
+
+
 def _market_snapshot_html() -> str:
     idx = [("^NSEI", "Nifty 50"), ("^GSPC", "S&P 500"), ("^STOXX50E", "Euro Stoxx 50")]
     try:
@@ -309,10 +457,21 @@ def build():
     # 0. Market snapshot
     snapshot_html = _market_snapshot_html()
 
-    # 1. India / US / Europe fundamentals screener picks
+    # 1. India / US / Europe / Japan / Korea fundamentals screener picks
     ind_picks_rows = _market_picks_rows(ind_data, "IN")
     us_picks_rows = _market_picks_rows(us_data, "US")
-    eu_picks_rows = _eu_picks_rows()
+    try:
+        eu_picks_rows = _eu_picks_rows()
+    except Exception:
+        eu_picks_rows = []
+    try:
+        jp_picks_rows = _jp_picks_rows()
+    except Exception:
+        jp_picks_rows = []
+    try:
+        kr_picks_rows = _kr_picks_rows()
+    except Exception:
+        kr_picks_rows = []
 
     # 2. India CCC screen (screener.in 228040)
     ccc_rows = _ccc_rows()
@@ -364,6 +523,12 @@ def build():
               f"<td>{r['CAGR%']}</td><td>{r['Return_1y%']}</td><td>{r.Sharpe}</td></tr>"
               for _, r in p5.iterrows()]
 
+    # 9. Market Correlation Highlights — top clusters per market (NSE/US/Europe/Japan/Korea)
+    try:
+        corr_html = _corr_section()
+    except Exception:
+        corr_html = "<p style='color:#777'>Correlation scan unavailable.</p>"
+
     html = f"""<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:820px;color:#1a1a1a">
 <style>
 h3{{font-size:14px;margin:14px 0 6px;color:#333}}
@@ -373,7 +538,7 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 .trail td{{padding:4px 8px;border-bottom:1px solid #f0f0f0}}
 </style>
 <h1 style="font-size:21px;margin:0 0 2px">📈 Daily Market Brief — {today}</h1>
-<p style="color:#666;font-size:13px;margin:0 0 14px">India · US · Europe fundamentals + Darvas breakouts + convergence + news picks + global momentum + 5-year scoreboard · data as of last close</p>
+<p style="color:#666;font-size:13px;margin:0 0 14px">India · US · Europe · Japan · Korea fundamentals + Darvas breakouts + convergence + news picks + global momentum + 5-year scoreboard + market correlation highlights · data as of last close</p>
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px">🌍 Market Snapshot</h2>
 {snapshot_html}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇮🇳 India — Daily Screener (most tradable)</h2>
@@ -384,6 +549,10 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 <p style="font-size:11px;color:#666;margin:3px 0">Mood: <b style="color:#2e7d32">{us_mood['mood']} ({us_mood['score']:+.2f})</b> from {us_mood.get('n_articles',0)} articles.</p>
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇪🇺 Europe — Fundamentals Picks</h2>
 {_table(["Symbol","Name","Tier","Screens","Piotroski"], eu_picks_rows) if eu_picks_rows else "<p>no European scan available today</p>"}
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇯🇵 Japan — Fundamentals Picks</h2>
+{_table(["Code","Name","Tier","Screens","Piotroski"], jp_picks_rows) if jp_picks_rows else "<p>no Japan scan available today</p>"}
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇰🇷 Korea — Fundamentals Picks</h2>
+{_table(["Code","Name","Tier","Screens","Piotroski"], kr_picks_rows) if kr_picks_rows else "<p>no Korea scan available today</p>"}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">💵 India — Cash Conversion Cycle (screener.in 228040)</h2>
 <p style="font-size:12px;color:#555">Lowest/negative CCC = collects from customers before paying suppliers. Tradable (High/Medium) only.</p>
 {_table(["Symbol","Name","CCC days","ROCE","Liquidity"], ccc_rows) if ccc_rows else "<p>n/a</p>"}
@@ -411,13 +580,16 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 {_table(["Market","Symbol","6mo %","Liquidity"], other_rows) if other_rows else "<p>n/a</p>"}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🗓️ 20-Market 5-Year Scoreboard</h2>
 {_table(["Mkt","Index","5y CAGR%","1y %","Sharpe"], p_rows)}
-<p style="font-size:11px;color:#bf360c;border-top:1px solid #eee;padding-top:10px;margin-top:18px">⚠️ Educational/research only. NOT investment advice. Screener/Darvas/Convergence results are mechanical filters, not buy/sell signals. Liquidity/CCC are estimates; index figures price-only, local currency. Past performance does not guarantee future returns. Consult a SEBI-registered investment advisor.</p>
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🔗 Market Correlation Highlights</h2>
+<p style="font-size:12px;color:#555">Top correlated-stock clusters per market (market_correlation_scan.py), 1y returns, threshold-based clustering.</p>
+{corr_html}
+<p style="font-size:11px;color:#bf360c;border-top:1px solid #eee;padding-top:10px;margin-top:18px">⚠️ Educational/research only. NOT investment advice. Screener/Darvas/Convergence results are mechanical filters, not buy/sell signals. Liquidity/CCC are estimates; index figures price-only, local currency. Correlation clusters are statistical (not causal) groupings and can break down in stressed markets. Past performance does not guarantee future returns. Consult a SEBI-registered investment advisor.</p>
 </div>"""
 
     text = (f"Daily Market Brief — {today}\n"
             f"India mood: {mood['mood']} ({mood['score']:+.2f}). US mood: {us_mood['mood']} ({us_mood['score']:+.2f}).\n"
-            f"India/US/Europe screener picks + CCC + convergence + news picks + Darvas breakouts + "
-            f"global momentum + 20-market 5y scoreboard.\n"
+            f"India/US/Europe/Japan/Korea screener picks + CCC + convergence + news picks + Darvas breakouts + "
+            f"global momentum + 20-market 5y scoreboard + market correlation highlights.\n"
             f"Educational/research only. NOT investment advice.")
     subject = f"📈 Daily Market Brief — {today}"
     return subject, text, html

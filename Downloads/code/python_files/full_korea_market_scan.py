@@ -39,6 +39,19 @@ import pandas as pd
 import requests
 import yfinance as yf
 
+# Liquidity gate (shared, currency-aware). Lazy so the scan still runs if the
+# module is unavailable; _LiqStub then tags everything UNKNOWN rather than
+# gating the whole universe out.
+try:
+    import liquidity as _liq
+except Exception:                                    # pragma: no cover
+    class _LiqStub:
+        @staticmethod
+        def gate(df, ticker):
+            return 0.0, "UNKNOWN"
+    _liq = _LiqStub()
+
+
 try:
     from pykrx import stock as krx
 except ImportError:
@@ -514,13 +527,23 @@ def main():
                    "Below 200MA (Downtrend)"    if dist_ma and dist_ma < -5 else
                    "Near 200MA (Consolidation)" if dist_ma else "Need 200+ days")
 
+        # Liquidity gate. Turnover here is in WON — liquidity.gate() converts via the
+        # .KS/.KQ suffix, so the USD bar matches every other market. A raw KRW number
+        # against a rupee floor would be nonsense (W1cr ~ $7k vs Rs1cr ~ $120k).
+        yf_tkr = f"{code}{stock_info.get('yf_suffix', '.KS')}"
+        tv_usd, liq_tier = _liq.gate(df, yf_tkr)
+        if liq_tier is None:
+            continue
+
         row = {
             "Code":               code,
             "Name":               stock_info.get("name", ""),
             "Market":             stock_info.get("market", ""),
-            "YF_Ticker":          f"{code}{stock_info.get('yf_suffix', '.KS')}",
+            "YF_Ticker":          yf_tkr,
             "LTP_KRW":            ltp,
             "Change%":            chg_pct,
+            "Turnover_USD":       round(tv_usd),
+            "Liquidity_Tier":     liq_tier,
             "200_Day_MA":         ma200,
             "Distance_to_200MA%": dist_ma,
             "Trend_Signal":       trend,

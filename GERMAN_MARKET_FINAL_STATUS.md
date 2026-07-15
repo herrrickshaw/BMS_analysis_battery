@@ -1,6 +1,8 @@
 # 🇩🇪 German Market Expansion - Final Status
 
-**Status:** ✅ **PRODUCTION READY**  
+> **⚠️ RECONCILED 2026-07-14.** The "15-25% CAGR" figures in this doc are unsourced targets, not a measured backtest — no dated point-in-time German fundamentals source exists in this repo to test them (see [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md)). The extraction/API test results below may still be technically accurate; the return projection is not.
+
+**Status:** 🔴 SUPERSEDED (2026-07-14) — original claim: ✅ **PRODUCTION READY**  
 **Date:** July 4, 2026  
 **Extraction Test:** COMPLETE  
 **API Endpoint:** VERIFIED  
@@ -203,7 +205,7 @@ python3 german_market_analysis.py --full
 
 ## Summary
 
-**German Market Expansion is READY FOR DEPLOYMENT**
+**🔴 SUPERSEDED (2026-07-14)** — original claim: German Market Expansion is READY FOR DEPLOYMENT (see reconciliation banner at top of this file)
 
 - ✅ yfinance limitations identified (0% DAX coverage)
 - ✅ Official Deutsche Börse APIs documented (4 tiers)

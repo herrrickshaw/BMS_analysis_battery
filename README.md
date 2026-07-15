@@ -1,6 +1,9 @@
 # 🌍 Global Stock Screening System
 **Production-ready multi-market stock analysis with OCaml, universal screens & validation**
 
+> **⚠️ RECONCILED 2026-07-14 — the "production-ready" and return claims in this README are not validated.**
+> The 22.4% blended-return figure and the underlying "Piotroski quality dominates all markets" premise trace back to a 272-stock sample, never confirmed against this repo's actual rigorous point-in-time backtest (`herrrickshaw/market-screener-backtests`, SEC EDGAR + yfinance, fold-cross-validated) — which reaches the opposite conclusion for the US and shows quality signals work only as a breakout-confirmation overlay elsewhere. See [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md) for the reconciled, source-linked recommendations before running or trusting this system's output.
+
 ---
 
 ## 🎯 What This Is
@@ -94,7 +97,7 @@ open DAILY_SCREENING_REPORT.html
 
 ## 🎉 Status
 
-✅ **PRODUCTION READY**
+🔴 **SUPERSEDED (2026-07-14)** — see reconciliation banner at top of this file; original claim was ✅ PRODUCTION READY
 
 - All components built and tested
 - Complete documentation provided

@@ -16,6 +16,7 @@ from difflib import get_close_matches
 from typing import Optional
 
 _DATA = os.path.join(os.path.dirname(__file__), '..', '..', 'data')
+_DUCKDB_PATH = os.path.join(_DATA, 'market_data.duckdb')
 
 
 # ── loaders ───────────────────────────────────────────────────────────────────
@@ -46,6 +47,43 @@ def _load_csv(path: str, yf_col: str, name_col: str,
                     by_name[name.lower()] = yf
     except FileNotFoundError:
         pass
+    return {'by_yf': out, 'by_code': by_code, 'by_name': by_name}
+
+
+def _load_duckdb_table(table: str, yf_col: str, name_col: str,
+                        code_col: Optional[str] = None, extra_cols: list[str] | None = None) -> dict:
+    """Generic DuckDB table loader → {yf_ticker: {name, code?, ...}} (mirrors _load_csv)."""
+    out: dict[str, dict] = {}
+    by_code: dict[str, str] = {}
+    by_name: dict[str, str] = {}
+    import duckdb
+    cols = [yf_col, name_col] + ([code_col] if code_col else []) + (extra_cols or [])
+    try:
+        con = duckdb.connect(_DUCKDB_PATH, read_only=True)
+        try:
+            rows = con.execute(f"SELECT {', '.join(cols)} FROM {table}").fetchall()
+        finally:
+            con.close()
+    except duckdb.Error:
+        return {'by_yf': out, 'by_code': by_code, 'by_name': by_name}
+
+    for values in rows:
+        row = dict(zip(cols, values))
+        yf = (row.get(yf_col) or '').strip()
+        name = (row.get(name_col) or '').strip()
+        code = (row.get(code_col) or '').strip() if code_col else ''
+        if not yf:
+            continue
+        entry = {'yf_ticker': yf, 'name': name}
+        if code:
+            entry['code'] = code
+        for c in (extra_cols or []):
+            entry[c] = (row.get(c) or '').strip()
+        out[yf] = entry
+        if code:
+            by_code[code] = yf
+        if name:
+            by_name[name.lower()] = yf
     return {'by_yf': out, 'by_code': by_code, 'by_name': by_name}
 
 
@@ -81,15 +119,18 @@ def _db(market: str) -> dict:
             )
 
     elif market == 'europe':
-        # Prefer comprehensive all-exchanges list; fall back to legacy STOXX 600 list
-        europe_path = os.path.join(_DATA, 'europe_all_list.csv')
-        if not os.path.exists(europe_path):
-            europe_path = os.path.join(_DATA, 'europe_list.csv')
-        result = _load_csv(
-            europe_path,
+        # Prefer the DuckDB table (migrated from europe_all_list.csv); fall back to legacy STOXX 600 list
+        result = _load_duckdb_table(
+            'europe_all_list',
             yf_col='yf_ticker', name_col='name',
             extra_cols=['exchange', 'index'],
         )
+        if not result['by_yf']:
+            result = _load_csv(
+                os.path.join(_DATA, 'europe_list.csv'),
+                yf_col='yf_ticker', name_col='name',
+                extra_cols=['exchange', 'index'],
+            )
 
     elif market == 'japan':
         result = _load_csv(

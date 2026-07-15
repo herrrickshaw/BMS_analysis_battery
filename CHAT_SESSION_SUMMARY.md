@@ -1,9 +1,11 @@
 # 📊 Complete Chat Session Summary
 **Global Stock Strategy Analysis - Comprehensive Delivery**
 
+> **⚠️ RECONCILED 2026-07-14.** This session's headline findings (272-stock Piotroski dominance, 22.4%→24.1% return projection) were never validated against the repo's actual rigorous point-in-time backtest, which reaches the opposite conclusion for the US. Kept for historical record only — see [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md) for the reconciled findings.
+
 **Session Date**: July 6, 2026  
 **Duration**: Single extended session  
-**Status**: ✅ Phase 1 Complete | 🚀 Phase 2 Ready | 📈 LFS Analysis Starting
+**Status**: 🔴 SUPERSEDED (2026-07-14) — original claim: ✅ Phase 1 Complete | 🚀 Phase 2 Ready | 📈 LFS Analysis Starting
 
 ---
 

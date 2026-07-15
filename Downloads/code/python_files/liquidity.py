@@ -35,6 +35,151 @@ CCY = {"US": "USD", "IN": "INR", "CN": "CNY", "JP": "JPY", "EU": "EUR", "HK": "H
 UNIT = {"UK": 100.0, "ZA": 100.0}
 
 
+# ── ticker-suffix currency map (for scans that mix currencies in ONE universe) ─
+# The market-keyed CCY/UNIT above works for screener_kit's per-market seeds, where
+# London sits in its own "UK" seed and UNIT["UK"]=100 unwinds pence. The daily
+# pipeline's Europe scan is different: full_european_market_scan.py runs all ~966
+# tickers across 17 exchanges in ONE pass with no market split, so currency has to
+# come from the ticker suffix instead.
+#
+# The trap this exists to stop: **London quotes in PENCE, not pounds.** Measured
+# 2026-07-15, median LTP is 416 on `.L` vs 72 on `.PA` and 22 on `.MI` — treating
+# `.L` as EUR/GBP without the /100 overstates London turnover 100x, and `.L` is
+# 426 of the European universe (its largest bloc). Tel Aviv (agorot) and
+# Johannesburg (cents) share the convention.
+CCY_BY_SUFFIX = {
+    ".L": "GBp", ".IL": "GBp",
+    ".DE": "EUR", ".F": "EUR", ".PA": "EUR", ".AS": "EUR", ".BR": "EUR",
+    ".LS": "EUR", ".IR": "EUR", ".MI": "EUR", ".MC": "EUR", ".HE": "EUR",
+    ".VI": "EUR", ".AT": "EUR", ".TL": "EUR", ".RG": "EUR", ".VS": "EUR",
+    ".SW": "CHF", ".ST": "SEK", ".OL": "NOK", ".CO": "DKK", ".WA": "PLN",
+    ".IS": "TRY", ".PR": "CZK", ".BD": "HUF", ".IC": "ISK",
+    ".T": "JPY", ".KS": "KRW", ".KQ": "KRW", ".NS": "INR", ".BO": "INR",
+    ".HK": "HKD", ".SS": "CNY", ".SZ": "CNY", ".TW": "TWD", ".SI": "SGD",
+    ".TA": "ILA", ".JO": "ZAc", ".AX": "AUD", ".TO": "CAD", ".SA": "BRL",
+}
+# quote sub-units -> (real currency, divisor)
+SUBUNIT = {"GBp": ("GBP", 100.0), "ILA": ("ILS", 100.0), "ZAc": ("ZAR", 100.0)}
+
+
+def currency_for(ticker: str) -> str:
+    """Quote currency from a yfinance ticker suffix. Bare symbol => US (USD)."""
+    t = str(ticker)
+    if "." in t:
+        return CCY_BY_SUFFIX.get("." + t.rsplit(".", 1)[1], "USD")
+    return "USD"
+
+
+def turnover_usd_for(df, ticker: str, fx: Dict[str, float]) -> float:
+    """Median daily Close*Volume for one symbol, converted to USD.
+
+    `fx` maps currency -> units per 1 USD (the shape _fx_rates returns).
+    Sub-unit quotes (GBp/ILA/ZAc) are divided out before conversion.
+    """
+    if df is None or not hasattr(df, "columns"):
+        return 0.0
+    if "Close" not in df.columns or "Volume" not in df.columns:
+        return 0.0
+    try:
+        tv = float((df["Close"] * df["Volume"]).median())
+    except Exception:
+        return 0.0
+    if tv != tv or tv <= 0:                       # NaN / empty
+        return 0.0
+    ccy = currency_for(ticker)
+    if ccy in SUBUNIT:
+        ccy, div = SUBUNIT[ccy]
+        tv /= div
+    rate = fx.get(ccy)
+    if not rate or rate <= 0:
+        return 0.0
+    return tv / rate
+
+
+# ── scan-facing gate ──────────────────────────────────────────────────────────
+# One USD bar across every market, so "tradeable" means the same thing whether the
+# stock is in Mumbai or Tokyo. Anchored to the India floor the user chose
+# (Rs 1 crore/day ~ USD 120k) and carried over rather than inventing a different
+# standard per country. Tier cuts are the USD equivalents of the India bands.
+#
+# Median (not mean) turnover, so one block deal can't lift a dead stock over the bar.
+SCAN_FLOOR_USD = 120_000                      # ~ Rs 1 cr/day
+SCAN_TIERS_USD = ((12_000_000, "T1_MEGA"),    # ~ >= Rs 100 cr/day
+                  (3_000_000,  "T2_LARGE"),   # ~ Rs 25-100 cr
+                  (600_000,    "T3_MID"),     # ~ Rs 5-25 cr
+                  (0,          "T4_SMALL"))   # ~ Rs 1-5 cr
+
+
+def measurable(df) -> bool:
+    """True when the frame actually carries what turnover needs."""
+    return (df is not None and hasattr(df, "columns")
+            and "Close" in df.columns and "Volume" in df.columns)
+
+
+def scan_gate(df, ticker: str, fx: Dict[str, float]):
+    """(median daily turnover USD, tier) — tier is None when below the floor.
+
+    Currency comes from the ticker suffix, so this is safe on mixed-currency
+    universes (the Europe scan) where a market key can't disambiguate.
+
+    FAILS OPEN, deliberately: if the frame has no Volume column, or the currency
+    has no FX rate, liquidity is UNMEASURABLE — which is not the same as
+    "illiquid". Returning None there would silently empty an entire scan (a
+    yfinance schema change dropping Volume would read as "no picks today" rather
+    than a broken feed). Such rows are tagged "UNKNOWN" so they stay visible and
+    can be filtered downstream on purpose rather than by accident.
+    """
+    if not measurable(df):
+        return 0.0, "UNKNOWN"
+    ccy = currency_for(ticker)
+    base = SUBUNIT[ccy][0] if ccy in SUBUNIT else ccy
+    if not fx.get(base):
+        return 0.0, "UNKNOWN"
+    tv = turnover_usd_for(df, ticker, fx)
+    if tv < SCAN_FLOOR_USD:
+        return tv, None
+    for lo, name in SCAN_TIERS_USD:
+        if tv >= lo:
+            return tv, name
+    return tv, "T4_SMALL"
+
+
+def scan_fx() -> Dict[str, float]:
+    """FX map for scan_gate: currency -> units per 1 USD. Call once per run."""
+    need = sorted({c for c in CCY_BY_SUFFIX.values()} | {"USD"})
+    need = [SUBUNIT[c][0] if c in SUBUNIT else c for c in need]
+    fx = _fx_rates(need)
+    return {k: v for k, v in fx.items() if v}
+
+
+_SCAN_FX: Dict[str, float] = {}
+
+
+def gate(df, ticker: str):
+    """Process-cached liquidity gate for the market scans.
+
+    (median daily turnover USD, tier); tier None => below the floor, skip the
+    symbol. FX is fetched once per process, not per symbol. Every failure path
+    yields "UNKNOWN" rather than None so a broken feed can never masquerade as
+    "nothing qualified today".
+
+    Usage in a scan's per-symbol loop:
+        tv, tier = liquidity.gate(df, yf_ticker)
+        if tier is None:
+            continue
+    """
+    global _SCAN_FX
+    if not _SCAN_FX:
+        try:
+            _SCAN_FX = scan_fx() or {"USD": 1.0}
+        except Exception:
+            _SCAN_FX = {"USD": 1.0}
+    try:
+        return scan_gate(df, ticker, _SCAN_FX)
+    except Exception:
+        return 0.0, "UNKNOWN"
+
+
 def _fx_rates(currencies) -> Dict[str, float]:
     """USD value of 1 unit-of-USD in each currency (live, with cache fallback)."""
     import yfinance as yf

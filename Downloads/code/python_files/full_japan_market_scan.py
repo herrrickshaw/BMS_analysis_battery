@@ -37,6 +37,19 @@ import pandas as pd
 import requests
 import yfinance as yf
 
+# Liquidity gate (shared, currency-aware). Lazy so the scan still runs if the
+# module is unavailable; _LiqStub then tags everything UNKNOWN rather than
+# gating the whole universe out.
+try:
+    import liquidity as _liq
+except Exception:                                    # pragma: no cover
+    class _LiqStub:
+        @staticmethod
+        def gate(df, ticker):
+            return 0.0, "UNKNOWN"
+    _liq = _LiqStub()
+
+
 try:
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     from openpyxl.utils import get_column_letter
@@ -533,6 +546,13 @@ def main():
                    "Below 200MA (Downtrend)"  if dist_ma and dist_ma < -5 else
                    "Near 200MA (Consolidation)" if dist_ma else "Insufficient History")
 
+        # Liquidity gate. Turnover here is in YEN — liquidity.gate() converts via the
+        # .T suffix, so the USD bar is the same one India and the US are held to.
+        # Comparing a raw JPY number against a rupee floor would be meaningless.
+        tv_usd, liq_tier = _liq.gate(df, yf_tkr)
+        if liq_tier is None:
+            continue
+
         row = {
             "YF_Ticker":          yf_tkr,
             "Code":               info.get("code", yf_tkr.replace(".T", "")),
@@ -540,6 +560,8 @@ def main():
             "Sector":             info.get("sector", "—"),
             "LTP_JPY":            ltp,
             "Change%":            chg_pct,
+            "Turnover_USD":       round(tv_usd),
+            "Liquidity_Tier":     liq_tier,
             "200_Day_MA":         ma200,
             "Distance_to_200MA%": dist_ma,
             "Trend_Signal":       trend,

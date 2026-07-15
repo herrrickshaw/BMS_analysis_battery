@@ -23,6 +23,9 @@ bse>=3.3.0           # BSE bhavcopy (symbol_master.py's _bse_names() imports `bs
                      # 0 rows via its own `except ImportError: pass` every time
 bseindia>=1.1        # BSE symbols (full_indian_market_scan.py)
 nse>=3.0             # NSE/BSE bhavcopy EOD files
+pykrx>=1.0.0         # full_korea_market_scan.py: KOSPI/KOSDAQ universe + native KRX OHLC.
+                     # Was UNDECLARED and missing 2026-07-15 -> the Korea scan aborted with
+                     # "pip install pykrx" and silently produced no output for the day.
 finance-datareader>=0.9.0  # symbol_master.py's _korea_names() (KOSPI/KOSDAQ);
                      # PyPI package is `finance-datareader`, imported as `FinanceDataReader`
 akshare>=1.18        # symbol_master.py's _china_names() (SSE/SZSE A-shares)

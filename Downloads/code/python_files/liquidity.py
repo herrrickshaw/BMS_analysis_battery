@@ -152,6 +152,34 @@ def scan_fx() -> Dict[str, float]:
     return {k: v for k, v in fx.items() if v}
 
 
+_SCAN_FX: Dict[str, float] = {}
+
+
+def gate(df, ticker: str):
+    """Process-cached liquidity gate for the market scans.
+
+    (median daily turnover USD, tier); tier None => below the floor, skip the
+    symbol. FX is fetched once per process, not per symbol. Every failure path
+    yields "UNKNOWN" rather than None so a broken feed can never masquerade as
+    "nothing qualified today".
+
+    Usage in a scan's per-symbol loop:
+        tv, tier = liquidity.gate(df, yf_ticker)
+        if tier is None:
+            continue
+    """
+    global _SCAN_FX
+    if not _SCAN_FX:
+        try:
+            _SCAN_FX = scan_fx() or {"USD": 1.0}
+        except Exception:
+            _SCAN_FX = {"USD": 1.0}
+    try:
+        return scan_gate(df, ticker, _SCAN_FX)
+    except Exception:
+        return 0.0, "UNKNOWN"
+
+
 def _fx_rates(currencies) -> Dict[str, float]:
     """USD value of 1 unit-of-USD in each currency (live, with cache fallback)."""
     import yfinance as yf

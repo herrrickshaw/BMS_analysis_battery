@@ -477,7 +477,11 @@ def build():
     ccc_rows = _ccc_rows()
 
     # 3. Convergence (fundamentals + street agree)
-    convergence_html = _convergence_html("🇮🇳 India", ind_data) + _convergence_html("🇺🇸 US", us_data)
+    # split per market: each geography's block owns its own convergence, so
+    # "what about India?" is answerable in one place instead of six
+    conv_in = _convergence_html("🇮🇳 India", ind_data)
+    conv_us = _convergence_html("🇺🇸 US", us_data)
+    convergence_html = conv_in + conv_us          # kept for any external caller
 
     # 4. Share Market News Picks — India + US
     in_news_rows = _news_rows("IN")
@@ -538,50 +542,58 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 .trail td{{padding:4px 8px;border-bottom:1px solid #f0f0f0}}
 </style>
 <h1 style="font-size:21px;margin:0 0 2px">📈 Daily Market Brief — {today}</h1>
-<p style="color:#666;font-size:13px;margin:0 0 14px">India · US · Europe · Japan · Korea fundamentals + Darvas breakouts + convergence + news picks + global momentum + 5-year scoreboard + market correlation highlights · data as of last close</p>
+<p style="color:#666;font-size:13px;margin:0 0 14px">One block per market — screener, fundamentals, news and breakouts together · then global context · data as of last close</p>
+<p style="font-size:11px;color:#555;margin:0 0 14px;background:#f6f8fc;border-left:3px solid #1a73e8;padding:6px 9px">Every pick clears a liquidity floor (~₹1cr/day in India, ~$120k elsewhere) — untradable microcaps, ETFs and bonds are excluded. <b>Tier</b>: T1 mega ≥$12M/day · T2 large ≥$3M · T3 mid ≥$600k · T4 small ≥$120k.</p>
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px">🌍 Market Snapshot</h2>
 {snapshot_html}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇮🇳 India — Daily Screener (most tradable)</h2>
+
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇮🇳 India <span style="font-weight:400;color:#666;font-size:13px">— mood {mood['mood']} ({mood['score']:+.2f}) from {mood.get('n_articles',0)} articles</span></h2>
+<h3 style="font-size:13px;margin:12px 0 4px;color:#333">Screener — most tradable</h3>
 {_table(["Symbol","Tier","Screens","Turnover","Liquidity"], ind_picks_rows) if ind_picks_rows else "<p>no picks</p>"}
-<p style="font-size:11px;color:#666;margin:3px 0">Mood: <b style="color:#2e7d32">{mood['mood']} ({mood['score']:+.2f})</b> from {mood.get('n_articles',0)} articles. Liquidity: High ≥$5M/day · Medium $0.5–5M · Low &lt;$0.5M.</p>
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇺🇸 US — Daily Screener (most tradable)</h2>
-{_table(["Symbol","Tier","Screens","Turnover","Liquidity"], us_picks_rows) if us_picks_rows else "<p>no picks (run daily_combined_report.py --market US)</p>"}
-<p style="font-size:11px;color:#666;margin:3px 0">Mood: <b style="color:#2e7d32">{us_mood['mood']} ({us_mood['score']:+.2f})</b> from {us_mood.get('n_articles',0)} articles.</p>
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇪🇺 Europe — Fundamentals Picks</h2>
-{_table(["Symbol","Name","Tier","Screens","Piotroski"], eu_picks_rows) if eu_picks_rows else "<p>no European scan available today</p>"}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇯🇵 Japan — Fundamentals Picks</h2>
-{_table(["Code","Name","Tier","Screens","Piotroski"], jp_picks_rows) if jp_picks_rows else "<p>no Japan scan available today</p>"}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🇰🇷 Korea — Fundamentals Picks</h2>
-{_table(["Code","Name","Tier","Screens","Piotroski"], kr_picks_rows) if kr_picks_rows else "<p>no Korea scan available today</p>"}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">💵 India — Cash Conversion Cycle (screener.in 228040)</h2>
-<p style="font-size:12px;color:#555">Lowest/negative CCC = collects from customers before paying suppliers. Tradable (High/Medium) only.</p>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">Cash Conversion Cycle <span style="font-weight:400;color:#777">(screener.in 228040)</span></h3>
+<p style="font-size:11px;color:#666;margin:2px 0">Lowest/negative CCC = collects from customers before paying suppliers.</p>
 {_table(["Symbol","Name","CCC days","ROCE","Liquidity"], ccc_rows) if ccc_rows else "<p>n/a</p>"}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">⭐ Convergence — Fundamentals &amp; The Street Agree</h2>
-{convergence_html}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🔥 Share Market News Picks — India</h2>
-<p style="font-size:12px;color:#555">Stocks the street is talking about today (headline mentions + sentiment), independent of the screeners. News buzz, NOT a recommendation.</p>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">⭐ Convergence <span style="font-weight:400;color:#777">— fundamentals &amp; the street agree</span></h3>
+{conv_in}
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">🔥 News picks <span style="font-weight:400;color:#777">— buzz, NOT a recommendation</span></h3>
 {_table(["Symbol","Name","Sentiment","Mentions","Headline"], in_news_rows) if in_news_rows else "<p>n/a</p>"}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🔥 Share Market News Picks — US</h2>
-<p style="font-size:12px;color:#555">Stocks the street is talking about today (headline mentions + sentiment), independent of the screeners. News buzz, NOT a recommendation.</p>
-{_table(["Symbol","Name","Sentiment","Mentions","Headline"], us_news_rows) if us_news_rows else "<p>n/a</p>"}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🗞️ Talk on the Street — per-ticker sentiment (fundamental picks)</h2>
-<h3>🇮🇳 India</h3>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">🗞️ Talk on the Street <span style="font-weight:400;color:#777">— per-ticker sentiment</span></h3>
 {_table(["Symbol","Sentiment","Score","Articles"], in_talk_rows) if in_talk_rows else "<p style='color:#777'>No per-ticker news matches today.</p>"}
-<h3>🇺🇸 US</h3>
-{_table(["Symbol","Sentiment","Score","Articles"], us_talk_rows) if us_talk_rows else "<p style='color:#777'>No per-ticker news matches today.</p>"}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">📈 Darvas Breakouts</h2>
 {darvas_in}
+
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇺🇸 US <span style="font-weight:400;color:#666;font-size:13px">— mood {us_mood['mood']} ({us_mood['score']:+.2f}) from {us_mood.get('n_articles',0)} articles</span></h2>
+<h3 style="font-size:13px;margin:12px 0 4px;color:#333">Screener — most tradable</h3>
+{_table(["Symbol","Tier","Screens","Turnover","Liquidity"], us_picks_rows) if us_picks_rows else "<p>no picks (run daily_combined_report.py --market US)</p>"}
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">⭐ Convergence</h3>
+{conv_us}
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">🔥 News picks <span style="font-weight:400;color:#777">— buzz, NOT a recommendation</span></h3>
+{_table(["Symbol","Name","Sentiment","Mentions","Headline"], us_news_rows) if us_news_rows else "<p>n/a</p>"}
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">🗞️ Talk on the Street</h3>
+{_table(["Symbol","Sentiment","Score","Articles"], us_talk_rows) if us_talk_rows else "<p style='color:#777'>No per-ticker news matches today.</p>"}
 {darvas_us}
+
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇪🇺 Europe</h2>
+<h3 style="font-size:13px;margin:12px 0 4px;color:#333">Fundamentals picks</h3>
+{_table(["Symbol","Name","Tier","Screens","Piotroski"], eu_picks_rows) if eu_picks_rows else "<p>no European scan available today</p>"}
 {darvas_eu}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🌍 Global Momentum — Top 15 (20 markets)</h2>
+
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇯🇵 Japan</h2>
+<h3 style="font-size:13px;margin:12px 0 4px;color:#333">Fundamentals picks</h3>
+{_table(["Code","Name","Tier","Screens","Piotroski"], jp_picks_rows) if jp_picks_rows else "<p>no Japan scan available today</p>"}
+
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇰🇷 Korea</h2>
+<h3 style="font-size:13px;margin:12px 0 4px;color:#333">Fundamentals picks</h3>
+{_table(["Code","Name","Tier","Screens","Piotroski"], kr_picks_rows) if kr_picks_rows else "<p>no Korea scan available today</p>"}
+
+<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🌍 Global context</h2>
+<h3 style="font-size:13px;margin:12px 0 4px;color:#333">Momentum — top 15 across 20 markets</h3>
 {_table(["Mkt","Symbol","6mo %","RSI"], g_rows)}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🗺️ Other Markets — top tradable mover each</h2>
-<p style="font-size:12px;color:#555">Best liquid (≥$1M/day) 6-month performer per market.</p>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">Other markets — top tradable mover each <span style="font-weight:400;color:#777">(≥$1M/day)</span></h3>
 {_table(["Market","Symbol","6mo %","Liquidity"], other_rows) if other_rows else "<p>n/a</p>"}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🗓️ 20-Market 5-Year Scoreboard</h2>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">20-market 5-year scoreboard</h3>
 {_table(["Mkt","Index","5y CAGR%","1y %","Sharpe"], p_rows)}
-<h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:22px">🔗 Market Correlation Highlights</h2>
-<p style="font-size:12px;color:#555">Top correlated-stock clusters per market (market_correlation_scan.py), 1y returns, threshold-based clustering.</p>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">🔗 Correlation highlights</h3>
+<p style="font-size:11px;color:#666;margin:2px 0">Top correlated-stock clusters per market, 1y returns. Statistical (not causal) groupings; they break down in stressed markets.</p>
 {corr_html}
 <p style="font-size:11px;color:#bf360c;border-top:1px solid #eee;padding-top:10px;margin-top:18px">⚠️ Educational/research only. NOT investment advice. Screener/Darvas/Convergence results are mechanical filters, not buy/sell signals. Liquidity/CCC are estimates; index figures price-only, local currency. Correlation clusters are statistical (not causal) groupings and can break down in stressed markets. Past performance does not guarantee future returns. Consult a SEBI-registered investment advisor.</p>
 </div>"""

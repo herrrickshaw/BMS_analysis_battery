@@ -255,6 +255,17 @@ def main() -> int:
         for r in ex.map(roace_one, samp["Symbol"].tolist()):
             if r:
                 rows.append(r)
+    # An empty `rows` used to crash with KeyError: 'Symbol' — pd.DataFrame([]) has no
+    # columns, so the merge key does not exist. That made a HOST THROTTLE look like a
+    # code bug. yfinance returns empty frames rather than raising when it throttles, so
+    # this is the only signal there is: say what happened.
+    if not rows:
+        print("  ZERO tickers returned statements. yfinance is almost certainly")
+        print("  throttling — it returns EMPTY frames rather than raising. Verify with:")
+        print("      yf.Ticker('RELIANCE.NS').income_stmt   # empty => throttled")
+        print("  Back off and retry later; do not run this straight after a full scan")
+        print("  (four market scans make ~13,000 yfinance calls).")
+        return 1
     got = pd.DataFrame(rows).merge(samp, on="Symbol", how="left")
     print(f"  statements retrieved for {len(got)}/{len(samp)} "
           f"({len(got)/len(samp)*100:.0f}%)\n")

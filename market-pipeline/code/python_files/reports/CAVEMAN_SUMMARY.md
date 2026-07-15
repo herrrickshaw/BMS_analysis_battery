@@ -69,30 +69,42 @@ Market work. Where many eye look, no easy food. Where nobody look, food.
 
 ---
 
-## BUT — YOU CANNOT EAT MOST OF IT
+## HOW MUCH MONEY CAN USE THIS
 
-Quiet stock quiet because nobody trade. So YOU also cannot trade.
+Quiet stock quiet because few people trade. Typical quiet stock trade only
+**$160,000 in whole day**. That the problem.
 
-We measure cost. Real cost. Spread + price move when you push.
+You buy 10 stock. So each stock get 1/10 of your money.
 
-| your money | cost each year | how much of day volume you eat | you keep |
-|---|---|---|---|
-| $100,000 | 2% | 6% | **+11.3 GOOD** |
-| $1,000,000 | 10% | **61%** | +3.2 meh |
-| $10,000,000 | 91% | **607%** | **−78 DEAD** |
-| $50,000,000 | 452% | **3038%** | **−438 VERY DEAD** |
+| your money | each stock | cost/year | you buy this % of whole day trade | you keep | can do? |
+|---|---|---|---|---|---|
+| $1,000 | $100 | 1.10% | 0.06% | **+12.2%** | YES |
+| $10,000 | $1,000 | 1.18% | 0.61% | **+12.1%** | YES |
+| $50,000 | $5,000 | 1.54% | 3.0% | **+11.8%** | YES |
+| $100,000 | $10,000 | 1.99% | 6.1% | **+11.3%** | YES |
+| $250,000 | $25,000 | 3.34% | 15.2% | **+10.0%** | yes — but at edge |
+| $500,000 | $50,000 | 5.60% | **30%** | +7.7% | NO — cannot buy |
+| $1,000,000 | $100,000 | 10.1% | **61%** | +3.2% | NO — cannot buy |
+| $2,000,000 | $200,000 | 19.1% | **122%** | −5.8% | NO |
+| $10,000,000 | $1,000,000 | 91.2% | **608%** | −77.9% | NO |
 
-Look at "day volume" column. That column is real answer.
+**Two different wall. Money wall and buying wall. Buying wall come first.**
 
-At $10 million you must buy **607% of everything traded that day**. That not
-expensive. That **IMPOSSIBLE**. Stock not exist in that amount.
+Under **$250,000** — you keep +10% to +12%. Steady. Cost mostly spread (1.09%),
+and spread same no matter how small you are. So small money not punished.
 
-**So: small hunter eat. Big hunter starve.**
+Over **$250,000** — you must buy more than 15–20% of whole day trade. Cannot do.
+Price run away from you. Not "expensive" — **not possible**.
 
-And maybe that WHY food still there after 25 year! Big fund cannot take it.
-Too big. Cannot fit in small hole. Food stay for small hunter.
+At $10 million you need **608% of whole day**. Six times more than exist.
+Not a price problem. Stock not there.
 
-**You are small hunter. Good.**
+**Ceiling is about $250,000.** Not fee. Not tax. Just — not enough stock to buy.
+
+Fund with $10 million cannot do this. Ever. Maybe that why edge still here after
+25 year: too small for anyone big to remove.
+
+**If you have under $250,000 — this is for you. Over — this is not for you.**
 
 ---
 

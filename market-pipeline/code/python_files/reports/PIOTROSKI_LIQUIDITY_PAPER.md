@@ -132,21 +132,34 @@ Costs are estimated from data, not assumed: **Corwin–Schultz (2012)** recovers
 bid-ask spread from daily high/low bars (no quote data required); **Amihud ILLIQ** supplies
 price impact scaled by position size.
 
-| Portfolio | Cost/yr | Position as % of ADV | Net premium | |
-|---|---|---|---|---|
-| $100,000 | 1.99% | 6.1% | **+11.3%** | survives |
-| $1,000,000 | 10.10% | **60.8%** | +3.2% | marginal |
-| $10,000,000 | 91.23% | 607% | −77.9% | dead |
-| $50,000,000 | 451.81% | 3,038% | −438.5% | dead |
+The illiquid tier's median stock trades **$0.16M/day**, and its median spread is **1.09%**.
+A 10-position portfolio at each capital level, gross premium +13.3% (best vector):
 
-**The %-of-daily-volume column is the result.** At $10M, positions reach 607% of average
-daily volume: the model is not pricing a trade, it is reporting that the trade does not
-exist. Impact is charged linearly where real impact convexifies, so true capacity is below
-$1M — likely **$300–500k**.
+| Capital | Per position | Cost/yr | % of ADV | **Net premium** | Verdict |
+|---|---|---|---|---|---|
+| $1,000 | $100 | 1.10% | 0.06% | **+12.2%** | profitable |
+| $10,000 | $1,000 | 1.18% | 0.61% | **+12.1%** | profitable |
+| $50,000 | $5,000 | 1.54% | 3.04% | **+11.8%** | profitable |
+| $100,000 | $10,000 | 1.99% | 6.08% | **+11.3%** | profitable |
+| $250,000 | $25,000 | 3.34% | 15.19% | **+10.0%** | profitable — near ceiling |
+| $500,000 | $50,000 | 5.60% | **30.4%** | +7.7% | not executable |
+| $1,000,000 | $100,000 | 10.10% | **60.8%** | +3.2% | not executable |
+| $2,000,000 | $200,000 | 19.12% | **122%** | −5.8% | not executable |
+| $10,000,000 | $1,000,000 | 91.23% | **608%** | −77.9% | not executable |
 
-This is a **retail-scale premium, unreachable at institutional scale** — plausibly *why* it
-survives twenty-five years after publication. No fund can arbitrage an anomaly it cannot
-trade.
+**Two distinct ceilings, and the binding one is not cost.** Below ~$250k the premium is
+stable at +10% to +12%, because cost is dominated by the 1.09% spread, which does not scale
+with size. Above ~$250k the position exceeds ~15–20% of average daily volume — the practical
+limit for building a position in one day near the quoted price. Beyond that the model is not
+pricing a trade; it is reporting that the trade does not exist.
+
+**The capacity ceiling is therefore ≈ $250,000**, set by execution, not by fees. Impact is
+charged linearly where real impact convexifies, so this is an upper bound.
+
+This is a **retail-scale premium, unreachable at institutional scale**. A fund deploying $10M
+would need 608% of the median name's daily volume. That is a plausible reason the premium
+persists twenty-five years after publication: it cannot be arbitraged by anyone large enough
+to matter.
 
 ### 4.4 The F-score does not improve breakouts
 

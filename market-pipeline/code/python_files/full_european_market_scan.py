@@ -580,6 +580,25 @@ def main():
     triple_hits = []
 
     if not args.no_scans and breakout_symbols:
+        # Reuse quarterly fundamentals. Same rationale as India's scan and the US
+        # fix (63min -> 4s): Piotroski/CoffeeCan come from quarterly filings and
+        # don't move day to day. Europe's volume is modest (~190 breakouts), but
+        # it is the same rate-limit pressure that made the FX fetch fail on
+        # 2026-07-15 — which silently disabled THIS market's liquidity gate
+        # (all 191 rows Liquidity_Tier=UNKNOWN). Fewer avoidable .info calls
+        # protects the gate as much as the clock.
+        _eu_cached, _eu_src = {}, None
+        try:
+            import fundamentals_cache as _fc
+            _eu_cached, _eu_src = _fc.load("european_scan/european_market_scan*.xlsx",
+                                           key="Symbol")
+        except Exception as _e:
+            print(f"  fundamentals cache unavailable: {str(_e)[:50]}")
+        _eu_reuse = [s for s in breakout_symbols if s in _eu_cached]
+        breakout_symbols = [s for s in breakout_symbols if s not in _eu_cached]
+        if _eu_reuse:
+            print(f"  reusing {len(_eu_reuse)} fundamentals from {_eu_src}")
+
         print(f"\nStage 4 — Fetching financials & scans for {len(breakout_symbols)} breakouts ({MAX_WORKERS} workers) …")
         done = 0
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
@@ -631,6 +650,22 @@ def main():
                         print(f"    {done}/{len(breakout_symbols)} processed (Triple Hits so far: {len(triple_hits)})")
                 except Exception as e:
                     print(f"    ❌ Fundamental error on {sym}: {e}")
+
+        # Merge reused rows back — the loop only ran the FETCH list, so without
+        # this every reused stock vanishes from Fundamentals/Triple_Hits.
+        if _eu_reuse:
+            for s in _eu_reuse:
+                row = dict(_eu_cached[s])
+                cur = all_stocks_map.get(s)
+                if cur:                      # refresh everything price-derived
+                    for k in ("LTP", "Change%", "Darvas_Signal", "Box_Top", "Box_Bottom",
+                              "Upside_to_Top%", "200_Day_MA", "Distance_to_200MA%",
+                              "Trend_Signal", "Turnover_USD", "Liquidity_Tier"):
+                        if k in cur:
+                            row[k] = cur[k]
+                fund_rows.append(row)
+            print(f"  merged {len(_eu_reuse)} reused fundamentals "
+                  f"(prices refreshed from today's scan)")
     else:
         print("\nStage 4 — Skipped (No active breakouts or --no-scans set)")
 

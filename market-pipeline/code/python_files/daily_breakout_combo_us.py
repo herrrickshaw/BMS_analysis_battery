@@ -57,7 +57,14 @@ import duckdb
 import pandas as pd
 
 FUND = "/Users/umashankar/repos/global-stock-screener/cache_seed/fundamentals_history/US.parquet"
-PX = "/Users/umashankar/repos/global-market-data/cache_seed/ltm/US.parquet"
+# 🔴 WAS global-market-data/cache_seed/ltm/US.parquet — an INTERRUPTED collection.
+# It holds 5,358 symbols but is missing whole letter blocks (D-L, O, U-Z) and omits
+# S&P 500 names outright (CME, CMI absent; its most-covered symbols are all B's).
+# Every US result before 2026-07-15 18:00 ran on 597 tickers drawn only from
+# A,B,C,M,N,P,Q,R,S,T — a letter-biased subset, not a universe.
+# The complete panel is in global-stock-screener: 9,278 symbols, and overlap with EDGAR
+# fundamentals rises 2,281 (50%) -> 4,459 (97%).
+PX = "/Users/umashankar/repos/global-stock-screener/cache_seed/ltm/US.parquet"
 HOLD = 252
 BOX = 60
 COOLDOWN = 10

@@ -91,8 +91,29 @@ FAILURES=()
   echo "[13/14] Correlation scan — Korea"
   $PY market_correlation_scan.py --market KOREA --output-dir correlation_scan || { echo "  Korea correlation scan failed (continuing)"; FAILURES+=("Korea: correlation scan"); }
 
-  echo "[14/14] build + send mailer"
-  $PY send_mailer.py "$@" || { echo "  mailer build/send failed"; FAILURES+=("mailer: build/send"); }
+  # [13b] External validation — the gate between "built" and "sent".
+  #
+  # The screeners emit RECOMMENDATIONS. Checking the brief against our own scan
+  # only proves internal consistency; it cannot catch a scan that is confidently
+  # wrong about the world. On 2026-07-15 every internal check passed while the
+  # pipeline quoted MODISONLTD at 284.6/+3.6% from 2026-05-29 — SEVEN WEEKS stale —
+  # and shipped it as a GOLDEN_CROSS pick. The brief, the scan, the parquet and the
+  # warehouse all agreed with each other and were all wrong together. Only
+  # screener.in disagreed.
+  #
+  # So: if the picks don't match a public source, DON'T SEND — fall back to
+  # --draft, which still writes brief_today.html for a human to inspect. A missing
+  # brief is a visible problem; a confidently wrong one that lands in your inbox
+  # is not.
+  echo "[13b/14] validate brief against screener.in"
+  if $PY validate_brief.py --sample 6; then
+      echo "[14/14] build + send mailer"
+      $PY send_mailer.py "$@" || { echo "  mailer build/send failed"; FAILURES+=("mailer: build/send"); }
+  else
+      echo "  ❌ external validation FAILED — sending SUPPRESSED, saving draft instead"
+      FAILURES+=("mailer: NOT SENT — brief failed screener.in validation (see above)")
+      $PY send_mailer.py --draft || { echo "  draft save failed"; FAILURES+=("mailer: draft save"); }
+  fi
 
   if [[ ${#FAILURES[@]} -gt 0 ]]; then
     echo "[ALERT] ${#FAILURES[@]} step(s) failed: ${FAILURES[*]}"

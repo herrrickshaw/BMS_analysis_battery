@@ -216,7 +216,7 @@ def main() -> int:
 
     print("\n  === F-score edge BY LIQUIDITY — Piotroski claims the edge is in SMALL names ===")
     dl = d.merge(liq, on="Symbol", how="left")
-    dl = dl[dl.turnover.notna()]
+    dl = dl[dl.turnover.notna()].copy()
     if len(dl) > 200:
         dl["tier"] = pd.qcut(dl.turnover, 3, labels=["SMALL", "MID", "LARGE"])
         print(f"    {'tier':7s} {'n':>6s} {'F>=70 mean':>11s} {'F>=70 med':>10s} "
@@ -231,6 +231,41 @@ def main() -> int:
                       f"{lo.fwd_ret.median()*100:>8.1f}% {edge:>+8.1f}%")
         print("    (median edge = high-F median minus low-F median. Piotroski predicts")
         print("     this is POSITIVE and LARGEST in SMALL.)")
+
+    # ── rank WITHIN tier, not across ──────────────────────────────────────────
+    # THE POINT OF THIS RUN. The all-sample top-20 lost the universe in every vector,
+    # and the tier table above says why: the edge is +14.4% median in SMALL and -7.3%
+    # in LARGE, so a portfolio ranked across everything fills up with large caps —
+    # exactly where the screen is worth less than nothing. Ranking within a tier tests
+    # whether the screen works when pointed at the end of the market it claims.
+    #
+    # MEDIAN is the headline, not mean. Every finding this session flipped between the
+    # two and the median was right each time (LARGE F<40 posts a 117% mean against a
+    # 15.1% median — a handful of moonshots). A 10-stock median is also what an
+    # investor actually experiences; the mean is what one lottery ticket does to a
+    # spreadsheet.
+    print("\n  === RANK WITHIN TIER (top-10 per tier per year) — the actionable test ===")
+    TOP_T = 10
+    print(f"    {'tier':7s} {'vector':11s} {'port med':>9s} {'tier med':>9s} "
+          f"{'MED EDGE':>9s} {'port mean':>10s} {'beat tier':>10s}")
+    for t in ("SMALL", "MID", "LARGE"):
+        st = dl[dl.tier == t]
+        for p in PP.PRESETS:
+            per = []
+            for ts, g in st.groupby("t"):
+                g2 = g[g[p].notna()]
+                if len(g2) < TOP_T * 2:          # need a real pool to rank inside
+                    continue
+                top = g2.nlargest(TOP_T, p)
+                per.append((top.fwd_ret.median(), g2.fwd_ret.median(), top.fwd_ret.mean()))
+            if len(per) < 4:
+                continue
+            x = pd.DataFrame(per, columns=["pm", "um", "pmean"])
+            edge = (x.pm - x.um).mean() * 100
+            print(f"    {t:7s} {p:11s} {x.pm.mean()*100:>8.1f}% {x.um.mean()*100:>8.1f}% "
+                  f"{edge:>+8.1f}% {x.pmean.mean()*100:>9.1f}% "
+                  f"{int((x.pm > x.um).sum()):>4}/{len(x):<4}")
+        print()
     d.to_csv("reports/sweep_piotroski_plus_us.csv", index=False)
     print("\n  -> reports/sweep_piotroski_plus_us.csv")
     return 0

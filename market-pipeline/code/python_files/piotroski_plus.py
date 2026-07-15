@@ -74,6 +74,78 @@ ROCE_CV_HURDLE = 0.30        # sd/mean across ~5y
 F_MAX = 9
 PLUS_MAX = 3
 
+# ── weights ───────────────────────────────────────────────────────────────────
+# Every test is a 0/1 pass, and the weight decides what a pass is WORTH. Weight
+# vectors are how one scoring engine filters for different kinds of company:
+# the tests never change, only what you are willing to pay for.
+#
+# score() returns the raw booleans; weights are applied afterwards by weigh().
+# That separation is deliberate and load-bearing for backtesting — statements are
+# fetched and tested ONCE, then any number of weight vectors are swept over the
+# cached result. Folding weights into score() would mean a network round-trip per
+# vector and make a sweep impractical.
+#
+# TEST_NAMES is the canonical order. Anything reading these dicts should key by
+# name, never by position.
+TEST_NAMES = (
+    "1_roa_positive", "2_cfo_positive", "3_roa_improving", "4_accruals_cfo_gt_roa",
+    "5_leverage_falling", "6_current_ratio_rising", "7_no_dilution",
+    "8_gross_margin_rising", "9_asset_turnover_rising",
+    "10_roce_level", "11_roce_stable", "12_roce_not_deteriorating",
+)
+
+PIOTROSKI_TESTS = TEST_NAMES[:9]
+ROCE_TESTS = TEST_NAMES[9:]
+
+# Presets are hypotheses about what matters, not settings. Each is justified by
+# what it would have picked or rejected on this repo's own India sample.
+PRESETS: dict[str, dict[str, float]] = {
+    # Canonical: reproduces Piotroski 9 + ROCE 3 exactly. The control.
+    "canonical": {n: 1.0 for n in TEST_NAMES},
+
+    # QUALITY — durable compounders. Pays for earning well on capital and, more,
+    # for earning it CONSISTENTLY.
+    #
+    # WHY STABILITY OUTWEIGHS LEVEL (2.0 vs 3.5), which looks backwards:
+    # A LINEAR WEIGHTED SUM CANNOT EXPRESS "NEEDS BOTH" — that is a conjunction,
+    # and no choice of weights turns a sum into an AND. Measured, not assumed:
+    # with level and stability both at 3.0, SUZLON (ROCE 32.1%, CV 0.87) and NTPC
+    # (ROCE 9.9%, CV 0.04) TIED at 57.7 — each banked one 3.0 and the vector could
+    # not tell "a return you cannot rely on" from "a return capped by regulation".
+    # Both scored F=7.0, so Piotroski could not either.
+    # Tilting toward stability breaks the tie in the direction that reflects what
+    # the level/stability split is FOR: a repeatable 10% is evidence of management
+    # skill, an erratic 32% is usually evidence of a cycle. Callers who genuinely
+    # need the conjunction should filter on the raw booleans
+    # (10_roce_level AND 11_roce_stable), not hunt for magic weights.
+    "quality": {**{n: 0.5 for n in PIOTROSKI_TESTS},
+                "1_roa_positive": 1.0, "2_cfo_positive": 1.0,
+                "10_roce_level": 2.0, "11_roce_stable": 3.5,
+                "12_roce_not_deteriorating": 1.5},
+
+    # TURNAROUND — improving off a weak base. Pays for the deltas and for cash
+    # quality; explicitly does NOT require a high ROCE level, because demanding
+    # one defines the whole category out of existence. Keeps stability at zero:
+    # a turnaround is BY DEFINITION unstable, so penalising CV here would be
+    # incoherent. This is the vector that would surface TATASTEEL/BHEL — which
+    # "quality" correctly rejects. Neither vector is wrong; they hunt different game.
+    "turnaround": {**{n: 0.5 for n in TEST_NAMES},
+                   "3_roa_improving": 3.0, "4_accruals_cfo_gt_roa": 2.0,
+                   "2_cfo_positive": 2.0, "9_asset_turnover_rising": 2.0,
+                   "8_gross_margin_rising": 2.0,
+                   "10_roce_level": 0.0, "11_roce_stable": 0.0,
+                   "12_roce_not_deteriorating": 2.0},
+
+    # SAFETY — balance-sheet defence. Pays for falling leverage, rising current
+    # ratio, no dilution, positive cash, and a ROCE that does not swing. Note this
+    # is the one preset where a LOW absolute return is acceptable: a regulated
+    # utility (NTPC, CV 0.04) is exactly what this vector should find.
+    "safety": {**{n: 0.5 for n in TEST_NAMES},
+               "5_leverage_falling": 3.0, "6_current_ratio_rising": 2.0,
+               "7_no_dilution": 2.0, "2_cfo_positive": 2.0,
+               "11_roce_stable": 3.0, "10_roce_level": 0.5},
+}
+
 
 def _series(df, *names):
     """All years for the first matching statement line, newest first."""
@@ -201,6 +273,80 @@ def score(ticker) -> dict:
             "total": (f + p) if ftest and ptest else None,
             "roce": roce, "roce_ex_cash": roce_ex, "roce_cv": cv,
             "years": len(hist), **detail}
+
+
+def _ran(v) -> bool:
+    """Did this test actually run?
+
+    NOT simply `v is not None`. A scored result round-tripped through CSV/parquet
+    (which is exactly what a backtest sweep does) comes back with skipped tests as
+    float NaN, and NaN fails an `is None` check while being TRUTHY. That silently
+    counted every skipped test as a PASS — it broke the canonical control on 33 of
+    118 stocks before this guard existed. Strings are the same trap from CSV:
+    bool("False") is True.
+    """
+    if v is None:
+        return False
+    if isinstance(v, float) and v != v:      # NaN
+        return False
+    if isinstance(v, str):
+        return v.strip().lower() in ("true", "false", "1", "0")
+    return True
+
+
+def _passed(v) -> bool:
+    if isinstance(v, str):
+        return v.strip().lower() in ("true", "1")
+    return bool(v)
+
+
+def weigh(r: dict, weights: dict[str, float] | str = "canonical") -> dict:
+    """Apply a weight vector to an ALREADY-SCORED result. No network, no refetch.
+
+    Pass a preset name or a {test_name: weight} dict. Unlisted tests weigh 0.
+
+    NORMALISATION — the part that is easy to get wrong. Tests whose inputs were
+    missing are skipped (None), not failed. If we divided the earned weight by the
+    FULL vector's weight, every company missing a gross-margin line would score
+    low for a data gap rather than a business fact — and that gap is not random:
+    RELIANCE has no Gross Profit line, so a naive denominator would systematically
+    mark down exactly the large caps. So the denominator is the weight of the tests
+    that ACTUALLY RAN, making `pct` comparable across companies with different
+    coverage.
+
+    Returns:
+      raw        earned weight
+      possible   weight of tests that ran (the honest denominator)
+      pct        raw/possible, 0-100 — THE comparable figure
+      coverage   possible/total_vector_weight — how much of the vector was testable.
+                 Low coverage means a high pct is thin, so it is reported, never
+                 folded into pct. Filter on it explicitly.
+    """
+    if isinstance(weights, str):
+        if weights not in PRESETS:
+            raise KeyError(f"unknown preset {weights!r}; have {sorted(PRESETS)}")
+        weights = PRESETS[weights]
+    if not r:
+        return {"raw": None, "possible": None, "pct": None, "coverage": None}
+
+    raw = possible = 0.0
+    for name, w in weights.items():
+        v = r.get(name)
+        if not _ran(v):          # test did not run — excluded from BOTH sides
+            continue
+        possible += w
+        if _passed(v):
+            raw += w
+    total = sum(weights.values()) or 1.0
+    if possible <= 0:
+        return {"raw": 0.0, "possible": 0.0, "pct": None, "coverage": 0.0}
+    return {"raw": raw, "possible": possible,
+            "pct": raw / possible * 100, "coverage": possible / total}
+
+
+def sweep(r: dict, presets=None) -> dict[str, float]:
+    """pct under every preset, for one scored company. Cheap: pure arithmetic."""
+    return {p: weigh(r, p)["pct"] for p in (presets or PRESETS)}
 
 
 def verdict(r: dict) -> str:

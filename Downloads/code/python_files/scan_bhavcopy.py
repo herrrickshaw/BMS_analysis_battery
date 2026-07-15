@@ -32,11 +32,49 @@ from stock_utils import parallel_map, pct_change
 OUT_DIR = Path("indian_full_scan"); OUT_DIR.mkdir(exist_ok=True)
 
 
+# ── liquidity gate + tiers ────────────────────────────────────────────────────
+# WHY: without a liquidity floor the screener recommends stocks you cannot buy.
+# On 2026-07-15, 5 of 13 golden-cross picks were untradeable — AUSTENG led the
+# brief on a +16% move while turning over Rs 2.1 LAKH/day, and GKCONS turned over
+# Rs 18,658/day. At that size a handful of trades sets the price, so the "signal"
+# is noise. A Rs 1 crore/day floor also removes, without any instrument-type rule:
+# corporate debt (875NHAI29 Rs 2.7L/day, 1018GS2026 Rs 10.8K), liquid-fund ETFs
+# (LIQUIDSBI Rs 35L), and REIT/InvITs (EMBASSY Rs 55L, INDIGRID Rs 51L).
+#
+# Turnover is derived as Close x Volume rather than read from the bhavcopy's
+# TtlTrfVal, so no schema change is needed. Validated against TtlTrfVal: 0.19%
+# error on RELIANCE, 0.80% on 360ONE, 1.05% on DATAMATICS, and at the Rs 1cr gate
+# the two disagree on just 1 of 7,838 symbols (1,344 vs 1,345 pass).
+#
+# Median (not mean) so a single block deal can't lift a dead stock over the bar.
+LIQ_FLOOR = 10_000_000               # Rs 1 crore/day median turnover -> 1,344 of 7,838
+LIQ_TIERS = ((1_000_000_000, "T1_MEGA"),    # >= Rs 100 cr/day   (61 symbols)
+             (250_000_000,   "T2_LARGE"),   #    Rs 25-100 cr    (212)
+             (50_000_000,    "T3_MID"),     #    Rs 5-25 cr      (405)
+             (0,             "T4_SMALL"))   #    Rs 1-5 cr       (666)
+
+
+def _liquidity(df):
+    """(median daily turnover in Rs, tier) — tier is None when below the floor."""
+    if df is None or "Volume" not in df.columns or "Close" not in df.columns:
+        return 0.0, None
+    tv = (df["Close"] * df["Volume"]).median()
+    if tv is None or not (tv >= LIQ_FLOOR):
+        return float(tv or 0), None
+    for lo, name in LIQ_TIERS:
+        if tv >= lo:
+            return float(tv), name
+    return float(tv), "T4_SMALL"
+
+
 def _screen_one(item):
     """Run the price screeners on one symbol's bhavcopy OHLCV frame."""
     sym, df = item
     if df is None or len(df) < 60:
         return None
+    turnover, tier = _liquidity(df)
+    if tier is None:
+        return None                  # below the liquidity floor — not tradeable
     d = compute_darvas_box(df)
     gc = compute_golden_crossover(df)
     ltp = float(df["Close"].iloc[-1])
@@ -53,6 +91,8 @@ def _screen_one(item):
         "Position_in_Box%": d.get("position_in_box_pct"),
         "GC_Signal": "GOLDEN_CROSS" if gc.get("gc_signal") else "",
         "DMA50_above_200": gc.get("dma50_above_200"),
+        "Median_Turnover": round(turnover),
+        "Liquidity_Tier": tier,
         "Data_Points": len(df),
     }
 

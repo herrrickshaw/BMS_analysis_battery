@@ -59,7 +59,43 @@ import pandas as pd
 
 PARQUET = "/Users/umashankar/repos/global-market-data/cache_seed/ltm/IN.parquet"
 PER_TIER = int(sys.argv[1]) if len(sys.argv) > 1 else 45
-WORKERS = 6          # modest: yfinance rate-limits, and this is a sample not a sweep
+WORKERS = 3          # yfinance throttles; 6 workers straight after 4 market scans
+                     # (~13,000 calls) returned ZERO statements for every ticker.
+# yfinance does NOT raise when throttled — it returns EMPTY frames, so a throttle is
+# indistinguishable from "this company has no data" unless you probe a name you KNOW has
+# statements. RELIANCE.NS is the canary: if its income_stmt is empty, we are throttled.
+BACKOFF_SECS = 180   # 3 minutes between attempts
+MAX_ATTEMPTS = 5     # ~15 min of patience before giving up
+
+
+def _throttled() -> bool:
+    """True when yfinance is refusing us. Probes a ticker guaranteed to have data."""
+    import yfinance as yf
+    try:
+        i = yf.Ticker("RELIANCE.NS").income_stmt
+        return i is None or i.empty
+    except Exception:
+        return True
+
+
+def wait_for_yfinance() -> bool:
+    """Back off until yfinance answers again. Returns False if it never does.
+
+    Waiting beats hammering: every failed call while throttled extends the block. This
+    is the same lesson screener.in taught three times today — a restart is not a retry.
+    """
+    import time
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        if not _throttled():
+            if attempt > 1:
+                print(f"  yfinance responding again (attempt {attempt})")
+            return True
+        if attempt == MAX_ATTEMPTS:
+            break
+        print(f"  throttled — waiting {BACKOFF_SECS}s "
+              f"(attempt {attempt}/{MAX_ATTEMPTS}, ~{BACKOFF_SECS*(MAX_ATTEMPTS-attempt)//60} min left)")
+        time.sleep(BACKOFF_SECS)
+    return False
 
 
 def tiers() -> pd.DataFrame:
@@ -243,6 +279,10 @@ def _piotroski(t, inc, bal, ta_s, cl_s, yrs) -> dict:
 def main() -> int:
     print(f"\n{'='*72}\n  ROACE by LIQUIDITY tier — India | sample {PER_TIER}/tier\n{'='*72}")
     print("  Educational/research only. NOT investment advice.\n")
+    if not wait_for_yfinance():
+        print("  yfinance still throttled after "
+              f"{MAX_ATTEMPTS} attempts / {MAX_ATTEMPTS*BACKOFF_SECS//60} min. Try later.")
+        return 1
     t = tiers()
     samp = (t.sort_values("turnover", ascending=False)
              .groupby("tier", group_keys=False)

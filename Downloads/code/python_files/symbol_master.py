@@ -44,7 +44,14 @@ import pandas as pd
 
 warnings.filterwarnings("ignore")
 
-MASTER = Path.home() / "Downloads" / "market_cache" / "symbol_master.parquet"
+# MARKET_CACHE mirrors the existing BHAV_CACHE idiom so the whole tree can live
+# outside ~/Downloads. That matters for more than tidiness: macOS TCC denies
+# launchd ALL access to ~/Downloads, so anything rooted there is unreadable to the
+# scheduled 00:30 run unless /bin/bash is granted Full Disk Access. Keeping the
+# default pointed at the old location means nothing breaks for interactive use.
+import os as _os
+MASTER = Path(_os.environ.get(
+    "MARKET_CACHE", Path.home() / "Downloads" / "market_cache")) / "symbol_master.parquet"
 MASTER.parent.mkdir(parents=True, exist_ok=True)
 STALE_HOURS = 24
 

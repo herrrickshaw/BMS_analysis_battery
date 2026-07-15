@@ -614,7 +614,7 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 <h1 style="font-size:21px;margin:0 0 2px">📈 Daily Market Brief — {today}</h1>
 <p style="color:#666;font-size:13px;margin:0 0 10px">One block per market — screener, fundamentals, news and breakouts together · then global context</p>
 {as_of_html}
-<p style="font-size:11px;color:#555;margin:0 0 14px;background:#f6f8fc;border-left:3px solid #1a73e8;padding:6px 9px">Every pick clears a liquidity floor (~₹1cr/day in India, ~$120k elsewhere) — untradable microcaps, ETFs and bonds are excluded. <b>Tier</b>: T1 mega ≥$12M/day · T2 large ≥$3M · T3 mid ≥$600k · T4 small ≥$120k.</p>
+<p style="font-size:11px;color:#555;margin:0 0 14px;background:#f6f8fc;border-left:3px solid #1a73e8;padding:6px 9px"><b>Liquidity floor</b>: India ~₹1cr/day (an explicit policy choice); other markets ~$10k/day (a structural floor — below it a listing is not transacted anywhere). The old single ~$120k bar was India's rupee gate applied everywhere: measured, it cut at India's 47th percentile but Korea's 23rd — one constant, four different filters. <b>Tier</b> is now a PERCENTILE within each market's own tradeable universe (~20% per tier), so "illiquid" means the same thing in Mumbai and New York. Bonds, G-secs and T-bills are excluded structurally, not by value — a bond trading 90 units/day at ₹1 lakh face clears a value gate.</p>
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px">🌍 Market Snapshot</h2>
 {snapshot_html}
 

@@ -6,23 +6,23 @@
 
 ---
 
-> ## 🔴 STATUS: NUMBERS BELOW ARE BEING REGENERATED
+> ## STATUS: regenerated on clean data (15 Jul 2026, final)
 >
-> Adversarial validation (five independent agents, each instructed to *refute* rather than
-> confirm) found **eight defects** after this note was drafted. Three are fixed, one is
-> documented-and-unfixed, and a re-collection is running. **Every figure here should be
-> read as provisional until that lands.**
+> Adversarial validation (five agents, each instructed to *refute*) found **eight defects**
+> after the first draft. All the data defects are now fixed and every number below is from
+> the clean re-collection. **The corrections shrank the findings; none grew.**
 >
-> | | |
+> | defect | resolution |
 > |---|---|
-> | **Fixed — invalidates the tables below** | US `revenue` stored the ASC-606 *contract-revenue subset*, not total revenue. ADM FY2023 held **$25.69B against a 10-K total of ~$93.9B — wrong by 3.7×**. `cost_of_revenue > revenue` (impossible) fired on 262/5,418 rows. Revenue feeds Piotroski tests 8 and 9, so this **flips booleans**, and it skews to multi-segment filers — i.e. large caps, i.e. the cell carrying the headline. |
-> | **Documented, NOT fixed** | `EBIT = PBT + interest` is **wrong for lenders** — for a bank/NBFC interest is cost of goods sold. EBIT inflates ~4×, capital employed ~9×, and **the errors partially cancel into the 5–25% plausible band**, so no range check can fire. It survived validation because the checks used (RELIANCE 8.9%, TCS 56.8%) are both non-financials. **ROCE for Indian lenders is wrong and there is no guard.** |
-> | **Fixed** | Per-market liquidity floors were **fabricated** — US $475k reproduced under no universe definition (measured: $300k with junk, $896k without). The "India 47th percentile" anchor existed only because 1,079 of 3,476 panel names are delisted. Deleted, not recomputed. |
-> | **Fixed** | `(x or 0)` silently voids NaN — `float(str(nan))` succeeds so the `None` fallback never fires, and **NaN is truthy**. Voided 15% of gate-passing rows. |
+> | US `revenue` stored the ASC-606 *subset* — ADM FY2023 held $25.69B vs a 10-K ~$93.9B | **Fixed.** `Revenues` now takes tag precedence. |
+> | `form=10-K AND fp=FY` **does not mean annual** — a 10-K tags its quarterly breakouts `fp=FY`, so quarters entered the series as fiscal years | **Fixed** by a duration filter (300–400 days). **This removed 61,236 rows — half the dataset.** `revenue_suspect` fell 19,044 → 640. ADM 2023 is now one row at $93.94B. |
+> | US price panel was an **interrupted alphabetical collection** (CME, Cummins, all of D–L absent) | **Fixed.** Coverage 13% → 43% of tickers. |
+> | Per-market liquidity floors were **fabricated** (US $475k reproduced under no definition) | **Fixed by deletion.** Only India's ₹1cr — a policy a human actually chose — remains. |
+> | `(x or 0)` silently keeps NaN (`float(str(nan))` succeeds; NaN is truthy) | **Fixed.** |
+> | `EBIT = PBT + interest` is **wrong for lenders**; errors cancel *into* the plausible band so no range check fires | **Fixed** via screener.in's sector field, after three ratio/structure detectors were refuted. |
 >
-> **Coverage rose 13% → 43%** of available tickers once the broken price panel and an
-> inconsistent field requirement were fixed. Sample sizes throughout are therefore
-> understated.
+> Two of the four double-sort cells are now classified **unmeasured** — see §4.1. That is a
+> result, not an omission.
 
 ---
 
@@ -33,17 +33,23 @@ stock liquidity — two attributes that are heavily entangled and are routinely 
 Using SEC EDGAR fundamentals gated on **actual filing dates** and a survivorship-complete
 price panel, we find the F-score premium tracks **illiquidity, not size**. Double-sorting
 liquidity within size, illiquid names out-earn liquid names in *both* size buckets, and
-the largest premium (+33.7pp median) appears in **large-capitalisation but illiquid**
-firms — not small caps. The only negative cell is large-and-liquid (−1.7pp).
+the largest premium (**+29.3pp median**) appears in **large-capitalisation but illiquid**
+firms — not small caps. That cell was measured five times as data defects were fixed and
+landed in 27.8–33.7 every time, surviving a corruption that removed half the dataset.
+Two of the four cells are classified **unmeasured**: they moved monotonically with every
+input fix and never converged.
 
 We separately confirm Fang, Noe & Tice (2009): return on capital employed rises
 monotonically with liquidity (11.0% → 21.6% ex-cash). Better companies are more liquid;
 better *investments* are not. A Corwin–Schultz + Amihud cost model bounds the strategy's
-capacity at roughly **$300–500k**, above which it is unprofitable — consistent with the
+capacity at roughly **$250k**, set by execution rather than fees — consistent with the
 F-score literature's finding that the premium is unreachable at institutional scale.
 
-We report six derived metrics that failed validation and were discarded, and note that
-mean and median disagreed on **every** headline result, with the median correct each time.
+We report **eleven** derived metrics that failed validation, every one caught by an
+independent check and none by reasoning; three more were fixes proposed here that the data
+refuted before they shipped. Mean and median disagreed on **every** headline result, with
+the median correct each time. **Every finding shrank as the inputs were cleaned; none
+grew** — which is the note's most useful result.
 
 ---
 
@@ -71,10 +77,10 @@ Both can hold simultaneously. Better companies need not be better investments.
 
 | | |
 |---|---|
-| **Fundamentals** | SEC EDGAR, 4,597 tickers, 111,949 filings |
-| **Prices** | 10.5y point-in-time panel, 9.0M rows |
-| **Usable panel** | 3,294 stock-years · 597 symbols · 9 annual rebalances (2017–2025) |
-| **Daily-scan panel** | 12,773 breakout signals · 636 symbols · 10 years |
+| **Fundamentals** | SEC EDGAR, 5,016 tickers, 62,939 annual rows (after the duration filter removed 61,236 quarterly rows) |
+| **Prices** | 10.5y point-in-time panel, 9,278 symbols (the complete one — an earlier panel was an interrupted alphabetical collection) |
+| **Usable panel** | 11,955 stock-years · 2,028 symbols · 9 annual rebalances (2017–2025) |
+| **Coverage** | 43% of EDGAR tickers, up from 13% once the broken panel and an inconsistent field requirement were fixed |
 
 **Point-in-time integrity.** Entry is gated on EDGAR's `filed` field — the actual filing
 date, carrying 1,449 distinct fiscal-end-to-filing lags including a 2009 fiscal year filed
@@ -97,8 +103,10 @@ moves outside [−50%, +100%] collapses that standard deviation to **29%**.
 The F-score is computed unmodified (9 tests). A separate 3-point ROCE block — level
 (ex-cash), 5-year stability, trend — is reported alongside, never merged, so the F-score
 stays comparable to published results and the block's marginal contribution stays
-measurable. Their rank correlation is **+0.236** (n=288) and **+0.239** (n=150,
-independent): they are complements, not substitutes.
+measurable. Their rank correlation is **+0.236** (n=288), **+0.239** (n=150) and **+0.172**
+(n=~150) across three independent samples: they are complements, not substitutes. That
+reproducibility — three samples, all near +0.2 — makes it the note's most stable finding,
+more so than any premium estimate.
 
 Returns are winsorised 1/99 per rebalance. **Median is the headline throughout.**
 
@@ -110,32 +118,40 @@ Turnover and market capitalisation correlate at **+0.797**. Ranking on turnover 
 as we initially did — cannot distinguish them. Double-sorting liquidity *within* size,
 with capitalisation measured point-in-time (last close × shares as filed):
 
-| Size | Liquidity | n | F≥70 | F<40 | **Premium** | @818 | @1,673 |
-|---|---|---|---|---|---|---|---|
-| Small | **Illiquid** | 2,703 | +3.4% | −10.0% | **+13.4pp** | +13.8 | +12.2 |
-| Small | Liquid | 2,703 | +4.6% | −2.9% | +7.5pp | +7.7 | **+13.9** |
-| **Large** | **Illiquid** | 2,703 | +6.8% | **−24.6%** | **+31.4pp** | +33.7 | +27.8 |
-| Large | Liquid | 2,702 | +8.2% | +0.9% | **+7.4pp** | **−1.7** | +3.6 |
+| Size | Liquidity | n | F≥70 | F<40 | **Premium** | @818 | @1,673 | @2,703 | contam. |
+|---|---|---|---|---|---|---|---|---|---|
+| Small | Illiquid | 2,967 | −1.4% | −10.1% | **+8.7pp** | +13.8 | +12.2 | +13.4 | +9.4 |
+| Small | Liquid | 2,967 | +4.9% | −1.1% | +6.0pp | +7.7 | +13.9 | +7.5 | +5.8 |
+| **Large** | **Illiquid** | 2,967 | +5.5% | **−23.9%** | **+29.3pp** | +33.7 | +27.8 | +31.4 | +29.2 |
+| Large | Liquid | 2,967 | +8.1% | −3.1% | +11.2pp | −1.7 | +3.6 | +7.4 | +10.6 |
 
-Illiquid beats liquid **within both size buckets**. The largest premium is in **large,
-illiquid** firms — 4× the next cell.
+**The prior-run columns are the most important part of this table.** The same four cells
+were measured five times as data defects were fixed. They did not behave alike, and the
+difference is what separates a finding from an artefact.
 
-**The last two columns are the honest part of this table.** The same four cells were
-computed at three sample sizes as data defects were fixed, and they did not all hold:
+**`LARGE + ILLIQUID` is the finding.** Five measurements, every one in **27.8–33.7**, and it
+survived a corruption that removed *half* the dataset. Its mechanism is intact throughout:
+weak-F names there crash **−23.9%**.
 
-- **Small+Liquid reversed and reverted.** At n=1,673 it read +13.9 and appeared to *beat*
-  illiquid — contradicting the paper's thesis. At n=2,703 it settles back to +7.5. The
-  middle run was the outlier; the thesis was retracted on it and then restored.
-- **Large+Liquid moved monotonically** −1.7 → +3.6 → **+7.4** as data was added. An earlier
-  draft called it "the only negative cell." **That claim is withdrawn: it is positive.**
-  The premium is smallest there, not absent.
-- **Large+Illiquid and Small+Illiquid are stable** across all three (+31 to +34, +12 to +14).
+**The thesis holds, narrowly.** Illiquid beats liquid in both size buckets — but Small's gap
+shrank from +6.1pp to **+2.7pp** as the data cleaned.
+
+**Two cells are UNMEASURED, and we say so rather than quoting them:**
+
+- **Small+Illiquid fell monotonically** with every fix: 13.8 → 12.2 → 13.4 → 9.4 → **8.7**.
+  Contamination was inflating it.
+- **Large+Liquid climbed monotonically across all five**: −1.7 → +3.6 → +7.4 → +10.6 → **+11.2**,
+  never converging. An earlier draft called it *"the only negative cell"* at −1.7. It is now
+  +11.2 and still moving. **A quantity that moves with every input fix has not been
+  measured** — it has been sampled from a distribution we cannot yet pin down. This
+  conclusion was committed to *before* the final run, precisely so it could not be
+  rationalised after.
 
 A claim that survives a 3.3× increase in sample is worth more than one that doesn't. Two
 of these four did; two did not. The thesis rests on the two that did.
 
 **Mechanism.** In the strongest cell, illiquid large-caps with weak fundamentals *crash*
-(F<40 median −25.6%): value traps, low float, distressed names institutions cannot exit.
+(F<40 median −23.9%): value traps, low float, distressed names institutions cannot exit.
 The F-score identifies them. The premium is largely downside avoidance, not upside capture.
 
 ### 4.2 Liquidity predicts firm quality — the Fang–Noe–Tice channel

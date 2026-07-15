@@ -35,3 +35,60 @@ uploads/
 .aws/
 *.pem
 stock-extractor.pem
+
+# launchd agents hold real credentials in EnvironmentVariables (Gmail app
+# password for the daily brief). The installed copy stays machine-local; the
+# tracked template in Downloads/code/python_files ships a placeholder only.
+/Library/
+
+# Claude Code session transcripts — these capture raw tool output verbatim,
+# so any credential ever echoed during a session is recorded here in cleartext.
+/.claude/
+
+# ── Regenerated market-data caches: MUST NOT reach LFS ────────────────────────
+# Everything below matches an LFS rule in .gitattributes (*.parquet, *.xlsx,
+# **/data/**/*.csv) *and* is rewritten on every pipeline run. Parquet/DuckDB/xlsx
+# are binary, so git stores no delta — each run would add a brand-new permanent
+# LFS blob (~120 MB/day, unreclaimable once pushed).
+#
+# Durable copies live in Postgres: market_data DB, `bhavcopy` schema (9.5M rows).
+# The local DuckDB + this cache rebuild from it via scripts/bhavcopy_to_db.py.
+# Verified 2026-07-15: nse/bse.parquet reproduce the raw day-CSVs losslessly
+# (34/34 cols, 269/269 dates), so nothing unique is lost by ignoring the cache.
+/Downloads/data/bhavcopy_cache/
+/data/bhavcopy.duckdb
+
+# Per-run scan + correlation outputs (timestamped snapshots, regenerated daily).
+/Downloads/data/*_correlation_scan/
+/Downloads/data/*_scan/
+/Downloads/code/python_files/correlation_scan/
+/Downloads/code/python_files/*_scan/
+/Downloads/code/python_files/*_full_scan/
+/Downloads/code/python_files/.venv/
+/Downloads/code/python_files/combined_report_results/
+/Downloads/code/python_files/brief_today.html
+/Downloads/market_cache/ohlc/
+
+# Audit manifests from scripts/build_audit_manifest.py (dated, regenerable).
+/data/audit/
+
+# ── ~/market-pipeline: the pipeline's new home (moved out of ~/Downloads, which
+# macOS TCC makes unreadable to launchd). Track the CODE, never the data.
+# Same reasoning as the Downloads rules above: these paths match *.parquet /
+# **/data/**/*.csv / *.xlsx in .gitattributes AND are rewritten every run, so a
+# single `git add -A` would push ~3 GB of regenerated blobs into LFS forever.
+# Durable copies live in Postgres (market_data); the cache rebuilds from it.
+/market-pipeline/data/
+/market-pipeline/market_cache/
+/market-pipeline/code/python_files/.venv/
+/market-pipeline/code/python_files/*_scan/
+/market-pipeline/code/python_files/*_full_scan/
+/market-pipeline/code/python_files/correlation_scan/
+/market-pipeline/code/python_files/combined_report_results/
+/market-pipeline/code/python_files/sentiment_results/
+/market-pipeline/code/python_files/*.log
+/market-pipeline/code/python_files/brief_today.html
+
+# MemPalace per-project files (issue #185)
+mempalace.yaml
+entities.json

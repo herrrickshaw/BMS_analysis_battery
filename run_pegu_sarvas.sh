@@ -79,14 +79,21 @@ if [[ $? -ne 0 ]]; then
   exit 1
 fi
 
-# Check output
-if [[ ! -f "$DATA_DIR/all_stocks_combined.csv" ]]; then
-  # Accept per-exchange files as fallback
-  if [[ ! -f "$DATA_DIR/nse_stocks_fundamental.csv" && \
-        ! -f "$DATA_DIR/bse_stocks_fundamental.csv" ]]; then
-    echo "[ERROR] No CSV data files found in $DATA_DIR/"
-    exit 1
-  fi
+# Check output (data now lives in data/market_data.duckdb, not loose CSVs)
+HAS_DATA=$(python3 -c "
+import duckdb, os
+path = os.path.join('$DATA_DIR', 'market_data.duckdb')
+if not os.path.exists(path):
+    print('no')
+else:
+    con = duckdb.connect(path, read_only=True)
+    tables = {t[0] for t in con.execute('SHOW TABLES').fetchall()}
+    con.close()
+    print('yes' if tables & {'all_stocks_combined', 'nse_stocks_fundamental', 'bse_stocks_fundamental'} else 'no')
+")
+if [[ "$HAS_DATA" != "yes" ]]; then
+  echo "[ERROR] No data tables found in $DATA_DIR/market_data.duckdb"
+  exit 1
 fi
 echo "[1/2] Data extraction complete."
 echo ""
@@ -96,7 +103,7 @@ echo "[2/2] Running Pegu scoring & Sarvas scan in R..."
 
 # Check R packages
 Rscript - <<'RCHECK'
-pkgs <- c("dplyr", "ggplot2", "tidyr", "readr", "scales")
+pkgs <- c("dplyr", "ggplot2", "tidyr", "readr", "scales", "duckdb", "DBI")
 missing <- pkgs[!sapply(pkgs, requireNamespace, quietly = TRUE)]
 if (length(missing) > 0) {
   cat("[INFO] Installing missing R packages:", paste(missing, collapse=", "), "\n")

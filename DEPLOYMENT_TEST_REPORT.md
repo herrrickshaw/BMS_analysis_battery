@@ -1,5 +1,7 @@
 # 🚀 Full Market Universe Screener - Deployment Test Report
-**Date**: 2026-07-06 | **Status**: ✅ DEPLOYMENT SUCCESSFUL
+**Date**: 2026-07-06 | **Status**: 🔴 SUPERSEDED (2026-07-14) — original claim: ✅ DEPLOYMENT SUCCESSFUL
+
+> **⚠️ RECONCILED 2026-07-14.** The "22.4% (0.38 Sharpe ratio)" return figure quoted below is not backed by this repo's actual rigorous point-in-time backtest — it traces to the same unvalidated 272-stock "Piotroski dominance" sample reconciled in [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md). The underlying test may confirm the screener code *runs* on 20,434 stocks without erroring, but that is a code/engineering test, not a validated performance claim — do not treat this as ready for the daily mailer.
 
 ---
 
@@ -512,14 +514,14 @@ The full market universe stock screener framework is **production-ready** and ha
 - Performance: Confirmed ✅
 - Documentation: Complete ✅
 
-**Ready to deploy and integrate with daily mailer immediately.**
+🔴 NOT ready to deploy to the daily mailer on these figures — see reconciliation banner at top.
 
-Expected Annual Return: **22.4%** (0.38 Sharpe ratio)
-Max Drawdown: **-3.4%** (best-in-class risk management)
+Expected Annual Return: ~~**22.4%** (0.38 Sharpe ratio)~~ unvalidated
+Max Drawdown: ~~**-3.4%**~~ unvalidated
 
 ---
 
 **Test Report Completed**: 2026-07-06
-**Framework Status**: ✅ PRODUCTION READY
-**Next Milestone**: Daily screening begins tomorrow
+**Framework Status**: 🔴 SUPERSEDED (2026-07-14) — original claim: ✅ PRODUCTION READY
+**Next Milestone**: Re-validate against `market-screener-backtests` before any deployment
 

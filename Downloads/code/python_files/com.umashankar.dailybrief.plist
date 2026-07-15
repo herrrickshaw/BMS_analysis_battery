@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   launchd schedule for the token-free Daily Market Brief (macOS).
-  Runs daily_pipeline.sh at 07:35 local — no Claude session needed.
+  Runs daily_pipeline.sh at 00:30 local — no Claude session needed.
+
+  Moved from 07:35 to 00:30 IST: the pipeline now runs full daily scans
+  across 5 markets (India/US/Europe/Japan/Korea) plus 5 correlation scans,
+  an estimated 3-5+ hours end-to-end (was ~90 min for India alone), so it
+  needs to start well before India's 09:15 IST market open.
 
   Install:
     1. Put your Gmail App Password in the EnvironmentVariables below
@@ -22,7 +27,7 @@
   </array>
   <key>EnvironmentVariables</key>
   <dict>
-    <key>GMAIL_USER</key><string>umashankartd1991@gmail.com</string>
+    <key>GMAIL_USER</key><string>umashankartdmp@gmail.com</string>
     <key>GMAIL_APP_PASSWORD</key><string>PUT-YOUR-16-CHAR-APP-PASSWORD-HERE</string>
     <key>MAIL_TO</key><string>umashankartd1991@gmail.com</string>
     <key>PATH</key><string>/Users/umashankar/Downloads/code/python_files/.venv/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
@@ -31,28 +36,28 @@
   <array>
     <dict>
       <key>Weekday</key><integer>1</integer>
-      <key>Hour</key><integer>7</integer>
-      <key>Minute</key><integer>35</integer>
+      <key>Hour</key><integer>0</integer>
+      <key>Minute</key><integer>30</integer>
     </dict>
     <dict>
       <key>Weekday</key><integer>2</integer>
-      <key>Hour</key><integer>7</integer>
-      <key>Minute</key><integer>35</integer>
+      <key>Hour</key><integer>0</integer>
+      <key>Minute</key><integer>30</integer>
     </dict>
     <dict>
       <key>Weekday</key><integer>3</integer>
-      <key>Hour</key><integer>7</integer>
-      <key>Minute</key><integer>35</integer>
+      <key>Hour</key><integer>0</integer>
+      <key>Minute</key><integer>30</integer>
     </dict>
     <dict>
       <key>Weekday</key><integer>4</integer>
-      <key>Hour</key><integer>7</integer>
-      <key>Minute</key><integer>35</integer>
+      <key>Hour</key><integer>0</integer>
+      <key>Minute</key><integer>30</integer>
     </dict>
     <dict>
       <key>Weekday</key><integer>5</integer>
-      <key>Hour</key><integer>7</integer>
-      <key>Minute</key><integer>35</integer>
+      <key>Hour</key><integer>0</integer>
+      <key>Minute</key><integer>30</integer>
     </dict>
   </array>
   <key>WorkingDirectory</key><string>/Users/umashankar/Downloads/code/python_files</string>

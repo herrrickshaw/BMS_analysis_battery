@@ -33,6 +33,19 @@ from pathlib import Path
 import pandas as pd
 import yfinance as yf
 
+# Liquidity gate (shared, currency-aware). Lazy so the scan still runs if the
+# module is unavailable; _LiqStub then tags everything UNKNOWN rather than
+# gating the whole universe out.
+try:
+    import liquidity as _liq
+except Exception:                                    # pragma: no cover
+    class _LiqStub:
+        @staticmethod
+        def gate(df, ticker):
+            return 0.0, "UNKNOWN"
+    _liq = _LiqStub()
+
+
 try:
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     from openpyxl.utils import get_column_letter
@@ -498,6 +511,16 @@ def main():
             dist_ma = round(((ltp - ma_200) / ma_200 * 100), 2) if ma_200 else None
             trend_sig = "Above 200MA (Uptrend)" if dist_ma and dist_ma > 5 else "Below 200MA (Downtrend)" if dist_ma and dist_ma < -5 else "Near 200MA (Consolidation)" if dist_ma else "Insufficient History"
 
+            # Liquidity gate. THIS is the multi-currency case: one pass spans 17
+            # exchanges, so turnover here is variously EUR/GBp/CHF/SEK/NOK/DKK/PLN/
+            # TRY/CZK/HUF. liquidity.gate() reads the currency off the ticker suffix
+            # and — critically — unwinds London's PENCE quotes (a .L price of 416
+            # means GBP 4.16). Without that, .L turnover is 100x overstated and the
+            # 426 London names (the largest bloc here) clear any floor.
+            tv_usd, liq_tier = _liq.gate(df, sym)
+            if liq_tier is None:
+                continue
+
             # Darvas Box
             darv = compute_darvas_box(df)
             name, sector = meta.get(sym, (sym, "—"))
@@ -508,6 +531,8 @@ def main():
                 "Sector":             sector,
                 "LTP":                ltp,
                 "Change%":            chg_pct,
+                "Turnover_USD":       round(tv_usd),
+                "Liquidity_Tier":     liq_tier,
                 "200_Day_MA":         ma_200,
                 "Distance_to_200MA%": dist_ma,
                 "Trend_Signal":       trend_sig,

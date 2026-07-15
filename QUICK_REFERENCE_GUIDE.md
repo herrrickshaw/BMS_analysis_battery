@@ -1,10 +1,13 @@
 # 📖 Quick Reference Guide
 **Global Stock Strategy Analysis - Complete Deliverables**
 
+> **⚠️ RECONCILED 2026-07-14 — the one-sentence summary below is not validated.**
+> "Piotroski dominates" is a variance observation on a 272-stock sample, not a confirmed return edge; the repo's actual rigorous point-in-time backtest reaches the opposite conclusion for the US. See [`STOCK_ANALYSIS_MASTER_SUMMARY.md`](STOCK_ANALYSIS_MASTER_SUMMARY.md) for what's actually validated.
+
 ---
 
 ## 🎯 One-Sentence Summary
-Comprehensive real-data analysis of 17,257+ stocks revealed market-specific quality screening improves returns from 22.4% → 24.1-28.1% annually; Phase 1 validated (Japan 78% win), Phase 2 ready July 8.
+🔴 SUPERSEDED: ~~Comprehensive real-data analysis of 17,257+ stocks revealed market-specific quality screening improves returns from 22.4% → 24.1-28.1% annually; Phase 1 validated (Japan 78% win), Phase 2 ready July 8.~~ (never validated — see banner above)
 
 ---
 

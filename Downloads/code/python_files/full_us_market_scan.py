@@ -108,6 +108,36 @@ NASDAQ_FTP_BASE_HTTP = "http://ftp.nasdaqtrader.com/dynamic/SymDir"
 _SYMBOL_CACHE = DOWNLOAD_DIR / ".symbols_cache.json"
 
 
+_FX_CACHE = {}
+
+
+def _liq_gate(df, ticker):
+    """(median daily turnover USD, tier) — tier None => below the liquidity floor.
+
+    Why gate at all: without it the screeners recommend stocks nobody can buy. The
+    India screen emitted a GOLDEN_CROSS on a +16% move in a stock turning over
+    Rs 2.1 lakh/day — at that size a handful of trades sets the price, so the move
+    IS the illiquidity. Same USD bar is applied across every market.
+
+    FX is fetched once per process, not per symbol. Degrades open (no gate) rather
+    than silently dropping the whole universe if liquidity/FX is unavailable.
+    """
+    global _FX_CACHE
+    try:
+        import liquidity as _liq
+    except Exception:
+        return 0.0, "UNKNOWN"
+    if not _FX_CACHE:
+        try:
+            _FX_CACHE = _liq.scan_fx() or {"USD": 1.0}
+        except Exception:
+            _FX_CACHE = {"USD": 1.0}
+    try:
+        return _liq.scan_gate(df, ticker, _FX_CACHE)
+    except Exception:
+        return 0.0, "UNKNOWN"
+
+
 def _load_symbol_cache():
     try:
         if _SYMBOL_CACHE.exists():
@@ -763,6 +793,13 @@ def main(nasdaq_only: bool = False, top: int = 0, run_scans: bool = True,
         prev    = round(float(closes.iloc[-2]), 2) if len(closes) >= 2 else None
         chg_pct = round((ltp - prev) / prev * 100, 2) if (prev and prev) else None
 
+        # Liquidity gate — skip names nobody can trade. Same USD bar as every other
+        # market (see liquidity.scan_gate); currency comes from the ticker suffix,
+        # so this stays correct if non-USD tickers ever enter the US universe.
+        tv_usd, liq_tier = _liq_gate(df, ticker)
+        if liq_tier is None:
+            continue
+
         darvas = compute_darvas_box(df)
         gc     = compute_golden_crossover(df)
         base_row = {
@@ -770,6 +807,8 @@ def main(nasdaq_only: bool = False, top: int = 0, run_scans: bool = True,
             "LTP":              ltp,
             "Prev_Close":       prev,
             "Change%":          chg_pct,
+            "Turnover_USD":     round(tv_usd),
+            "Liquidity_Tier":   liq_tier,
             "Darvas_Signal":    darvas.get("signal"),
             "Box_Top":          darvas.get("box_top"),
             "Box_Bottom":       darvas.get("box_bottom"),

@@ -26,6 +26,18 @@ cd "$(dirname "$0")"
 PY=python3
 LOG="daily_pipeline_$(date +%Y%m%d).log"
 mkdir -p correlation_scan
+# ── step timing ───────────────────────────────────────────────────────────────
+# Emits a machine-readable marker before every step so run times are MEASURED, not
+# reconstructed. Until now the only evidence of what a step cost was artifact
+# mtimes, hand-diffed after the fact — which is how Korea sat at 28 min unnoticed
+# while Europe took 3. Parsed by scan_timings.py:
+#   [STEP] <epoch> <ISO8601> <label>
+# The trailing __end__ marker closes the final step so its duration is knowable.
+step() {
+  printf '[STEP] %s %s %s\n' "$(date +%s)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"
+  echo "$*"
+}
+
 FAILURES=()
 {
   echo "=== Daily pipeline $(date) ==="
@@ -43,52 +55,52 @@ FAILURES=()
   # Deliberately does NOT abort: a missing networkx shouldn't stop India from
   # scanning. It prints a banner and registers a FAILURE so the alert email fires —
   # loud and attributable, without throwing away the steps that would still work.
-  echo "[0/14] dependency check"
+  step "[0/14] dependency check"
   $PY check_deps.py || FAILURES+=("STARTUP: missing required dependencies (see banner above)")
 
-  echo "[1/14] India EOD refresh (official bhavcopy, incremental)"
+  step "[1/14] India EOD refresh (official bhavcopy, incremental)"
   $PY bhavcopy_history.py 400 || { echo "  bhavcopy refresh failed (will use cache)"; FAILURES+=("India: bhavcopy refresh"); }
 
-  echo "[2/14] India full screener scan"
+  step "[2/14] India full screener scan"
   $PY scan_bhavcopy.py || { echo "  scan failed (will use latest cache)"; FAILURES+=("India: full screener scan"); }
 
-  echo "[3/14] India combined report (fundamentals + street talk)"
+  step "[3/14] India combined report (fundamentals + street talk)"
   $PY daily_combined_report.py --market IN --html || { echo "  combined report failed"; FAILURES+=("India: combined report"); }
 
-  echo "[3b] refresh India CCC screen (screener.in)"
+  step "[3b] refresh India CCC screen (screener.in)"
   $PY -c "import screener_in as s; s.ccc_screen().to_parquet('cache_seed/india_ccc_screen.parquet', index=False)" || { echo "  CCC refresh skipped"; FAILURES+=("India: CCC screen refresh"); }
 
-  echo "[3c] daily test: validate screener.in CCC scrape"
+  step "[3c] daily test: validate screener.in CCC scrape"
   $PY test_screener_in.py || { echo "  ⚠️  screener.in CCC test FAILED — see checks above. CCC section will show n/a until this is fixed."; FAILURES+=("India: CCC scrape test"); }
 
-  echo "[4/14] US full market scan (fresh, NASDAQ+NYSE, min-price \$2)"
+  step "[4/14] US full market scan (fresh, NASDAQ+NYSE, min-price \$2)"
   $PY full_us_market_scan.py --workers 10 --min-price 2 || { echo "  US full market scan failed (continuing)"; FAILURES+=("US: full market scan"); }
 
-  echo "[5/14] US combined report (fundamentals + street talk, reuses fresh US scan)"
+  step "[5/14] US combined report (fundamentals + street talk, reuses fresh US scan)"
   $PY daily_combined_report.py --market US --html || { echo "  US combined report failed (continuing)"; FAILURES+=("US: combined report"); }
 
-  echo "[6/14] Europe full market scan (broad 17-exchange / 966-stock universe)"
+  step "[6/14] Europe full market scan (broad 17-exchange / 966-stock universe)"
   $PY full_european_market_scan.py --universe data/europe_broad_list.csv --label broad || { echo "  Europe full market scan failed (continuing)"; FAILURES+=("Europe: full market scan"); }
 
-  echo "[7/14] Japan full market scan (TSE)"
+  step "[7/14] Japan full market scan (TSE)"
   $PY full_japan_market_scan.py --workers 10 || { echo "  Japan full market scan failed (continuing)"; FAILURES+=("Japan: full market scan"); }
 
-  echo "[8/14] Korea full market scan (KOSPI+KOSDAQ)"
+  step "[8/14] Korea full market scan (KOSPI+KOSDAQ)"
   $PY full_korea_market_scan.py --workers 10 || { echo "  Korea full market scan failed (continuing)"; FAILURES+=("Korea: full market scan"); }
 
-  echo "[9/14] Correlation scan — NSE"
+  step "[9/14] Correlation scan — NSE"
   $PY market_correlation_scan.py --market NSE --output-dir correlation_scan || { echo "  NSE correlation scan failed (continuing)"; FAILURES+=("NSE: correlation scan"); }
 
-  echo "[10/14] Correlation scan — US"
+  step "[10/14] Correlation scan — US"
   $PY market_correlation_scan.py --market US --output-dir correlation_scan || { echo "  US correlation scan failed (continuing)"; FAILURES+=("US: correlation scan"); }
 
-  echo "[11/14] Correlation scan — Europe"
+  step "[11/14] Correlation scan — Europe"
   $PY market_correlation_scan.py --market EUROPE --output-dir correlation_scan || { echo "  Europe correlation scan failed (continuing)"; FAILURES+=("Europe: correlation scan"); }
 
-  echo "[12/14] Correlation scan — Japan"
+  step "[12/14] Correlation scan — Japan"
   $PY market_correlation_scan.py --market JAPAN --output-dir correlation_scan || { echo "  Japan correlation scan failed (continuing)"; FAILURES+=("Japan: correlation scan"); }
 
-  echo "[13/14] Correlation scan — Korea"
+  step "[13/14] Correlation scan — Korea"
   $PY market_correlation_scan.py --market KOREA --output-dir correlation_scan || { echo "  Korea correlation scan failed (continuing)"; FAILURES+=("Korea: correlation scan"); }
 
   # [13b] External validation — the gate between "built" and "sent".
@@ -105,9 +117,9 @@ FAILURES=()
   # --draft, which still writes brief_today.html for a human to inspect. A missing
   # brief is a visible problem; a confidently wrong one that lands in your inbox
   # is not.
-  echo "[13b/14] validate brief against screener.in"
+  step "[13b/14] validate brief against screener.in"
   if $PY validate_brief.py --sample 6; then
-      echo "[14/14] build + send mailer"
+      step "[14/14] build + send mailer"
       $PY send_mailer.py "$@" || { echo "  mailer build/send failed"; FAILURES+=("mailer: build/send"); }
   else
       echo "  ❌ external validation FAILED — sending SUPPRESSED, saving draft instead"

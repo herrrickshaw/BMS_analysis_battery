@@ -4,9 +4,11 @@
 *.gz filter=lfs diff=lfs merge=lfs -text
 # Market data - CSV files tracked in LFS
 data/**/*.csv filter=lfs diff=lfs merge=lfs -text
+**/data/**/*.csv filter=lfs diff=lfs merge=lfs -text
 fundamentals/**/*.csv filter=lfs diff=lfs merge=lfs -text
 *_ohlcv*.csv filter=lfs diff=lfs merge=lfs -text
 *_fundamentals*.csv filter=lfs diff=lfs merge=lfs -text
 # Large Excel files
 *.xlsx filter=lfs diff=lfs merge=lfs -text
 *.xls filter=lfs diff=lfs merge=lfs -text
+*.mdb filter=lfs diff=lfs merge=lfs -text

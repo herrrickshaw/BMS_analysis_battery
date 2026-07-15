@@ -26,6 +26,8 @@ Usage (import):
     )
 """
 
+from __future__ import annotations
+
 import sys
 import warnings
 from datetime import datetime

@@ -39,7 +39,12 @@ from pathlib import Path
 import duckdb
 
 HOME = Path("/Users/umashankar")
-PF = HOME / "Downloads" / "code" / "python_files"
+# The live pipeline writes scans to market-pipeline/. The old Downloads/ tree is a
+# stale mirror (and is periodically wiped mid-run), so reading from it fed the
+# warehouse a 119-row partial while the complete 6,279-row US scan sat unseen here.
+PF = HOME / "market-pipeline" / "code" / "python_files"
+if not (PF / "us_full_scan").exists():  # fall back if the layout ever moves
+    PF = HOME / "Downloads" / "code" / "python_files"
 DSN = "dbname=market_data host=/tmp user=umashankar"
 SCHEMA = "market_daily"
 
@@ -113,33 +118,70 @@ def ingest_snapshot(con, market: str) -> None:
         log(con, market, geo, sub, None, 0, 0, "missing", f"no workbook in {sub}/")
         print(f"  {market:8s} MISSING      no scan workbook in {sub}/")
         return
-    f = files[-1]
-    as_of = _date_from_name(f)
-    if as_of is None:
-        log(con, market, geo, f.name, None, 0, 0, "failed", "no date in filename")
-        print(f"  {market:8s} FAILED       cannot parse date from {f.name}")
+
+    # A scan dir accumulates several re-runs per day (partial retries, throttled
+    # runs, a full sweep). Blindly taking files[-1] once grabbed a 119-row partial
+    # and, because the date was then "already ingested", permanently locked out the
+    # complete 6,279-row scan. So: group by date, and for each date pick the LARGEST
+    # file (byte size is a faithful proxy for row count across these identical
+    # sheets). Only the newest date is ingested per run.
+    by_date: dict = {}
+    for p in files:
+        d = _date_from_name(p)
+        if d is None:
+            continue
+        cur = by_date.get(d)
+        if cur is None or p.stat().st_size > cur.stat().st_size:
+            by_date[d] = p
+    if not by_date:
+        log(con, market, geo, files[-1].name, None, 0, 0, "failed", "no date in any filename")
+        print(f"  {market:8s} FAILED       cannot parse date from any workbook")
         return
 
+    # Reconcile EVERY date, newest first, not just the latest: a date whose stored
+    # snapshot is already as full as the best file is a no-op, so this repairs a
+    # past partial (e.g. the 119-row 07-15) without re-touching complete history.
+    for as_of in sorted(by_date, reverse=True):
+        _ingest_date(con, market, geo, as_of, by_date[as_of])
+
+
+def _ingest_date(con, market: str, geo: str, as_of, f) -> None:
+    import pandas as pd
+
+    # "already ingested" is no longer a hard skip: if the best file for this date
+    # holds MORE rows than what's stored, it's a fuller scan and must replace the
+    # partial — that is what "updating" the warehouse means. Equal/fewer rows skip.
     already = con.execute(
         f'SELECT count(*) FROM pg."{SCHEMA}".snapshots WHERE market=? AND as_of_date=?',
         [market, as_of],
     ).fetchone()[0]
-    if already:
-        total = con.execute(
-            f'SELECT count(*) FROM pg."{SCHEMA}".snapshots WHERE market=?', [market]
-        ).fetchone()[0]
-        log(con, market, geo, f.name, as_of, 0, total, "no_new_data",
-            f"{as_of} already ingested ({already:,} rows)")
-        print(f"  {market:8s} no_new_data  last_data={as_of}  (+0, total {total:,})")
-        return
 
     try:
-        import pandas as pd
         df = pd.read_excel(f, sheet_name="All_Stocks")
     except Exception as e:
         log(con, market, geo, f.name, as_of, 0, 0, "failed", str(e)[:180])
         print(f"  {market:8s} FAILED       {str(e)[:60]}")
         return
+    # Count the way the row will actually land — unique symbols — so a deduped
+    # stored snapshot compares equal to its source and the run stays idempotent.
+    _symcol = next((c for c in ("Symbol", "YF_Ticker", "Code") if c in df.columns), None)
+    best_rows = df[_symcol].astype(str).nunique() if _symcol else len(df)
+
+    if already and already >= best_rows:
+        total = con.execute(
+            f'SELECT count(*) FROM pg."{SCHEMA}".snapshots WHERE market=?', [market]
+        ).fetchone()[0]
+        log(con, market, geo, f.name, as_of, 0, total, "no_new_data",
+            f"{as_of} already ingested ({already:,} rows >= best file {best_rows:,})")
+        print(f"  {market:8s} no_new_data  last_data={as_of}  (+0, total {total:,})")
+        return
+    if already:
+        con.execute(
+            f'DELETE FROM pg."{SCHEMA}".snapshots WHERE market=? AND as_of_date=?',
+            [market, as_of],
+        )
+        print(f"  {market:8s} replacing    {as_of} partial ({already:,} rows) "
+              f"with fuller {f.name} ({best_rows:,} rows)")
 
     # Column encodings diverge per market — the same divergence already documented
     # for the Darvas sheets. US: Symbol/LTP/Prev_Close/Darvas_Signal. Europe:
@@ -177,6 +219,9 @@ def ingest_snapshot(con, market: str) -> None:
         "darvas_signal": text("Darvas_Signal", "Trend_Signal"),
         "source_file": f.name,
     })
+    # Some source sheets list a ticker twice (e.g. Korea's KOSPI/KOSDAQ overlap),
+    # which otherwise lands as duplicate (market, date, symbol) rows. Keep the first.
+    out = out.drop_duplicates(subset="symbol", keep="first")
     con.register("out_df", out)
     con.execute(f'INSERT INTO pg."{SCHEMA}".snapshots SELECT * FROM out_df')
     con.unregister("out_df")
@@ -188,11 +233,19 @@ def ingest_snapshot(con, market: str) -> None:
 
 
 def status(con) -> None:
+    # One run now logs several dates, so "most recent run_at" is ambiguous among
+    # the tied rows. Rank by the DATA date to name the true latest snapshot, and
+    # take max(total_rows) per market — total_rows is cumulative, so its max is the
+    # final count regardless of which date's row happened to carry it.
     rows = con.execute(f"""
-        SELECT market, geography, source, last_data_date, total_rows, status, run_at
-        FROM (SELECT *, row_number() OVER (PARTITION BY market ORDER BY run_at DESC) rn
+        SELECT t.market, t.geography, t.source, t.last_data_date, tot.total_rows,
+               t.status, t.run_at
+        FROM (SELECT *, row_number() OVER (
+                  PARTITION BY market ORDER BY last_data_date DESC, run_at DESC) rn
               FROM pg."{SCHEMA}".ingest_log) t
-        WHERE rn=1 ORDER BY market
+        JOIN (SELECT market, max(total_rows) total_rows
+              FROM pg."{SCHEMA}".ingest_log GROUP BY market) tot USING (market)
+        WHERE t.rn=1 ORDER BY t.market
     """).fetchall()
     today = dt.date.today()
     print(f"\n=== MARKET DATA FRESHNESS (as of {today}) ===")

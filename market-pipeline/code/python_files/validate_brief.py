@@ -134,16 +134,42 @@ def validate(sample: int, tol: float) -> dict:
     common = max(set(dates), key=dates.count) if dates else None
     off = [c["symbol"] for c in checks if c.get("date") and c["date"] != common]
 
-    ok = (verified >= MIN_VERIFIED) and not bad and len(off) <= max(1, verified // 4)
+    # MARKET-HOURS GUARD. screener.in only prints "<date> - close price" when the
+    # market is CLOSED; once NSE opens it shows a live intraday quote with no date.
+    # The date check — the strong one — then parses nothing and silently passes,
+    # while prices get compared against live ticks rather than the close (observed
+    # 2026-07-15 09:15 IST: 5 of 6 dates None, INFY 1.48% off on a 2% tolerance).
+    # Unverifiable is NOT verified: say so rather than quietly downgrade to a
+    # price-only check. The 00:30 production run is unaffected (market closed).
+    dated = len(dates)
+    date_unverifiable = dated < max(2, (verified + 1) // 2)
+
+    # ANY date disagreement fails. This used to tolerate one odd name as a
+    # "holiday/listing quirk", which pre-dates the liquidity gate: every pick now
+    # clears ~$120k/day and therefore trades daily, so an older close date is not a
+    # quirk, it is stale data. Tolerating one is exactly how the MODISONLTD case
+    # (a single name frozen seven weeks back) would slip through — and the earlier
+    # code reported the disagreement while still returning ok=True, which reads as
+    # a pass. A false alarm here costs a draft instead of a send; the reverse costs
+    # a confidently wrong brief in your inbox.
+    ok = (verified >= MIN_VERIFIED) and not bad and not date_unverifiable and not off
     reason = ""
     if verified < MIN_VERIFIED:
         reason = f"only {verified} of {sample} verifiable (need {MIN_VERIFIED}) — cannot confirm"
     elif bad:
         reason = f"{len(bad)} price mismatch(es) beyond {tol}%"
+    elif date_unverifiable:
+        reason = (f"close date unverifiable — only {dated}/{verified} names showed a "
+                  f"'close price' date. screener.in is likely showing LIVE quotes "
+                  f"(market open), so prices are being compared against intraday "
+                  f"ticks, not the close. Re-run when the market is shut.")
     elif off:
-        reason = f"close dates disagree: {off} vs majority {common}"
+        reason = (f"close dates disagree — {off} vs majority {common}. These names are "
+                  f"liquidity-gated so they trade every day; an older close means "
+                  f"stale data, not a quirk.")
     return {"ok": ok, "reason": reason, "scan": f.split("/")[-1],
-            "verified": verified, "close_date": common, "checks": checks}
+            "verified": verified, "dated": dated, "close_date": common,
+            "checks": checks}
 
 
 def main() -> int:

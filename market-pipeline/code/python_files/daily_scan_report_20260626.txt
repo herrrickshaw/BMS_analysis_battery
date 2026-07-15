@@ -1,0 +1,64 @@
+DAILY MARKET SCAN REPORT — 26 Jun 2026
+Generated: 09:53 IST
+========================================
+
+INDIAN MARKET (NSE + BSE — 4,805 stocks scanned)
+--------------------------------------------------
+★ Triple Hits (Darvas breakout + Piotroski ≥7 + Coffee Can PASS):
+  • PRIVISCL    F=9/9  CC=5/5  LTP=₹3550.5  -0.61% to box top
+  • KOVAI       F=9/9  CC=5/5  LTP=₹6019.0  -1.75% to box top
+  • CCL         F=8/9  CC=5/5  LTP=₹1163.2  -0.83% to box top
+  • PRICOLLTD   F=7/9  CC=5/5  LTP=₹586.7   -0.06% to box top
+  • APOLLOHOSP  F=7/9  CC=5/5  LTP=₹8592.0  -0.68% to box top
+  • LGBBROSLTD  F=7/9  CC=5/5  LTP=₹1587.4  -1.01% to box top
+  • LUPIN       F=7/9  CC=5/5  LTP=₹2343.5  -1.59% to box top
+  • KFINTECH    F=7/9  CC=5/5  LTP=₹874.2   -1.73% to box top
+
+Top Darvas Breakouts (by upside to box top — freshest):
+  • SINCLAIR    LTP=₹78.16   Box Top=₹78.15   Upside=-0.01%
+  • SUPRAPFSL   LTP=₹33.50   Box Top=₹33.49   Upside=-0.03%
+  • DBSTOCKBRO  LTP=₹31.00   Box Top=₹30.99   Upside=-0.03%
+  • DIGJAMLMTD  LTP=₹47.00   Box Top=₹46.98   Upside=-0.04%
+  • ASARFI      LTP=₹228.10  Box Top=₹228.00  Upside=-0.04%
+  • KCP         LTP=₹170.57  Box Top=₹170.50  Upside=-0.04%
+  • GRSE        LTP=₹2724.80 Box Top=₹2723.70 Upside=-0.04%
+  • SRM         LTP=₹508.65  Box Top=₹508.40  Upside=-0.05%
+  • SHETR       LTP=₹95.55   Box Top=₹95.50   Upside=-0.05%
+  • MASFIN      LTP=₹311.95  Box Top=₹311.80  Upside=-0.05%
+
+Darvas Breakdowns (exit signals — 776 total, first 20):
+  ANNVRPP, COMRADE, UHMVL, RAJKSYN, EFORU, RFLL, NOL, AUREATE, ENBETRD,
+  MAPROIN, SBECSUG, SVJ, ARTSON, KINETRU, ADESHWAR, JSHL, GICL, SKPMIL,
+  ADISHAKTI, STYLEBAAZA
+
+Full results: ~/Downloads/indian_full_scan/indian_full_scan_20260626_0943.xlsx
+
+
+US MARKET (NASDAQ + NYSE — 7,081 stocks scanned)
+--------------------------------------------------
+★ Triple Hits: NONE today
+
+Top Darvas Breakouts (by upside — freshest):
+  • KRAQU   LTP=$10.10  Box Top=$10.10  Upside=+0.00%
+  • DSU     LTP=$9.70   Box Top=$9.70   Upside=+0.00%
+  • BIP-PB  LTP=$16.25  Box Top=$16.25  Upside=+0.00%
+  • MFM     LTP=$5.53   Box Top=$5.53   Upside=+0.00%
+  • GGT-PE  LTP=$20.06  Box Top=$20.06  Upside=-0.01%
+  • WING    LTP=$165.42 Box Top=$165.40 Upside=-0.01%
+  • CHW     LTP=$8.74   Box Top=$8.74   Upside=-0.01%
+  • NEE-PT  LTP=$50.17  Box Top=$50.16  Upside=-0.02%
+  • FAST    LTP=$46.92  Box Top=$46.91  Upside=-0.02%
+  • NNN     LTP=$46.37  Box Top=$46.36  Upside=-0.02%
+
+Darvas Breakdowns (exit signals — 565 total, first 20):
+  HSPTU, HSPT, JLHL, RGC, BRAI, TOYO, VELO, BVC, MNTS, NVTS, ASTC,
+  MSTR, CPSH, FAC, CBRS, ASST, INOD, CHPT, BWET, SVRN
+
+Full results: ~/Downloads/us_full_scan/us_full_scan_20260626_0953.xlsx
+
+
+ERRORS / WARNINGS
+-----------------
+• BSE: ~150 delisted/invalid symbols skipped (normal — stale universe entries)
+• US: ~75 symbols returned NoneType data error (likely ETFs/preferred shares with incomplete yfinance data)
+• All 4 scan stages completed successfully (exit code 0)

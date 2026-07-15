@@ -1,0 +1,76 @@
+INDIAN MARKET (NSE + BSE — 1,000 stocks scanned, first batch)
+--------------------------------------------------------------
+★ Triple Hits (Darvas breakout + Piotroski ≥7 + Coffee Can PASS): 17
+
+  • BHARTIHEXA    F=9/9  CC=5/5  LTP=₹1503.60  0.57% above box top
+  • CCL           F=8/9  CC=5/5  LTP=₹1159.40  0.51% above box top
+  • BELRISE       F=8/9  CC=5/5  LTP=₹242.07   2.30% above box top
+  • HBLENGINE     F=8/9  CC=5/5  LTP=₹820.55   4.36% above box top
+  • ARSSBL        F=7/9  CC=5/5  LTP=₹553.80   0.08% above box top
+  • BANSALWIRE    F=7/9  CC=5/5  LTP=₹317.85   0.50% above box top
+  • CEMPRO        F=7/9  CC=5/5  LTP=₹1222.50  0.55% above box top
+  • APLAPOLLO     F=7/9  CC=5/5  LTP=₹1842.00  0.67% above box top
+  • BEL           F=7/9  CC=5/5  LTP=₹420.00   1.13% above box top
+  • DATAPATTNS    F=7/9  CC=5/5  LTP=₹4831.00  2.26% above box top
+  • DOLLAR        F=7/9  CC=5/5  LTP=₹266.65   4.37% above box top
+  • DOMS          F=7/9  CC=5/5  LTP=₹2300.50  4.82% above box top
+  • AHLUCONT      F=7/9  CC=5/5  LTP=₹848.60   4.94% above box top
+  • ADOR          F=7/9  CC=5/5  LTP=₹1238.40  6.17% above box top
+  • 20MICRONS     F=7/9  CC=5/5  LTP=₹206.41   6.50% above box top
+  • CEATLTD       F=7/9  CC=5/5  LTP=₹3500.10  6.85% above box top
+  • INDHOTEL      F=7/9  CC=5/5  LTP=₹724.05   7.44% above box top
+
+Top Darvas Breakouts — freshest signals (by % above box top):
+  • COCHINSHIP    LTP=₹1483.60  Box Top=₹1482.80  +0.05%
+  • BALMLAWRIE    LTP=₹179.94   Box Top=₹179.85   +0.05%
+  • HUBTOWN       LTP=₹205.50   Box Top=₹205.40   +0.05%
+  • HONASA        LTP=₹419.90   Box Top=₹419.60   +0.07%
+  • ARSSBL        LTP=₹553.80   Box Top=₹553.37   +0.08%
+  • CASHIETF      LTP=₹1067.65  Box Top=₹1066.75  +0.08%
+  • ELPROINTL     LTP=₹172.47   Box Top=₹172.29   +0.10%
+  • IKS           LTP=₹1699.90  Box Top=₹1698.00  +0.11%
+  • ENEXT50       LTP=₹71.88    Box Top=₹71.79    +0.13%
+  • ASIANENE      LTP=₹374.35   Box Top=₹373.85   +0.13%
+
+Darvas Breakdowns (exit signals) — 194 total:
+  AQYLON, BAGFILMS, AONESILVER, BRIGADE, BONLON, GTPL, AURIGROW, AZAD,
+  ASIANTILES, BOHRAIND, BCLIND, ALMONDZ, ICDSLTD, HSCL, ANMOL ... +179 more
+
+
+US MARKET (NASDAQ + NYSE — 7,627 symbols, 5,421 with valid data)
+----------------------------------------------------------------
+★ Triple Hits (Darvas breakout + Piotroski ≥7 + Coffee Can PASS): 0
+
+  No triple hits found in today's scan.
+
+Top Darvas Breakouts — freshest signals (by % above box top):
+  • FHN-PE    LTP=$24.32   Box Top=$24.32  +0.00%
+  • GLOP-PB   LTP=$25.66   Box Top=$25.66  +0.00%
+  • WEA       LTP=$10.53   Box Top=$10.53  +0.00%
+  • MFM       LTP=$5.53    Box Top=$5.53   +0.00%
+  • PSA-PG    LTP=$19.83   Box Top=$19.83  +0.01%
+  • LNT       LTP=$74.57   Box Top=$74.56  +0.01%
+  • EMR       LTP=$143.14  Box Top=$143.12 +0.01%
+  • PRK       LTP=$179.21  Box Top=$179.19 +0.01%
+  • PSNY      LTP=$20.05   Box Top=$20.05  +0.02%
+  • BSRR      LTP=$40.55   Box Top=$40.54  +0.02%
+
+Darvas Breakdowns (exit signals) — 596 total:
+  DD, HSPTU, HSPT, ENRD, STI, VCX, MNTS, BVC, ATGL, VELO, AXTI, DMRC,
+  PWRL, PURR, AAOI ... +581 more
+
+
+ERRORS / WARNINGS
+-----------------
+• Indian scan: limited to first 1,000 symbols (--top 1000 flag). Full 2,681-stock
+  universe not scanned today. Re-run without --top flag for complete coverage.
+• Indian scan: NASDAQ/NYSE FTP unavailable — SEC EDGAR fallback used (minor delay).
+• US scan: 7 symbols failed download (RDHL, NXTC, LHSW, FBYDP, UCFIW, SAC, NCDL)
+  — likely delisted or data gaps. 5,421 of 7,627 symbols had valid OHLC data.
+• US triple hits = 0 today. Fundamental data may be thin for breakout candidates;
+  consider re-checking next session.
+
+OUTPUT FILES
+------------
+• Indian: ~/Downloads/indian_full_scan/indian_full_scan_20260624_0837.xlsx
+• US:     ~/Downloads/us_full_scan/us_full_scan_20260624_0848.xlsx

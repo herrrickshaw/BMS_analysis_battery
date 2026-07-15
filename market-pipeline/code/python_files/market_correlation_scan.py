@@ -281,8 +281,24 @@ def run(
 
     yf_suffix = MARKET_YF_SUFFIX[market]
     print(f"Scanning {len(symbols)} {market} symbols (period={period})...", flush=True)
-    prices = fetch_universe_prices(symbols, period=period, yf_suffix=yf_suffix,
-                                    sleep_between=sleep_between)
+
+    # Read through the shared incremental cache rather than re-downloading. This
+    # scan and the market scans cover the SAME universe: previously each night
+    # pulled ~13,084 tickers x 1 year twice over. The cache fetches only dates it
+    # doesn't already have, so a warm run costs ~1 bar/ticker — and if a market
+    # scan ran first, this costs nothing at all.
+    #
+    # Falls back to the original direct fetch if the cache is unavailable, so a
+    # cache problem degrades to the old behaviour instead of losing the scan.
+    try:
+        import ohlcv_cache as _oc
+        prices = _oc.get_closes(market, symbols, yf_suffix=yf_suffix, period=period)
+        if prices.empty:
+            raise RuntimeError("cache returned nothing")
+    except Exception as _e:
+        print(f"  (ohlcv_cache unavailable: {str(_e)[:60]} — direct fetch)", flush=True)
+        prices = fetch_universe_prices(symbols, period=period, yf_suffix=yf_suffix,
+                                        sleep_between=sleep_between)
     print(f"{prices.shape[1]}/{len(symbols)} symbols resolved with usable history", flush=True)
 
     if clustering == "mst":

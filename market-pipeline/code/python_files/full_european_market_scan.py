@@ -134,7 +134,27 @@ def load_universe(path: str) -> dict:
 
 def bulk_download(symbols: list, batch_size: int) -> dict:
     """Batched yfinance bulk OHLC download — {ticker: DataFrame}. Used whenever the
-    universe is larger than one safe yf.download() call (broad Europe: ~1,000+)."""
+    universe is larger than one safe yf.download() call (broad Europe: ~1,000+).
+
+    Reads through ohlcv_cache first: Europe was re-downloading a FULL YEAR for
+    ~1,039 tickers on every run just to learn one new bar, and the correlation scan
+    then downloaded the same universe again. India (bhavcopy) and the US
+    (MarketCache) already fetch incrementally; Europe and Japan did not. The cache
+    fetches only dates it lacks, so a warm run costs ~1 bar/ticker and the second
+    consumer of the day costs nothing.
+
+    Falls back to the original direct download if the cache is unavailable — a
+    cache problem must degrade to the old behaviour, not lose the scan.
+    """
+    try:
+        import ohlcv_cache as _oc
+        got = _oc.get("EUROPE", symbols, yf_suffix="", period="1y")
+        if got:
+            print(f"  ohlcv_cache: {len(got)}/{len(symbols)} tickers")
+            return got
+    except Exception as _e:
+        print(f"  (ohlcv_cache unavailable: {str(_e)[:60]} — direct download)")
+
     frames = {}
     batches = [symbols[i:i + batch_size] for i in range(0, len(symbols), batch_size)]
     print(f"  Downloading OHLC for {len(symbols)} tickers in {len(batches)} batches …")

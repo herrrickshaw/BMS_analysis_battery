@@ -64,35 +64,60 @@ import pandas as pd
 # SEPARATE rule and not a cost term.
 MAX_ADV_PCT = 15.0
 
-# ── country-specific floors ───────────────────────────────────────────────────
-# DO NOT apply India's gate to other markets. Measured, markets are not comparable in
-# USD depth (median daily turnover, 60-session median per name):
-#     US   $650k      IN   $166k      JP   $493k      KR   $396k
-# The US median stock is 4x deeper than India's. So India's Rs 1 crore ($120k) gate is:
-#     India  47th percentile   <- its own market, where it was chosen
-#     US     35th              JP  32nd            KR  23rd
-# One constant, four different filters. Applied to Korea it removes a quarter of the
-# market where in India it removes half — it stops being a liquidity rule and becomes a
-# currency artefact.
+# ── country floors ────────────────────────────────────────────────────────────
+# 🔴 THE PREVIOUS VERSION OF THIS BLOCK WAS FABRICATED. It set US $475k / JP $381k /
+# KR $349k, each claimed to be "the 47th percentile of its own market — the same
+# stringency as India's Rs 1 crore gate". Adversarial validation could not reproduce
+# three of the four, and re-measurement shows why. The universe definition swings the
+# answer 3x:
 #
-# Each market's floor is therefore set at the SAME STRINGENCY as India's own gate (the
-# 47th percentile of its own distribution), which is the user's chosen level expressed
-# in each market's native depth rather than in rupees:
+#     mkt   ALL names   LIVE only   LIVE+traded   claimed
+#     US      $300k       $300k       $896k        $475k    <- matches NOTHING
+#     IN      $110k       $284k       $284k        $120k
+#     JP      $364k       $364k       $365k        $381k
+#     KR      $311k       $311k       $342k        $349k
+#
+#   * US: 1,476 of 9,278 symbols are zero-turnover SPAC units, warrants and OTC
+#     ordinaries. Counting them -> $300k, dropping them -> $896k. $475k reproduces under
+#     NO definition — it cannot be reconstructed, so it was not measured.
+#   * IN: Rs 1 crore looked like "the 47th percentile" ONLY because 1,079 of 3,476 names
+#     in the panel are DELISTED. On the live universe it is the ~35th. The anchor the
+#     whole construction rested on was an artifact of counting corpses.
+#
+# AND THE PREMISE WAS WRONG TOO, not just the arithmetic. Exporting "India's percentile"
+# to three other markets exports an arbitrary choice and dresses it as a principle.
+# Rs 1 crore is a POLICY CHOICE the user made for India. It is not a law of markets, and
+# there is no reason Korea should inherit it.
+#
+# So the floors are gone. What remains is the rule that was always doing the real work:
+#     CAPITAL floor  = position / MAX_ADV_PCT  — universal RULE, market-specific OUTCOME
+# plus a per-market POLICY floor only where a human actually chose one.
+#
+# The reconciliation two validators arrived at independently, and the reason this is
+# computed on the LIVE universe: delisted names BELONG in a backtest panel (they are what
+# makes it survivorship-free) and MUST NOT be in a live-tradeability percentile. Same
+# panel, two uses, two filters.
 MARKET_FLOOR_USD = {
-    "IN": 120_000,     # Rs 1 crore/day — the user's explicit gate. Also removes, with no
-                       # instrument-type rule, corporate debt (875NHAI29 ~Rs 2.7L/day),
-                       # liquid-fund ETFs (LIQUIDSBI) and REIT/InvITs from the equity list.
-    "US": 475_000,     # 47th pctile of US
-    "JP": 381_000,     # 47th pctile of JP
-    "KR": 349_000,     # 47th pctile of KR
+    # India only, because India is the only market where a floor was actually chosen.
+    # Rs 1 crore/day. Stated as a policy choice, NOT as a percentile — on the live
+    # universe it happens to sit near the 35th, and that number is a consequence of the
+    # choice, not a justification for it.
+    "IN": 120_000,
 }
-DEFAULT_FLOOR_USD = 120_000   # unmeasured market: fall back to the India gate and SAY SO
+# No default floor. An unmeasured market gets the CAPITAL floor only — which is the
+# honest answer, because we have not chosen a policy for it. Inventing a constant is
+# what produced the fabricated numbers above.
+DEFAULT_FLOOR_USD = 0.0
 
 
 def market_floor(market: str) -> float:
-    """Floor for one market, in USD/day. Never silently guesses."""
-    m = (market or "").strip().upper()[:2]
-    return MARKET_FLOOR_USD.get(m, DEFAULT_FLOOR_USD)
+    """Policy floor for one market in USD/day, or 0 where no policy was chosen.
+
+    Returns 0 rather than guessing. A market with no floor is not unconstrained: the
+    CAPITAL floor in Gate.min_adv_usd still applies, and it is the constraint that
+    actually binds (above ~15-20% of ADV a position cannot be built at the quoted price).
+    """
+    return MARKET_FLOOR_USD.get((market or "").strip().upper()[:2], DEFAULT_FLOOR_USD)
 
 
 # Kept for callers that predate market_floor(). It is India's gate — do not treat it as

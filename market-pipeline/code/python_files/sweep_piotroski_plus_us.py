@@ -68,7 +68,15 @@ def main() -> int:
         WHERE ebit IS NOT NULL AND net_income IS NOT NULL AND cfo IS NOT NULL
           AND total_assets > 0 AND current_assets IS NOT NULL AND current_liabilities > 0
           AND shares > 0 AND revenue > 0
-          AND gross_profit IS NOT NULL
+          -- gross_profit is NOT required. It was the last big bottleneck: with it the
+          -- universe is 890 tickers, without it 1,839 — it HALVED the sample. It is also
+          -- INCONSISTENT with India, where test 8 is skipped for any non-manufacturer
+          -- (screener.in publishes no COGS line, and TCS's raw materials are 0.1% of
+          -- sales so the formula returns ~98% vs a true ~42%). Requiring the field for
+          -- the US while skipping it for India meant the two markets scored different
+          -- things AND the US paid half its sample for the privilege.
+          -- Test 8 is now SKIPPED when absent; weigh() drops it from numerator AND
+          -- denominator, so scores stay comparable across differing coverage.
           -- long_term_debt is NOT required. It is only 21% populated and was the
           -- BINDING constraint: requiring it collapsed the sample to 359 symbols with
           -- a median turnover of $27.6M/day — 77x more liquid than the typical US
@@ -138,8 +146,12 @@ def main() -> int:
         d["6_current_ratio_rising"] = bool(cur.current_assets / cur.current_liabilities
                                            > prv.current_assets / prv.current_liabilities)
         d["7_no_dilution"] = bool(cur.shares <= prv.shares * 1.01)
-        d["8_gross_margin_rising"] = bool(cur.gross_profit / cur.revenue
-                                          > prv.gross_profit / prv.revenue)
+        # skipped, not failed — a missing gross-profit line is not evidence of a
+        # falling margin
+        d["8_gross_margin_rising"] = (
+            bool(cur.gross_profit / cur.revenue > prv.gross_profit / prv.revenue)
+            if pd.notna(cur.gross_profit) and pd.notna(prv.gross_profit)
+            and cur.revenue and prv.revenue else None)
         d["9_asset_turnover_rising"] = bool(cur.revenue / cur.total_assets
                                             > prv.revenue / prv.total_assets)
         d["10_roce_level"] = bool(cur.roce > PP.ROCE_LEVEL_HURDLE)

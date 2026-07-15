@@ -196,7 +196,7 @@ def main() -> int:
     for t in rebals:
         cut = t - pd.Timedelta(days=LAG_DAYS)
         for tk, g in by_t.items():
-            vis = g[g.fy_end <= cut.date()]
+            vis = g[g.fy_end <= cut]   # cut is a Timestamp; .date() raises on datetime64
             if len(vis) < 2:
                 continue
             cur, prv = vis.iloc[-1], vis.iloc[-2]

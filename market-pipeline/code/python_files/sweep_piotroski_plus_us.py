@@ -60,8 +60,21 @@ def main() -> int:
         FROM '{FUND}'
         WHERE ebit IS NOT NULL AND net_income IS NOT NULL AND cfo IS NOT NULL
           AND total_assets > 0 AND current_assets IS NOT NULL AND current_liabilities > 0
-          AND long_term_debt IS NOT NULL AND shares > 0 AND revenue > 0
+          AND shares > 0 AND revenue > 0
           AND gross_profit IS NOT NULL
+          -- long_term_debt is NOT required. It is only 21% populated and was the
+          -- BINDING constraint: requiring it collapsed the sample to 359 symbols with
+          -- a median turnover of $27.6M/day — 77x more liquid than the typical US
+          -- stock, i.e. the S&P mega-cap complex. That is the one place Piotroski
+          -- was never claimed to work: his 1996 paper locates the edge in SMALL,
+          -- ILLIQUID, low-coverage value names, and this repo's own ROCE work found
+          -- the F-score discriminates least in large caps (16.2% vs 14.1%) and most
+          -- in small (15.7% vs 8.0%). The negative result was therefore partly an
+          -- artefact of WHERE the data-completeness filter pointed the test.
+          -- Test 5 (falling leverage) is now SKIPPED when the field is absent rather
+          -- than excluding the company; weigh() drops skipped tests from BOTH the
+          -- numerator and denominator, so scores stay comparable across companies
+          -- with different coverage.
           AND date_diff('day', CAST(fy_end AS DATE), CAST(filed AS DATE)) BETWEEN 0 AND 400
           AND CAST(fy_end AS DATE) BETWEEN DATE '2014-01-01' AND DATE '2026-07-15'
         ORDER BY ticker, fy_end
@@ -110,8 +123,11 @@ def main() -> int:
         d["2_cfo_positive"] = bool(cur.cfo > 0)
         d["3_roa_improving"] = bool(roa > roa_p)
         d["4_accruals_cfo_gt_roa"] = bool(cur.cfo / cur.total_assets > roa)
-        d["5_leverage_falling"] = bool(cur.long_term_debt / cur.total_assets
-                                       < prv.long_term_debt / prv.total_assets)
+        # skipped, not failed, when long_term_debt is absent — a missing field is not
+        # evidence of rising leverage
+        d["5_leverage_falling"] = (
+            bool(cur.long_term_debt / cur.total_assets < prv.long_term_debt / prv.total_assets)
+            if pd.notna(cur.long_term_debt) and pd.notna(prv.long_term_debt) else None)
         d["6_current_ratio_rising"] = bool(cur.current_assets / cur.current_liabilities
                                            > prv.current_assets / prv.current_liabilities)
         d["7_no_dilution"] = bool(cur.shares <= prv.shares * 1.01)
@@ -177,14 +193,44 @@ def main() -> int:
             f"{res[p][res[p].t==t]['ex'].iloc[0]*100:>+10.1f}%"
             if len(res[p][res[p].t == t]) else f"{'--':>11s}" for p in res))
 
-    print("\n  === is high-F actually GOOD in the US? (memory says a prior backtest")
-    print("      found it INVERTED — high-F underperforming) ===")
-    d["f_only"] = d["canonical"]
+    print("\n  === is high-F actually GOOD in the US? mean AND median — they disagree ===")
     for lo, hi, lab in [(0, 40, "weak  (bottom)"), (40, 70, "middle"), (70, 101, "strong (top)")]:
         s = d[(d.canonical >= lo) & (d.canonical < hi)]
         if len(s) > 50:
             print(f"    canonical {lab:16s} n={len(s):>5,}  mean fwd {s.fwd_ret.mean()*100:>6.1f}%"
                   f"  median {s.fwd_ret.median()*100:>6.1f}%")
+
+    # Did dropping the long_term_debt requirement actually reach smaller names? If the
+    # sample is still mega-cap-only, the rerun proves nothing and must say so.
+    liq = con.execute(f"""
+        WITH l AS (SELECT Symbol, Close*Volume tv,
+                          row_number() OVER (PARTITION BY Symbol ORDER BY Date DESC) rn
+                   FROM '{PX}' WHERE Close>0 AND Volume>0)
+        SELECT Symbol, median(tv) turnover FROM l WHERE rn<=60 GROUP BY 1""").df()
+    m = d[["Symbol"]].drop_duplicates().merge(liq, on="Symbol", how="left")
+    print(f"\n  === did this actually reach the small names? ===")
+    print(f"    tested symbols {len(m):,} | median turnover ${m.turnover.median()/1e6:,.1f}M/day")
+    print(f"    full universe  {len(liq):,} | median turnover ${liq.turnover.median()/1e6:,.1f}M/day")
+    print(f"    tested median sits at the {(liq.turnover < m.turnover.median()).mean()*100:.0f}th"
+          f" percentile of US liquidity  (was 80th when long_term_debt was required)")
+
+    print("\n  === F-score edge BY LIQUIDITY — Piotroski claims the edge is in SMALL names ===")
+    dl = d.merge(liq, on="Symbol", how="left")
+    dl = dl[dl.turnover.notna()]
+    if len(dl) > 200:
+        dl["tier"] = pd.qcut(dl.turnover, 3, labels=["SMALL", "MID", "LARGE"])
+        print(f"    {'tier':7s} {'n':>6s} {'F>=70 mean':>11s} {'F>=70 med':>10s} "
+              f"{'F<40 mean':>10s} {'F<40 med':>9s} {'med edge':>9s}")
+        for t in ("SMALL", "MID", "LARGE"):
+            s = dl[dl.tier == t]
+            hi, lo = s[s.canonical >= 70], s[s.canonical < 40]
+            if len(hi) > 20 and len(lo) > 20:
+                edge = (hi.fwd_ret.median() - lo.fwd_ret.median()) * 100
+                print(f"    {t:7s} {len(s):>6,} {hi.fwd_ret.mean()*100:>10.1f}% "
+                      f"{hi.fwd_ret.median()*100:>9.1f}% {lo.fwd_ret.mean()*100:>9.1f}% "
+                      f"{lo.fwd_ret.median()*100:>8.1f}% {edge:>+8.1f}%")
+        print("    (median edge = high-F median minus low-F median. Piotroski predicts")
+        print("     this is POSITIVE and LARGEST in SMALL.)")
     d.to_csv("reports/sweep_piotroski_plus_us.csv", index=False)
     print("\n  -> reports/sweep_piotroski_plus_us.csv")
     return 0

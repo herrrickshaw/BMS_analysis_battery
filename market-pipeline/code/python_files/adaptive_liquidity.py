@@ -136,6 +136,38 @@ def capacity(df: pd.DataFrame, positions: int = 10, adv_col: str = "adv_usd") ->
     return pd.DataFrame(rows)
 
 
+def retier(df: pd.DataFrame, turnover_col: str = "Median_Turnover",
+           tier_col: str = "Liquidity_Tier") -> pd.DataFrame:
+    """Replace a scan's ABSOLUTE tiers with PERCENTILE tiers, in one post-pass.
+
+    Wiring note — why this is a post-pass and not a change to scan_gate():
+    scan_gate() is per-symbol and stateless, called inside each scan's parallel map. A
+    percentile needs the whole universe, so it CANNOT be computed there. Rather than
+    restructure five scans, the split is:
+        scan_gate()  -> keeps the FLOOR (per-symbol, absolute, correct as-is)
+        retier()     -> assigns TIERS once the frame exists
+
+    Rows the floor already rejected are absent, and "UNKNOWN" rows (liquidity
+    unmeasurable — scan_gate fails OPEN by design so a schema change cannot silently
+    empty a scan) keep their label rather than being ranked. Ranking an unmeasurable
+    row would invent a tier from a missing number.
+
+    Leaves the frame untouched if there are too few rows to rank meaningfully.
+    """
+    if turnover_col not in df.columns or tier_col not in df.columns:
+        return df
+    out = df.copy()
+    rankable = out[turnover_col].notna() & (out[turnover_col] > 0) & (out[tier_col] != "UNKNOWN")
+    if int(rankable.sum()) < 20:
+        return df                       # too few to form percentiles; keep absolute tiers
+    pct = out.loc[rankable, turnover_col].rank(pct=True) * 100
+    new = pd.Series(index=out.index, dtype=object)
+    for lo, name in TIER_CUTS:
+        new.loc[rankable & (pct >= lo) & new.isna()] = name
+    out.loc[rankable, tier_col] = new.loc[rankable]
+    return out
+
+
 def describe(df: pd.DataFrame, market: str, adv_col: str = "adv_usd") -> str:
     """One line per market. Makes cross-market comparison possible without constants."""
     d = df[df[adv_col] > 0]

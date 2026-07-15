@@ -41,7 +41,9 @@
 # Without credentials, symbols fall back to NASDAQ FTP → SEC EDGAR.
 
 import argparse
+import glob
 import json
+import os
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -842,8 +844,48 @@ def main(nasdaq_only: bool = False, top: int = 0, run_scans: bool = True,
 
     if run_scans:
         all_syms_for_fund = list(ohlc_row_map.keys())
-        print(f"\nStage 4 — All 5 fundamental screeners on {len(all_syms_for_fund)} stocks "
+
+        # Reuse fundamentals instead of re-fetching .info for the whole universe.
+        #
+        # This step was the pipeline's single biggest cost: 62m54s on 2026-07-14,
+        # 2.3x worse than Korea's 28 min and the reason the run trips Yahoo's rate
+        # limiter (which then surfaces as "Invalid Crumb"/YFRateLimitError). Cause:
+        # one yf.Ticker(...).info call PER STOCK across ~5,700 liquid US names,
+        # every night — for data that changes QUARTERLY.
+        #
+        # India's scan already does this and says why: "fundamentals are quarterly
+        # and do not change day-to-day, so they are reused from the most recent
+        # existing full-scan workbook". The US scan never adopted it. Now it does:
+        # reuse the previous workbook's fundamentals when they're fresher than
+        # FUND_REUSE_DAYS and fetch only symbols we've never seen; otherwise take
+        # the full refresh. Price/Darvas/DMA fields are always recomputed from
+        # today's OHLC below, so only the slow quarterly fields are reused.
+        FUND_REUSE_DAYS = 7
+        cached_fund, reuse_src = {}, None
+        try:
+            prev = sorted(glob.glob("us_full_scan/us_full_scan_*.xlsx"))
+            if prev:
+                age_d = (time.time() - os.path.getmtime(prev[-1])) / 86400
+                if age_d <= FUND_REUSE_DAYS:
+                    fd = pd.read_excel(prev[-1], sheet_name="All_Fundamentals")
+                    for _, r in fd.iterrows():
+                        s = str(r.get("Symbol", "")).strip()
+                        if s:
+                            cached_fund[s] = r.to_dict()
+                    reuse_src = f"{Path(prev[-1]).name} ({age_d:.1f}d old)"
+                else:
+                    print(f"  fundamentals cache {age_d:.1f}d old (> {FUND_REUSE_DAYS}d) "
+                          f"— full refresh")
+        except Exception as e:
+            print(f"  no fundamentals reused: {str(e)[:70]}")
+
+        need = [s for s in all_syms_for_fund if s not in cached_fund]
+        if reuse_src:
+            print(f"\nStage 4 — reusing fundamentals from {reuse_src}: "
+                  f"{len(all_syms_for_fund) - len(need):,} reused, {len(need):,} to fetch")
+        print(f"\nStage 4 — All 5 fundamental screeners on {len(need)} stocks "
               f"({workers} workers) …")
+        all_syms_for_fund = need
         done = 0
         with ThreadPoolExecutor(max_workers=workers) as pool:
             futures = {pool.submit(fundamental_scan, sym): sym for sym in all_syms_for_fund}
@@ -904,6 +946,34 @@ def main(nasdaq_only: bool = False, top: int = 0, run_scans: bool = True,
                               f"(multi-screen hits: {len(six_screen_rows)})")
                 except Exception as e:
                     print(f"    {sym}: error — {e}")
+        # Merge the reused rows back in. The loop above only ran the symbols we
+        # actually fetched, so without this every reused stock would silently
+        # vanish from the output — trading a slow scan for a truncated one.
+        # Quarterly fields come from cache; everything price-derived is refreshed
+        # from TODAY's OHLC so nothing stale reaches the brief.
+        if cached_fund:
+            fresh = 0
+            for sym, cr in cached_fund.items():
+                if sym not in ohlc_row_map:
+                    continue                      # not in today's gated universe
+                ohlc = ohlc_row_map[sym]
+                row = dict(cr)
+                row.update({
+                    "LTP":            ohlc.get("LTP"),
+                    "Change%":        ohlc.get("Change%"),
+                    "Darvas_Signal":  ohlc.get("Darvas_Signal"),
+                    "Box_Top":        ohlc.get("Box_Top"),
+                    "Box_Bottom":     ohlc.get("Box_Bottom"),
+                    "Upside_to_Top%": ohlc.get("Upside_to_Top%"),
+                    "GC_Signal":      ohlc.get("GC_Signal"),
+                    "DMA50":          ohlc.get("DMA50"),
+                    "DMA200":         ohlc.get("DMA200"),
+                    "Turnover_USD":   ohlc.get("Turnover_USD"),
+                    "Liquidity_Tier": ohlc.get("Liquidity_Tier"),
+                })
+                fund_rows.append(row)
+                fresh += 1
+            print(f"  merged {fresh:,} reused fundamentals (prices refreshed from today's OHLC)")
     else:
         print("\nStage 4 — Skipped (--no-scans)")
 

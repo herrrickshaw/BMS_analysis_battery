@@ -53,6 +53,23 @@ from pathlib import Path
 import pandas as pd
 import requests
 
+# ── percentile re-tier (adaptive_liquidity) ──────────────────────────────────
+# scan_gate() assigned ABSOLUTE tiers, which cannot discriminate within a market:
+# the first US sweep landed 94% of its sample in one tier because bands tuned to
+# India's Rs 1cr floor cannot separate US stocks from each other. The floor stays
+# absolute (correct, and per-symbol); tiers become PERCENTILE so "illiquid" means
+# the same thing in every market and each market self-calibrates.
+# Percentiles need the whole universe, so this runs once on the assembled frame
+# rather than inside the per-symbol map.
+def _retier(_df, _col):
+    try:
+        import adaptive_liquidity as _AL
+        return _AL.retier(_df, turnover_col=_col)
+    except Exception as _e:      # never let tiering break a scan
+        print(f"  retier skipped: {str(_e)[:60]}")
+        return _df
+
+
 # Persistent cache (avoids re-downloading on subsequent runs)
 try:
     from market_data_cache import MarketCache as _MarketCache
@@ -672,6 +689,7 @@ def save_excel(all_rows, darvas_rows, fund_rows, triple_rows,
                 pd.DataFrame().to_excel(writer, sheet_name=name, index=False)
                 return
             df = pd.DataFrame(rows)
+            df = _retier(df, "Turnover_USD")
             if sort_col and sort_col in df.columns:
                 df = df.sort_values(sort_col, ascending=False)
             df.to_excel(writer, sheet_name=name, index=False)

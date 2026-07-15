@@ -29,6 +29,23 @@ from bhavcopy_history import fetch_history
 from full_indian_market_scan import compute_darvas_box, compute_golden_crossover
 from stock_utils import parallel_map, pct_change
 
+# ── percentile re-tier (adaptive_liquidity) ──────────────────────────────────
+# scan_gate() assigned ABSOLUTE tiers, which cannot discriminate within a market:
+# the first US sweep landed 94% of its sample in one tier because bands tuned to
+# India's Rs 1cr floor cannot separate US stocks from each other. The floor stays
+# absolute (correct, and per-symbol); tiers become PERCENTILE so "illiquid" means
+# the same thing in every market and each market self-calibrates.
+# Percentiles need the whole universe, so this runs once on the assembled frame
+# rather than inside the per-symbol map.
+def _retier(_df, _col):
+    try:
+        import adaptive_liquidity as _AL
+        return _AL.retier(_df, turnover_col=_col)
+    except Exception as _e:      # never let tiering break a scan
+        print(f"  retier skipped: {str(_e)[:60]}")
+        return _df
+
+
 OUT_DIR = Path("indian_full_scan"); OUT_DIR.mkdir(exist_ok=True)
 
 
@@ -109,6 +126,7 @@ def main():
     rows = parallel_map(_screen_one, list(hist.items()), workers=8,
                         label="stocks", progress_every=1000)
     all_df = pd.DataFrame([r for r in rows if r])
+    all_df = _retier(all_df, "Median_Turnover")
     darvas_df = all_df[all_df["Darvas_Signal"].isin(["BREAKOUT_BUY", "BREAKDOWN_SELL"])]
     gc_n = int((all_df["GC_Signal"] == "GOLDEN_CROSS").sum())
     print(f"  {len(all_df)} screened | {len(darvas_df)} Darvas signals | {gc_n} golden crosses\n")

@@ -30,6 +30,22 @@ FAILURES=()
 {
   echo "=== Daily pipeline $(date) ==="
 
+  # [0] Dependency check — FIRST, and loud.
+  #
+  # Every step below is guarded with `|| echo "... failed (continuing)"` so one
+  # market can't sink the run. The cost of that resilience is that a missing
+  # dependency looks exactly like a bad network day: one line in the log, pipeline
+  # moves on, market silently goes stale for days. On 2026-07-15 four deps were
+  # missing this way (networkx -> all 5 correlation scans dead; lmdb -> store never
+  # written; duckdb; pykrx -> Korea aborted and produced NO output, and was not even
+  # declared in requirements.txt).
+  #
+  # Deliberately does NOT abort: a missing networkx shouldn't stop India from
+  # scanning. It prints a banner and registers a FAILURE so the alert email fires —
+  # loud and attributable, without throwing away the steps that would still work.
+  echo "[0/14] dependency check"
+  $PY check_deps.py || FAILURES+=("STARTUP: missing required dependencies (see banner above)")
+
   echo "[1/14] India EOD refresh (official bhavcopy, incremental)"
   $PY bhavcopy_history.py 400 || { echo "  bhavcopy refresh failed (will use cache)"; FAILURES+=("India: bhavcopy refresh"); }
 

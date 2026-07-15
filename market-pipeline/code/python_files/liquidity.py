@@ -16,6 +16,9 @@
 
 from __future__ import annotations
 
+import datetime as _dt
+import json
+import os
 import warnings
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -180,21 +183,196 @@ def gate(df, ticker: str):
         return 0.0, "UNKNOWN"
 
 
-def _fx_rates(currencies) -> Dict[str, float]:
-    """USD value of 1 unit-of-USD in each currency (live, with cache fallback)."""
-    import yfinance as yf
-    need = sorted(set(currencies) - {"USD"})
-    fx = {"USD": 1.0}
+FX_CACHE_PATH = Path(os.environ.get(
+    "BHAV_CACHE", Path.home() / "Downloads" / "data" / "bhavcopy_cache")) / "fx_usd.json"
+FX_STALE_DAYS = 7
+
+
+def _fx_read_cache() -> Dict[str, float]:
     try:
-        d = yf.download([f"{c}=X" for c in need], period="5d", progress=False)["Close"]
-        for c in need:
-            try:
-                fx[c] = float(d[f"{c}=X"].dropna().iloc[-1])
-            except Exception:
-                fx[c] = None
+        d = json.loads(FX_CACHE_PATH.read_text())
+        age = (_dt.datetime.now() - _dt.datetime.fromisoformat(d["as_of"])).days
+        if age > FX_STALE_DAYS:
+            print(f"  fx: cache {age}d old (> {FX_STALE_DAYS}d) — refusing to use")
+            return {}
+        return {k: float(v) for k, v in d.get("rates", {}).items() if v}
     except Exception:
-        for c in need:
-            fx[c] = None
+        return {}
+
+
+def _fx_write_cache(rates: Dict[str, float]) -> None:
+    try:
+        FX_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        FX_CACHE_PATH.write_text(json.dumps(
+            {"as_of": _dt.datetime.now().isoformat(),
+             "rates": {k: v for k, v in rates.items() if v}}, indent=1))
+    except Exception:
+        pass
+
+
+_UA = {"User-Agent": "Mozilla/5.0 (research)"}
+
+
+def _fx_from_erapi(need: list) -> Dict[str, float]:
+    """open.er-api.com — free, no key, ALL currencies in ONE call."""
+    import json as _j
+    import urllib.request as _u
+    try:
+        r = _u.Request("https://open.er-api.com/v6/latest/USD", headers=_UA)
+        d = _j.load(_u.urlopen(r, timeout=20))
+        rates = d.get("rates", {})
+        return {c: float(rates[c]) for c in need if rates.get(c)}
+    except Exception:
+        return {}
+
+
+def _fx_from_frankfurter(need: list) -> Dict[str, float]:
+    """frankfurter.app — ECB reference rates, free, no key."""
+    import json as _j
+    import urllib.request as _u
+    try:
+        r = _u.Request(f"https://api.frankfurter.app/latest?from=USD&to={','.join(need)}",
+                       headers=_UA)
+        d = _j.load(_u.urlopen(r, timeout=20))
+        return {c: float(v) for c, v in d.get("rates", {}).items() if v}
+    except Exception:
+        return {}
+
+
+# FRED (Federal Reserve H.10) series, USD-quoted. Some are inverted (USD per unit).
+_FRED_SERIES = {
+    "JPY": ("DEXJPUS", False), "INR": ("DEXINUS", False), "KRW": ("DEXKOUS", False),
+    "CHF": ("DEXSZUS", False), "CNY": ("DEXCHUS", False), "HKD": ("DEXHKUS", False),
+    "TWD": ("DEXTAUS", False), "SGD": ("DEXSIUS", False), "BRL": ("DEXBZUS", False),
+    "MXN": ("DEXMXUS", False), "ZAR": ("DEXSAUS", False), "CAD": ("DEXCAUS", False),
+    "SEK": ("DEXSDUS", False), "NOK": ("DEXNOUS", False), "DKK": ("DEXDNUS", False),
+    "EUR": ("DEXUSEU", True), "GBP": ("DEXUSUK", True), "AUD": ("DEXUSAL", True),
+    "NZD": ("DEXUSNZ", True),
+}
+
+
+def _fred_key() -> str:
+    k = os.environ.get("FRED_API_KEY", "")
+    if k:
+        return k
+    for p in (Path.home() / ".env.local", Path(__file__).parent / ".env"):
+        try:
+            for line in p.read_text().splitlines():
+                if line.startswith("FRED_API_KEY="):
+                    return line.split("=", 1)[1].strip().strip('"').strip("'")
+        except Exception:
+            continue
+    return ""
+
+
+def _fx_from_fred(need: list) -> Dict[str, float]:
+    """FRED — official Fed H.10. Authoritative but a few business days lagged."""
+    import json as _j
+    import urllib.request as _u
+    key = _fred_key()
+    if not key:
+        return {}
+    out = {}
+    for c in need:
+        sid = _FRED_SERIES.get(c)
+        if not sid:
+            continue
+        series, inverted = sid
+        try:
+            url = ("https://api.stlouisfed.org/fred/series/observations"
+                   f"?series_id={series}&api_key={key}&file_type=json"
+                   "&sort_order=desc&limit=5")
+            d = _j.load(_u.urlopen(url, timeout=20))
+            obs = [o for o in d.get("observations", []) if o.get("value") not in (".", "", None)]
+            if not obs:
+                continue
+            v = float(obs[0]["value"])
+            out[c] = (1.0 / v) if inverted else v
+        except Exception:
+            continue
+    return out
+
+
+def _fx_rates(currencies) -> Dict[str, float]:
+    """USD value of 1 unit-of-USD in each currency. Live, with a REAL disk cache.
+
+    The docstring used to promise "cache fallback" and there was none: on a failed
+    fetch every currency came back None, scan_fx() dropped them, and scan_gate then
+    returned UNKNOWN for every non-USD ticker — silently DISABLING the liquidity
+    gate for India/Japan/Korea/Europe while leaving US intact. That is exactly what
+    happened during the 2026-07-15 sample run, when a saturated yfinance returned
+    "23 Failed downloads: ['SEK=X','INR=X',...]": the markets most in need of the
+    gate quietly stopped being gated.
+
+    Now the last good rates are persisted and reused when a fetch fails. FX moves
+    ~1%/day against tier bands that are 5-10x wide, so a day-old rate is
+    immaterial to a liquidity decision — while a missing rate removes the gate
+    entirely. Refuses a cache older than FX_STALE_DAYS rather than pretend.
+    """
+    need = sorted(set(currencies) - {"USD"})
+    fx: Dict[str, float] = {"USD": 1.0}
+    used = []
+
+    # Source order is deliberate. yfinance is LAST despite being the most "live":
+    # it needs one download PER PAIR (23 calls), is the component already tripping
+    # Yahoo's rate limiter, and returned nothing at all during the 2026-07-15 run
+    # ("23 Failed downloads: ['SEK=X','INR=X',...]"). open.er-api returns EVERY
+    # currency in ONE keyless call, so it is both more reliable and lighter — and
+    # using it first takes pressure off the same rate limiter the scans depend on.
+    # Cross-checked 2026-07-15: INR 96.24 (er-api) / 96.2 (frankfurter) / 96.3
+    # (yfinance) / 95.33 (FRED, a few days lagged) — all inside the ~1% that a
+    # 5-10x-wide tier band cannot notice.
+    for name, fn in (("er-api", _fx_from_erapi),
+                     ("frankfurter", _fx_from_frankfurter),
+                     ("fred", _fx_from_fred)):
+        missing = [c for c in need if not fx.get(c)]
+        if not missing:
+            break
+        got = fn(missing)
+        if got:
+            fx.update(got)
+            used.append(f"{name}:{len(got)}")
+
+    missing = [c for c in need if not fx.get(c)]
+    if missing:                                    # last resort: the flaky one
+        try:
+            import yfinance as yf
+            d = yf.download([f"{c}=X" for c in missing], period="5d",
+                            progress=False)["Close"]
+            n = 0
+            for c in missing:
+                try:
+                    v = float(d[f"{c}=X"].dropna().iloc[-1])
+                    if v > 0:
+                        fx[c] = v
+                        n += 1
+                except Exception:
+                    continue
+            if n:
+                used.append(f"yfinance:{n}")
+        except Exception:
+            pass
+
+    live = {k: v for k, v in fx.items() if v and k != "USD"}
+    if live:
+        _fx_write_cache({**_fx_read_cache(), **live})
+    if used:
+        print(f"  fx: {len(live)}/{len(need)} rates from {', '.join(used)}")
+
+    missing = [c for c in need if not fx.get(c)]
+    if missing:
+        cached = _fx_read_cache()
+        filled = [c for c in missing if cached.get(c)]
+        for c in filled:
+            fx[c] = cached[c]
+        if filled:
+            print(f"  fx: {len(filled)} rate(s) served from cache "
+                  f"({', '.join(filled[:6])}{'…' if len(filled) > 6 else ''})")
+        still = [c for c in missing if not fx.get(c)]
+        if still:
+            # Loud: these markets lose their gate this run.
+            print(f"  ⚠️  fx: NO rate for {', '.join(still[:8])} — the liquidity gate "
+                  f"is INACTIVE for those markets this run (tier=UNKNOWN)")
     return fx
 
 

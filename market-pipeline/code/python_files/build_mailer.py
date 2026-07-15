@@ -515,6 +515,15 @@ def build():
     us_mood = us_data.get("mood") or {"mood": "n/a", "score": 0, "n_articles": 0}
 
     # 0. Market snapshot
+    # Carry FX: a funding-currency (JPY/CHF) spike unwinds leveraged carry and
+    # the selling lands on exactly the equities this brief covers — the 2024-08-05
+    # yen-carry unwind took the Nikkei -12.4% in a session and the KOSPI -8.8%.
+    # Best-effort: never let an FX hiccup break the brief.
+    try:
+        from carry_fx import carry_html as _carry_html
+        carry_html_ = _carry_html()
+    except Exception as _e:
+        carry_html_ = f"<p style='color:#777;font-size:12px'>carry FX unavailable ({str(_e)[:40]})</p>"
     as_of_html = _as_of_html()
     snapshot_html = _market_snapshot_html()
 
@@ -654,6 +663,8 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 {_table(["Market","Symbol","6mo %","Liquidity"], other_rows) if other_rows else "<p>n/a</p>"}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">20-market 5-year scoreboard</h3>
 {_table(["Mkt","Index","5y CAGR%","1y %","Sharpe"], p_rows)}
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">💱 Carry-trade FX <span style="font-weight:400;color:#777">— the cross-asset channel into JP/KR/IN equities</span></h3>
+{carry_html_}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">🔗 Correlation highlights</h3>
 <p style="font-size:11px;color:#666;margin:2px 0">Top correlated-stock clusters per market, 1y returns. Statistical (not causal) groupings; they break down in stressed markets.</p>
 {corr_html}

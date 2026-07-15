@@ -57,7 +57,16 @@ import pandas as pd
 PX = "/Users/umashankar/repos/global-market-data/cache_seed/ltm/US.parquet"
 SWEEP = "reports/sweep_piotroski_plus_us.csv"
 PORTFOLIO_N = 10          # top-10 per tier, matching the sweep
-CAPITALS = (100_000, 1_000_000, 10_000_000, 50_000_000)
+# Full ladder. The earlier (100k, 1M, 10M, 50M) set skipped the small end entirely and
+# so never located the actual ceiling — it reported "capacity ~$300-500k" by interpolating
+# between $100k (fine) and $1M (dead). Measured on the ladder the ceiling is ~$250k.
+CAPITALS = (1_000, 10_000, 50_000, 100_000, 250_000, 500_000,
+            1_000_000, 2_000_000, 5_000_000, 10_000_000)
+# The BINDING constraint is execution, not fees. Above ~15-20% of average daily volume a
+# position cannot be built in one day near the quoted price, and the linear impact model
+# understates cost precisely where it matters. Report it rather than pricing an
+# impossible trade.
+ADV_CEILING_PCT = 20.0
 
 
 def corwin_schultz(con) -> pd.DataFrame:

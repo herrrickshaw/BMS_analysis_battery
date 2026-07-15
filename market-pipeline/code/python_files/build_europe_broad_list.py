@@ -131,6 +131,9 @@ EMERGING = [
 ]
 
 
+DUCKDB_SEED = HERE.parent.parent.parent / "data" / "market_data.duckdb"
+
+
 def _load_seed(seed: Path | None) -> pd.DataFrame:
     cands = [seed] if seed else SEED_CANDIDATES
     for c in cands:
@@ -138,9 +141,22 @@ def _load_seed(seed: Path | None) -> pd.DataFrame:
             df = pd.read_csv(c)
             print(f"  seed: {c}  ({len(df)} rows)")
             return df
+    # The loose europe_all_list.csv these candidates point at was migrated into
+    # market_data.duckdb (see CLAUDE.md "Tracked tabular data goes in DuckDB") and
+    # no longer exists on disk — fall back to the live table, which also carries
+    # any since-committed data fixes (e.g. 5856ae6e's exchange-prefix strip).
+    if not seed and DUCKDB_SEED.exists():
+        import duckdb
+        with duckdb.connect(str(DUCKDB_SEED), read_only=True) as con:
+            df = con.execute(
+                "select yf_ticker, name, index, exchange from europe_all_list"
+            ).df()
+        print(f"  seed: {DUCKDB_SEED} (europe_all_list, {len(df)} rows)")
+        return df
     raise SystemExit(
         "  ✗ No seed found. Expected git-tracked europe_all_list.csv at "
-        + " or ".join(str(x) for x in SEED_CANDIDATES))
+        + " or ".join(str(x) for x in SEED_CANDIDATES)
+        + f" or table europe_all_list in {DUCKDB_SEED}")
 
 
 def _validate(tickers: list[str]) -> set[str]:

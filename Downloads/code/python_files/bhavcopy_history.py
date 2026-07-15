@@ -51,6 +51,33 @@ OHLC_MAP = {"OpnPric": "Open", "HghPric": "High", "LwPric": "Low",
 # BSE equity is filtered on FinInstrmTp=="STK"; NSE equity on SctySrs=="EQ".
 
 
+def _equity_only(df: Optional["pd.DataFrame"]) -> Optional["pd.DataFrame"]:
+    """Keep only real company equity, using the ISIN prefix.
+
+    `SctySrs=='EQ'` (NSE) and `FinInstrmTp=='STK'` (BSE) do NOT mean "a company
+    share". Every NSE bhavcopy row is series EQ, and BSE tags government bonds as
+    STK — so both filters let non-equity through. Indian ISINs encode the
+    instrument type, and that is the only reliable discriminator here:
+
+        INE...  company equity          (2,389 NSE / 7,709 BSE)
+        INF...  mutual fund / ETF       (  356 NSE /   332 BSE)
+        IN0...  Govt of India bonds     e.g. 1018GOI2026        (468 BSE)
+        IN1/2/3 State Development Loans e.g. 64GUJSDL30         (216 BSE)
+        IN9...  DVR shares              (1: JAIN DVR) — excluded, not ordinary equity
+
+    Without this, the screener computes Darvas boxes and golden crosses on G-Secs
+    and liquid ETFs: on 2026-07-15, 317 of 3,925 screened rows were non-equity and
+    LIQUIDSBI (SBI Nifty 1D Rate ETF, a ~₹1000 cash-parking fund) was emitted as 1
+    of just 15 GOLDEN_CROSS recommendations and shipped in the daily brief.
+
+    Applied on BOTH the fresh-download and the cache-read path — the day-CSVs on
+    disk were written before this filter existed and still contain non-equity.
+    """
+    if df is None or df.empty or "ISIN" not in df.columns:
+        return df
+    return df[df["ISIN"].astype(str).str.startswith("INE")]
+
+
 def _cleaned_behind_assembled(cached: "pd.DataFrame", want_dates: set) -> bool:
     """True when cleaned_long is missing dates that assembled_long already has.
 
@@ -72,12 +99,12 @@ def _cleaned_behind_assembled(cached: "pd.DataFrame", want_dates: set) -> bool:
 def _nse_day(day: _dt.date, nse_client) -> Optional[pd.DataFrame]:
     f = NSE_DIR / f"{day:%Y%m%d}.csv"
     if f.exists():
-        return pd.read_csv(f)
+        return _equity_only(pd.read_csv(f))
     try:
         p = nse_client.equityBhavcopy(date=_dt.datetime(day.year, day.month, day.day))
         df = pd.read_csv(p)
         df.columns = [c.strip() for c in df.columns]
-        df = df[df.get("SctySrs", "") == "EQ"]
+        df = _equity_only(df[df.get("SctySrs", "") == "EQ"])
         df.to_csv(f, index=False)
         try:
             Path(p).unlink()
@@ -91,7 +118,7 @@ def _nse_day(day: _dt.date, nse_client) -> Optional[pd.DataFrame]:
 def _bse_day(day: _dt.date, sess: requests.Session) -> Optional[pd.DataFrame]:
     f = BSE_DIR / f"{day:%Y%m%d}.csv"
     if f.exists():
-        return pd.read_csv(f)
+        return _equity_only(pd.read_csv(f))
     url = ("https://www.bseindia.com/download/BhavCopy/Equity/"
            f"BhavCopy_BSE_CM_0_0_0_{day:%Y%m%d}_F_0000.CSV")
     try:
@@ -100,7 +127,7 @@ def _bse_day(day: _dt.date, sess: requests.Session) -> Optional[pd.DataFrame]:
             return None
         df = pd.read_csv(io.BytesIO(r.content))
         df.columns = [c.strip() for c in df.columns]
-        df = df[df.get("FinInstrmTp", "") == "STK"]
+        df = _equity_only(df[df.get("FinInstrmTp", "") == "STK"])
         df.to_csv(f, index=False)
         return df
     except Exception:
@@ -294,15 +321,30 @@ def fetch_history(n_days: int = 400, workers: int = 8, exchanges=("NSE", "BSE"),
         print(f"  Pivoting {allrows['Date'].nunique()} dates → per-symbol series …")
     allrows = allrows.rename(columns={"Symbol": "TckrSymb"})
     out_all: Dict[str, pd.DataFrame] = {}
-    # NSE precedence: process NSE group last so it overwrites BSE-only collisions
-    for exch in ("BSE", "NSE"):
-        sub = allrows[allrows["_exch"] == exch]
-        for sym, g in sub.groupby("TckrSymb"):
-            g = g.set_index("Date").sort_index()[["Open", "High", "Low", "Close", "Volume"]]
-            if clean_ohlcv is not None:
-                g = clean_ohlcv(g, ticker=str(sym), min_bars=1)
-            if g is not None and len(g):
-                out_all[str(sym)] = g
+    # NSE precedence, resolved per (Symbol, Date) — NOT per symbol.
+    #
+    # The previous form looped `for exch in ("BSE", "NSE")` and did
+    # `out_all[sym] = g`, so the NSE pass REPLACED a symbol's entire series rather
+    # than just its colliding dates. Any stock that stopped trading on NSE but
+    # continues on BSE was therefore frozen at its last NSE bar, with every later
+    # (real, live) BSE bar silently discarded — and the screener then quoted that
+    # stale price as a current recommendation.
+    #
+    # Measured 2026-07-15 before this fix: 270 of 7,833 symbols were frozen, up to
+    # 313 days stale (ABAN ended 2025-09-04 while BSE traded through 2026-07-14;
+    # MODISONLTD showed 284.6 from 2026-05-29 and was emitted as a GOLDEN_CROSS
+    # pick while screener.in had it at ₹289 on 14 Jul).
+    #
+    # 'BSE' < 'NSE', so sorting by _exch and keeping the last row per (Symbol,Date)
+    # prefers NSE where both quote that day, while retaining BSE-only dates.
+    allrows = allrows.sort_values(["TckrSymb", "Date", "_exch"])
+    allrows = allrows.drop_duplicates(subset=["TckrSymb", "Date"], keep="last")
+    for sym, g in allrows.groupby("TckrSymb"):
+        g = g.set_index("Date").sort_index()[["Open", "High", "Low", "Close", "Volume"]]
+        if clean_ohlcv is not None:
+            g = clean_ohlcv(g, ticker=str(sym), min_bars=1)
+        if g is not None and len(g):
+            out_all[str(sym)] = g
 
     # persist the cleaned long frame so the next run hits the fast path
     try:

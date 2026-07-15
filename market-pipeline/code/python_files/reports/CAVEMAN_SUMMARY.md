@@ -95,9 +95,14 @@ Score see it coming. Score say NO.
 BIG + LOUD = Apple. Microsoft. Everybody watch. Thousand smart people with
 big computer already look at Apple today.
 
-No free food there. Score find nothing. **−1.7.** Correct! Should find nothing!
+Score edge there is **+7.4** — SMALLEST of the four boxes. Not zero. Small.
 
-Market work. Where many eye look, no easy food. Where nobody look, food.
+⚠️ We first said **−1.7, the only BAD box**. That was WRONG and we take it back.
+More data made it climb: −1.7, then +3.6, then +7.4. It never stopped climbing,
+which means we never had enough data to know. **Claim dead.**
+
+Still fits the story though: where many eye look, LEAST food. Not NO food.
+Weaker claim. True claim.
 
 ---
 
@@ -183,7 +188,7 @@ Must ask two question separate.
 
 ---
 
-## SIX TIME WE WRONG (this the useful part)
+## ELEVEN TIME WE WRONG (this the useful part)
 
 Every wrong thing LOOK RIGHT. Table full of number. Number look fine. Number lie.
 
@@ -195,11 +200,21 @@ Every wrong thing LOOK RIGHT. Table full of number. Number look fine. Number lie
 | Current ratio guess | fine | 62% right. coin flip 58% right. **useless** | check against real data |
 | Gross margin TCS | 98% | real 42%. TCS buy no raw material. TCS buy PEOPLE. | look at TCS |
 | Darvas result | one thing | opposite thing | count signal: 117 → 12,773 |
+| US price list | looked fine | **missing half the alphabet!** No CME, no Cummins, no D-to-L | count letters |
+| US revenue | ADM $25.7bn | real $93.9bn. **3.7x wrong** | cost bigger than revenue = impossible |
+| Bank money math | ROCE 9% | wrong — but lands in normal range so no alarm | check a BANK, not RELIANCE |
+| Country floors | "47th percentile" | made up. Reproduce from nothing | try to recompute |
+| `(x or 0)` | safe | NaN is TRUE. `nan or 0` = nan | run it |
 
 **None caught by thinking hard. ALL caught by checking against other data.**
 
-Two of six were us correcting US. Same day. We wrong, then we wrong again about
-how we wrong.
+**And THREE fix we try was ALSO wrong — data caught them before they ship:**
+- bank detector: caught ADANIPOWER (power company!), missed 360ONE (real bank)
+- "bond sneak past money gate": **0 of 446 sneak past.** We guess. We wrong.
+- country floors: we say "47th percentile" but never actually compute it
+
+Every time same shape: **story sound right → we believe → we not check.**
+Story sounding right is NOT evidence. That is the real lesson.
 
 ---
 

@@ -3,6 +3,21 @@
 *Same findings as PIOTROSKI_LIQUIDITY_PAPER.md. Small words. Real numbers.*
 *Learn only. Not money advice.*
 
+## 🔴 WARNING: NUMBERS HERE ARE BEING REDONE
+
+Five robot checkers tried to BREAK this work. They found **8 broken things**.
+Some fixed. One still broken. Numbers below will change.
+
+**Still broken:** for a BANK, the money math is wrong. Bank borrows money — that
+is bank's raw material, not bank's cost of borrowing. So we add it back wrong.
+BUT the two mistakes cancel each other and land the answer INSIDE the normal
+range. So no alarm rings. Sneaky. We check RELIANCE and TCS — neither is a bank.
+Bank numbers still wrong. We say so instead of hiding it.
+
+**Fixed but numbers not redone yet:** US "revenue" was only PART of revenue.
+ADM company: we stored $25.7 billion. Real number $93.9 billion. **3.7x wrong.**
+Revenue is used in 2 of the 9 tests. So those tests were wrong for big companies.
+
 ---
 
 ## THE BIG THING
@@ -30,14 +45,31 @@ We put stock in four box. Two things: BIG or SMALL. And LOUD or QUIET.
 
 | box | how many | score edge |
 |---|---|---|
-| SMALL + QUIET | 819 | **+13.8** good |
-| SMALL + LOUD | 818 | +7.7 less good |
-| **BIG + QUIET** | 818 | **+33.7 BEST** |
-| BIG + LOUD | 818 | **−1.7 BAD** |
+| SMALL + QUIET | 2,703 | **+13.4** good |
+| SMALL + LOUD | 2,703 | +7.5 less good |
+| **BIG + QUIET** | 2,703 | **+31.4 BEST** |
+| BIG + LOUD | 2,702 | +7.4 small |
 
 Look. **BIG + QUIET is BEST.** Big company! Not small! But quiet.
 
 In every box, QUIET beat LOUD. So quiet is the thing. Not small.
+
+**BUT — we counted three times, with more data each time:**
+
+| box | first count | second | third (most data) |
+|---|---|---|---|
+| SMALL + QUIET | +13.8 | +12.2 | **+13.4** steady |
+| SMALL + LOUD | +7.7 | **+13.9** ← jumped! | **+7.5** back |
+| BIG + QUIET | +33.7 | +27.8 | **+31.4** steady |
+| BIG + LOUD | **−1.7** | +3.6 | **+7.4** kept climbing |
+
+Second count said SMALL+LOUD beat SMALL+QUIET. We said "we wrong!" Then third
+count said no — first count right. **We changed our mind twice on same thing.**
+
+And "BIG+LOUD is the only bad box" — **that is DEAD.** It kept climbing:
+−1.7, then +3.6, then +7.4. Not bad. Just smallest. We take that claim back.
+
+**Two boxes stayed same, two boxes moved. Trust the two that stayed.**
 
 ---
 

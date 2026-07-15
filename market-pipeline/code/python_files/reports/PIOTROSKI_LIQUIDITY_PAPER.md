@@ -6,6 +6,26 @@
 
 ---
 
+> ## 🔴 STATUS: NUMBERS BELOW ARE BEING REGENERATED
+>
+> Adversarial validation (five independent agents, each instructed to *refute* rather than
+> confirm) found **eight defects** after this note was drafted. Three are fixed, one is
+> documented-and-unfixed, and a re-collection is running. **Every figure here should be
+> read as provisional until that lands.**
+>
+> | | |
+> |---|---|
+> | **Fixed — invalidates the tables below** | US `revenue` stored the ASC-606 *contract-revenue subset*, not total revenue. ADM FY2023 held **$25.69B against a 10-K total of ~$93.9B — wrong by 3.7×**. `cost_of_revenue > revenue` (impossible) fired on 262/5,418 rows. Revenue feeds Piotroski tests 8 and 9, so this **flips booleans**, and it skews to multi-segment filers — i.e. large caps, i.e. the cell carrying the headline. |
+> | **Documented, NOT fixed** | `EBIT = PBT + interest` is **wrong for lenders** — for a bank/NBFC interest is cost of goods sold. EBIT inflates ~4×, capital employed ~9×, and **the errors partially cancel into the 5–25% plausible band**, so no range check can fire. It survived validation because the checks used (RELIANCE 8.9%, TCS 56.8%) are both non-financials. **ROCE for Indian lenders is wrong and there is no guard.** |
+> | **Fixed** | Per-market liquidity floors were **fabricated** — US $475k reproduced under no universe definition (measured: $300k with junk, $896k without). The "India 47th percentile" anchor existed only because 1,079 of 3,476 panel names are delisted. Deleted, not recomputed. |
+> | **Fixed** | `(x or 0)` silently voids NaN — `float(str(nan))` succeeds so the `None` fallback never fires, and **NaN is truthy**. Voided 15% of gate-passing rows. |
+>
+> **Coverage rose 13% → 43%** of available tickers once the broken price panel and an
+> inconsistent field requirement were fixed. Sample sizes throughout are therefore
+> understated.
+
+---
+
 ## Abstract
 
 We test whether the Piotroski (2000) F-score premium is conditioned by firm size or by
@@ -90,16 +110,29 @@ Turnover and market capitalisation correlate at **+0.797**. Ranking on turnover 
 as we initially did — cannot distinguish them. Double-sorting liquidity *within* size,
 with capitalisation measured point-in-time (last close × shares as filed):
 
-| Size | Liquidity | n | F≥70 | F<40 | **Premium** |
-|---|---|---|---|---|---|
-| Small | **Illiquid** | 819 | +7.2% | −6.6% | **+13.8pp** |
-| Small | Liquid | 818 | −1.8% | −9.6% | +7.7pp |
-| **Large** | **Illiquid** | 818 | +8.2% | **−25.6%** | **+33.7pp** |
-| Large | Liquid | 818 | +3.6% | +5.3% | **−1.7pp** |
+| Size | Liquidity | n | F≥70 | F<40 | **Premium** | @818 | @1,673 |
+|---|---|---|---|---|---|---|---|
+| Small | **Illiquid** | 2,703 | +3.4% | −10.0% | **+13.4pp** | +13.8 | +12.2 |
+| Small | Liquid | 2,703 | +4.6% | −2.9% | +7.5pp | +7.7 | **+13.9** |
+| **Large** | **Illiquid** | 2,703 | +6.8% | **−24.6%** | **+31.4pp** | +33.7 | +27.8 |
+| Large | Liquid | 2,702 | +8.2% | +0.9% | **+7.4pp** | **−1.7** | +3.6 |
 
 Illiquid beats liquid **within both size buckets**. The largest premium is in **large,
-illiquid** firms. The only negative cell is large-and-liquid — the most efficiently priced
-corner of the most efficient equity market, where no premium should survive, and none does.
+illiquid** firms — 4× the next cell.
+
+**The last two columns are the honest part of this table.** The same four cells were
+computed at three sample sizes as data defects were fixed, and they did not all hold:
+
+- **Small+Liquid reversed and reverted.** At n=1,673 it read +13.9 and appeared to *beat*
+  illiquid — contradicting the paper's thesis. At n=2,703 it settles back to +7.5. The
+  middle run was the outlier; the thesis was retracted on it and then restored.
+- **Large+Liquid moved monotonically** −1.7 → +3.6 → **+7.4** as data was added. An earlier
+  draft called it "the only negative cell." **That claim is withdrawn: it is positive.**
+  The premium is smallest there, not absent.
+- **Large+Illiquid and Small+Illiquid are stable** across all three (+31 to +34, +12 to +14).
+
+A claim that survives a 3.3× increase in sample is worth more than one that doesn't. Two
+of these four did; two did not. The thesis rests on the two that did.
 
 **Mechanism.** In the strongest cell, illiquid large-caps with weak fundamentals *crash*
 (F<40 median −25.6%): value traps, low float, distressed names institutions cannot exit.
@@ -188,8 +221,24 @@ an independent check; none by reasoning.**
 | Current-ratio proxy | 62.1% sign agreement vs 57.6% coin-flip baseline | independent ground truth |
 | Gross margin | 98% for a services firm (true ~42%) | raw materials = 0.1% of sales |
 | Darvas gradient | reversed under proper power | 117 → 12,773 signals |
+| **US price panel** | **interrupted alphabetical collection** — CME, Cummins and all of D–L absent; the 597-ticker sample held only A,B,C,M,N,P,Q,R,S,T | comparing symbol counts against EDGAR |
+| **US revenue tag** | ASC-606 subset stored as total — ADM 3.7× wrong | `cost_of_revenue > revenue` is impossible |
+| **Lender EBIT** | interest added back for banks/NBFCs; errors cancel **into the plausible band** | ROE cross-check on financials |
+| **Per-market floors** | fabricated — reproduce under no universe definition | recomputing them |
+| **`(x or 0)`** | NaN is truthy; `float(str(nan))` succeeds | executing it |
 
-Two were corrections to our own earlier conclusions within the same analysis.
+**Three of these were corrections to this analysis's own conclusions, and three more were
+fixes I proposed that the data refuted *before they shipped*:**
+
+- an `interest/revenue ≥ 25%` lender gate — **caught Adani Power (a power utility), missed
+  360ONE and 5PAISA (both NBFCs)**. Interest/revenue measures leverage, not lending.
+- *"bonds pass the value gate on face value"* — **0 of 446 clear ₹1 crore; median bond
+  turnover is ₹0.9 lakh/day.** Reasoned from a precedent instead of measuring.
+- the per-market floors above, asserted as "the 47th percentile" without recomputation.
+
+Each was a plausible mechanism asserted without a check. **The pattern, not the individual
+bugs, is the finding**: a mechanism that sounds right is not evidence, and the six original
+failures share that shape exactly.
 
 **Mean and median disagreed on every headline result** — the illiquidity premium, the
 "inversion", low-F outperformance (117% mean vs 15.1% median). The median was correct each

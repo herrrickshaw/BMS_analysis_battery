@@ -1,0 +1,194 @@
+#!/usr/bin/env python3
+"""
+sweep_piotroski_plus_us.py — weight sweep on US SEC EDGAR data.
+
+WHY THE US RUN IS THE BETTER TEST
+---------------------------------
+India (screener.in) gives 10y but ~8 rebalances, 8-of-9 tests, and a 120-day
+reporting-lag PROXY because screener.in never exposes the filing date.
+
+US (SEC EDGAR, via sec_history_collector.py) gives:
+  * REAL filing dates — `filed` carries 1,449 distinct fy_end->filed lags, including
+    a 2009 fiscal year filed in 2012 (a genuine late/restated filing). This is a true
+    as-of date, not a lag assumption. It is the single biggest methodological upgrade
+    over the India run.
+  * ALL 9 Piotroski tests exactly — current_assets and current_liabilities are
+    reported directly, so test 6 needs no proxy and no validation.
+  * ~10 dense rebalances (2016-2025, 196->579 tickers/yr).
+
+HONEST LIMITS, measured not assumed
+-----------------------------------
+The headline "42 years / 111,949 rows" is false twice over:
+  1. 16 rows carry fy_end up to 2029 — impossible, parse artefacts (0.01%).
+  2. Requiring all 12 tests TOGETHER collapses 111,949 -> 4,889 rows / 1,038 tickers.
+     The binding field is long_term_debt (21% populated). Before 2016 that leaves
+     5-34 tickers/year — too few to rank a top-20 from, so the usable window is
+     2016-2025, not 2007-2026.
+Filing lag is constrained to 0-400 days: negatives are impossible, and >400d are
+restatements whose `filed` date no longer marks when the market learned the numbers.
+
+SURVIVORSHIP: unlike the India route, EDGAR keeps filings for companies that later
+delisted — a firm that filed in 2018 and died in 2020 still has its 2018 filing. The
+price parquet retains delisted names too. So this run is the closest to unbiased
+available, though names that never filed at all remain absent.
+"""
+from __future__ import annotations
+
+import warnings
+
+warnings.filterwarnings("ignore")
+
+import duckdb
+import numpy as np
+import pandas as pd
+
+import piotroski_plus as PP
+
+FUND = "/Users/umashankar/repos/global-stock-screener/cache_seed/fundamentals_history/US.parquet"
+PX = "/Users/umashankar/repos/global-market-data/cache_seed/ltm/US.parquet"
+HOLD = 252
+TOP_N = 20
+REBAL = [pd.Timestamp(f"{y}-06-01") for y in range(2017, 2026)]
+
+
+def main() -> int:
+    con = duckdb.connect()
+    f = con.execute(f"""
+        SELECT ticker, CAST(fy_end AS DATE) fy_end, CAST(filed AS DATE) filed,
+               ebit, net_income, cfo, total_assets, current_assets, current_liabilities,
+               long_term_debt, shares, revenue, gross_profit, equity
+        FROM '{FUND}'
+        WHERE ebit IS NOT NULL AND net_income IS NOT NULL AND cfo IS NOT NULL
+          AND total_assets > 0 AND current_assets IS NOT NULL AND current_liabilities > 0
+          AND long_term_debt IS NOT NULL AND shares > 0 AND revenue > 0
+          AND gross_profit IS NOT NULL
+          AND date_diff('day', CAST(fy_end AS DATE), CAST(filed AS DATE)) BETWEEN 0 AND 400
+          AND CAST(fy_end AS DATE) BETWEEN DATE '2014-01-01' AND DATE '2026-07-15'
+        ORDER BY ticker, fy_end
+    """).df()
+    f["ce"] = f.total_assets - f.current_liabilities
+    f = f[f.ce > 0].copy()
+    f["roce"] = f.ebit / f.ce
+    print(f"\n{'='*80}\n  PIOTROSKI PLUS — WEIGHT SWEEP | US (SEC EDGAR) | hold {HOLD}d"
+          f"\n{'='*80}")
+    print("  Educational/research only. NOT investment advice.")
+    print("  Entry gated on the REAL SEC filing date, not a reporting-lag assumption.\n")
+    print(f"  fundamentals: {len(f):,} ticker-years | {f.ticker.nunique():,} tickers | "
+          f"{f.fy_end.min()} .. {f.fy_end.max()}")
+
+    ds = ", ".join(f"DATE '{d.date()}'" for d in REBAL)
+    con.execute(f"""
+    CREATE OR REPLACE TABLE px AS SELECT Date, Symbol, Close FROM '{PX}' WHERE Close>0;
+    CREATE OR REPLACE TABLE ca AS
+      SELECT Symbol, Date, CASE WHEN prev>0 AND (Close/prev-1 < -0.50 OR Close/prev-1 > 1.00)
+                                THEN 1 ELSE 0 END is_ca
+      FROM (SELECT Symbol, Date, Close, lag(Close) OVER (PARTITION BY Symbol ORDER BY Date) prev FROM px);
+    CREATE OR REPLACE TABLE fw AS
+      SELECT p.Symbol, p.Date, p.Close,
+             lead(p.Close,{HOLD}) OVER (PARTITION BY p.Symbol ORDER BY p.Date) fwd,
+             last_value(p.Close) OVER (PARTITION BY p.Symbol ORDER BY p.Date
+               ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) last_px,
+             sum(c.is_ca) OVER (PARTITION BY p.Symbol ORDER BY p.Date
+               ROWS BETWEEN 1 FOLLOWING AND {HOLD} FOLLOWING) ca_ahead
+      FROM px p JOIN ca c ON p.Symbol=c.Symbol AND p.Date=c.Date;
+    """)
+    ret = con.execute(f"""
+      WITH rb AS (SELECT unnest([{ds}]) t),
+      anchor AS (SELECT rb.t, min(fw.Date) d FROM rb JOIN fw ON fw.Date >= rb.t GROUP BY rb.t)
+      SELECT a.t, f.Symbol, coalesce(f.fwd, f.last_px)/f.Close - 1 fwd_ret
+      FROM anchor a JOIN fw f ON f.Date = a.d
+      WHERE coalesce(f.ca_ahead,0)=0 AND f.Close>0
+    """).df()
+    ret["t"] = pd.to_datetime(ret["t"])
+    rmap = {(r.Symbol, r.t): r.fwd_ret for r in ret.itertuples()}
+    print(f"  forward returns: {len(ret):,} rows over {ret.t.nunique()} rebalances\n")
+
+    def tests(cur, prv, hist):
+        d = {}
+        roa, roa_p = cur.net_income / cur.total_assets, prv.net_income / prv.total_assets
+        d["1_roa_positive"] = bool(roa > 0)
+        d["2_cfo_positive"] = bool(cur.cfo > 0)
+        d["3_roa_improving"] = bool(roa > roa_p)
+        d["4_accruals_cfo_gt_roa"] = bool(cur.cfo / cur.total_assets > roa)
+        d["5_leverage_falling"] = bool(cur.long_term_debt / cur.total_assets
+                                       < prv.long_term_debt / prv.total_assets)
+        d["6_current_ratio_rising"] = bool(cur.current_assets / cur.current_liabilities
+                                           > prv.current_assets / prv.current_liabilities)
+        d["7_no_dilution"] = bool(cur.shares <= prv.shares * 1.01)
+        d["8_gross_margin_rising"] = bool(cur.gross_profit / cur.revenue
+                                          > prv.gross_profit / prv.revenue)
+        d["9_asset_turnover_rising"] = bool(cur.revenue / cur.total_assets
+                                            > prv.revenue / prv.total_assets)
+        d["10_roce_level"] = bool(cur.roce > PP.ROCE_LEVEL_HURDLE)
+        if len(hist) >= 3 and abs(np.mean(hist)) > 0.01:
+            d["11_roce_stable"] = bool(np.std(hist) / abs(np.mean(hist)) < PP.ROCE_CV_HURDLE)
+            d["12_roce_not_deteriorating"] = bool(cur.roce >= np.mean(hist))
+        else:
+            d["11_roce_stable"] = d["12_roce_not_deteriorating"] = None
+        return d
+
+    rows = []
+    by_t = {tk: g.reset_index(drop=True) for tk, g in f.groupby("ticker")}
+    for t in REBAL:
+        for tk, g in by_t.items():
+            vis = g[g.filed <= t]                 # REAL filing date — true as-of
+            if len(vis) < 2:
+                continue
+            cur, prv = vis.iloc[-1], vis.iloc[-2]
+            fr = rmap.get((tk, t))
+            if fr is None or fr != fr:
+                continue
+            r = tests(cur, prv, vis["roce"].dropna().tolist())
+            rec = {"Symbol": tk, "t": t, "fwd_ret": fr}
+            for p in PP.PRESETS:
+                rec[p] = PP.weigh(r, p)["pct"]
+            rows.append(rec)
+    d = pd.DataFrame(rows)
+    if d.empty:
+        print("  no scored rows"); return 1
+    print(f"  scored panel: {len(d):,} stock-years | {d.Symbol.nunique():,} symbols | "
+          f"{d.t.nunique()} rebalances\n")
+
+    print(f"  === TOP-{TOP_N} PORTFOLIO PER VECTOR (12m hold, equal weight) ===")
+    print(f"  {'vector':11s} {'mean':>7s} {'median':>7s} {'vs univ':>8s} {'beat univ':>10s} {'worst':>7s}")
+    uni = d.groupby("t")["fwd_ret"].mean()
+    print(f"  {'[universe]':11s} {uni.mean()*100:>6.1f}% {uni.median()*100:>6.1f}% "
+          f"{'--':>8s} {'--':>10s} {uni.min()*100:>6.1f}%")
+    res = {}
+    for p in PP.PRESETS:
+        pr = []
+        for t, g in d.groupby("t"):
+            g2 = g[g[p].notna()]
+            if len(g2) < TOP_N:
+                continue
+            pr.append((t, g2.nlargest(TOP_N, p)["fwd_ret"].mean(), g2["fwd_ret"].mean()))
+        if not pr:
+            continue
+        x = pd.DataFrame(pr, columns=["t", "port", "uni"])
+        x["ex"] = x.port - x.uni
+        res[p] = x
+        print(f"  {p:11s} {x.port.mean()*100:>6.1f}% {x.port.median()*100:>6.1f}% "
+              f"{x.ex.mean()*100:>+7.1f}% {int((x.ex>0).sum()):>4}/{len(x):<5} {x.port.min()*100:>6.1f}%")
+
+    print("\n  === excess vs universe, year by year (read THIS, not the mean) ===")
+    print(f"  {'year':6s} " + " ".join(f"{p:>11s}" for p in res))
+    for t in sorted({t for p in res for t in res[p].t}):
+        print(f"  {t.year:<6} " + " ".join(
+            f"{res[p][res[p].t==t]['ex'].iloc[0]*100:>+10.1f}%"
+            if len(res[p][res[p].t == t]) else f"{'--':>11s}" for p in res))
+
+    print("\n  === is high-F actually GOOD in the US? (memory says a prior backtest")
+    print("      found it INVERTED — high-F underperforming) ===")
+    d["f_only"] = d["canonical"]
+    for lo, hi, lab in [(0, 40, "weak  (bottom)"), (40, 70, "middle"), (70, 101, "strong (top)")]:
+        s = d[(d.canonical >= lo) & (d.canonical < hi)]
+        if len(s) > 50:
+            print(f"    canonical {lab:16s} n={len(s):>5,}  mean fwd {s.fwd_ret.mean()*100:>6.1f}%"
+                  f"  median {s.fwd_ret.median()*100:>6.1f}%")
+    d.to_csv("reports/sweep_piotroski_plus_us.csv", index=False)
+    print("\n  -> reports/sweep_piotroski_plus_us.csv")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

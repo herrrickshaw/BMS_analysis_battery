@@ -117,6 +117,15 @@ FAILURES=()
   # --draft, which still writes brief_today.html for a human to inspect. A missing
   # brief is a visible problem; a confidently wrong one that lands in your inbox
   # is not.
+  # [13a] Cross-market consistency — a market can look healthy alone and be the
+  # odd one out in comparison. Every anomaly found on 2026-07-15 (Japan/Korea's
+  # 200-DMA computed from a 3-month window and 0% populated; Europe+Japan running
+  # with NO liquidity gate when the FX fetch failed; India momentum-only) was
+  # invisible in its own scan and obvious side by side. Non-fatal: it registers a
+  # FAILURE so the alert fires, without blocking a brief that is mostly sound.
+  step "[13a/14] cross-market consistency audit"
+  $PY consistency_audit.py || FAILURES+=("consistency: cross-market anomaly (see audit above)")
+
   step "[13b/14] validate brief against screener.in"
   if $PY validate_brief.py --sample 6; then
       step "[14/14] build + send mailer"

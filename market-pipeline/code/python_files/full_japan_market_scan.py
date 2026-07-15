@@ -204,6 +204,24 @@ def build_ticker_universe() -> list[dict]:
 # ── Bulk OHLC ─────────────────────────────────────────────────────────────────
 
 def bulk_download_ohlc(tickers: list[str], period: str = "3mo") -> dict[str, pd.DataFrame]:
+    """Bulk OHLC for the TSE universe.
+
+    Reads through ohlcv_cache first. Japan was re-downloading 3 months of history
+    for ~3,700 tickers on every run to learn one new bar, and the Japan correlation
+    scan then pulled the same universe again. India (bhavcopy) and the US
+    (MarketCache) already fetch incrementally; Japan and Europe did not.
+
+    Falls back to the original direct download if the cache is unavailable.
+    """
+    try:
+        import ohlcv_cache as _oc
+        got = _oc.get("JAPAN", tickers, yf_suffix="", period=period)
+        if got:
+            print(f"  ohlcv_cache: {len(got)}/{len(tickers)} tickers")
+            return got
+    except Exception as _e:
+        print(f"  (ohlcv_cache unavailable: {str(_e)[:60]} — direct download)")
+
     result: dict[str, pd.DataFrame] = {}
     batches = [tickers[i:i + BATCH_SIZE] for i in range(0, len(tickers), BATCH_SIZE)]
     print(f"  Downloading OHLC for {len(tickers)} tickers in {len(batches)} batches …")

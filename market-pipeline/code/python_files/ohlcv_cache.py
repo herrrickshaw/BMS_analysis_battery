@@ -94,27 +94,47 @@ def refresh(market: str, symbols: List[str], yf_suffix: str = "",
     cached = _read(market)
     today = _dt.date.today()
     start = None
+    fetch_list = list(symbols)
 
     if not cached.empty:
         mx = cached["Date"].max().date()
-        if mx >= today - _dt.timedelta(days=1):
-            # Already has yesterday's bar — nothing to pull. This is the whole
-            # point: the second consumer of the day fetches ZERO.
+        date_fresh = mx >= today - _dt.timedelta(days=1)
+        # Symbol coverage matters as much as freshness. Checking only the date lets
+        # a cache seeded with a SUBSET satisfy a request for the full universe: a
+        # 60-ticker probe made a later 2,637-ticker Korea scan return "warm — no
+        # fetch" and silently produce 57/2,637. Freshness is per-(symbol,date), not
+        # per-file.
+        have = set(cached["Symbol"].unique())
+        missing = [s for s in symbols if s not in have]
+
+        if date_fresh and not missing:
             if verbose:
                 print(f"  ohlcv_cache[{market}]: warm ({len(cached):,} rows, "
-                      f"through {mx}) — no fetch", flush=True)
+                      f"{len(have):,} symbols, through {mx}) — no fetch", flush=True)
             return cached
-        start = mx + _dt.timedelta(days=1)
-        if verbose:
-            print(f"  ohlcv_cache[{market}]: incremental from {start} "
-                  f"(cache through {mx})", flush=True)
+
+        if missing:
+            # New symbols need their full history, not just the recent gap, so they
+            # are seeded over `period` while known symbols only need new dates.
+            # Fetching everything over `period` is the simple, correct union.
+            fetch_list = missing if date_fresh else list(symbols)
+            if verbose:
+                print(f"  ohlcv_cache[{market}]: {len(missing):,} of {len(symbols):,} "
+                      f"symbols absent — seeding those over {period}"
+                      + ("" if date_fresh else f"; cache also stale (through {mx})"),
+                      flush=True)
+        else:
+            start = mx + _dt.timedelta(days=1)
+            if verbose:
+                print(f"  ohlcv_cache[{market}]: incremental from {start} "
+                      f"(cache through {mx}, {len(have):,} symbols)", flush=True)
     elif verbose:
         print(f"  ohlcv_cache[{market}]: cold — seeding {period}", flush=True)
 
     rows = []
-    n_batches = (len(symbols) + BATCH_SIZE - 1) // BATCH_SIZE
-    for i in range(0, len(symbols), BATCH_SIZE):
-        batch = symbols[i:i + BATCH_SIZE]
+    n_batches = (len(fetch_list) + BATCH_SIZE - 1) // BATCH_SIZE
+    for i in range(0, len(fetch_list), BATCH_SIZE):
+        batch = fetch_list[i:i + BATCH_SIZE]
         ys = [_yf(s, yf_suffix) for s in batch]
         bn = i // BATCH_SIZE + 1
         if verbose:

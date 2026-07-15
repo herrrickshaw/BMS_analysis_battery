@@ -51,6 +51,23 @@ OHLC_MAP = {"OpnPric": "Open", "HghPric": "High", "LwPric": "Low",
 # BSE equity is filtered on FinInstrmTp=="STK"; NSE equity on SctySrs=="EQ".
 
 
+def _cleaned_behind_assembled(cached: "pd.DataFrame", want_dates: set) -> bool:
+    """True when cleaned_long is missing dates that assembled_long already has.
+
+    Guards the post-fetch fast path. Both frames are restricted to want_dates so
+    the rolling look-back window (which legitimately drops the oldest dates from
+    cleaned on each run) is not mistaken for staleness.
+    """
+    if cached is None or cached.empty or not CLEANED.exists():
+        return False
+    try:
+        have = {pd.Timestamp(d) for d in pd.read_parquet(CLEANED, columns=["Date"])["Date"].unique()}
+    except Exception:
+        return True          # can't read it → don't trust it, rebuild
+    want_asm = {pd.Timestamp(d) for d in cached["Date"].unique()} & want_dates
+    return bool(want_asm - have)
+
+
 # ── per-day download (cached) ──────────────────────────────────────────────────
 def _nse_day(day: _dt.date, nse_client) -> Optional[pd.DataFrame]:
     f = NSE_DIR / f"{day:%Y%m%d}.csv"
@@ -234,7 +251,15 @@ def fetch_history(n_days: int = 400, workers: int = 8, exchanges=("NSE", "BSE"),
     # POST-FETCH FAST PATH: the only "missing" date was today (not yet published)
     # and nothing new was actually downloaded → serve the cleaned cache, skip the
     # ~30s pivot+clean. This keeps intraday re-runs cheap until today's EOD lands.
-    if not new_rows and CLEANED.exists():
+    #
+    # "nothing new downloaded" does NOT imply the cleaned cache is current. If an
+    # earlier run persisted `assembled` and then died (or was killed) before writing
+    # `cleaned`, cleaned stays a date behind — and because new_rows is empty on every
+    # later run, this branch would short-circuit the rebuild FOREVER, silently
+    # pinning downstream consumers to stale data. (Seen 2026-07-15: assembled had
+    # 2026-07-14, cleaned was stuck at 2026-07-13 and no re-run could fix it.)
+    # So only take the fast path when cleaned actually covers assembled.
+    if not new_rows and CLEANED.exists() and not _cleaned_behind_assembled(cached, want_dates):
         try:
             out = _from_cleaned(min_bars)
             if verbose:
@@ -242,6 +267,8 @@ def fetch_history(n_days: int = 400, workers: int = 8, exchanges=("NSE", "BSE"),
             return out
         except Exception:
             pass
+    elif not new_rows and CLEANED.exists() and verbose:
+        print("  cleaned cache is behind assembled → rebuilding (fast path skipped)")
 
     # merge cache + new, persist the updated assembled parquet
     parts = [p for p in (cached, *new_rows) if p is not None and not p.empty]

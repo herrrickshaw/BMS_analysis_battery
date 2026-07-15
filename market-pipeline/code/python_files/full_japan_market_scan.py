@@ -622,6 +622,26 @@ def main():
             breakout_tickers = sorted(breakout_tickers, key=_upside)[:MAX_FUND_CANDIDATES]
             print(f"  (capped to {MAX_FUND_CANDIDATES} freshest breakouts)")
 
+        # Reuse quarterly fundamentals rather than refetching .info nightly.
+        # Piotroski/CoffeeCan come from quarterly filings and don't move day to
+        # day. India documented this years ago; the US adopted it today (63min ->
+        # 4s). Japan/Europe/Korea never did. The volume is smaller here (~200
+        # breakouts, not 5,700) but it is the SAME rate-limit pressure that made
+        # the FX fetch fail on 2026-07-15 — which silently disabled the liquidity
+        # gate for Europe AND Japan (every row Liquidity_Tier=UNKNOWN). Cutting
+        # avoidable .info calls protects other markets, not just this one.
+        _jp_cached, _jp_src = {}, None
+        try:
+            import fundamentals_cache as _fc
+            _jp_cached, _jp_src = _fc.load("japan_scan/japan_market_scan*.xlsx",
+                                           key="YF_Ticker")
+        except Exception as _e:
+            print(f"  fundamentals cache unavailable: {str(_e)[:50]}")
+        _jp_reuse = [t for t in breakout_tickers if t in _jp_cached]
+        breakout_tickers = [t for t in breakout_tickers if t not in _jp_cached]
+        if _jp_reuse:
+            print(f"  reusing {len(_jp_reuse)} fundamentals from {_jp_src}")
+
         print(f"\nStage 4 — Fundamental scans ({len(breakout_tickers)} candidates, "
               f"{args.workers} workers) …")
         done = 0
@@ -661,6 +681,29 @@ def main():
                               f"(triple hits: {len(triple_rows)})")
                 except Exception as e:
                     print(f"    {tkr}: error — {e}")
+
+        # Merge reused rows back. The loop above only ran the FETCH list, so
+        # without this every reused stock disappears from Fundamentals/Triple_Hits
+        # — a truncated scan masquerading as a fast one.
+        if _jp_reuse:
+            _fresh = {r["YF_Ticker"]: r for r in all_rows if r.get("YF_Ticker")}
+            for t in _jp_reuse:
+                row = dict(_jp_cached[t])
+                cur = _fresh.get(t)
+                if cur:                       # refresh everything price-derived
+                    for k in ("LTP_JPY", "Change%", "Darvas_Signal", "Box_Top",
+                              "Box_Bottom", "Upside_to_Top%", "200_Day_MA",
+                              "Distance_to_200MA%", "Trend_Signal",
+                              "Turnover_USD", "Liquidity_Tier"):
+                        if k in cur:
+                            row[k] = cur[k]
+                fund_rows.append(row)
+                if (str(row.get("Piotroski_Strong", "")).upper() == "YES"
+                        and str(row.get("CoffeeCan", "")).upper() == "PASS"
+                        and str(row.get("Darvas_Signal", "")) == "BREAKOUT_BUY"):
+                    triple_rows.append(row)
+            print(f"  merged {len(_jp_reuse)} reused fundamentals "
+                  f"(prices refreshed from today's scan)")
     else:
         print("\nStage 4 — Skipped")
 

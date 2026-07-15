@@ -114,14 +114,26 @@ def main():
     print(f"  {len(all_df)} screened | {len(darvas_df)} Darvas signals | {gc_n} golden crosses\n")
 
     print("Stage 3 — Reuse latest fundamentals + re-derive Triple Hits …")
-    prev_files = sorted(glob.glob("indian_full_scan/*_full_scan_*.xlsx"))
+    # This read used to be hardcoded to sheet_name="Fundamentals" — a name that
+    # NOTHING in India's chain ever writes: full_indian_market_scan.py (the seeder)
+    # writes "All_Fundamentals". So it failed with "Worksheet named 'Fundamentals'
+    # not found" on every run, and because line ~155 only WRITES the sheet when it
+    # successfully READ one, the sheet could never come into existence. India has
+    # been structurally incapable of carrying fundamentals: 0 of the last 6
+    # workbooks had them, and its brief section is momentum-only (Darvas/golden
+    # cross) while US/Europe/Japan/Korea carry Piotroski + Coffee Can — so its
+    # picks aren't comparable to theirs. fundamentals_cache accepts either name.
     fund_df = pd.DataFrame()
-    if prev_files:
-        try:
-            fund_df = pd.read_excel(prev_files[-1], sheet_name="Fundamentals")
-            print(f"  reused fundamentals from {Path(prev_files[-1]).name} ({len(fund_df)} rows)")
-        except Exception as e:
-            print(f"  no fundamentals reused: {e}")
+    try:
+        import fundamentals_cache as _fc
+        cached, src = _fc.load("indian_full_scan/*_full_scan_*.xlsx", key="Symbol")
+        if cached:
+            fund_df = pd.DataFrame(list(cached.values()))
+    except Exception as e:
+        print(f"  no fundamentals reused: {str(e)[:70]}")
+    if fund_df.empty:
+        print("  ⚠️  India has NO fundamentals — run full_indian_market_scan.py to seed them "
+              "(this section stays momentum-only until then)")
 
     fresh_darvas = dict(zip(all_df["Symbol"], all_df["Darvas_Signal"]))
     fresh_ltp = dict(zip(all_df["Symbol"], all_df["LTP"]))

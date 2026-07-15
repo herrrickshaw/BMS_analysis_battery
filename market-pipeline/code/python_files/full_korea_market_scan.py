@@ -616,6 +616,21 @@ def main():
             breakout_info = sorted(breakout_info, key=_upside)[:MAX_FUND_CANDIDATES]
             print(f"  (capped to {MAX_FUND_CANDIDATES} freshest breakouts)")
 
+        # Reuse quarterly fundamentals — same rationale as India/US/Japan/Europe.
+        # Piotroski/CoffeeCan come from quarterly filings; refetching .info nightly
+        # buys nothing and feeds the rate limiter that broke other markets' FX and
+        # liquidity gates on 2026-07-15. breakout_info is (code, suffix) tuples.
+        _kr_cached, _kr_src = {}, None
+        try:
+            import fundamentals_cache as _fc
+            _kr_cached, _kr_src = _fc.load("korea_scan/korea_market_scan*.xlsx", key="Code")
+        except Exception as _e:
+            print(f"  fundamentals cache unavailable: {str(_e)[:50]}")
+        _kr_reuse = [c for c, _ in breakout_info if c in _kr_cached]
+        breakout_info = [(c, s) for c, s in breakout_info if c not in _kr_cached]
+        if _kr_reuse:
+            print(f"  reusing {len(_kr_reuse)} fundamentals from {_kr_src}")
+
         print(f"\nStage 4 — Fundamental scans ({len(breakout_info)} candidates, "
               f"{args.workers} workers) …")
         done = 0
@@ -656,6 +671,28 @@ def main():
                               f"(triple hits: {len(triple_rows)})")
                 except Exception as e:
                     print(f"    {code}: error — {e}")
+
+        # Merge reused rows back — the loop only ran the FETCH list, so without
+        # this every reused stock vanishes from Fundamentals/Triple_Hits.
+        if _kr_reuse:
+            _fresh = {r["Code"]: r for r in all_rows if r.get("Code")}
+            for c in _kr_reuse:
+                row = dict(_kr_cached[c])
+                cur = _fresh.get(c)
+                if cur:                      # refresh everything price-derived
+                    for k in ("LTP_KRW", "Change%", "Darvas_Signal", "Box_Top",
+                              "Box_Bottom", "Upside_to_Top%", "200_Day_MA",
+                              "Distance_to_200MA%", "Trend_Signal",
+                              "Turnover_USD", "Liquidity_Tier"):
+                        if k in cur:
+                            row[k] = cur[k]
+                fund_rows.append(row)
+                if (str(row.get("Piotroski_Strong", "")).upper() == "YES"
+                        and str(row.get("CoffeeCan", "")).upper() == "PASS"
+                        and str(row.get("Darvas_Signal", "")) == "BREAKOUT_BUY"):
+                    triple_rows.append(row)
+            print(f"  merged {len(_kr_reuse)} reused fundamentals "
+                  f"(prices refreshed from today's scan)")
     else:
         print("\nStage 4 — Skipped")
 

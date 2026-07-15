@@ -35,6 +35,67 @@ CCY = {"US": "USD", "IN": "INR", "CN": "CNY", "JP": "JPY", "EU": "EUR", "HK": "H
 UNIT = {"UK": 100.0, "ZA": 100.0}
 
 
+# ── ticker-suffix currency map (for scans that mix currencies in ONE universe) ─
+# The market-keyed CCY/UNIT above works for screener_kit's per-market seeds, where
+# London sits in its own "UK" seed and UNIT["UK"]=100 unwinds pence. The daily
+# pipeline's Europe scan is different: full_european_market_scan.py runs all ~966
+# tickers across 17 exchanges in ONE pass with no market split, so currency has to
+# come from the ticker suffix instead.
+#
+# The trap this exists to stop: **London quotes in PENCE, not pounds.** Measured
+# 2026-07-15, median LTP is 416 on `.L` vs 72 on `.PA` and 22 on `.MI` — treating
+# `.L` as EUR/GBP without the /100 overstates London turnover 100x, and `.L` is
+# 426 of the European universe (its largest bloc). Tel Aviv (agorot) and
+# Johannesburg (cents) share the convention.
+CCY_BY_SUFFIX = {
+    ".L": "GBp", ".IL": "GBp",
+    ".DE": "EUR", ".F": "EUR", ".PA": "EUR", ".AS": "EUR", ".BR": "EUR",
+    ".LS": "EUR", ".IR": "EUR", ".MI": "EUR", ".MC": "EUR", ".HE": "EUR",
+    ".VI": "EUR", ".AT": "EUR", ".TL": "EUR", ".RG": "EUR", ".VS": "EUR",
+    ".SW": "CHF", ".ST": "SEK", ".OL": "NOK", ".CO": "DKK", ".WA": "PLN",
+    ".IS": "TRY", ".PR": "CZK", ".BD": "HUF", ".IC": "ISK",
+    ".T": "JPY", ".KS": "KRW", ".KQ": "KRW", ".NS": "INR", ".BO": "INR",
+    ".HK": "HKD", ".SS": "CNY", ".SZ": "CNY", ".TW": "TWD", ".SI": "SGD",
+    ".TA": "ILA", ".JO": "ZAc", ".AX": "AUD", ".TO": "CAD", ".SA": "BRL",
+}
+# quote sub-units -> (real currency, divisor)
+SUBUNIT = {"GBp": ("GBP", 100.0), "ILA": ("ILS", 100.0), "ZAc": ("ZAR", 100.0)}
+
+
+def currency_for(ticker: str) -> str:
+    """Quote currency from a yfinance ticker suffix. Bare symbol => US (USD)."""
+    t = str(ticker)
+    if "." in t:
+        return CCY_BY_SUFFIX.get("." + t.rsplit(".", 1)[1], "USD")
+    return "USD"
+
+
+def turnover_usd_for(df, ticker: str, fx: Dict[str, float]) -> float:
+    """Median daily Close*Volume for one symbol, converted to USD.
+
+    `fx` maps currency -> units per 1 USD (the shape _fx_rates returns).
+    Sub-unit quotes (GBp/ILA/ZAc) are divided out before conversion.
+    """
+    if df is None or not hasattr(df, "columns"):
+        return 0.0
+    if "Close" not in df.columns or "Volume" not in df.columns:
+        return 0.0
+    try:
+        tv = float((df["Close"] * df["Volume"]).median())
+    except Exception:
+        return 0.0
+    if tv != tv or tv <= 0:                       # NaN / empty
+        return 0.0
+    ccy = currency_for(ticker)
+    if ccy in SUBUNIT:
+        ccy, div = SUBUNIT[ccy]
+        tv /= div
+    rate = fx.get(ccy)
+    if not rate or rate <= 0:
+        return 0.0
+    return tv / rate
+
+
 def _fx_rates(currencies) -> Dict[str, float]:
     """USD value of 1 unit-of-USD in each currency (live, with cache fallback)."""
     import yfinance as yf

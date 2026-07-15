@@ -72,7 +72,8 @@ def load():
     f = con.execute(f"""
         SELECT ticker, CAST(fy_end AS DATE) fy_end, net_income, revenue, cfo, shares,
                equity_capital, reserves, borrowings, other_liab,
-               receivables, inventory, cash, ebit, capital_employed, roce
+               receivables, inventory, cash, ebit, capital_employed, roce,
+               raw_material_cost, change_in_inventory, power_and_fuel, other_mfr_exp
         FROM '{FUND}' WHERE ebit IS NOT NULL AND capital_employed > 0
     """).df()
     f["ta"] = (f["equity_capital"].fillna(0) + f["reserves"].fillna(0)
@@ -117,7 +118,26 @@ def tests(cur, prv, hist) -> dict:
     d["6_current_ratio_rising"] = None
     d["7_no_dilution"] = (bool(cur.shares <= prv.shares * 1.01)
                           if pd.notna(cur.shares) and pd.notna(prv.shares) and prv.shares else None)
-    d["8_gross_margin_rising"] = None          # no COGS line — skipped, never guessed
+    # Test 8: gross margin, computed HERE from the raw cost lines rather than read from
+    # the collector's gross_margin column. Two reasons:
+    #  1. The running collection loaded the collector module BEFORE the manufacturer
+    #     gate was added, so its gross_margin column is the UNGATED version — wrong for
+    #     services firms (it would put TCS at ~98% against a true ~42%).
+    #  2. Deriving it here keeps the gate next to the test that depends on it.
+    # MANUFACTURERS ONLY (rm/sales >= 0.30), where the formula is validated against
+    # yfinance's true Gross Profit at -0.1pp error (n=50). Below that it is skipped, not
+    # guessed: screener.in never splits Employee Cost into direct vs SG&A, so a services
+    # COGS cannot be built from this source.
+    def _gm(r):
+        if not (pd.notna(r.raw_material_cost) and r.revenue and r.revenue > 0):
+            return None
+        if r.raw_material_cost / r.revenue < 0.30:      # not a manufacturer
+            return None
+        cogs = (r.raw_material_cost - (r.change_in_inventory or 0)
+                + (r.power_and_fuel or 0) + (r.other_mfr_exp or 0))
+        return (r.revenue - cogs) / r.revenue
+    gm, gm_p = _gm(cur), _gm(prv)
+    d["8_gross_margin_rising"] = bool(gm > gm_p) if None not in (gm, gm_p) else None
     at = cur.revenue / cur.ta if pd.notna(cur.revenue) and cur.ta else None
     at_p = prv.revenue / prv.ta if pd.notna(prv.revenue) and prv.ta else None
     d["9_asset_turnover_rising"] = bool(at > at_p) if None not in (at, at_p) else None

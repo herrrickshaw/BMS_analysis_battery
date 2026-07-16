@@ -638,7 +638,14 @@ class SentimentPipeline:
 def main():
     p = argparse.ArgumentParser(description="Multi-source news sentiment pipeline")
     p.add_argument("--tickers", nargs="+", required=True)
-    p.add_argument("--market", choices=["IN","US"], default="IN")
+    # Was IN/US only — MarketauxProvider/AlphaVantageProvider/NewsDataProvider
+    # already handle other markets correctly (they pass the ticker through
+    # unchanged for any market != "IN", which is right since JP/KR/EU tickers
+    # in this pipeline already carry their own exchange suffix, e.g. 7203.T,
+    # 005930.KS). The CLI's choices list was the only thing actually blocking
+    # JP/KR — confirmed live: Marketaux found 3 articles for 7203.T directly,
+    # NewsData.io returned 2,168/1,062 Japan/Korea business results.
+    p.add_argument("--market", choices=["IN","US","JP","KR","EU"], default="IN")
     args = p.parse_args()
 
     print(f"\n{'#'*72}\n  NEWS SENTIMENT INGESTION PIPELINE\n{'#'*72}")

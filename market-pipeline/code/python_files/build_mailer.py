@@ -63,6 +63,39 @@ def _tv(x):
     return f"${x/1e6:.1f}M" if pd.notna(x) else "—"
 
 
+def _pct(x):
+    if pd.isna(x):
+        return "—"
+    color = "#1b7f37" if x >= 0 else "#b00"
+    return f"<span style='color:{color};font-weight:600'>{x:+.2f}%</span>"
+
+
+_CHANGE_SCAN_GLOB = {
+    "IN": "indian_full_scan/indian_full_scan_*.xlsx",
+    "US": "us_full_scan/us_full_scan_*.xlsx",
+}
+
+
+def _change_pct_map(market: str) -> dict:
+    """Symbol -> 1-day Change% from the latest scan workbook. The combined-report
+    picks JSON carries LTP but not Change% (see _market_picks_rows's docstring for
+    why turnover was replaced by LTP+Change% instead), so this reads it straight
+    from the same scan artifact LTP itself traces back to."""
+    pattern = _CHANGE_SCAN_GLOB.get(market)
+    if not pattern:
+        return {}
+    files = sorted(glob.glob(pattern))
+    if not files:
+        return {}
+    try:
+        d = pd.read_excel(files[-1], sheet_name="All_Stocks")
+    except Exception:
+        return {}
+    if "Symbol" not in d.columns or "Change%" not in d.columns:
+        return {}
+    return dict(zip(d["Symbol"], d["Change%"]))
+
+
 def _table(headers, rows):
     h = "".join(f"<th align='left' style='padding:5px 8px'>{x}</th>" for x in headers)
     return (f"<table style='border-collapse:collapse;width:100%;font-size:13px'>"
@@ -97,21 +130,34 @@ def _news_rows(market: str, top: int = 8):
 
 
 def _market_picks_rows(data: dict, market: str, cap: int = 12):
-    """Fundamentals-screener picks rows for India/US, liquidity-annotated."""
+    """Fundamentals-screener picks rows for India/US, liquidity-annotated.
+
+    Shows LTP + 1-day Change% rather than Turnover — Turnover matters for
+    deciding whether a pick is TRADEABLE (that's what the Liquidity column,
+    kept alongside, already answers), but once a pick clears the liquidity
+    gate the reader's next question is "what is it doing right now", which
+    turnover doesn't answer and price/change does.
+    """
     picks = data.get("picks") or []
     if not picks:
         return []
     p = pd.DataFrame(picks)
     p["Market"] = market
     p = liq.annotate(p)
+    chg_map = _change_pct_map(market)
+    p["Change_Pct"] = p["Symbol"].map(chg_map)
     rank = {"Triple Hit": 0, "Multi-Screen": 1, "Single-Screen": 2}
     lr = {"High": 0, "Medium": 1, "Low": 2, "Unknown": 3}
     p["_o"] = p["Tier"].map(rank).fillna(3)
     p["_l"] = p["Liquidity"].map(lr).fillna(3)
     rows = []
     for _, r in p.sort_values(["_o", "_l"]).head(cap).iterrows():
+        ltp = r.get("LTP")
+        ltp_disp = f"{ltp:,.2f}" if pd.notna(ltp) else "—"
         rows.append(f"<tr><td style='padding:4px 8px'><b>{r.Symbol}</b></td>"
-                    f"<td>{r.Tier}</td><td>{r.Screens}</td><td>{_tv(r.get('Turnover_USD'))}</td>"
+                    f"<td>{r.Tier}</td><td>{r.Screens}</td>"
+                    f"<td style='text-align:right'>{ltp_disp}</td>"
+                    f"<td style='text-align:right'>{_pct(r.get('Change_Pct'))}</td>"
                     f"<td style='color:{_COL.get(r.Liquidity,'#777')};font-weight:600'>{r.Liquidity}</td></tr>")
     return rows
 
@@ -620,7 +666,7 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇮🇳 India <span style="font-weight:400;color:#666;font-size:13px">— mood {mood['mood']} ({mood['score']:+.2f}) from {mood.get('n_articles',0)} articles</span></h2>
 <h3 style="font-size:13px;margin:12px 0 4px;color:#333">Screener — most tradable</h3>
-{_table(["Symbol","Tier","Screens","Turnover","Liquidity"], ind_picks_rows) if ind_picks_rows else "<p>no picks</p>"}
+{_table(["Symbol","Tier","Screens","LTP","Chg%","Liquidity"], ind_picks_rows) if ind_picks_rows else "<p>no picks</p>"}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">Cash Conversion Cycle <span style="font-weight:400;color:#777">(screener.in 228040)</span></h3>
 <p style="font-size:11px;color:#666;margin:2px 0">Lowest/negative CCC = collects from customers before paying suppliers.</p>
 {_table(["Symbol","Name","CCC days","ROCE","Liquidity"], ccc_rows) if ccc_rows else "<p>n/a</p>"}
@@ -634,7 +680,7 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇺🇸 US <span style="font-weight:400;color:#666;font-size:13px">— mood {us_mood['mood']} ({us_mood['score']:+.2f}) from {us_mood.get('n_articles',0)} articles</span></h2>
 <h3 style="font-size:13px;margin:12px 0 4px;color:#333">Screener — most tradable</h3>
-{_table(["Symbol","Tier","Screens","Turnover","Liquidity"], us_picks_rows) if us_picks_rows else "<p>no picks (run daily_combined_report.py --market US)</p>"}
+{_table(["Symbol","Tier","Screens","LTP","Chg%","Liquidity"], us_picks_rows) if us_picks_rows else "<p>no picks (run daily_combined_report.py --market US)</p>"}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">⭐ Convergence</h3>
 {conv_us}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">🔥 News picks <span style="font-weight:400;color:#777">— buzz, NOT a recommendation</span></h3>

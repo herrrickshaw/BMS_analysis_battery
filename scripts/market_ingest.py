@@ -111,6 +111,20 @@ def ingest_india(con) -> None:
     print(f"  india    {status:12s} last_data={mx}  total_rows={n:,}")
 
 
+def _symbol_count(path) -> int:
+    """Unique-symbol count in a scan workbook's All_Stocks sheet, or -1 if
+    unreadable. Used to pick the most complete file for a date by ACTUAL content,
+    not byte size — see ingest_snapshot()'s docstring comment for why byte size
+    is unreliable when two same-date files are close in size."""
+    import pandas as pd
+    try:
+        df = pd.read_excel(path, sheet_name="All_Stocks")
+    except Exception:
+        return -1
+    col = next((c for c in ("Symbol", "YF_Ticker", "Code") if c in df.columns), None)
+    return df[col].astype(str).nunique() if col else len(df)
+
+
 def ingest_snapshot(con, market: str) -> None:
     geo, sub, glob = SNAPSHOT_MARKETS[market]
     files = sorted((PF / sub).glob(glob))
@@ -122,17 +136,32 @@ def ingest_snapshot(con, market: str) -> None:
     # A scan dir accumulates several re-runs per day (partial retries, throttled
     # runs, a full sweep). Blindly taking files[-1] once grabbed a 119-row partial
     # and, because the date was then "already ingested", permanently locked out the
-    # complete 6,279-row scan. So: group by date, and for each date pick the LARGEST
-    # file (byte size is a faithful proxy for row count across these identical
-    # sheets). Only the newest date is ingested per run.
-    by_date: dict = {}
+    # complete 6,279-row scan. So: group by date, and for each date pick the file
+    # with the most unique symbols — actually counted, NOT proxied by byte size.
+    # Byte size was tried first and is WRONG: a Korea audit (2026-07-16) found
+    # korea_market_scan_20260716_0039.xlsx (460,335 bytes, 2,497 symbols) beat
+    # _0443.xlsx (459,940 bytes — smaller — but 2,498 symbols, including
+    # 492220.KQ, which the "larger" file lacked) purely because byte size doesn't
+    # track content when two files are close in size — formatting/precision/sheet
+    # metadata differences swamp a one-row difference. Group first, then only read
+    # (expensive) the files for dates with more than one candidate.
+    by_filename_date: dict = {}
     for p in files:
         d = _date_from_name(p)
         if d is None:
             continue
-        cur = by_date.get(d)
-        if cur is None or p.stat().st_size > cur.stat().st_size:
-            by_date[d] = p
+        by_filename_date.setdefault(d, []).append(p)
+    by_date: dict = {}
+    for d, candidates in by_filename_date.items():
+        if len(candidates) == 1:
+            by_date[d] = candidates[0]
+            continue
+        best, best_n = None, -1
+        for p in candidates:
+            n = _symbol_count(p)
+            if n > best_n:
+                best, best_n = p, n
+        by_date[d] = best if best is not None else max(candidates, key=lambda p: p.stat().st_size)
     if not by_date:
         log(con, market, geo, files[-1].name, None, 0, 0, "failed", "no date in any filename")
         print(f"  {market:8s} FAILED       cannot parse date from any workbook")

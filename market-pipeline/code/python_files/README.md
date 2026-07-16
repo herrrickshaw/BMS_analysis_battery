@@ -39,3 +39,13 @@ python run_pipeline.py --bulk-deals-csv bulk_deals.csv
 - This is the Phase-1 practical screener from the attached ML design: momentum, liquidity, 200-DMA strength, delivery %, and drawdown filters.
 - The attached document's later supervised, unsupervised, and RL layers can be added on top of this base.
 - The attached notebook's reporting idea is preserved through per-stock JSON exports and a bulk-deals CSV fallback.
+
+## Regime-conditional price prediction & circuit-breaker bounds
+`regime_price_model.py` / `regime_price_model_cross_market.py` fit a
+literature-grounded, regime-conditional return model (consolidation
+mean-reversion vs. breakout/breakdown momentum) and validate every
+prediction against each market's real circuit-breaker limit. See
+[DECISION_REGISTER.md](DECISION_REGISTER.md) for the full citation trail
+behind every design choice — why log-returns, why closed-form OLS, why the
+per-market bounds are 20%/30%/100%/50% and not one constant, and why
+predictions are hard-clamped rather than just flagged.

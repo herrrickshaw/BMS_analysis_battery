@@ -89,6 +89,13 @@ _BHAVCOPY_DB = "/Users/umashankar/data/bhavcopy.duckdb"
 #        stock can legitimately move >50% in a session (biotech catalysts,
 #        low-float squeezes). 100% stays a pure data-sanity heuristic, not a
 #        regulatory bound — genuine large moves under it must pass through.
+# Public-source citations + India's index-level (not stock-level) MWCB
+# structure + why these two numbers are NOT the same mechanism as India's
+# 20% market-wide halt threshold: see DECISION_REGISTER.md, decisions D-05
+# and D-05a. Korea (30%, exact) and Japan (50%, heuristic) bounds for the
+# same purpose live in regime_price_model.py's CIRCUIT_BOUND_PCT — not
+# duplicated here because those two markets don't have a Change% column in
+# this mailer yet.
 _CIRCUIT_BREAKER_PCT = {"IN": 20.0, "US": 100.0}
 
 

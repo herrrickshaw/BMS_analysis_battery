@@ -147,7 +147,7 @@ def fetch_batch(market: str, symbols: list[str]) -> list[dict]:
 
 
 def run_market(market: str, batch_size: int = 300, resume: bool = True,
-               full_universe: bool = False) -> pd.DataFrame:
+               full_universe: bool = False, batch_delay_seconds: int = 0) -> pd.DataFrame:
     """resume=True (default): skip tickers that already have a row with
     real historical data (reported_date notna) from a prior run — makes
     retries actually accumulate progress instead of re-fetching (and
@@ -165,7 +165,17 @@ def run_market(market: str, batch_size: int = 300, resume: bool = True,
     pead_sector_spillover_v3.py already depends on. The own-stock
     date+price-change dataset needs no sector label at all — only the
     sector-spillover "good performer moves peers" analysis does, and that
-    stays scoped to the classified subset."""
+    stays scoped to the classified subset.
+
+    batch_delay_seconds: real time.sleep() between batches, for when
+    back-to-back retries have already plateaued at 0 new results (observed
+    for India after several successive full-script retries: progress each
+    time until a point, then every batch in every retry returns 0 no
+    matter how long real-world time passes between separate process
+    invocations) — a within-run pause gives Yahoo's rate window more room
+    to recover than launching a fresh process immediately does. Each batch
+    is checkpointed to disk (see below) so a long paced run's progress
+    survives even if it's killed partway through."""
     symbols = _full_universe_symbols(market) if full_universe else _classified_symbols(market)
     out_dir = Path("cache_seed/earnings_dates_yahooquery_full") if full_universe else OUT_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -181,29 +191,41 @@ def run_market(market: str, batch_size: int = 300, resume: bool = True,
         print(f"[{market}] {len(symbols)} symbols ({'full universe' if full_universe else 'classified'}), "
               f"batching by {batch_size}...")
 
+    def _merge_and_save(prior_df: pd.DataFrame, new_rows: list) -> pd.DataFrame:
+        new_df = pd.DataFrame(new_rows)
+        if not prior_df.empty and not new_df.empty:
+            refreshed_tickers = set(new_df["ticker"].unique())
+            merged = pd.concat([prior_df[~prior_df["ticker"].isin(refreshed_tickers)], new_df],
+                                ignore_index=True)
+        elif not new_df.empty:
+            merged = new_df
+        else:
+            merged = prior_df
+        if not merged.empty:
+            merged = merged.drop_duplicates(subset=["ticker", "period_end_date"])
+            merged.to_parquet(out_path, index=False)
+        return merged
+
     all_rows = []
+    n_batches = len(list(_chunks(symbols, batch_size)))
     for i, batch in enumerate(_chunks(symbols, batch_size), 1):
         t0 = time.time()
         rows = fetch_batch(market, batch)
         all_rows.extend(rows)
         n_with_history = len(set(r["ticker"] for r in rows if r["reported_date"] is not None))
-        print(f"  [{market}] batch {i}: {len(batch)} symbols in {time.time()-t0:.1f}s, "
+        print(f"  [{market}] batch {i}/{n_batches}: {len(batch)} symbols in {time.time()-t0:.1f}s, "
               f"{n_with_history} with historical earnings data")
+        if batch_delay_seconds > 0:
+            # checkpoint every batch so a long paced run's progress survives
+            # even if it's killed partway through
+            prior = _merge_and_save(prior, all_rows)
+            all_rows = []
+            if i < n_batches:
+                print(f"  [{market}] sleeping {batch_delay_seconds}s before next batch...")
+                time.sleep(batch_delay_seconds)
 
-    new_df = pd.DataFrame(all_rows)
-    if not prior.empty and not new_df.empty:
-        # new rows for a ticker replace its old (possibly null) rows entirely
-        refreshed_tickers = set(new_df["ticker"].unique())
-        prior = prior[~prior["ticker"].isin(refreshed_tickers)]
-        df = pd.concat([prior, new_df], ignore_index=True)
-    elif not new_df.empty:
-        df = new_df
-    else:
-        df = prior
-
+    df = _merge_and_save(prior, all_rows)
     if not df.empty:
-        df = df.drop_duplicates(subset=["ticker", "period_end_date"])
-        df.to_parquet(out_path, index=False)
         n_tickers = df["ticker"].nunique()
         n_with_hist = df[df["reported_date"].notna()]["ticker"].nunique()
         n_with_next = df.dropna(subset=["next_earnings_date"])["ticker"].nunique()
@@ -219,9 +241,14 @@ def main():
     ap.add_argument("--full-universe", action="store_true",
                      help="use the complete OHLCV-panel universe (thousands/market) instead "
                           "of the ~700/market sector-classified subset")
+    ap.add_argument("--batch-delay-seconds", type=int, default=0,
+                     help="real sleep between batches, for retries that have already "
+                          "plateaued at 0 new results with no delay -- also enables "
+                          "per-batch checkpointing so a long paced run survives being killed")
     a = ap.parse_args()
     for m in a.market:
-        run_market(m, a.batch_size, full_universe=a.full_universe)
+        run_market(m, a.batch_size, full_universe=a.full_universe,
+                   batch_delay_seconds=a.batch_delay_seconds)
 
 
 if __name__ == "__main__":

@@ -74,9 +74,22 @@ def _from_yahooquery(market: str) -> pd.DataFrame:
     df["surprise"] = df["surprise_pct"] / 100.0
     df["surprise_sign"] = np.sign(df["surprise"])
     df["event_date"] = pd.to_datetime(df["reported_date"]).dt.tz_localize(None)
-    df["quarter_key"] = df["ticker"] + "_" + pd.to_datetime(df["period_end_date"]).dt.strftime("%Y-%m")
+    # intra-source dedup key (classified-subset vs full-universe overlap, BOTH
+    # yahooquery -- period_end_date is a fair match here since it's the same
+    # provider's own field on both sides)
+    df["_period_key"] = df["ticker"] + "_" + pd.to_datetime(df["period_end_date"]).dt.strftime("%Y-%m")
+    df = df.drop_duplicates(subset=["ticker", "_period_key"])
+    # cross-source dedup key (load_combined_events matches this against
+    # _from_yfinance_cache's quarter_key below) -- MUST use the same date
+    # field (event_date's calendar quarter) on both sides, or the two
+    # sources' differently-formatted keys never collide and every shared
+    # event gets double-counted instead of deduplicated (confirmed bug,
+    # caught by code review: yahooquery was keying off period_end_date
+    # formatted "%Y-%m" while yfinance keys off event_date's to_period("Q")
+    # -- two representations of DIFFERENT underlying dates that can never
+    # string-match even for the same real announcement).
+    df["quarter_key"] = df["ticker"] + "_" + df["event_date"].dt.to_period("Q").astype(str)
     df["_src"] = "yahooquery"
-    df = df.drop_duplicates(subset=["ticker", "quarter_key"])   # classified + full-universe overlap
     return df[["ticker", "event_date", "surprise", "surprise_sign", "quarter_key", "_src"]]
 
 

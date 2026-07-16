@@ -174,12 +174,23 @@ def load_all_events(market: str) -> pd.DataFrame:
     bad_surprise = combined["surprise_pct"].abs() > SURPRISE_PCT_SANITY_BOUND
     if bad_surprise.any():
         combined.loc[bad_surprise, "surprise_pct"] = np.nan  # flagged, not displayed
-    # de-dup: same ticker within 3 days counts as one event, keep the row with
-    # a real surprise_pct if any version of it has one
-    combined = combined.sort_values("surprise_pct", na_position="last")
+    # de-dup: same ticker within the same week counts as one event. Keep the
+    # row with a real surprise_pct over one without, and among rows that both
+    # have a real surprise_pct, keep by SOURCE PRIORITY (yahooquery_full >
+    # yfinance_cache > date-only sources) per this module's own docstring --
+    # NOT by sorting on the surprise_pct VALUE itself (confirmed bug, caught
+    # by code review: sort_values("surprise_pct") sorts by magnitude/sign, so
+    # keep="first" kept whichever source happened to report the numerically
+    # smallest value, e.g. a -3% yfinance row beating a +5% yahooquery row
+    # purely because -3 < +5 -- silently flipping the surprise sign fed into
+    # pead_sector_spillover_v4.py regardless of which source is authoritative).
+    SOURCE_PRIORITY = {"yahooquery_full": 0, "yfinance_cache": 1}
+    combined["_has_surprise"] = combined["surprise_pct"].notna()
+    combined["_src_rank"] = combined["source"].map(SOURCE_PRIORITY).fillna(9)
+    combined = combined.sort_values(["_has_surprise", "_src_rank"], ascending=[False, True])
     combined["date_bucket"] = combined["earnings_date"].dt.to_period("W").astype(str)
     combined = combined.drop_duplicates(subset=["ticker", "date_bucket"], keep="first")
-    return combined.drop(columns=["date_bucket"])
+    return combined.drop(columns=["date_bucket", "_has_surprise", "_src_rank"])
 
 
 def compute_price_changes(market: str, events: pd.DataFrame) -> pd.DataFrame:

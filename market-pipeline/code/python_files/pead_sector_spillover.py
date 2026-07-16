@@ -121,7 +121,7 @@ def _sector_leave_one_out_returns(rets: pd.DataFrame, sector_of: dict[str, str])
     return sectors, sector_sum, sector_n
 
 
-def run_market(market: str, events_loader=None) -> dict:
+def run_market(market: str, events_loader=None, top_n: int = 15) -> dict:
     """events_loader(market, symbols_set) -> DataFrame with columns
     [ticker, event_date, surprise, surprise_sign, date_is_proxy] (fy_end
     optional). Defaults to load_events() (annual filing-date + YoY-growth
@@ -265,7 +265,7 @@ def run_market(market: str, events_loader=None) -> dict:
         "pead_summary": pead_summary,
         "n_leader_candidates_tested": n_candidates_tested,
         "n_leaders_fdr_significant_q10": n_fdr_significant,
-        "top_sector_leaders": leaders[:15],
+        "top_sector_leaders": leaders[:top_n],
     }
 
 

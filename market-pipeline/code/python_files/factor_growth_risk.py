@@ -112,7 +112,24 @@ def altman_z_score(current_assets, current_liabilities, total_assets,
     x3 = ebit / total_assets
     x4 = market_cap / total_liabilities
     x5 = revenue / total_assets
-    return 1.2 * x1 + 1.4 * x2 + 3.3 * x3 + 0.6 * x4 + 1.0 * x5
+    z = 1.2 * x1 + 1.4 * x2 + 3.3 * x3 + 0.6 * x4 + 1.0 * x5
+    # SANITY BOUND. Caught live: XXII (a penny stock) scored Z=1.24e10 because
+    # its usable fy_end row (the last one before revenue went NaN in later
+    # filings and got excluded upstream) was 18 months stale by the rebalance
+    # date — pairing a stale, pre-dilution share count against an entry price
+    # from a price panel already documented elsewhere in this project as
+    # sometimes carrying unadjusted-split distortions (see the "raw Close not
+    # Adj Close" note on the deep 10y India panel) blew up X4 = market_cap /
+    # total_liabilities to an absurd multiple. No real company, however safe,
+    # produces a Z-Score in the thousands — Altman's own SAFE threshold is
+    # 2.99, and even exceptionally strong balance sheets rarely clear ~20-30.
+    # A score outside this band is evidence of stale-data/price-artifact
+    # contamination, not of extraordinary safety, so it is dropped (None)
+    # rather than reported as a number that would silently dominate any
+    # ranking that sorts on it.
+    if abs(z) > 100:
+        return None
+    return z
 
 
 def altman_zone(z):

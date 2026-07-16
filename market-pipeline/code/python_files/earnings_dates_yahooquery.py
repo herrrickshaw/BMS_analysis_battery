@@ -72,6 +72,17 @@ def _classified_symbols(market: str) -> list[str]:
     return [k[len(key):] for k, v in cache.items() if k.startswith(key) and v != "Unknown"]
 
 
+FULL_UNIVERSE_CACHE = Path("cache_seed/full_universe_symbols.json")
+
+
+def _full_universe_symbols(market: str) -> list[str]:
+    """The complete OHLCV-panel universe (thousands/market), not just the
+    ~700/market sector-classified subset — for the own-stock date+price-
+    change dataset, which needs no sector label at all (only the
+    sector-spillover 'good performer moves peers' analysis does)."""
+    return json.loads(FULL_UNIVERSE_CACHE.read_text())[market]
+
+
 def _chunks(lst: list, n: int):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
@@ -135,7 +146,8 @@ def fetch_batch(market: str, symbols: list[str]) -> list[dict]:
     return rows
 
 
-def run_market(market: str, batch_size: int = 300, resume: bool = True) -> pd.DataFrame:
+def run_market(market: str, batch_size: int = 300, resume: bool = True,
+               full_universe: bool = False) -> pd.DataFrame:
     """resume=True (default): skip tickers that already have a row with
     real historical data (reported_date notna) from a prior run — makes
     retries actually accumulate progress instead of re-fetching (and
@@ -143,9 +155,21 @@ def run_market(market: str, batch_size: int = 300, resume: bool = True) -> pd.Da
     the resumability contract earnings_dates_cache.py already established.
     Tickers with ONLY a null-history row (no earnings chart data at all,
     e.g. ETFs/indices) are retried every time, since that null could be a
-    rate-limit artifact rather than a genuine "no data" result."""
-    symbols = _classified_symbols(market)
-    out_path = OUT_DIR / f"{market}.parquet"
+    rate-limit artifact rather than a genuine "no data" result.
+
+    full_universe=True switches from the ~700/market sector-classified
+    subset (cache_seed/sector_map_cache.json) to the COMPLETE OHLCV-panel
+    universe (cache_seed/full_universe_symbols.json, thousands/market) and
+    writes to a SEPARATE output directory (earnings_dates_yahooquery_full/)
+    so it never collides with or disturbs the classified-subset parquet
+    pead_sector_spillover_v3.py already depends on. The own-stock
+    date+price-change dataset needs no sector label at all — only the
+    sector-spillover "good performer moves peers" analysis does, and that
+    stays scoped to the classified subset."""
+    symbols = _full_universe_symbols(market) if full_universe else _classified_symbols(market)
+    out_dir = Path("cache_seed/earnings_dates_yahooquery_full") if full_universe else OUT_DIR
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / f"{market}.parquet"
     prior = pd.read_parquet(out_path) if resume and out_path.exists() else pd.DataFrame()
 
     if not prior.empty:
@@ -154,7 +178,8 @@ def run_market(market: str, batch_size: int = 300, resume: bool = True) -> pd.Da
         print(f"[{market}] {len(have_history)} tickers already have historical data cached, "
               f"{len(symbols)} still to fetch...")
     else:
-        print(f"[{market}] {len(symbols)} classified symbols, batching by {batch_size}...")
+        print(f"[{market}] {len(symbols)} symbols ({'full universe' if full_universe else 'classified'}), "
+              f"batching by {batch_size}...")
 
     all_rows = []
     for i, batch in enumerate(_chunks(symbols, batch_size), 1):
@@ -191,9 +216,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--market", nargs="+", default=["IN", "US", "JP", "KR"])
     ap.add_argument("--batch-size", type=int, default=300)
+    ap.add_argument("--full-universe", action="store_true",
+                     help="use the complete OHLCV-panel universe (thousands/market) instead "
+                          "of the ~700/market sector-classified subset")
     a = ap.parse_args()
     for m in a.market:
-        run_market(m, a.batch_size)
+        run_market(m, a.batch_size, full_universe=a.full_universe)
 
 
 if __name__ == "__main__":

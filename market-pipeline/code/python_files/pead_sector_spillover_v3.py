@@ -50,21 +50,74 @@ warnings.filterwarnings("ignore")
 import pead_sector_spillover as pss
 
 YQ_DIR = "cache_seed/earnings_dates_yahooquery"
+YQ_FULL_DIR = "cache_seed/earnings_dates_yahooquery_full"   # different retry timing -> different gaps filled
 YF_DIR = "cache_seed/earnings_dates_cache"
+DART_PATH = "cache_seed/earnings_dates_dart/KR.parquet"       # Korea only, date-only (no surprise)
+DART_MATCH_WINDOW_DAYS = 60   # DART periodic reports are annual/half-year/quarterly,
+                              # not calendar-aligned like a US 10-Q -- match to the
+                              # nearest DART filing within this window of the
+                              # yahooquery/yfinance quarter's period end, not an
+                              # exact date match
 
 
 def _from_yahooquery(market: str) -> pd.DataFrame:
-    try:
-        df = pd.read_parquet(f"{YQ_DIR}/{market}.parquet")
-    except FileNotFoundError:
+    frames = []
+    for path in (f"{YQ_DIR}/{market}.parquet", f"{YQ_FULL_DIR}/{market}.parquet"):
+        try:
+            frames.append(pd.read_parquet(path))
+        except FileNotFoundError:
+            continue
+    if not frames:
         return pd.DataFrame(columns=["ticker", "event_date", "surprise", "surprise_sign", "quarter_key"])
+    df = pd.concat(frames, ignore_index=True)
     df = df.dropna(subset=["reported_date", "surprise_pct"]).copy()
     df["surprise"] = df["surprise_pct"] / 100.0
     df["surprise_sign"] = np.sign(df["surprise"])
     df["event_date"] = pd.to_datetime(df["reported_date"]).dt.tz_localize(None)
     df["quarter_key"] = df["ticker"] + "_" + pd.to_datetime(df["period_end_date"]).dt.strftime("%Y-%m")
     df["_src"] = "yahooquery"
+    df = df.drop_duplicates(subset=["ticker", "quarter_key"])   # classified + full-universe overlap
     return df[["ticker", "event_date", "surprise", "surprise_sign", "quarter_key", "_src"]]
+
+
+def _dart_date_override(market: str, combined: pd.DataFrame) -> pd.DataFrame:
+    """Korea only: DART periodic-report filing_date is a real regulatory
+    timestamp, more authoritative than yahooquery's/yfinance's own
+    'reportedDate' (itself a Yahoo-side scrape/estimate) -- but DART carries
+    NO consensus-surprise number, so it can only REFINE the date of an
+    event that already has a surprise sign from another source, never add
+    a new event on its own. For each Korea event, if a DART filing exists
+    within DART_MATCH_WINDOW_DAYS of the event's own date, swap in DART's
+    date as the more precise t=0 for the CAR/spillover event study."""
+    if market != "KR" or combined.empty:
+        return combined
+    try:
+        dart = pd.read_parquet(DART_PATH)
+    except FileNotFoundError:
+        return combined
+    dart = dart.dropna(subset=["filing_date"]).copy()
+    dart["filing_date"] = pd.to_datetime(dart["filing_date"]).dt.tz_localize(None)
+    dart = dart.sort_values("filing_date")
+
+    combined = combined.sort_values("event_date").reset_index(drop=True)
+    out_dates = combined["event_date"].copy()
+    n_overridden = 0
+    for tk, g in combined.groupby("ticker"):
+        d = dart[dart["ticker"] == tk]
+        if d.empty:
+            continue
+        dart_dates = d["filing_date"].values
+        for idx, ev_date in zip(g.index, g["event_date"]):
+            diffs = np.abs((dart_dates - np.datetime64(ev_date)) / np.timedelta64(1, "D"))
+            j = diffs.argmin()
+            if diffs[j] <= DART_MATCH_WINDOW_DAYS:
+                out_dates.loc[idx] = pd.Timestamp(dart_dates[j])
+                n_overridden += 1
+    combined = combined.copy()
+    combined["event_date"] = out_dates
+    print(f"[{market}] DART date-precision override: {n_overridden}/{len(combined)} events "
+          f"got a more authoritative regulatory filing_date (within {DART_MATCH_WINDOW_DAYS}d)")
+    return combined
 
 
 def _from_yfinance_cache(market: str) -> pd.DataFrame:
@@ -93,6 +146,7 @@ def load_combined_events(market: str, symbols: set[str]) -> pd.DataFrame:
     # yahooquery wins on quarter_key collisions (listed first -> keep='first')
     combined = combined.sort_values("_src", key=lambda s: s.map({"yahooquery": 0, "yfinance": 1}))
     combined = combined.drop_duplicates(subset=["ticker", "quarter_key"], keep="first")
+    combined = _dart_date_override(market, combined)
     combined["date_is_proxy"] = False
     return combined[["ticker", "event_date", "surprise", "surprise_sign", "date_is_proxy"]]
 

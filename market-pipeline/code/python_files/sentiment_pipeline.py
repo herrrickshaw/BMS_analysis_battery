@@ -56,6 +56,41 @@ from typing import Dict, List, Optional
 
 warnings.filterwarnings("ignore")
 
+# Load provider keys (MARKETAUX_KEY, NEWSDATA_KEY, ...) from a local .env — this
+# module previously only read the real process environment, so a key saved to
+# .env (this repo's established credential-storage convention, see
+# send_mailer.py's identical _load_dotenv) was silently never picked up: every
+# provider class does `os.environ.get(self.env_key, "")` at CLASS-DEFINITION
+# TIME below, so this must run before that point, not lazily inside a function.
+_ENV_PATHS = (
+    Path(__file__).parent / ".env",
+    Path.home() / "repos" / "global-stock-screener" / ".env",
+    Path.home() / ".env",
+)
+
+
+def _load_dotenv() -> None:
+    """Existing environment variables WIN — an explicitly exported value should
+    never be silently overridden by a file. Same contract as send_mailer.py's."""
+    for envf in _ENV_PATHS:
+        if not envf.exists():
+            continue
+        try:
+            lines = envf.read_text().splitlines()
+        except Exception:
+            continue
+        for line in lines:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, val = line.partition("=")
+            key, val = key.strip(), val.strip().strip('"').strip("'")
+            if key and val and key not in os.environ:
+                os.environ[key] = val
+
+
+_load_dotenv()
+
 try:
     import requests
     _REQ_OK = True

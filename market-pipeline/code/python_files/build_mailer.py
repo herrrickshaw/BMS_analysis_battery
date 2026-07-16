@@ -72,7 +72,28 @@ def _pct(x):
 
 _PG_DSN = "dbname=market_data host=/tmp user=umashankar"
 _BHAVCOPY_DB = "/Users/umashankar/data/bhavcopy.duckdb"
-_CHANGE_PCT_SANITY_BOUND = 100.0   # see _warehouse_ltp_map's docstring
+
+# Sanity bounds on 1-day Change%, keyed to each market's actual circuit-breaker
+# regime rather than one arbitrary flat number — see _warehouse_ltp_map's
+# docstring for the incident (XAIR +1273.8%) that motivated a bound at all.
+#   IN — NSE/BSE assign every non-F&O stock a STATIC daily price band of 2%,
+#        5%, 10% or 20% (exchange-published, symmetric). The ~200 F&O-eligible
+#        names trade on a wider DYNAMIC band instead of a fixed one, so they
+#        can rarely print slightly past 20% intraday — but a print beyond 20%
+#        is still overwhelmingly more likely to be a bad Prev_Close than a
+#        genuine move, so 20% is used as the "flag, don't display" gate for
+#        all India symbols alike (no per-stock band table is loaded here).
+#   US  — there is NO daily price CAP for US equities. LULD (Limit Up-Limit
+#        Down) only PAUSES trading when price exits a 5-20% band around a
+#        rolling reference price; the band re-centers after each pause, so a
+#        stock can legitimately move >50% in a session (biotech catalysts,
+#        low-float squeezes). 100% stays a pure data-sanity heuristic, not a
+#        regulatory bound — genuine large moves under it must pass through.
+_CIRCUIT_BREAKER_PCT = {"IN": 20.0, "US": 100.0}
+
+
+def _sanity_bound(market: str) -> float:
+    return _CIRCUIT_BREAKER_PCT.get(market, 100.0)
 
 
 def _warehouse_ltp_map(market: str) -> dict:
@@ -116,9 +137,10 @@ def _warehouse_ltp_map(market: str) -> dict:
         except Exception:
             return {}
         out = {}
+        bound = _sanity_bound("US")
         for r in df.itertuples():
             cp = r.change_pct
-            if cp is not None and abs(cp) > _CHANGE_PCT_SANITY_BOUND:
+            if cp is not None and abs(cp) > bound:
                 cp = None   # flagged, not displayed as a real move
             out[r.symbol] = (r.ltp, cp)
         return out
@@ -140,9 +162,10 @@ def _warehouse_ltp_map(market: str) -> dict:
         except Exception:
             return {}
         out = {}
+        bound = _sanity_bound("IN")
         for r in df.itertuples():
             cp = r.change_pct
-            if cp is not None and abs(cp) > _CHANGE_PCT_SANITY_BOUND:
+            if cp is not None and abs(cp) > bound:
                 cp = None
             out[r.symbol] = (r.ltp, cp)
         return out

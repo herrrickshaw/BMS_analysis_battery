@@ -70,30 +70,84 @@ def _pct(x):
     return f"<span style='color:{color};font-weight:600'>{x:+.2f}%</span>"
 
 
-_CHANGE_SCAN_GLOB = {
-    "IN": "indian_full_scan/indian_full_scan_*.xlsx",
-    "US": "us_full_scan/us_full_scan_*.xlsx",
-}
+_PG_DSN = "dbname=market_data host=/tmp user=umashankar"
+_BHAVCOPY_DB = "/Users/umashankar/data/bhavcopy.duckdb"
+_CHANGE_PCT_SANITY_BOUND = 100.0   # see _warehouse_ltp_map's docstring
 
 
-def _change_pct_map(market: str) -> dict:
-    """Symbol -> 1-day Change% from the latest scan workbook. The combined-report
-    picks JSON carries LTP but not Change% (see _market_picks_rows's docstring for
-    why turnover was replaced by LTP+Change% instead), so this reads it straight
-    from the same scan artifact LTP itself traces back to."""
-    pattern = _CHANGE_SCAN_GLOB.get(market)
-    if not pattern:
-        return {}
-    files = sorted(glob.glob(pattern))
-    if not files:
-        return {}
-    try:
-        d = pd.read_excel(files[-1], sheet_name="All_Stocks")
-    except Exception:
-        return {}
-    if "Symbol" not in d.columns or "Change%" not in d.columns:
-        return {}
-    return dict(zip(d["Symbol"], d["Change%"]))
+def _warehouse_ltp_map(market: str) -> dict:
+    """Symbol -> (ltp, change_pct), sourced from PERSISTED warehouse history —
+    NOT a fresh scan-file read. US reads the last known as_of_date per symbol
+    from Postgres market_daily.snapshots (the daily-ingest warehouse); India has
+    no equivalent snapshots table (it lives separately — see market_ingest.py's
+    own docstring on why India is OHLCV time series, not point-in-time
+    snapshots) so this computes change_pct itself from the last two trade_dates
+    in DuckDB bhavcopy.duckdb's cleaned_ohlcv.
+
+    Querying the warehouse rather than the latest scan file also closes a real
+    coverage gap: the warehouse accumulates every day's ingest, so a symbol
+    missing from TODAY's single scan file (confirmed live: 53/486 India picks,
+    11%) can still resolve from its last known snapshot.
+
+    SANITY BOUND, not optional: live-tested and found the SOURCE scan's own
+    Prev_Close is sometimes wrong for thinly-traded names — XAIR showed
+    Prev_Close=$0.42 against LTP=$5.77, a mathematically consistent but
+    implausible +1273.8% single-day move, and this pattern repeated across
+    several other penny names in the same scan. That number was already being
+    stored (it round-trips into this same warehouse via market_ingest.py) but
+    never DISPLAYED before — Change% wasn't a mailer column until now, so
+    nothing surfaced it. A single US equity essentially never moves >100% in
+    one day; treat anything beyond that as evidence of a bad prev-close, not a
+    real move, and show "flagged" rather than the raw number.
+    """
+    import duckdb as _dd
+
+    if market == "US":
+        try:
+            con = _dd.connect()
+            con.execute(f"ATTACH '{_PG_DSN}' AS pg (TYPE postgres)")
+            df = con.execute("""
+                SELECT symbol, ltp, change_pct FROM (
+                    SELECT symbol, ltp, change_pct,
+                           row_number() OVER (PARTITION BY symbol ORDER BY as_of_date DESC) rn
+                    FROM pg.market_daily.snapshots WHERE market='us'
+                ) WHERE rn = 1
+            """).df()
+        except Exception:
+            return {}
+        out = {}
+        for r in df.itertuples():
+            cp = r.change_pct
+            if cp is not None and abs(cp) > _CHANGE_PCT_SANITY_BOUND:
+                cp = None   # flagged, not displayed as a real move
+            out[r.symbol] = (r.ltp, cp)
+        return out
+
+    if market == "IN":
+        try:
+            con = _dd.connect(_BHAVCOPY_DB, read_only=True)
+            df = con.execute("""
+                WITH ranked AS (
+                    SELECT symbol, trade_date, close,
+                           row_number() OVER (PARTITION BY symbol ORDER BY trade_date DESC) rn
+                    FROM cleaned_ohlcv
+                )
+                SELECT a.symbol, a.close ltp, b.close prev_close,
+                       (a.close / b.close - 1) * 100 change_pct
+                FROM ranked a JOIN ranked b ON a.symbol = b.symbol AND b.rn = 2
+                WHERE a.rn = 1 AND b.close > 0
+            """).df()
+        except Exception:
+            return {}
+        out = {}
+        for r in df.itertuples():
+            cp = r.change_pct
+            if cp is not None and abs(cp) > _CHANGE_PCT_SANITY_BOUND:
+                cp = None
+            out[r.symbol] = (r.ltp, cp)
+        return out
+
+    return {}
 
 
 def _table(headers, rows):
@@ -137,6 +191,11 @@ def _market_picks_rows(data: dict, market: str, cap: int = 12):
     kept alongside, already answers), but once a pick clears the liquidity
     gate the reader's next question is "what is it doing right now", which
     turnover doesn't answer and price/change does.
+
+    LTP and Change% both come from the WAREHOUSE (_warehouse_ltp_map), not a
+    fresh scan-file read or the picks JSON's own (possibly stale) LTP — see
+    that function's docstring for why: better coverage (accumulates across
+    days, not just today's file) and a sanity bound the raw scan data needs.
     """
     picks = data.get("picks") or []
     if not picks:
@@ -144,8 +203,9 @@ def _market_picks_rows(data: dict, market: str, cap: int = 12):
     p = pd.DataFrame(picks)
     p["Market"] = market
     p = liq.annotate(p)
-    chg_map = _change_pct_map(market)
-    p["Change_Pct"] = p["Symbol"].map(chg_map)
+    wh = _warehouse_ltp_map(market)
+    p["LTP"] = p["Symbol"].map(lambda s: wh.get(s, (None, None))[0])
+    p["Change_Pct"] = p["Symbol"].map(lambda s: wh.get(s, (None, None))[1])
     rank = {"Triple Hit": 0, "Multi-Screen": 1, "Single-Screen": 2}
     lr = {"High": 0, "Medium": 1, "Low": 2, "Unknown": 3}
     p["_o"] = p["Tier"].map(rank).fillna(3)

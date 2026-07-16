@@ -1,13 +1,20 @@
-# Decision Register — Price Prediction & Circuit-Breaker Validation
+# Decision Register — Price Prediction, Circuit-Breaker Validation & PEAD/Spillover
 
 Every non-obvious design choice in `regime_price_model*.py`, `build_mailer.py`'s
-circuit-breaker sanity bounds, and `backtest_circuit_breaker_darvas.py` is
-recorded here with the literature source that motivated it. The goal is
-traceability: a reviewer should be able to ask "why this number / why this
-architecture" and find the answer is a cited finding, not an arbitrary choice.
+circuit-breaker sanity bounds, `backtest_circuit_breaker_darvas.py`, and the
+`pead_sector_spillover*.py` / `cross_sectional_momentum.py` / `liquidity.py`
+event-study work is recorded here with the literature source that motivated
+it. The goal is traceability: a reviewer should be able to ask "why this
+number / why this architecture" and find the answer is a cited finding, not
+an arbitrary choice.
 
-Full source PDFs are in `~/Downloads/`. Citation keys below match the
-docstring citations already in the code (`[FP16]`, `[ICCT15]`, etc.).
+Full source PDFs for the circuit-breaker/signal-processing register (`[FP16]`
+through `[EURONEXT-TS]`) are in `~/Downloads/`. The PEAD & Sector-Spillover
+register below cites classic accounting/finance/statistics papers referenced
+in code docstrings but not locally archived as PDFs — citations are complete
+and independently verifiable, just not paired with a local file. Citation
+keys below match the docstring citations already in the code (`[FP16]`,
+`[ICCT15]`, `[BB68]`, etc.).
 
 ## Source register
 
@@ -89,6 +96,72 @@ docstring citations already in the code (`[FP16]`, `[ICCT15]`, etc.).
 **Decision**: the codebase treats return prediction, volatility modeling, and circuit-breaker bounding as a coherent signal-processing problem (stationarity, filtering, closed-form estimation) rather than an assortment of unrelated heuristics.
 **Literature basis**: `[JSTSP-CFP]` is the IEEE Signal Processing Society's own call for papers establishing "Financial Signal Processing and Machine Learning for Electronic Trading" as a recognized special-issue topic area, explicitly listing "covariance modeling," "market microstructure modeling," and "signal processing algorithms for electronic trading" as in-scope — i.e., an editorial board of five named guest editors (Akansu/NJIT, Jay/QAMLab, Malioutov/IBM Research, Mandic/Imperial College London, Palomar/HKUST — the same Palomar as `[FP16]`) considers this a legitimate cross-disciplinary research area, not a novel or unusual combination invented for this task.
 **Where**: this register; `regime_price_model.py`'s module docstring.
+
+---
+
+---
+
+## Source register — PEAD & Sector-Spillover
+
+| Key | Full citation | Type | Role |
+|---|---|---|---|
+| `[BB68]` | Ball, R. & Brown, P. *An Empirical Evaluation of Accounting Income Numbers*. Journal of Accounting Research, 6(2), 159–178 (1968). | Peer-reviewed, foundational | Original discovery of post-earnings-announcement drift |
+| `[BT89]` | Bernard, V.L. & Thomas, J.K. *Post-Earnings-Announcement Drift: Delayed Price Response or Risk Premium?* Journal of Accounting Research, 27, 1–36 (1989). | Peer-reviewed | Drift persists for weeks post-announcement; not explained by risk |
+| `[BT90]` | Bernard, V.L. & Thomas, J.K. *Evidence That Stock Prices Do Not Fully Reflect the Implications of Current Earnings for Future Earnings*. Journal of Accounting and Economics, 13(4), 305–340 (1990). | Peer-reviewed | Motivates the pos-minus-neg CAR spread (growing with horizon) as the diagnostic for genuine drift |
+| `[F81]` | Foster, G. *Intra-Industry Information Transfers Associated with Earnings Releases*. Journal of Accounting and Economics, 3(3), 201–232 (1981). | Peer-reviewed, foundational | One firm's earnings news moves same-industry peers |
+| `[TZ08]` | Thomas, J. & Zhang, F. *Overreaction to Intra-Industry Information Transfers?* Journal of Accounting Research, 46(4), 909–940 (2008). | Peer-reviewed | Motivates testing spillover per-candidate across MULTIPLE events, not a one-shot correlation |
+| `[FOS84]` | Foster, G., Olsen, C. & Shevlin, T. *Earnings Releases, Anomalies, and the Behavior of Security Returns*. The Accounting Review, 59(4), 574–603 (1984). | Peer-reviewed | Seasonal-random-walk surprise proxy when no analyst consensus exists |
+| `[BW80/85]` | Brown, S.J. & Warner, J.B. *Measuring Security Price Performance*. J. Financial Economics, 8(3), 205–258 (1980); *Using Daily Stock Returns: The Case of Event Studies*. J. Financial Economics, 14(1), 3–31 (1985). | Peer-reviewed | Simple mean/market-adjusted abnormal-return models perform comparably to complex ones at event-study horizons |
+| `[MG99]` | Moskowitz, T.J. & Grinblatt, M. *Do Industries Explain Momentum?* Journal of Finance, 54(4), 1249–1290 (1999). | Peer-reviewed | Sector/industry-neutral cross-sectional momentum |
+| `[A02]` | Amihud, Y. *Illiquidity and Stock Returns: Cross-Section and Time-Series Effects*. Journal of Financial Markets, 5(1), 31–56 (2002). | Peer-reviewed | ILLIQ price-impact measure for liquidity tiering |
+| `[BH95]` | Benjamini, Y. & Hochberg, Y. *Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing*. Journal of the Royal Statistical Society: Series B, 57(1), 289–300 (1995). | Peer-reviewed, foundational (statistics) | Multiple-testing correction across all spillover candidates tested, not just the ones that look interesting |
+
+## Decisions — PEAD & Sector-Spillover
+
+### D-10 — PEAD measured as sector-adjusted CAR conditioned on surprise sign; the pos-minus-neg SPREAD, not raw CAR, is the diagnostic
+**Decision**: `pead_summary` reports CAR separately for positive- and negative-surprise events at each horizon, and treats `{horizon}_pos_minus_neg_spread_pct` as the load-bearing number — a spread that stays positive and grows with horizon is evidence of real drift; similar CARs for both signs indicates a generic positive-drift artifact unrelated to the surprise itself.
+**Literature basis**: `[BB68]` established that returns keep drifting in the direction of the surprise after the announcement. `[BT89]`/`[BT90]` showed this persists for weeks and isn't a risk premium — `[BT90]` in particular is why the spread (not the level) is the right test: a market that fully reacted to earnings news would show a flat spread near zero, not a growing one.
+**Where**: `pead_sector_spillover.py:202-223`, unchanged through v2/v3/v4.
+
+### D-11 — Sector-spillover ("leader") status requires a same-direction hit-rate across MULTIPLE separate events, not a single-event correlation
+**Decision**: a candidate ticker needs ≥3 of its own earnings events (`MIN_EVENTS_FOR_LEADER`) before it's even tested; "leader" status is a binomial test on the hit-rate across all of them, not a one-quarter coincidence.
+**Literature basis**: `[F81]` is the original finding that one firm's earnings release moves same-industry peers. `[TZ08]` specifically frames this as something that should be measured across a firm's REPEATED announcement history, not inferred from one event — motivating `MIN_EVENTS_FOR_LEADER` and the per-ticker binomial test over `n` events rather than flagging any single large peer reaction.
+**Where**: `pead_sector_spillover.py:225-260` (`spillover_rows` aggregation, `MIN_EVENTS_FOR_LEADER = 3`).
+
+### D-12 — YoY net-income growth as the surprise proxy when no analyst consensus exists (v1 only)
+**Decision**: `load_events()` (v1's default events loader) computes `surprise = (net_income − prior_year_net_income) / |prior_year_net_income|` rather than leaving surprise undefined when no I/B/E/S-style consensus estimate is available.
+**Literature basis**: `[FOS84]` is the original justification for a "seasonal random walk" earnings-expectation proxy (this quarter's number is expected to equal the same quarter a year ago) when consensus data doesn't exist — exactly the situation this repo is in, since no analyst-estimate source was ever collected.
+**Where**: `pead_sector_spillover.py:load_events()`. Superseded for numeric events by real consensus-based `surprise_pct` from yahooquery/yfinance starting in v2, but v1 remains runnable and is still the fallback shape other loaders match.
+
+### D-13 — Abnormal return = leave-one-out equal-weight sector benchmark, not a full CAPM/Fama-French residual
+**Decision**: `_sector_leave_one_out_returns()` computes each event's abnormal return as the stock's own return minus the equal-weighted return of every OTHER stock in its sector that day — no beta estimation, no factor model.
+**Literature basis**: `[BW80/85]` is the standard event-study methodology citation showing that simple mean/market-adjusted abnormal-return models perform comparably to more complex risk-adjusted models at the short event windows used here (1/2/3-month CARs), making a full factor model unnecessary complexity for this task.
+**Where**: `pead_sector_spillover.py:_sector_leave_one_out_returns()`, reused by every PEAD/spillover computation and by `cross_sectional_momentum.py`.
+
+### D-14 — Cross-sectional momentum tested peer-relative (vs. sector peers), not each stock vs. its own past
+**Decision**: `cross_sectional_momentum.py` ranks stocks against their OWN sector's other members at each horizon (3d/1wk/2wk/1mo), rather than comparing a stock's recent return to its own historical average (time-series momentum).
+**Literature basis**: `[MG99]` is the origin of industry/sector-neutral momentum — showing that a meaningful share of individual-stock momentum is actually explained by INDUSTRY momentum, which motivates testing momentum peer-relative within a sector rather than stock-vs-self.
+**Where**: `cross_sectional_momentum.py` (module docstring cites `[MG99]` directly).
+
+### D-15 — Amihud ILLIQ for liquidity tiering, not raw market cap or turnover alone
+**Decision**: `liquidity.py:amihud_illiq()` computes price-impact-per-dollar-traded and uses it (alongside turnover) to gate/tier stocks by liquidity, rather than relying on market cap as a liquidity proxy.
+**Literature basis**: `[A02]` is the original ILLIQ measure — |return| / dollar volume as a price-impact estimate — and its own finding that illiquidity commands a return premium is the reason liquidity tiering matters at all for this repo's factor work, not just a data-cleaning step.
+**Where**: `liquidity.py:amihud_illiq()`, `_scan_floor()`, `scan_gate()`.
+
+### D-16 — Benjamini-Hochberg FDR correction (q=0.10) across ALL candidates tested, not raw p<0.05 on the ones that look interesting
+**Decision**: every "good performer moves its peers" leader search ranks candidates by p-value and applies the standard BH step-up procedure across the FULL tested set (`n_leader_candidates_tested`, typically 140–464 depending on market) before calling anything significant — never just eyeballing the smallest p-values.
+**Literature basis**: `[BH95]` is the canonical multiple-testing correction — testing hundreds of tickers at face-value p<0.05 would produce dozens of false positives from chance alone; BH-FDR bounds the expected false-discovery proportion among rejected hypotheses instead.
+**Where**: `pead_sector_spillover.py:229-260`, unchanged through v2/v3/v4. Directly responsible for narrowing the US "good performer" list from 8 nominally-significant tickers down to the 1-3 that actually survive correction (MCHP always; ANET/WDAY inconsistently, see D-17).
+
+### D-17 — Full-sample significance is validated with an explicit train/test split and confound checks before being trusted, not accepted at face value
+**Decision**: `pead_walkforward_validate.py` re-runs the unchanged statistical core on chronologically split TRAIN/TEST folds, and separately checks candidates against (a) their own negative-surprise-day behavior, (b) the sector's unconditional base rate, and (c) same-sector peers with identical event counts — before treating any full-sample FDR-significant result as real.
+**Literature basis**: this extends D-04's chronological train/test discipline (`[ICCT15]`, Goyal & Welch's out-of-sample skepticism) into the event-study setting; the three confound checks are this session's own diagnostic design in response to a specific observed risk (MCHP/ANET/WDAY's surprise sign was 26-28/28 positive, so a "same-direction hit rate" could otherwise just be re-measuring bull-market sector drift) rather than a technique drawn from a specific paper.
+**Where**: `pead_walkforward_validate.py`. Result: MCHP passed every check; ANET/WDAY passed the confound checks but showed weaker/inconsistent significance across the temporal split, downgraded from "confirmed" to "watch" accordingly.
+
+### D-18 — price_change_* sanity bound reuses D-05's per-market circuit-breaker regime, not a new invented threshold
+**Decision**: `earnings_price_dataset.py:_price_change_bound_pct()` nulls out any computed 1d/5d/21d price change beyond a bound derived from the SAME `CIRCUIT_BOUND_PCT` dict as D-05/D-06 (worst-case N-consecutive-limit-days compounding for the multi-day windows), rather than a flat or market-blind cutoff.
+**Literature basis**: no new source — a direct extension of D-05's per-market bounds (`[NSE-PB]`, `[KRX-GUIDE]`, `[LULD-FAQ]`, `[JPX-DPL]`) and D-06's magnet-effect-motivated hard-clamping (`[KHATOON25]`) to a second dataset, kept in the same file family (`regime_price_model.CIRCUIT_BOUND_PCT` imported directly, not redefined) so the two never silently drift apart.
+**Where**: `earnings_price_dataset.py:_price_change_bound_pct()`, `compute_price_changes()`. Caught a real -69.2% one-day India move (impossible under `[NSE-PB]`'s 20% limit) and a repeated 230.3% Korea value (impossible under `[KRX-GUIDE]`'s 30% limit) — both data errors, not real trading.
 
 ---
 

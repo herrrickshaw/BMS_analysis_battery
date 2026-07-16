@@ -49,6 +49,8 @@ import pandas as pd
 
 warnings.filterwarnings("ignore")
 
+from regime_price_model import CIRCUIT_BOUND_PCT  # {"IN":20.0,"KR":30.0,"US":100.0,"JP":50.0}, literature-backed
+
 LTM_DIR = "/Users/umashankar/repos/global-market-data/cache_seed/ltm"
 OUT_DIR = Path("cache_seed/earnings_price_dataset")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -64,12 +66,46 @@ WINDOWS = {"1d": 1, "5d": 5, "21d": 21}
 # Altman Z-Score bound — nulled, not silently passed through.
 SURPRISE_PCT_SANITY_BOUND = 500.0
 
+# price_change_* sanity bound, reusing the SAME literature-backed circuit-
+# breaker constants regime_price_model.py already established (IN/KR are
+# exact regulatory single-day limits, US/JP are conservative heuristics —
+# see that file's docstring for citations) rather than inventing a second,
+# possibly-inconsistent bound. Applied per market so all four get sanitized
+# by their OWN real regime, not one blanket cutoff that would be wrong for
+# a market with no daily price cap (US) or a tighter one (India).
+# Confirmed empirically before adding this: IN showed a -69.2% ONE-DAY move
+# (impossible under India's 20% limit) and KR showed the exact same 230.3%
+# value repeated across the 1d/5d/AND 21d windows for one bad print
+# (impossible under KRX's hard 30% daily limit) -- both unambiguous data
+# errors (bad split adjustment / corrupted price row), not real trading.
+# 5d/21d use a worst-case "N consecutive limit days" ceiling (multiplicative
+# compounding of the same daily bound) rather than the 1-day bound directly,
+# since a genuine multi-day drift can legitimately exceed one day's limit.
+def _price_change_bound_pct(market: str, window_days: int) -> float:
+    daily_pct = CIRCUIT_BOUND_PCT.get(market, 20.0) / 100
+    return float(np.log((1 + daily_pct) ** window_days) * 100)
+
 
 def _load_yahooquery_full(market: str) -> pd.DataFrame:
-    p = Path(f"cache_seed/earnings_dates_yahooquery_full/{market}.parquet")
-    if not p.exists():
+    """Unions the full-universe run with the classified-subset run (both
+    same schema, same source, different symbol scope/timing) -- NOT a
+    strict superset relationship: a market can succeed in one run and be
+    fully rate-limited in the other. Confirmed empirically for Korea:
+    earnings_dates_yahooquery_full/KR.parquet has 2,600 tickers but 0 with
+    real historical data (that run was completely blocked), while
+    earnings_dates_yahooquery/KR.parquet (classified-subset, run earlier
+    under different rate-limit conditions) has 656 real events across 579
+    tickers. Reading only the full-universe file silently dropped Korea's
+    best yahooquery source from this dataset."""
+    frames = []
+    for p in (Path(f"cache_seed/earnings_dates_yahooquery_full/{market}.parquet"),
+              Path(f"cache_seed/earnings_dates_yahooquery/{market}.parquet")):
+        if p.exists():
+            frames.append(pd.read_parquet(p).dropna(subset=["reported_date"]))
+    if not frames:
         return pd.DataFrame(columns=["ticker", "earnings_date", "surprise_pct", "source"])
-    df = pd.read_parquet(p).dropna(subset=["reported_date"])
+    df = pd.concat(frames, ignore_index=True)
+    df = df.drop_duplicates(subset=["ticker", "period_end_date"])
     return pd.DataFrame({
         "ticker": df["ticker"], "earnings_date": pd.to_datetime(df["reported_date"]).dt.tz_localize(None),
         "surprise_pct": df["surprise_pct"], "source": "yahooquery_full",
@@ -122,7 +158,17 @@ def load_all_events(market: str) -> pd.DataFrame:
             filter_fn=lambda d: d[d["is_earnings_8k"] == True]))  # noqa: E712
     if market == "KR":
         parts.append(_load_date_only(
-            "cache_seed/earnings_dates_dart/KR.parquet", "ticker", "filing_date", "dart"))
+            "cache_seed/earnings_dates_dart/KR.parquet", "ticker", "filing_date", "dart",
+            # DART's 기재정정 (amendment/correction) filings re-file an
+            # ALREADY-counted quarterly/half-year/annual report, not a new
+            # earnings event -- confirmed empirically: 2,124/22,642 raw DART
+            # rows are amendments, and unlike the other three markets'
+            # date-only sources (NSE actual_result, SEC 8-K Item 2.02, both
+            # already one-event-per-filing) Korea's raw feed was silently
+            # counting the correction as a second event. Excluding them
+            # brings Korea back to the same "one row per genuine filing"
+            # granularity as IN/US.
+            filter_fn=lambda d: d[~d["report_name"].str.contains("기재정정", na=False)]))
     combined = pd.concat(parts, ignore_index=True)
     combined = combined.dropna(subset=["ticker", "earnings_date"])
     bad_surprise = combined["surprise_pct"].abs() > SURPRISE_PCT_SANITY_BOUND
@@ -162,7 +208,10 @@ def compute_price_changes(market: str, events: pd.DataFrame) -> pd.DataFrame:
                 out[f"price_change_{label}"] = None
                 continue
             fut = col.iloc[end]
-            out[f"price_change_{label}"] = (float(np.log(fut / base)) * 100) if pd.notna(fut) and fut > 0 else None
+            chg = (float(np.log(fut / base)) * 100) if pd.notna(fut) and fut > 0 else None
+            if chg is not None and abs(chg) > _price_change_bound_pct(market, H):
+                chg = None  # flagged as a data error, not displayed -- see _price_change_bound_pct
+            out[f"price_change_{label}"] = chg
         rows.append(out)
     return pd.DataFrame(rows)
 
@@ -172,17 +221,40 @@ def main():
     ap.add_argument("--market", nargs="+", default=["IN", "US", "JP", "KR"])
     a = ap.parse_args()
 
+    compiled = []
     for m in a.market:
         events = load_all_events(m)
         print(f"[{m}] {events['ticker'].nunique()} tickers, {len(events)} events "
               f"(sources: {events['source'].value_counts().to_dict()})")
         df = compute_price_changes(m, events)
+        # granularity flag: every market's raw feed mixes surprise-bearing
+        # rows (yahooquery/yfinance) with date-only cross-check rows
+        # (NSE/SEC-8K/DART) in wildly different proportions -- KR is ~94%
+        # date-only, JP has NONE at all. Any cross-market comparison MUST
+        # filter on this rather than treat "n_events" as apples-to-apples.
+        df["has_surprise"] = df["surprise_pct"].notna()
         out_path = OUT_DIR / f"{m}.parquet"
         df.to_parquet(out_path, index=False)
-        n_with_surprise = df["surprise_pct"].notna().sum()
+        n_with_surprise = int(df["has_surprise"].sum())
         n_with_1d = df["price_change_1d"].notna().sum()
         print(f"[{m}] -> {out_path}: {len(df)} rows, {df['ticker'].nunique()} tickers, "
-              f"{n_with_surprise} with surprise%, {n_with_1d} with a computed 1d price change")
+              f"{n_with_surprise} with surprise% ({n_with_surprise/len(df):.1%}), "
+              f"{n_with_1d} with a computed 1d price change")
+        compiled.append(df)
+
+    if compiled:
+        all_df = pd.concat(compiled, ignore_index=True)
+        all_path = OUT_DIR / "ALL.parquet"
+        all_df.to_parquet(all_path, index=False)
+        print(f"\n-> {all_path}: {len(all_df)} rows across {all_df['market'].nunique()} markets, "
+              f"same schema/columns/sanitization applied uniformly "
+              f"(surprise% bound={SURPRISE_PCT_SANITY_BOUND}, price-change bound=per-market circuit regime)")
+        print("\nCross-market granularity (use has_surprise to filter to comparable rows):")
+        summary = all_df.groupby("market").agg(
+            tickers=("ticker", "nunique"), rows=("ticker", "size"),
+            surprise_bearing=("has_surprise", "sum")).reset_index()
+        summary["surprise_bearing_pct"] = (summary["surprise_bearing"] / summary["rows"] * 100).round(1)
+        print(summary.to_string(index=False))
 
 
 if __name__ == "__main__":

@@ -63,7 +63,10 @@ SCREENERS = ["darvas", "golden_cross", "new_highs", "below_200dma",
              "roce_plus", "sloan_quality", "not_distress",
              "capacity_expansion", "growth_stocks", "graham_10y", "small_cap_growth",
              "reversal_weekly", "reversal_monthly",  # v3: Lehmann (1990) / Jegadeesh (1990)
-             "pead_positive_surprise", "debt_reduction"]  # v4: PEAD x deleveraging
+             "pead_positive_surprise", "debt_reduction",  # v4: PEAD x deleveraging
+             "net_margin", "operating_margin", "pb_value", "ps_value",  # v6: Screener.in ratio taxonomy
+             "ev_ebitda_value", "peg_value", "fcf_yield", "low_beta",
+             "eps_growth", "roic_value", "fcf_margin", "net_debt_ebitda", "ev_sales"]  # v7: financial-media gap check
 CONTROLS = ["log_liquidity", "volatility_63d"]
 HORIZON_LABELS = ["T+5d", "T+21d", "T+63d", "T+126d", "T+252d"]
 HORIZONS = [f"xret_{h}" for h in HORIZON_LABELS]        # primary: excess return over SPY

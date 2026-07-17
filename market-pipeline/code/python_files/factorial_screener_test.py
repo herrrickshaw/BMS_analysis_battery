@@ -91,6 +91,7 @@ def _flag_split_days(ohlcv: pd.DataFrame) -> pd.DataFrame:
     df["likely_split"] = likely.fillna(False)
 
     daily_ret = df.groupby("Symbol", sort=False)["Close"].pct_change()
+    df["daily_ret"] = daily_ret  # persisted (was previously a local-only var) -- low_beta_signals (v6) needs it
     dollar_vol = df["Close"] * df["Volume"]
     df["dollar_vol_63d"] = (
         dollar_vol.groupby(df["Symbol"]).transform(lambda s: s.rolling(63, min_periods=20).mean())
@@ -287,6 +288,46 @@ def short_term_reversal_signals(ohlcv: pd.DataFrame, lookback: int, bottom_quant
     return out.reset_index(drop=True)
 
 
+def low_beta_signals(ohlcv: pd.DataFrame, lookback: int = 252, beta_threshold: float = 0.8,
+                      min_price: float = 5.0) -> pd.DataFrame:
+    """v6 addition: the "Market & Price" category's Beta parameter,
+    Screener.in-style, applied here as the low-volatility/low-beta anomaly
+    (Ang, Hodrick, Xing & Zhang 2006, 2009; Frazzini & Pedersen 2014
+    "Betting Against Beta") -- low-beta stocks have historically earned
+    risk-adjusted returns disproportionate to their low market sensitivity.
+    Flagged as a genuine literature gap in this account's own research
+    (v3's docstring never closed it); closed here.
+
+    Rolling `lookback`-day beta vs SPY (cov(stock,bench)/var(bench)),
+    shifted by one bar so the beta measured on day t never includes day
+    t's own return (same anti-lookahead convention as every other
+    screener here). Same min_price floor as short_term_reversal_signals
+    for the same reason (a low-beta reading on a near-zero-price stock is
+    a data artifact, not a real defensive characteristic)."""
+    bench = ohlcv[ohlcv["Symbol"] == BENCHMARK_SYMBOL].sort_values("Date")[["Date", "daily_ret"]]
+    bench = bench.rename(columns={"daily_ret": "bench_ret"}).set_index("Date")["bench_ret"]
+
+    out = []
+    for sym, g in ohlcv.groupby("Symbol", sort=False):
+        if sym == BENCHMARK_SYMBOL or len(g) < lookback + 5:
+            continue
+        g = g.sort_values("Date")
+        merged = g[["Date", "Close", "daily_ret"]].merge(bench, left_on="Date", right_index=True, how="inner")
+        if len(merged) < lookback + 5:
+            continue
+        stock_r = merged["daily_ret"].shift(1)
+        bench_r = merged["bench_ret"].shift(1)
+        roll_cov = stock_r.rolling(lookback).cov(bench_r)
+        roll_var = bench_r.rolling(lookback).var()
+        beta = roll_cov / roll_var
+        eligible = merged["Close"].shift(1) >= min_price
+        low = (beta < beta_threshold) & eligible
+        fresh = low & ~low.shift(1, fill_value=False)
+        for i in merged.index[fresh.fillna(False)]:
+            out.append((sym, merged.loc[i, "Date"]))
+    return pd.DataFrame(out, columns=["symbol", "signal_date"])
+
+
 # ── Fundamental screeners (from point-in-time SEC filings) ─────────────────
 
 def compute_fundamental_screens(fund: pd.DataFrame) -> pd.DataFrame:
@@ -366,6 +407,16 @@ def compute_fundamental_screens(fund: pd.DataFrame) -> pd.DataFrame:
         df.groupby("ticker")["eps"].rolling(10, min_periods=5).mean().reset_index(level=0, drop=True)
     )
 
+    # --- v7 addition: EPS Growth -- the number every earnings headline
+    # leads with ("beat/missed EPS estimates"), distinct from ni_growth
+    # (net income growth): EPS growth is diluted by share-count changes
+    # (buybacks push EPS growth above NI growth; dilution pushes it below)
+    # in a way NI growth alone can't capture. Fresh groupby (eps didn't
+    # exist when `g` above was created), same convention as eps_10y_avg.
+    df["eps_prior"] = df.groupby("ticker")["eps"].shift(1)
+    df["eps_growth"] = (df["eps"] - df["eps_prior"]) / df["eps_prior"].abs()
+    df["eps_growth_pass"] = (df["eps_growth"] > 0.15).astype(int)
+
     # 3y revenue CAGR for Coffee Can
     df["rev_3y_ago"] = g["revenue"].shift(3)
     df["rev_cagr_3y"] = (df["revenue"] / df["rev_3y_ago"]).pow(1 / 3) - 1
@@ -398,6 +449,12 @@ def compute_fundamental_screens(fund: pd.DataFrame) -> pd.DataFrame:
     # ROIC proxy for Magic Formula: EBIT / (equity + total_debt - cash)
     df["invested_capital"] = df["equity"] + df["total_debt"] - df["cash"]
     df["roic"] = df["ebit"] / df["invested_capital"]
+    # v7 addition: ROIC as its OWN screener, not just a Magic Formula input --
+    # one of the most-cited profitability metrics in market commentary
+    # ("high-ROIC business"). 15% matches ROCE-Plus's own level threshold,
+    # kept identical for direct comparability between the two capital-
+    # efficiency metrics rather than picking a different number.
+    df["roic_pass"] = (df["roic"] > 0.15).astype(int)
 
     # --- ROCE block from piotroski_plus.py (reused verbatim, not reinvented) --
     # +1 level:   roce_ex_cash > 15%  (ROCE = EBIT / (Total Assets - Current
@@ -430,6 +487,25 @@ def compute_fundamental_screens(fund: pd.DataFrame) -> pd.DataFrame:
     # -- i.e. cash flow, not accruals, is driving reported earnings.
     df["sloan_ratio"] = (df["net_income"] - df["cfo"]) / df["total_assets"]
     df["sloan_pass"] = (df["sloan_ratio"] < 0).astype(int)
+
+    # --- v6 addition (2026-07-17): Screener.in "Profitability & Returns" /
+    # "Margins" category, applied to US SEC EDGAR data. User-requested
+    # follow-up to debt_reduction: work through the standard Screener.in
+    # parameter taxonomy (screener.in/screens/298558) for combinations not
+    # yet tested. Net Margin and Operating Margin are the two margin
+    # ratios that need no price join (pure income-statement), so computed
+    # here alongside gross_margin (already used inside Piotroski).
+    df["net_margin"] = df["net_income"] / df["revenue"]
+    df["operating_margin"] = df["ebit"] / df["revenue"]
+    df["net_margin_pass"] = (df["net_margin"] > 0.10).astype(int)
+    df["operating_margin_pass"] = (df["operating_margin"] > 0.15).astype(int)
+
+    # v7 addition: FCF Margin (FCF/Revenue) -- an EFFICIENCY metric, distinct
+    # from FCF Yield (FCF/market cap, a VALUATION metric already computed
+    # in attach_market_cap). A company can have a healthy FCF margin while
+    # looking expensive on FCF yield, or vice versa -- two different claims.
+    df["fcf_margin"] = df["fcf"] / df["revenue"]
+    df["fcf_margin_pass"] = (df["fcf_margin"] > 0.10).astype(int)
 
     return df
 
@@ -492,6 +568,71 @@ def attach_market_cap(fund: pd.DataFrame, ohlcv: pd.DataFrame) -> pd.DataFrame:
         & (merged["de_ratio"] < 0.5) & (merged["roe"] > 0.15)
     ).astype(int)
 
+    # --- v6 addition: Screener.in "Valuation Multipliers" category, the
+    # mcap-dependent ratios (need the price join above) -----------------------
+    # P/B: mcap / book value (equity). <3 is a standard "not overpriced
+    # relative to net assets" value threshold (screener.in and Graham-style
+    # value screens commonly use 3-5x as the ceiling).
+    merged["pb_ratio"] = merged["mcap"] / merged["equity"]
+    merged["pb_pass"] = ((merged["pb_ratio"] > 0) & (merged["pb_ratio"] < 3)).astype(int)
+
+    # P/S: mcap / revenue. <2 is a standard moderate-value threshold (deep
+    # value screens sometimes use <1; this uses the more common, less
+    # restrictive convention).
+    merged["ps_ratio"] = merged["mcap"] / merged["revenue"]
+    merged["ps_pass"] = ((merged["ps_ratio"] > 0) & (merged["ps_ratio"] < 2)).astype(int)
+
+    # EV/EBITDA: (mcap + total_debt - cash) / (EBIT + D&A). <10 is the
+    # standard "reasonably priced" ceiling used across both US and Indian
+    # value-investing convention -- capital-structure-neutral, unlike P/E.
+    merged["ebitda"] = merged["ebit"] + merged["d_and_a"].fillna(0)
+    merged["ev"] = merged["mcap"] + merged["total_debt"] - merged["cash"]
+    merged["ev_ebitda"] = merged["ev"] / merged["ebitda"]
+    merged["ev_ebitda_pass"] = (
+        (merged["ebitda"] > 0) & (merged["ev_ebitda"] > 0) & (merged["ev_ebitda"] < 10)
+    ).astype(int)
+
+    # v7 addition: Net Debt/EBITDA -- the standard credit/leverage metric
+    # in financial-media coverage ("net debt to EBITDA of 3.5x"), distinct
+    # from D/E (which uses book equity, not cash-earnings capacity). <2.0x
+    # is a common "conservatively levered" threshold in credit analysis.
+    # A LEVEL screen (is leverage currently low), complementary to
+    # debt_reduction (a CHANGE screen -- is leverage falling).
+    merged["net_debt"] = merged["total_debt"] - merged["cash"]
+    merged["net_debt_ebitda"] = merged["net_debt"] / merged["ebitda"]
+    merged["net_debt_ebitda_pass"] = (
+        (merged["ebitda"] > 0) & (merged["net_debt_ebitda"] < 2.0)
+    ).astype(int)
+
+    # v7 addition: EV/Sales -- commonly cited for growth/unprofitable
+    # companies where P/E and EV/EBITDA don't work (no earnings yet).
+    # Distinct from P/S: uses EV (capital-structure-neutral), not just
+    # market cap. <3 is a looser, more growth-oriented convention than
+    # ps_pass's <2 P/S ceiling (deliberately different thresholds for two
+    # different valuation lenses).
+    merged["ev_sales"] = merged["ev"] / merged["revenue"]
+    merged["ev_sales_pass"] = ((merged["ev_sales"] > 0) & (merged["ev_sales"] < 3)).astype(int)
+
+    # PEG (Peter Lynch): trailing P/E / trailing earnings growth. <1 is
+    # Lynch's own classic "attractively priced relative to its own growth"
+    # threshold. Documented approximation: PEG's textbook definition uses
+    # FORWARD growth (analyst estimates), not available here -- ni_growth
+    # (trailing YoY, already computed) is used instead, same "no consensus
+    # data, use the trailing/seasonal proxy" convention as D-12's PEAD
+    # surprise proxy elsewhere in this file.
+    merged["pe_ttm"] = merged["mcap"] / merged["net_income"]
+    merged["peg_ratio"] = merged["pe_ttm"] / (merged["ni_growth"] * 100)
+    merged["peg_pass"] = (
+        (merged["net_income"] > 0) & (merged["ni_growth"] > 0)
+        & (merged["peg_ratio"] > 0) & (merged["peg_ratio"] < 1)
+    ).astype(int)
+
+    # FCF Yield: free cash flow / market cap. >5% is a common institutional
+    # "cheap relative to real cash generation" screening bar -- distinct
+    # from Coffee Can's raw fcf>0 binary (this is a YIELD, not a sign check).
+    merged["fcf_yield"] = merged["fcf"] / merged["mcap"]
+    merged["fcf_yield_pass"] = (merged["fcf_yield"] > 0.05).astype(int)
+
     return merged
 
 
@@ -503,7 +644,10 @@ def build_fundamental_signal_dates(fund_scored: pd.DataFrame) -> pd.DataFrame:
     cols = ["piotroski_pass", "coffee_can_pass", "magic_formula_pass", "bull_cartel_pass",
             "roce_plus_pass", "sloan_pass", "not_distress",
             "capacity_expansion_pass", "growth_stocks_pass", "graham_10y_pass", "small_cap_growth_pass",
-            "pead_positive_surprise_pass", "debt_reduction_pass"]
+            "pead_positive_surprise_pass", "debt_reduction_pass",
+            "net_margin_pass", "operating_margin_pass", "pb_pass", "ps_pass",
+            "ev_ebitda_pass", "peg_pass", "fcf_yield_pass",
+            "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass"]
     df = fund_scored.dropna(subset=["filed"]).copy()
     df["any_pass"] = df[cols].sum(axis=1) > 0
     df = df[df["any_pass"]]
@@ -630,12 +774,15 @@ def main():
     rev_w["screener"] = "reversal_weekly"
     rev_m = short_term_reversal_signals(ohlcv, lookback=21)
     rev_m["screener"] = "reversal_monthly"
+    lb = low_beta_signals(ohlcv)
+    lb["screener"] = "low_beta"
     print(f"  golden_cross: {len(gc):,} signals across {gc['symbol'].nunique():,} symbols")
     print(f"  darvas: {len(dv):,} signals across {dv['symbol'].nunique():,} symbols")
     print(f"  new_highs: {len(nh):,} signals across {nh['symbol'].nunique():,} symbols")
     print(f"  below_200dma: {len(b200):,} signals across {b200['symbol'].nunique():,} symbols")
     print(f"  reversal_weekly: {len(rev_w):,} signals across {rev_w['symbol'].nunique():,} symbols")
     print(f"  reversal_monthly: {len(rev_m):,} signals across {rev_m['symbol'].nunique():,} symbols")
+    print(f"  low_beta: {len(lb):,} signals across {lb['symbol'].nunique():,} symbols")
 
     print("\nComputing fundamental signals...")
     fund_scored = compute_fundamental_screens(fund)
@@ -644,7 +791,10 @@ def main():
     for c in ["piotroski_pass", "coffee_can_pass", "magic_formula_pass", "bull_cartel_pass",
               "roce_plus_pass", "sloan_pass", "not_distress",
               "capacity_expansion_pass", "growth_stocks_pass", "graham_10y_pass", "small_cap_growth_pass",
-              "pead_positive_surprise_pass", "debt_reduction_pass"]:
+              "pead_positive_surprise_pass", "debt_reduction_pass",
+              "net_margin_pass", "operating_margin_pass", "pb_pass", "ps_pass",
+              "ev_ebitda_pass", "peg_pass", "fcf_yield_pass",
+            "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass"]:
         print(f"  {c}: {fund_sig[c].sum():,} filing-level passes")
 
     # --- Melt fundamental wide-passes into long screener rows -----------------
@@ -658,7 +808,19 @@ def main():
                      ("graham_10y_pass", "graham_10y"),
                      ("small_cap_growth_pass", "small_cap_growth"),
                      ("pead_positive_surprise_pass", "pead_positive_surprise"),
-                     ("debt_reduction_pass", "debt_reduction")]:
+                     ("debt_reduction_pass", "debt_reduction"),
+                     ("net_margin_pass", "net_margin"),
+                     ("operating_margin_pass", "operating_margin"),
+                     ("pb_pass", "pb_value"),
+                     ("ps_pass", "ps_value"),
+                     ("ev_ebitda_pass", "ev_ebitda_value"),
+                     ("peg_pass", "peg_value"),
+                     ("fcf_yield_pass", "fcf_yield"),
+                     ("eps_growth_pass", "eps_growth"),
+                     ("roic_pass", "roic_value"),
+                     ("fcf_margin_pass", "fcf_margin"),
+                     ("net_debt_ebitda_pass", "net_debt_ebitda"),
+                     ("ev_sales_pass", "ev_sales")]:
         sub = fund_sig[fund_sig[c] == 1][["symbol", "signal_date"]].copy()
         sub["screener"] = name
         fund_long.append(sub)
@@ -670,6 +832,7 @@ def main():
                               b200[["symbol", "signal_date", "screener"]],
                               rev_w[["symbol", "signal_date", "screener"]],
                               rev_m[["symbol", "signal_date", "screener"]],
+                              lb[["symbol", "signal_date", "screener"]],
                               fund_long], ignore_index=True)
     all_signals["signal_date"] = pd.to_datetime(all_signals["signal_date"])
     all_signals["year"] = all_signals["signal_date"].dt.year

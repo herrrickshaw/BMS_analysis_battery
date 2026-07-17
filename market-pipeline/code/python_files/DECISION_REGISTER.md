@@ -165,6 +165,94 @@ keys below match the docstring citations already in the code (`[FP16]`,
 
 ---
 
+## Glossary — acronyms & key tickers
+
+### Key tickers referenced this session
+
+| Ticker | Company | Context |
+|---|---|---|
+| MCHP | Microchip Technology | US Technology-sector spillover leader — the only ticker that survived every validation this session (full-sample re-runs, 4 confound checks, walk-forward train/test split, FDR correction) |
+| ANET | Arista Networks | Initially a candidate US spillover leader; downgraded to "not FDR-robust" once the `quarter_key` double-counting bug (see D-16/D-17) was fixed |
+| WDAY | Workday | Same as ANET — initially promising, downgraded after the walk-forward split showed weak early-period significance |
+| VIJAYABANK | Vijaya Bank (delisted, merged into Bank of Baroda 2019) | Recurring diagnostic test case — surfaced both a Yahoo-coverage gap and a real NSE-collector bug (`NoneType` crash on a null `resCmpData`) |
+| GUJALKALI | Gujarat Alkalies & Chemicals | India's top (never FDR-significant) sector-spillover candidate across every run this session |
+
+### Markets, exchanges & regulators
+
+| Acronym | Meaning |
+|---|---|
+| NSE | National Stock Exchange (India) |
+| BSE | Bombay Stock Exchange |
+| SEBI | Securities and Exchange Board of India |
+| LODR | Listing Obligations and Disclosure Requirements (SEBI regulation governing board-meeting/results filing timelines) |
+| SEC | Securities and Exchange Commission (US) |
+| EDGAR | Electronic Data Gathering, Analysis, and Retrieval (SEC's filing system) |
+| DART | Data Analysis, Retrieval and Transfer System (Korea's OpenDART regulatory filing portal) |
+| KRX | Korea Exchange |
+| TSE | Tokyo Stock Exchange |
+| JPX | Japan Exchange Group (TSE's parent) |
+| TDnet | Timely Disclosure network (Japan's regulatory disclosure system) |
+| LULD | Limit Up-Limit Down (US trading-pause mechanism, not a daily price cap) |
+| MWCB | Market-Wide Circuit Breaker (index-level halt, distinct from per-stock price bands) |
+| SME | Small and Medium Enterprises (a separate BSE listing platform/segment) |
+
+### PEAD / event-study statistics
+
+| Acronym | Meaning |
+|---|---|
+| PEAD | Post-Earnings-Announcement Drift |
+| CAR | Cumulative Abnormal Return |
+| FDR | False Discovery Rate (Benjamini-Hochberg multiple-testing correction) |
+| YoY | Year-over-Year |
+| SUE | Standardized Unexpected Earnings (classic PEAD-literature surprise measure; this pipeline uses a simpler YoY-growth proxy instead) |
+| GARCH | Generalized Autoregressive Conditional Heteroskedasticity (volatility model) |
+| OLS | Ordinary Least Squares |
+| VAR | Vector AutoRegression |
+| VECM | Vector Error Correction Model |
+| RMSE | Root Mean Square Error |
+| ILLIQ | Illiquidity (Amihud's price-impact measure) |
+
+### Financial metrics
+
+| Acronym | Meaning |
+|---|---|
+| EPS | Earnings Per Share |
+| ROE | Return on Equity |
+| ROCE | Return on Capital Employed |
+| P/E | Price-to-Earnings ratio |
+| P/B | Price-to-Book ratio |
+| CCC | Cash Conversion Cycle |
+| FY | Fiscal Year |
+| DII / FII | Domestic / Foreign Institutional Investor |
+| ISIN | International Securities Identification Number (used to cross-reference NSE/BSE filings for the same company by identity, not name-matching) |
+
+### Data, networking & tooling
+
+| Acronym | Meaning |
+|---|---|
+| XBRL | eXtensible Business Reporting Language (structured filing format behind NSE's `/results-comparision` endpoint) |
+| OHLCV | Open, High, Low, Close, Volume |
+| LTM | Last Twelve Months (the local price-panel cache this pipeline reads) |
+| API | Application Programming Interface |
+| REST | Representational State Transfer |
+| SDK | Software Development Kit |
+| JSON / CSV / HTML / XML | Data/document formats |
+| PID | Process ID (used throughout to track background jobs) |
+| TLS / SSL | Transport/Secure Sockets Layer — relevant to why `curl` succeeded against BSE's API when Python's plain `requests` didn't (TLS fingerprinting) |
+| ALPN | Application-Layer Protocol Negotiation (seen in `curl -v` output while debugging BSE) |
+| mTLS | Mutual TLS (seen in nemoclaw's gateway logs) |
+| WAF | Web Application Firewall (BSE's soft-block behavior) |
+| MIC | Market Identifier Code (seen in EODHD's exchange list, e.g. `XNAS`, `XNYS`) |
+| ISO | International Organization for Standardization (`CountryISO2`/`ISO3` fields in EODHD data) |
+| PyPI | Python Package Index |
+| LFS | Large File Storage (git-lfs, used for this repo's parquet data) |
+| PR | Pull Request |
+| VM | Virtual Machine (colima/nemoclaw) |
+| NIM | NVIDIA Inference Microservice (referenced in nemoclaw's sandbox teardown messages) |
+| CLI | Command-Line Interface |
+
+---
+
 ## Known gaps (explicitly not yet addressed, for a future extension)
 
 - **Europe** has a documented static-collar rule (`[EURONEXT-TS]`: ±8% blue-chip / ±10% other) but no `Change%` column exists yet for Europe in `build_mailer.py`, so no bound has been wired in. Xetra (`[XETRA-PM]`, not yet fetched in full) uses volatility-interruption auctions instead of a fixed cap, so a single EU-wide number would need the same per-exchange care as Japan's yen-table, not a flat percentage.

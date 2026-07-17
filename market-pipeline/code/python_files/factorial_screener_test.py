@@ -441,18 +441,35 @@ def short_interest_decline_signals(short_interest_path: str = SHORT_INTEREST_PAT
 
 def compute_fundamental_screens(fund: pd.DataFrame) -> pd.DataFrame:
     df = fund.copy()
-    df["roa"] = df["net_income"] / df["total_assets"]
-    df["roe"] = df["net_income"] / df["equity"]
+    df = df.sort_values(["ticker", "fy_end"])
+    g = df.groupby("ticker")
+
+    # CFA Institute convention (Robinson et al., International Financial
+    # Statement Analysis, Ch.7 p.267-268): "Because operating income occurs
+    # throughout the period... it generally makes sense to use some average
+    # measure of assets... Most ratio databases use a simple average of the
+    # beginning- and end-of-year balance sheet amounts." roa/roe/asset_turnover
+    # pair an income-statement FLOW (net income, revenue) with a balance-sheet
+    # STOCK (assets, equity) -- using the ending value alone (the prior
+    # convention here) overstates the ratio whenever the balance sheet grew
+    # during the period. No average is possible for a ticker's first filing
+    # (no prior period) -- left NaN, same "missing stays missing" convention
+    # as total_debt_strict elsewhere in this file, not silently defaulted.
+    df["total_assets_prior_bal"] = g["total_assets"].shift(1)
+    df["avg_total_assets"] = (df["total_assets"] + df["total_assets_prior_bal"]) / 2
+    df["equity_prior_bal"] = g["equity"].shift(1)
+    df["avg_equity"] = (df["equity"] + df["equity_prior_bal"]) / 2
+
+    df["roa"] = df["net_income"] / df["avg_total_assets"]
+    df["roe"] = df["net_income"] / df["avg_equity"]
     df["current_ratio"] = df["current_assets"] / df["current_liabilities"]
     df["leverage"] = df["long_term_debt"] / df["total_assets"]
     df["gross_margin"] = df["gross_profit"].fillna(df["revenue"] - df["cost_of_revenue"]) / df["revenue"]
-    df["asset_turnover"] = df["revenue"] / df["total_assets"]
+    df["asset_turnover"] = df["revenue"] / df["avg_total_assets"]
     df["fcf"] = df["cfo"] - df["capex"]
     df["total_debt"] = df["long_term_debt"].fillna(0) + df["short_term_debt"].fillna(0)
     df["de_ratio"] = df["total_debt"] / df["equity"]
 
-    df = df.sort_values(["ticker", "fy_end"])
-    g = df.groupby("ticker")
     df["d_roa"] = g["roa"].diff()
     df["d_leverage"] = g["leverage"].diff()
     df["d_current_ratio"] = g["current_ratio"].diff()

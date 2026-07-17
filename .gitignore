@@ -36,6 +36,15 @@ uploads/
 *.pem
 stock-extractor.pem
 
+# Downloads/ is a real macOS Downloads folder shared with this repo's working
+# tree, not a project directory — it accumulates personal files (tax reports,
+# bank statements, insurance docs, payslips) alongside pipeline scripts/data.
+# Blanket-ignore it so `git add -A`/status never surfaces those by accident;
+# this does NOT untrack the ~362 files already tracked under Downloads/ (the
+# pipeline code + LFS data caches), which stay trackable via explicit `git add
+# <path>`. Adding a genuinely new file under Downloads/ needs `git add -f`.
+/Downloads/
+
 # launchd agents hold real credentials in EnvironmentVariables (Gmail app
 # password for the daily brief). The installed copy stays machine-local; the
 # tracked template in Downloads/code/python_files ships a placeholder only.

@@ -1,0 +1,37 @@
+screener,category,addressable_universe,unique_symbols_fired,coverage_pct_of_universe,pct_of_firing_symbols_in_sp500
+short_interest_decline,v8 (S&P 500 ONLY by design),503,499,99.2,100.0
+insider_buying,v8 (S&P 500 ONLY by design),503,285,56.7,100.0
+coffee_can,fundamental (SEC EDGAR subset),5016,316,6.3,33.2
+roce_plus,fundamental (SEC EDGAR subset),5016,668,13.3,32.0
+piotroski,fundamental (SEC EDGAR subset),5016,1414,28.2,23.6
+operating_margin,fundamental (SEC EDGAR subset),5016,1296,25.8,23.3
+net_margin,fundamental (SEC EDGAR subset),5016,1897,37.8,20.1
+fcf_margin,fundamental (SEC EDGAR subset),5016,1779,35.5,19.1
+peg_value,fundamental (SEC EDGAR subset),5016,2366,47.2,17.2
+fcf_yield,fundamental (SEC EDGAR subset),5016,1860,37.1,17.2
+ev_ebitda_value,fundamental (SEC EDGAR subset),5016,1204,24.0,16.9
+debt_reduction,fundamental (SEC EDGAR subset),5016,1369,27.3,16.6
+net_debt_ebitda,fundamental (SEC EDGAR subset),5016,2443,48.7,16.3
+graham_10y,fundamental (SEC EDGAR subset),5016,1089,21.7,15.6
+ev_sales,fundamental (SEC EDGAR subset),5016,1760,35.1,15.2
+ps_value,fundamental (SEC EDGAR subset),5016,1656,33.0,14.9
+magic_formula,fundamental (SEC EDGAR subset),5016,364,7.3,14.8
+buyback_yield,fundamental (SEC EDGAR subset),5016,2531,50.5,14.5
+growth_stocks,fundamental (SEC EDGAR subset),5016,396,7.9,13.1
+bull_cartel,fundamental (SEC EDGAR subset),5016,2136,42.6,12.7
+not_distress,fundamental (SEC EDGAR subset),5016,1447,28.8,12.4
+roic_value,fundamental (SEC EDGAR subset),5016,2960,59.0,11.9
+capacity_expansion,fundamental (SEC EDGAR subset),5016,3511,70.0,11.8
+pb_value,fundamental (SEC EDGAR subset),5016,2609,52.0,11.7
+eps_growth,fundamental (SEC EDGAR subset),5016,3878,77.3,11.5
+pead_positive_surprise,fundamental (SEC EDGAR subset),5016,4187,83.5,11.5
+low_asset_growth,fundamental (SEC EDGAR subset),5016,4205,83.8,11.5
+sloan_quality,fundamental (SEC EDGAR subset),5016,4332,86.4,11.1
+reversal_monthly,technical (full OHLCV universe),6480,5526,85.3,8.7
+reversal_weekly,technical (full OHLCV universe),6480,5742,88.6,8.4
+low_beta,technical (full OHLCV universe),6480,5289,81.6,7.7
+new_highs,technical (full OHLCV universe),6480,6349,98.0,7.6
+below_200dma,technical (full OHLCV universe),6480,6464,99.8,7.5
+golden_cross,technical (full OHLCV universe),6480,6453,99.6,7.5
+darvas,technical (full OHLCV universe),6480,6447,99.5,7.5
+small_cap_growth,fundamental (SEC EDGAR subset),5016,356,7.1,3.1

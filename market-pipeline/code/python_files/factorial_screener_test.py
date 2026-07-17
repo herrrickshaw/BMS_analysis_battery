@@ -59,6 +59,10 @@ import pandas as pd
 
 OHLCV_PATH = "/Users/umashankar/repos/global-stock-screener/cache_seed/ltm/US.parquet"
 FUND_PATH = "/Users/umashankar/repos/global-stock-screener/cache_seed/fundamentals_history/US.parquet"
+# v8: S&P 500-scope only (484-503 symbols), NOT the full universe above -- see
+# collect_insider_form4.py / collect_short_interest.py docstrings for the scope decision.
+INSIDER_PATH = "/Users/umashankar/market-pipeline/code/python_files/cache_seed/insider_transactions_us.parquet"
+SHORT_INTEREST_PATH = "/Users/umashankar/market-pipeline/code/python_files/cache_seed/short_interest_us.parquet"
 MIN_YEARS_HISTORY = 5.0
 
 HORIZONS = {"T+5d": 5, "T+21d": 21, "T+63d": 63, "T+126d": 126, "T+252d": 252}
@@ -129,10 +133,15 @@ def load_fundamentals() -> pd.DataFrame:
 
 # ── Technical screeners (vectorized per symbol) ─────────────────────────────
 
-def golden_cross_signals(ohlcv: pd.DataFrame) -> pd.DataFrame:
+def golden_cross_signals(ohlcv: pd.DataFrame, min_price: float = 5.0) -> pd.DataFrame:
     """50-DMA crosses above 200-DMA. Both MAs computed from bars strictly
     before the signal day is not required here (MAs are inherently trailing,
-    no lookahead by construction)."""
+    no lookahead by construction). min_price floor (same convention as
+    short_term_reversal_signals/low_beta_signals) added after finding this
+    screener firing on sub-$0.0001 OTC tickers (ECXJ, IBIDF -- the SAME
+    penny-stock percentage-explosion pattern already caught on MNBEF in
+    v3, undetected here because this screener never had the floor -- one
+    signal produced a +18,999,884% T+252d "excess return")."""
     out = []
     for sym, g in ohlcv.groupby("Symbol", sort=False):
         g = g.sort_values("Date")
@@ -146,18 +155,26 @@ def golden_cross_signals(ohlcv: pd.DataFrame) -> pd.DataFrame:
         cross[:200] = False
         idx = np.where(cross)[0]
         for i in idx:
+            if c[i] < min_price:
+                continue
             out.append((sym, g["Date"].iloc[i]))
     return pd.DataFrame(out, columns=["symbol", "signal_date"])
 
 
-def darvas_signals(ohlcv: pd.DataFrame, box_window: int = 63, min_hold: int = 10) -> pd.DataFrame:
+def darvas_signals(ohlcv: pd.DataFrame, box_window: int = 63, min_hold: int = 10,
+                    min_price: float = 5.0) -> pd.DataFrame:
     """Darvas box breakout: box_top/box_bottom = rolling max(High)/min(Low)
     over the PRIOR box_window bars, EXCLUDING the current bar (this account's
     own established rule -- see feedback_darvas_box_design.md: including the
     current bar in box formation makes breakdown detection impossible).
     Breakout = today's Close > box_top, where box_top has been stable
     (unchanged) for at least min_hold bars -- a genuine consolidation, not a
-    single-day high being immediately "broken" by the next day's noise."""
+    single-day high being immediately "broken" by the next day's noise.
+    min_price floor added after finding this screener firing on sub-cent
+    OTC tickers (MNBEF, IBIDF, SGIPF, OBIIF, KELRF, TOKCF) that produced
+    T+252d "excess returns" in the hundreds of thousands to millions of
+    percent -- the same percentage-explosion pattern already caught (and
+    fixed) elsewhere this session, missing here until now."""
     out = []
     for sym, g in ohlcv.groupby("Symbol", sort=False):
         g = g.sort_values("Date")
@@ -177,17 +194,22 @@ def darvas_signals(ohlcv: pd.DataFrame, box_window: int = 63, min_hold: int = 10
         for i in idx:
             if i < box_window + min_hold:
                 continue
+            if close[i] < min_price:
+                continue
             out.append((sym, g["Date"].iloc[i]))
     return pd.DataFrame(out, columns=["symbol", "signal_date"])
 
 
-def new_high_signals(ohlcv: pd.DataFrame, near_pct: float = 0.98) -> pd.DataFrame:
+def new_high_signals(ohlcv: pd.DataFrame, near_pct: float = 0.98, min_price: float = 5.0) -> pd.DataFrame:
     """"Companies Creating New Highs": Close within near_pct of the trailing
     252-trading-day (52-week) high, EXCLUDING the current bar from the
     rolling max (same anti-lookahead convention as the Darvas box -- the
     high a stock is "near" must be a high it had already made, not one this
     bar itself sets). Signal = the first day in a run that crosses into
-    that zone, not every day it stays there."""
+    that zone, not every day it stays there. min_price floor added after
+    finding this screener firing on sub-cent OTC tickers (ECXJ at $0.00001,
+    MNBEF, NOFCF) producing T+252d "excess returns" up to +18,999,884% --
+    same percentage-explosion pattern caught elsewhere this session."""
     out = []
     for sym, g in ohlcv.groupby("Symbol", sort=False):
         g = g.sort_values("Date")
@@ -202,14 +224,19 @@ def new_high_signals(ohlcv: pd.DataFrame, near_pct: float = 0.98) -> pd.DataFram
         for i in idx:
             if i < 252:
                 continue
+            if close[i] < min_price:
+                continue
             out.append((sym, g["Date"].iloc[i]))
     return pd.DataFrame(out, columns=["symbol", "signal_date"])
 
 
-def below_200dma_signals(ohlcv: pd.DataFrame) -> pd.DataFrame:
+def below_200dma_signals(ohlcv: pd.DataFrame, min_price: float = 5.0) -> pd.DataFrame:
     """"Stocks below 200-DMA": Close crosses below the 200-day moving
     average -- a contrarian/value-timing entry, the mirror image of Golden
-    Cross's confirmation logic rather than a momentum signal."""
+    Cross's confirmation logic rather than a momentum signal. min_price
+    floor added after finding this screener firing on sub-cent OTC tickers
+    (IBIDF, BECEF) producing T+252d "excess returns" up to +11,545,300% --
+    same percentage-explosion pattern caught elsewhere this session."""
     out = []
     for sym, g in ohlcv.groupby("Symbol", sort=False):
         g = g.sort_values("Date")
@@ -222,6 +249,8 @@ def below_200dma_signals(ohlcv: pd.DataFrame) -> pd.DataFrame:
         cross[:200] = False
         idx = np.where(cross)[0]
         for i in idx:
+            if c[i] < min_price:
+                continue
             out.append((sym, g["Date"].iloc[i]))
     return pd.DataFrame(out, columns=["symbol", "signal_date"])
 
@@ -328,6 +357,86 @@ def low_beta_signals(ohlcv: pd.DataFrame, lookback: int = 252, beta_threshold: f
     return pd.DataFrame(out, columns=["symbol", "signal_date"])
 
 
+# ── v8 additions: insider Form 4 + FINRA short interest (S&P 500 scope only,
+# see collect_insider_form4.py / collect_short_interest.py) ─────────────────
+
+def insider_buying_signals(insider_path: str = INSIDER_PATH, min_transactions: int = 2,
+                            min_buy_share: float = 0.30, max_price_per_share: float = 50_000.0) -> pd.DataFrame:
+    """Net insider buying (Form 3/4 open-market P/S transactions only, no
+    grants/exercises/gifts -- filtered upstream by the collector). Aggregated
+    to one row per (symbol, calendar quarter) -- Form 4s cluster in bursts
+    (a 10b5-1 plan can file weekly), so per-transaction signals would badly
+    overlap; quarterly matches this repo's fundamental-screener cadence.
+
+    Signal = net dollar value of P minus S is POSITIVE, buy-side is >=30%
+    of gross dollar volume in the quarter (catches genuine net conviction,
+    not one small purchase offsetting a much larger routine sale), and
+    >=2 filings in the quarter (a single transaction is too thin a sample).
+
+    CAVEAT (real limitation, not hidden): the collector didn't pull the
+    reporting-owner CIK, so "n_transactions" can't distinguish multiple
+    DIFFERENT insiders buying from one insider filing multiple tranches --
+    weaker than an ideal "breadth of insiders" signal.
+
+    max_price_per_share caps ~17 known bad TRANS_PRICEPERSHARE rows (raw
+    SEC Form 4 data-entry errors, e.g. AMD showing $525M/share in 2017 --
+    no S&P 500 constituent has traded anywhere near $50k/share in this
+    window) before they can distort dollar-value aggregation.
+
+    Point-in-time: signal_date = the LAST FILING_DATE within the quarter
+    that produced the pass -- known to an observer at that moment, uses
+    no information from later quarters."""
+    df = pd.read_parquet(insider_path)
+    df = df[df["TRANS_PRICEPERSHARE"].between(0.01, max_price_per_share)].copy()
+    dollar_value = df["TRANS_SHARES"] * df["TRANS_PRICEPERSHARE"]
+    df["buy_value"] = np.where(df["TRANS_CODE"] == "P", dollar_value, 0.0)
+    df["sell_value"] = np.where(df["TRANS_CODE"] == "S", dollar_value, 0.0)
+    df["fy_quarter"] = df["FILING_DATE"].dt.to_period("Q")
+
+    g = df.groupby(["symbol", "fy_quarter"]).agg(
+        n_trans=("buy_value", "size"),
+        buy_value=("buy_value", "sum"),
+        sell_value=("sell_value", "sum"),
+        signal_date=("FILING_DATE", "max"),
+    ).reset_index()
+    g["gross_value"] = g["buy_value"] + g["sell_value"]
+    g = g[g["gross_value"] > 0]
+    g["buy_share"] = g["buy_value"] / g["gross_value"]
+    passed = g[(g["n_trans"] >= min_transactions) & (g["buy_value"] > g["sell_value"])
+               & (g["buy_share"] >= min_buy_share)][["symbol", "signal_date"]].copy()
+    return passed.reset_index(drop=True)
+
+
+def short_interest_decline_signals(short_interest_path: str = SHORT_INTEREST_PATH,
+                                    min_decline_pct: float = -10.0, min_prior_position: int = 10_000,
+                                    publication_lag_days: int = 11) -> pd.DataFrame:
+    """FINRA consolidated short interest: a sharp DECLINE in short interest
+    is the contrarian-friendly signal (Asquith, Pathak & Ritter 2005; Desai,
+    Ramesh, Thiagarajan & Balachandran 2002 -- high short interest predicts
+    UNDERperformance, so unwinding shorts is the bullish direction).
+
+    min_prior_position (>=10,000 shares) excludes the same "tiny-base
+    percentage explosion" pattern this session has hit before on price
+    data (v3 reversal, v5 blended portfolio): 115 of 97,555 rows here have
+    previousShortPositionQuantity <10,000 (mostly spinoff/re-listing
+    tickers with no real prior short base) and produce changePercent up
+    to +4,405,230% -- economically meaningless, not a real signal. This
+    gate matters most for the DECLINE side too: a drop from 200 to 20
+    shares is a genuine -90% but on a base too small to mean anything.
+
+    publication_lag_days (~11 calendar days = FINRA's documented ~8
+    trading-day settlement-to-publication gap, see collect_short_interest.py)
+    shifts settlementDate to an approximate public-availability date -- a
+    genuine simplification (not the exact publication calendar), flagged
+    not hidden."""
+    df = pd.read_parquet(short_interest_path)
+    eligible = df["previousShortPositionQuantity"] >= min_prior_position
+    declined = df["changePercent"] <= min_decline_pct
+    passed = df[eligible & declined][["symbol", "settlementDate"]].copy()
+    passed["signal_date"] = passed["settlementDate"] + pd.Timedelta(days=publication_lag_days)
+    return passed[["symbol", "signal_date"]].reset_index(drop=True)
+
+
 # ── Fundamental screeners (from point-in-time SEC filings) ─────────────────
 
 def compute_fundamental_screens(fund: pd.DataFrame) -> pd.DataFrame:
@@ -360,6 +469,30 @@ def compute_fundamental_screens(fund: pd.DataFrame) -> pd.DataFrame:
     df["capex_prior"] = g["capex"].shift(1)
     df["capex_growth"] = (df["capex"] - df["capex_prior"]) / df["capex_prior"].abs()
     df["capacity_expansion_pass"] = (df["capex_growth"] > 0.25).astype(int)
+
+    # v8 addition: Asset Growth anomaly (Cooper, Gulen & Schill 2008,
+    # Journal of Finance) -- companies that grow TOTAL ASSETS aggressively
+    # tend to UNDERPERFORM subsequently (over-investment/empire-building),
+    # the OPPOSITE prediction from "growth is good." Deliberately a
+    # DIFFERENT metric from capacity_expansion (capex growth specifically,
+    # tested above) -- total asset growth captures acquisitions, working-
+    # capital buildup, and everything else, not just new plant/equipment.
+    # pass = LOW asset growth (<10% YoY), a CONTRARIAN screen: this
+    # anomaly predicts low-growth companies outperform, not high-growth
+    # ones -- so the "pass" flag intentionally selects the low-growth tail.
+    df["total_assets_prior"] = g["total_assets"].shift(1)
+    df["asset_growth"] = (df["total_assets"] - df["total_assets_prior"]) / df["total_assets_prior"].abs()
+    df["low_asset_growth_pass"] = ((df["asset_growth"] < 0.10) & (df["asset_growth"] > -0.50)).astype(int)
+
+    # v8 addition: Buyback Yield -- net YoY share-count REDUCTION, a
+    # magnitude-aware "shareholder yield" component commonly cited
+    # alongside dividend yield in financial media. Distinct from
+    # Piotroski's f_no_dilution (a binary "shares didn't increase" check
+    # with no magnitude threshold) -- this requires a MEANINGFUL buyback
+    # (>=2% net reduction), not just "flat or down."
+    df["shares_prior"] = g["shares"].shift(1)
+    df["buyback_pct"] = -(df["shares"] - df["shares_prior"]) / df["shares_prior"].abs()
+    df["buyback_yield_pass"] = (df["buyback_pct"] > 0.02).astype(int)
 
     # --- v4 addition (2026-07-17): PEAD proxy + debt reduction ---------------
     # PEAD (post-earnings-announcement drift, Ball & Brown 1968; Bernard &
@@ -647,7 +780,8 @@ def build_fundamental_signal_dates(fund_scored: pd.DataFrame) -> pd.DataFrame:
             "pead_positive_surprise_pass", "debt_reduction_pass",
             "net_margin_pass", "operating_margin_pass", "pb_pass", "ps_pass",
             "ev_ebitda_pass", "peg_pass", "fcf_yield_pass",
-            "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass"]
+            "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass",
+            "low_asset_growth_pass", "buyback_yield_pass"]
     df = fund_scored.dropna(subset=["filed"]).copy()
     df["any_pass"] = df[cols].sum(axis=1) > 0
     df = df[df["any_pass"]]
@@ -784,6 +918,14 @@ def main():
     print(f"  reversal_monthly: {len(rev_m):,} signals across {rev_m['symbol'].nunique():,} symbols")
     print(f"  low_beta: {len(lb):,} signals across {lb['symbol'].nunique():,} symbols")
 
+    print("\nComputing v8 insider Form 4 / FINRA short interest signals (S&P 500 scope only)...")
+    ins = insider_buying_signals()
+    ins["screener"] = "insider_buying"
+    print(f"  insider_buying: {len(ins):,} signals across {ins['symbol'].nunique():,} symbols")
+    shi = short_interest_decline_signals()
+    shi["screener"] = "short_interest_decline"
+    print(f"  short_interest_decline: {len(shi):,} signals across {shi['symbol'].nunique():,} symbols")
+
     print("\nComputing fundamental signals...")
     fund_scored = compute_fundamental_screens(fund)
     fund_scored = attach_market_cap(fund_scored, ohlcv)
@@ -794,7 +936,8 @@ def main():
               "pead_positive_surprise_pass", "debt_reduction_pass",
               "net_margin_pass", "operating_margin_pass", "pb_pass", "ps_pass",
               "ev_ebitda_pass", "peg_pass", "fcf_yield_pass",
-            "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass"]:
+            "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass",
+              "low_asset_growth_pass", "buyback_yield_pass"]:
         print(f"  {c}: {fund_sig[c].sum():,} filing-level passes")
 
     # --- Melt fundamental wide-passes into long screener rows -----------------
@@ -820,7 +963,9 @@ def main():
                      ("roic_pass", "roic_value"),
                      ("fcf_margin_pass", "fcf_margin"),
                      ("net_debt_ebitda_pass", "net_debt_ebitda"),
-                     ("ev_sales_pass", "ev_sales")]:
+                     ("ev_sales_pass", "ev_sales"),
+                     ("low_asset_growth_pass", "low_asset_growth"),
+                     ("buyback_yield_pass", "buyback_yield")]:
         sub = fund_sig[fund_sig[c] == 1][["symbol", "signal_date"]].copy()
         sub["screener"] = name
         fund_long.append(sub)
@@ -833,6 +978,8 @@ def main():
                               rev_w[["symbol", "signal_date", "screener"]],
                               rev_m[["symbol", "signal_date", "screener"]],
                               lb[["symbol", "signal_date", "screener"]],
+                              ins[["symbol", "signal_date", "screener"]],
+                              shi[["symbol", "signal_date", "screener"]],
                               fund_long], ignore_index=True)
     all_signals["signal_date"] = pd.to_datetime(all_signals["signal_date"])
     all_signals["year"] = all_signals["signal_date"].dt.year

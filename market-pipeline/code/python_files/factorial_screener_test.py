@@ -320,6 +320,44 @@ def compute_fundamental_screens(fund: pd.DataFrame) -> pd.DataFrame:
     df["capex_growth"] = (df["capex"] - df["capex_prior"]) / df["capex_prior"].abs()
     df["capacity_expansion_pass"] = (df["capex_growth"] > 0.25).astype(int)
 
+    # --- v4 addition (2026-07-17): PEAD proxy + debt reduction ---------------
+    # PEAD (post-earnings-announcement drift, Ball & Brown 1968; Bernard &
+    # Thomas 1989/1990): a positive earnings surprise keeps drifting the
+    # price up for weeks afterward, already directly testable here since
+    # every screener's forward return is measured from the `filed` date.
+    # Surprise proxy = D-12's own convention from pead_sector_spillover.py
+    # (this account's already-established methodology when no analyst
+    # consensus exists): a "seasonal random walk" expectation -- this
+    # year's net income is expected to equal last year's, so ni_growth>0
+    # is a "beat" of that naive expectation. Deliberately NOT reusing
+    # Bull Cartel's own ni_growth>0.20 threshold -- PEAD's literature
+    # claim is about beating a flat expectation, not about high-growth
+    # names specifically, so the bar here is 0%, not 20%.
+    df["pead_positive_surprise_pass"] = (df["ni_growth"] > 0).astype(int)
+
+    # "Stepping out of debt": literal deleveraging -- TOTAL DEBT (long +
+    # short term) fell >=10% YoY, not just a de_ratio improvement that
+    # could come from equity growth alone with debt flat.
+    #
+    # total_debt (above) uses .fillna(0) on each component, a fine
+    # convention for LEVEL screens (de_ratio, invested_capital) but
+    # dangerous for a CHANGE calc: a SEC EDGAR tag that's simply missing
+    # for one year -- not the company actually having zero debt -- would
+    # register as a fake "-100% reduction" when it's absent, or a fake
+    # spike when it reappears. Caught on VZ specifically (a company that
+    # always carries substantial debt): total_debt swung from $61B to a
+    # LITERAL $0 and back across consecutive filings purely from tag
+    # gaps. total_debt_strict requires BOTH components present (non-null)
+    # in a given year -- missing data stays missing, not zero.
+    debt_data_complete = df["long_term_debt"].notna() & df["short_term_debt"].notna()
+    df["total_debt_strict"] = df["total_debt"].where(debt_data_complete)
+    df["total_debt_strict_prior"] = df.groupby("ticker")["total_debt_strict"].shift(1)
+    df["debt_change_pct"] = (
+        (df["total_debt_strict"] - df["total_debt_strict_prior"]) / df["total_debt_strict_prior"].abs())
+    df["debt_reduction_pass"] = (
+        (df["debt_change_pct"] < -0.10) & (df["total_debt_strict_prior"] >= 1e6)  # ignore near-zero-base noise
+    ).astype(int)
+
     # EPS for the Graham 10-year-average-earnings screen (computed here so the
     # rolling window is available before the price join). Fresh groupby call
     # (not reusing `g` above) since `eps` didn't exist when `g` was created.
@@ -464,7 +502,8 @@ def build_fundamental_signal_dates(fund_scored: pd.DataFrame) -> pd.DataFrame:
     tagged with WHICH screens passed on that filing."""
     cols = ["piotroski_pass", "coffee_can_pass", "magic_formula_pass", "bull_cartel_pass",
             "roce_plus_pass", "sloan_pass", "not_distress",
-            "capacity_expansion_pass", "growth_stocks_pass", "graham_10y_pass", "small_cap_growth_pass"]
+            "capacity_expansion_pass", "growth_stocks_pass", "graham_10y_pass", "small_cap_growth_pass",
+            "pead_positive_surprise_pass", "debt_reduction_pass"]
     df = fund_scored.dropna(subset=["filed"]).copy()
     df["any_pass"] = df[cols].sum(axis=1) > 0
     df = df[df["any_pass"]]
@@ -604,7 +643,8 @@ def main():
     fund_sig = build_fundamental_signal_dates(fund_scored)
     for c in ["piotroski_pass", "coffee_can_pass", "magic_formula_pass", "bull_cartel_pass",
               "roce_plus_pass", "sloan_pass", "not_distress",
-              "capacity_expansion_pass", "growth_stocks_pass", "graham_10y_pass", "small_cap_growth_pass"]:
+              "capacity_expansion_pass", "growth_stocks_pass", "graham_10y_pass", "small_cap_growth_pass",
+              "pead_positive_surprise_pass", "debt_reduction_pass"]:
         print(f"  {c}: {fund_sig[c].sum():,} filing-level passes")
 
     # --- Melt fundamental wide-passes into long screener rows -----------------
@@ -616,7 +656,9 @@ def main():
                      ("capacity_expansion_pass", "capacity_expansion"),
                      ("growth_stocks_pass", "growth_stocks"),
                      ("graham_10y_pass", "graham_10y"),
-                     ("small_cap_growth_pass", "small_cap_growth")]:
+                     ("small_cap_growth_pass", "small_cap_growth"),
+                     ("pead_positive_surprise_pass", "pead_positive_surprise"),
+                     ("debt_reduction_pass", "debt_reduction")]:
         sub = fund_sig[fund_sig[c] == 1][["symbol", "signal_date"]].copy()
         sub["screener"] = name
         fund_long.append(sub)

@@ -62,7 +62,8 @@ SCREENERS = ["darvas", "golden_cross", "new_highs", "below_200dma",
              "piotroski", "coffee_can", "magic_formula", "bull_cartel",
              "roce_plus", "sloan_quality", "not_distress",
              "capacity_expansion", "growth_stocks", "graham_10y", "small_cap_growth",
-             "reversal_weekly", "reversal_monthly"]  # v3: Lehmann (1990) / Jegadeesh (1990)
+             "reversal_weekly", "reversal_monthly",  # v3: Lehmann (1990) / Jegadeesh (1990)
+             "pead_positive_surprise", "debt_reduction"]  # v4: PEAD x deleveraging
 CONTROLS = ["log_liquidity", "volatility_63d"]
 HORIZON_LABELS = ["T+5d", "T+21d", "T+63d", "T+126d", "T+252d"]
 HORIZONS = [f"xret_{h}" for h in HORIZON_LABELS]        # primary: excess return over SPY

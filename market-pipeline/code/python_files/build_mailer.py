@@ -457,6 +457,127 @@ def _ccc_rows(top: int = 12):
     return rows
 
 
+def _load_pead_leaders(market: str) -> set:
+    """FDR-significant sector-spillover leaders from the latest
+    pead_sector_spillover_v4.py run -- the ONLY tickers this session's
+    validation confirmed a real (not merely nominally-significant) same-
+    sector spillover effect for, after full-sample re-runs, four confound
+    checks, and a walk-forward train/test split (see DECISION_REGISTER.md's
+    PEAD & Sector-Spillover section, D-16/D-17). As of this session that's
+    just MCHP (US, Technology) -- ANET/WDAY looked promising early on but
+    were downgraded once a quarter_key dedup bug was fixed, so this
+    deliberately reads ONLY the fdr_significant flag, not the full
+    candidate list, to avoid resurfacing a result that already failed
+    multiple-testing correction. Missing/unavailable file degrades to an
+    empty set, matching every other section's graceful-degradation
+    contract, never an error."""
+    try:
+        data = json.load(open("cache_seed/pead_sector_spillover_v4_results.json"))
+    except Exception:
+        return set()
+    for r in data:
+        if r.get("market") == market:
+            return {l["ticker"] for l in r.get("top_sector_leaders", []) if l.get("fdr_significant")}
+    return set()
+
+
+def _load_dividend_history_in() -> set:
+    """India only -- no equivalent source exists for US/JP/KR this
+    session. Flags symbols that have EVER mentioned "Dividend" in an NSE
+    board-meeting description (cache_seed/earnings_dates_nse/IN.parquet).
+    This is a coarse "this company is a known dividend payer" signal, NOT
+    a prediction that the upcoming board meeting specifically will declare
+    one -- NSE's own board-meeting notice is a generic "financial results"
+    intimation ahead of the meeting; the description only confirms
+    dividend intent once the company itself files it, which usually
+    happens closer to (or at) the meeting date, not a week ahead."""
+    try:
+        df = pd.read_parquet("cache_seed/earnings_dates_nse/IN.parquet")
+    except FileNotFoundError:
+        return set()
+    bm = df[df["event_type"] == "board_meeting"]
+    return set(bm[bm["description"].str.contains("Dividend", case=False, na=False)]["symbol"])
+
+
+def _earnings_news_lookup(market: str, symbols: set) -> dict:
+    """Cross-checks the SAME news-sentiment fetch _news_rows()/_talk_rows()
+    already run (news_picks.news_picks) for headlines that actually
+    mention earnings/results terms, restricted to tickers with earnings
+    due in the next 7 days -- reuses the existing fetch rather than adding
+    a second network call the mailer would need to also degrade
+    gracefully for."""
+    keywords = ("earning", "result", "profit", "quarter", " q1", " q2", " q3", " q4",
+                "beat", "miss", "guidance", "revenue", "dividend")
+    try:
+        picks = npk.news_picks(market, top=60, min_mentions=1)
+    except Exception:
+        return {}
+    out = {}
+    for p in picks:
+        if p["symbol"] not in symbols:
+            continue
+        headline = p.get("headline") or ""
+        if any(k in headline.lower() for k in keywords):
+            out[p["symbol"]] = f"{p['label']}: {headline[:70]}"
+    return out
+
+
+def _upcoming_earnings_section(market: str, symbols: list, cap: int = 12) -> str:
+    """NEW section for the stock-recommendation picks: which of THIS
+    market's picks report earnings within the next 7 days, cross-
+    referenced against a dividend-history flag, confirmed PEAD sector-
+    leader status, and any earnings-related news already surfaced for that
+    ticker.
+
+    DELIBERATELY NOT a prediction of which way any of these stocks will
+    move after their NEXT earnings call -- nobody knows the surprise sign
+    yet. What IS shown is validated, backward-looking evidence: (a) has
+    this company mentioned dividends at a past board meeting, (b) has this
+    exact ticker's own earnings, historically and across a walk-forward
+    holdout, shown a statistically significant tendency to move its
+    sector peers (Foster 1981; Thomas & Zhang 2008), and (c) does its
+    recent news already reference the upcoming/last result. See
+    DECISION_REGISTER.md's PEAD & Sector-Spillover section for the full
+    literature basis and this session's validation methodology.
+    """
+    kd_path = Path(f"cache_seed/earnings_key_dates/{market}.parquet")
+    if not kd_path.exists() or not symbols:
+        return "<p style='color:#777'>Upcoming-earnings data unavailable (run earnings_key_dates.py).</p>"
+    try:
+        kd = pd.read_parquet(kd_path)
+    except Exception:
+        return "<p style='color:#777'>Upcoming-earnings data unavailable.</p>"
+    kd = kd[kd["symbol"].isin(symbols)].copy()
+    if kd.empty:
+        return "<p style='color:#777'>None of today's picks report earnings in the next 7 days.</p>"
+    now = pd.Timestamp.now()
+    kd["days_until"] = (kd["next_date_start"] - now).dt.total_seconds() / 86400
+    kd = kd[(kd["days_until"] >= 0) & (kd["days_until"] <= 7)]
+    if kd.empty:
+        return "<p style='color:#777'>None of today's picks report earnings in the next 7 days.</p>"
+
+    leaders = _load_pead_leaders(market)
+    div_syms = _load_dividend_history_in() if market == "IN" else set()
+    news_lookup = _earnings_news_lookup(market, set(kd["symbol"]))
+
+    rows = []
+    for _, r in kd.sort_values("days_until").head(cap).iterrows():
+        sym = r["symbol"]
+        when = r["next_date_start"].strftime("%d %b")
+        range_note = f"–{r['next_date_end'].strftime('%d %b')}" if r["is_range"] else ""
+        div_flag = "💰 dividend history" if sym in div_syms else "—"
+        pead_flag = ("📊 <b>confirmed PEAD leader</b>" if sym in leaders else "—")
+        news_flag = news_lookup.get(sym, "—")
+        rows.append(
+            f"<tr><td style='padding:4px 8px'><b>{sym}</b></td>"
+            f"<td>{when}{range_note}</td><td style='text-align:right'>{int(round(r['days_until']))}d</td>"
+            f"<td>{div_flag}</td><td>{pead_flag}</td>"
+            f"<td style='color:#555;font-size:11px'>{news_flag}</td></tr>")
+    if not rows:
+        return "<p style='color:#777'>None of today's picks report earnings in the next 7 days.</p>"
+    return _table(["Symbol", "Date", "In", "Dividend history", "PEAD", "Earnings-related news"], rows)
+
+
 def _darvas_section(market: str, cap: int = 15) -> str:
     """Fresh Darvas breakouts for one market, capped to `cap` rows for readability
     (a full-universe scan can surface 100+ "fresh" breakouts — the header still
@@ -666,6 +787,16 @@ def build():
     # 1. India / US / Europe / Japan / Korea fundamentals screener picks
     ind_picks_rows = _market_picks_rows(ind_data, "IN")
     us_picks_rows = _market_picks_rows(us_data, "US")
+    ind_symbols = [p["Symbol"] for p in (ind_data.get("picks") or [])]
+    us_symbols = [p["Symbol"] for p in (us_data.get("picks") or [])]
+    try:
+        ind_earnings_html = _upcoming_earnings_section("IN", ind_symbols)
+    except Exception as e:
+        ind_earnings_html = f"<p style='color:#777'>Upcoming-earnings section unavailable ({str(e)[:60]}).</p>"
+    try:
+        us_earnings_html = _upcoming_earnings_section("US", us_symbols)
+    except Exception as e:
+        us_earnings_html = f"<p style='color:#777'>Upcoming-earnings section unavailable ({str(e)[:60]}).</p>"
     try:
         eu_picks_rows = _eu_picks_rows()
     except Exception:
@@ -757,6 +888,9 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇮🇳 India <span style="font-weight:400;color:#666;font-size:13px">— mood {mood['mood']} ({mood['score']:+.2f}) from {mood.get('n_articles',0)} articles</span></h2>
 <h3 style="font-size:13px;margin:12px 0 4px;color:#333">Screener — most tradable</h3>
 {_table(["Symbol","Tier","Screens","LTP","Chg%","Liquidity"], ind_picks_rows) if ind_picks_rows else "<p>no picks</p>"}
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">📅 Upcoming earnings <span style="font-weight:400;color:#777">— next 7 days, dividend history &amp; PEAD context</span></h3>
+<p style="font-size:11px;color:#666;margin:2px 0">Not a directional call — the surprise hasn't happened yet. "Confirmed PEAD leader" means THIS ticker's own earnings have historically moved its sector peers, validated with a walk-forward holdout (see DECISION_REGISTER.md).</p>
+{ind_earnings_html}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">Cash Conversion Cycle <span style="font-weight:400;color:#777">(screener.in 228040)</span></h3>
 <p style="font-size:11px;color:#666;margin:2px 0">Lowest/negative CCC = collects from customers before paying suppliers.</p>
 {_table(["Symbol","Name","CCC days","ROCE","Liquidity"], ccc_rows) if ccc_rows else "<p>n/a</p>"}
@@ -771,6 +905,9 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇺🇸 US <span style="font-weight:400;color:#666;font-size:13px">— mood {us_mood['mood']} ({us_mood['score']:+.2f}) from {us_mood.get('n_articles',0)} articles</span></h2>
 <h3 style="font-size:13px;margin:12px 0 4px;color:#333">Screener — most tradable</h3>
 {_table(["Symbol","Tier","Screens","LTP","Chg%","Liquidity"], us_picks_rows) if us_picks_rows else "<p>no picks (run daily_combined_report.py --market US)</p>"}
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">📅 Upcoming earnings <span style="font-weight:400;color:#777">— next 7 days, dividend history &amp; PEAD context</span></h3>
+<p style="font-size:11px;color:#666;margin:2px 0">Not a directional call — the surprise hasn't happened yet. "Confirmed PEAD leader" means THIS ticker's own earnings have historically moved its sector peers, validated with a walk-forward holdout (see DECISION_REGISTER.md).</p>
+{us_earnings_html}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">⭐ Convergence</h3>
 {conv_us}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">🔥 News picks <span style="font-weight:400;color:#777">— buzz, NOT a recommendation</span></h3>

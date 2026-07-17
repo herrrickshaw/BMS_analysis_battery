@@ -9,19 +9,31 @@ can run immediately and re-run cheaply as more date coverage lands from
 the still-running yahooquery/DART/NSE/SEC background collections.
 
 SOURCES UNIONED PER MARKET (first match wins per ticker+quarter, order
-reflects how authoritative/precise each source's DATE is — note NONE of
-the date-only sources carry a surprise number, so they contribute date-only
-rows; a symbol can appear with price-change data even with surprise_pct
-null):
+reflects how authoritative/precise each source's DATE is — note most of
+the date-only sources carry no surprise number at all, so they contribute
+date-only rows; a symbol can appear with price-change data even with
+surprise_pct null):
   1. earnings_dates_yahooquery_full/{m}.parquet  — full-universe batch
      (real reportedDate + surprisePct together)
   2. earnings_dates_cache/{m}.parquet             — yfinance per-ticker
      (real Earnings Date + Surprise(%), classified-subset scale)
   3. earnings_dates_nse/IN.parquet (India only)   — NSE actual_result
      filingDate, no surprise number (date-only cross-check/fill)
-  4. earnings_dates_sec_8k/US.parquet (US only)   — SEC 8-K Item 2.02
+  4. NSE actual_eps (India only, same parquet)    — a YoY-EPS-growth
+     surprise PROXY (not a consensus beat) computed from NSE's own real
+     per-quarter EPS data — the endpoint behind this was surfaced via
+     nsepython's nse_past_results() this session, then reimplemented
+     against this collector's own shared-session/retry infrastructure.
+     The only numeric-surprise source for India tickers yahooquery/
+     yfinance have ZERO history for at all.
+  5. earnings_dates_bse/IN.parquet (India only)   — BSE-exclusive
+     companies (ISIN never seen in the NSE collection), date-only, no
+     surprise number. Prefixed "BSE:<scrip_cd>" — these tickers aren't in
+     the NSE/Yahoo-keyed LTM price panel, so they contribute an event but
+     currently get no computed price_change_*.
+  6. earnings_dates_sec_8k/US.parquet (US only)   — SEC 8-K Item 2.02
      filing_date, no surprise number (date-only cross-check/fill)
-  5. earnings_dates_dart/KR.parquet (Korea only)  — DART periodic-report
+  7. earnings_dates_dart/KR.parquet (Korea only)  — DART periodic-report
      filing_date, no surprise number (date-only cross-check/fill)
 
 PRICE-CHANGE WINDOWS: 1-day (announcement reaction), 5-day (~1 week), and
@@ -146,12 +158,90 @@ def _load_date_only(path: str, ticker_col: str, date_col: str, source_name: str,
     return out
 
 
+def _load_nse_eps_yoy_surprise(market: str) -> pd.DataFrame:
+    """India only: a YoY-EPS-growth surprise proxy computed from NSE's own
+    real per-quarter actual_eps data (basic_eps, from the /results-
+    comparision endpoint discovered via nsepython this session) -- NOT a
+    scraped consensus-beat number (NSE, like every other exchange, doesn't
+    publish analyst estimates), but the same "seasonal random walk"
+    surprise proxy pead_sector_spillover.py's v1 already uses for annual
+    net_income (Foster, Olsen & Shevlin 1984): this quarter's EPS vs. the
+    SAME quarter a year ago. This is the only numeric-surprise source for
+    India tickers yahooquery/yfinance have ZERO history for (confirmed
+    empirically this session: VALIANTLAB, VENUSPIPES, etc.).
+
+    NSE's endpoint only returns a rolling ~5-quarter trailing window per
+    ticker regardless of requested date range (confirmed empirically), so
+    a genuine YoY pair (same ticker, period_to ~365 days apart) only
+    exists for tickers whose 5-quarter window happens to span >=12
+    months -- most do, but this is NOT full historical depth, just
+    whatever NSE's endpoint currently exposes."""
+    if market != "IN":
+        return pd.DataFrame(columns=["ticker", "earnings_date", "surprise_pct", "source"])
+    p = Path("cache_seed/earnings_dates_nse/IN.parquet")
+    if not p.exists():
+        return pd.DataFrame(columns=["ticker", "earnings_date", "surprise_pct", "source"])
+    df = pd.read_parquet(p)
+    df = df[df["event_type"] == "actual_eps"].copy()
+    df["basic_eps"] = pd.to_numeric(df["basic_eps"], errors="coerce")
+    df["period_to"] = pd.to_datetime(df["period_to"], errors="coerce")
+    df["event_date"] = pd.to_datetime(df["event_date"], errors="coerce")
+    df = df.dropna(subset=["basic_eps", "period_to", "event_date"])
+
+    rows = []
+    for sym, g in df.groupby("symbol"):
+        g = g.sort_values("period_to")
+        for _, cur in g.iterrows():
+            # nearest prior quarter 350-380 days back = "same quarter, a year ago"
+            prior = g[(g["period_to"] < cur["period_to"] - pd.Timedelta(days=350)) &
+                      (g["period_to"] >= cur["period_to"] - pd.Timedelta(days=380))]
+            if prior.empty:
+                continue
+            eps_year_ago = prior.iloc[-1]["basic_eps"]
+            if pd.isna(eps_year_ago) or eps_year_ago == 0:
+                continue
+            rows.append({
+                "ticker": sym, "earnings_date": cur["event_date"],
+                "surprise_pct": (cur["basic_eps"] - eps_year_ago) / abs(eps_year_ago) * 100,
+                "source": "nse_eps_yoy",
+            })
+    return pd.DataFrame(rows, columns=["ticker", "earnings_date", "surprise_pct", "source"])
+
+
+def _load_bse_date_only() -> pd.DataFrame:
+    """India only. BSE's own scrips are keyed by numeric scrip_cd, not an
+    NSE-style ticker -- these rows were deliberately collected as
+    --bse-only-vs-nse (companies whose ISIN never appeared in the NSE
+    collection), so by definition none of them have an NSE symbol to
+    align to. Prefixed "BSE:<scrip_cd>" so they never collide with a real
+    NSE ticker string. NOTE: the LTM OHLCV price panel this pipeline's
+    price-change computation uses is NSE/Yahoo-ticker-keyed, so these
+    BSE-exclusive rows will contribute a date-only EVENT but will not
+    currently get a computed price_change_* (compute_price_changes skips
+    any ticker absent from the panel) -- kept in the union anyway for
+    inventory/reference and so a future BSE price-history addition would
+    need no changes here."""
+    p = Path("cache_seed/earnings_dates_bse/IN.parquet")
+    if not p.exists():
+        return pd.DataFrame(columns=["ticker", "earnings_date", "surprise_pct", "source"])
+    df = pd.read_parquet(p)
+    df = df[df["event_type"] == "actual_result"].copy()
+    df["earnings_date"] = pd.to_datetime(df["event_date"], errors="coerce").dt.tz_localize(None)
+    df = df.dropna(subset=["earnings_date"])
+    return pd.DataFrame({
+        "ticker": "BSE:" + df["scrip_cd"].astype(str), "earnings_date": df["earnings_date"],
+        "surprise_pct": np.nan, "source": "bse",
+    })
+
+
 def load_all_events(market: str) -> pd.DataFrame:
     parts = [_load_yahooquery_full(market), _load_yfinance_cache(market)]
     if market == "IN":
         parts.append(_load_date_only(
             "cache_seed/earnings_dates_nse/IN.parquet", "symbol", "event_date", "nse",
             filter_fn=lambda d: d[d["event_type"] == "actual_result"]))
+        parts.append(_load_nse_eps_yoy_surprise(market))
+        parts.append(_load_bse_date_only())
     if market == "US":
         parts.append(_load_date_only(
             "cache_seed/earnings_dates_sec_8k/US.parquet", "ticker", "filing_date", "sec_8k",
@@ -184,7 +274,11 @@ def load_all_events(market: str) -> pd.DataFrame:
     # smallest value, e.g. a -3% yfinance row beating a +5% yahooquery row
     # purely because -3 < +5 -- silently flipping the surprise sign fed into
     # pead_sector_spillover_v4.py regardless of which source is authoritative).
-    SOURCE_PRIORITY = {"yahooquery_full": 0, "yfinance_cache": 1}
+    # nse_eps_yoy ranks below the two real consensus-based sources (it's a
+    # growth PROXY, not an analyst-estimate beat) but above the date-only
+    # sources, which never carry a surprise_pct at all and only win a tie
+    # via the has_surprise sort key above this one.
+    SOURCE_PRIORITY = {"yahooquery_full": 0, "yfinance_cache": 1, "nse_eps_yoy": 2}
     combined["_has_surprise"] = combined["surprise_pct"].notna()
     combined["_src_rank"] = combined["source"].map(SOURCE_PRIORITY).fillna(9)
     combined = combined.sort_values(["_has_surprise", "_src_rank"], ascending=[False, True])

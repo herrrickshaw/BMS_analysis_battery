@@ -227,15 +227,76 @@ def fetch_financial_results(session: requests.Session, symbol: str,
     return rows
 
 
+def fetch_actual_eps(session: requests.Session, symbol: str) -> list[dict]:
+    """/api/results-comparision -- surfaced via nsepython's nse_past_results()
+    (a thin nsefetch() wrapper), but called here through THIS module's own
+    shared session + _get_json retry logic rather than nsepython directly:
+    nsefetch() opens a brand-new requests.Session and re-primes it with 2
+    extra homepage/option-chain GETs on EVERY call, tripling request volume
+    for a mass run and swallowing failures as a silent {} with no retry --
+    the opposite of the resumable, rate-conscious design the rest of this
+    collector already uses.
+
+    Returns real per-quarter actual EPS/net-profit numbers (NSE's own XBRL
+    filing data) with a filing date -- unlike fetch_board_meetings/
+    fetch_financial_results, which only carry dates, this can support a
+    YoY-growth surprise proxy (matching pead_sector_spillover.py v1's
+    methodology) computed straight from NSE data, with NO Yahoo dependency
+    at all. Confirmed empirically to cover tickers yahooquery has ZERO
+    history for (e.g. VALIANTLAB: 5 real quarters, none in Yahoo)."""
+    data, err = _get_json(session, "results-comparision", {"symbol": symbol})
+    if err:
+        print(f"  [{symbol}] actual-eps error: {err}")
+        return []
+    rows = []
+    # .get("resCmpData", []) is NOT safe here: the API returns an explicit
+    # {"resCmpData": null} (not a missing key) for symbols with nothing to
+    # compare -- e.g. VIJAYABANK, delisted/merged into Bank of Baroda in
+    # 2019 -- and .get(key, default) only falls back to default when the
+    # KEY is absent, not when its value is None, so that crashed the
+    # eps-only backfill with "TypeError: 'NoneType' object is not
+    # iterable" 4 symbols in, losing 3 already-fetched symbols' data that
+    # hadn't reached a checkpoint yet.
+    for r in (data or {}).get("resCmpData") or []:
+        rows.append({
+            "symbol": symbol,
+            "event_date": r.get("re_create_dt"),
+            "event_type": "actual_eps",
+            "source": "nse",
+            "period_from": r.get("re_from_dt"),
+            "period_to": r.get("re_to_dt"),
+            "basic_eps": r.get("re_basic_eps_for_cont_dic_opr"),
+            "net_profit_loss": r.get("re_con_pro_loss"),
+        })
+    return rows
+
+
 def _load_cached() -> pd.DataFrame:
     if CACHE_PATH.exists():
         return pd.read_parquet(CACHE_PATH)
     return pd.DataFrame(columns=["symbol", "event_date", "event_type", "source"])
 
 
-def fetch_and_cache(symbols: list[str], force: bool = False) -> pd.DataFrame:
+CHECKPOINT_EVERY = 50  # this collector has no incremental save otherwise --
+                       # for a full-universe run (thousands of symbols, 2
+                       # sleeps each) an interruption partway through would
+                       # otherwise lose ALL progress, not just the current batch
+
+
+def fetch_and_cache(symbols: list[str], force: bool = False, eps_only: bool = False) -> pd.DataFrame:
+    """eps_only=True: backfill fetch_actual_eps() ALONE for symbols that
+    don't have an 'actual_eps' row yet, regardless of whether they already
+    have board_meeting/actual_result rows from an earlier run. The default
+    "already cached" check (ANY row for the symbol) would otherwise skip
+    re-visiting a symbol a prior board-meetings/financial-results-only run
+    already touched, permanently missing the new EPS endpoint for it
+    without either a wasteful full --force re-fetch or this targeted mode."""
     have = _load_cached()
-    already = set(have["symbol"].unique()) if not have.empty and not force else set()
+    if eps_only:
+        has_eps = set(have[have["event_type"] == "actual_eps"]["symbol"].unique()) if not have.empty else set()
+        already = has_eps if not force else set()
+    else:
+        already = set(have["symbol"].unique()) if not have.empty and not force else set()
     missing = [s for s in symbols if s not in already]
 
     print(f"[nse] {len(symbols)} symbols requested, {len(already)} already cached, "
@@ -246,15 +307,50 @@ def fetch_and_cache(symbols: list[str], force: bool = False) -> pd.DataFrame:
 
     session = _new_session()
     new_rows = []
+    checkpoint_every = 20 if eps_only else CHECKPOINT_EVERY  # single-endpoint
+                                                              # eps_only calls
+                                                              # are cheap --
+                                                              # checkpoint
+                                                              # tighter so an
+                                                              # unexpected
+                                                              # response shape
+                                                              # loses less
     for i, sym in enumerate(missing, 1):
-        bm_rows = fetch_board_meetings(session, sym)
-        time.sleep(SLEEP_SECONDS)
-        fr_rows = fetch_financial_results(session, sym)
-        time.sleep(SLEEP_SECONDS)
-        print(f"  [{i}/{len(missing)}] {sym}: {len(bm_rows)} board meetings, "
-              f"{len(fr_rows)} financial-result filings")
-        new_rows.extend(bm_rows)
-        new_rows.extend(fr_rows)
+        try:
+            if eps_only:
+                eps_rows = fetch_actual_eps(session, sym)
+                time.sleep(SLEEP_SECONDS)
+                print(f"  [{i}/{len(missing)}] {sym}: {len(eps_rows)} actual-EPS quarters")
+                new_rows.extend(eps_rows)
+            else:
+                bm_rows = fetch_board_meetings(session, sym)
+                time.sleep(SLEEP_SECONDS)
+                fr_rows = fetch_financial_results(session, sym)
+                time.sleep(SLEEP_SECONDS)
+                eps_rows = fetch_actual_eps(session, sym)
+                time.sleep(SLEEP_SECONDS)
+                print(f"  [{i}/{len(missing)}] {sym}: {len(bm_rows)} board meetings, "
+                      f"{len(fr_rows)} financial-result filings, {len(eps_rows)} actual-EPS quarters")
+                new_rows.extend(bm_rows)
+                new_rows.extend(fr_rows)
+                new_rows.extend(eps_rows)
+        except Exception as e:
+            # a per-symbol crash (unexpected response shape, etc.) must
+            # never take down a multi-thousand-symbol run -- confirmed
+            # this exact failure mode: the eps-only backfill died on
+            # symbol 4/3476 and silently lost 3 already-fetched symbols
+            # that hadn't reached a checkpoint yet.
+            print(f"  [{i}/{len(missing)}] {sym}: UNEXPECTED ERROR ({e}) — skipping, continuing")
+            continue
+
+        if new_rows and i % checkpoint_every == 0:
+            new_df = pd.DataFrame(new_rows)
+            combined = pd.concat([have, new_df], ignore_index=True) if not have.empty else new_df
+            combined = combined.drop_duplicates(subset=["symbol", "event_type", "event_date"])
+            combined.to_parquet(CACHE_PATH, index=False)
+            have = combined
+            new_rows = []
+            print(f"  [nse] checkpoint: {len(have)} total rows saved ({i}/{len(missing)} symbols done)")
 
     if new_rows:
         new_df = pd.DataFrame(new_rows)
@@ -262,7 +358,7 @@ def fetch_and_cache(symbols: list[str], force: bool = False) -> pd.DataFrame:
         combined = combined.drop_duplicates(subset=["symbol", "event_type", "event_date"])
         combined.to_parquet(CACHE_PATH, index=False)
         have = combined
-    else:
+    elif have.empty:
         print("[nse] no new rows fetched (all requests errored — see per-symbol messages above)")
 
     return have
@@ -274,12 +370,21 @@ def main():
                      help="NSE symbols (bare, no .NS suffix), e.g. RELIANCE TCS INFY")
     ap.add_argument("--from-sector-cache", action="store_true",
                      help="Pull symbols from cache_seed/sector_map_cache.json IN: entries")
+    ap.add_argument("--full-universe", action="store_true",
+                     help="Pull symbols from cache_seed/full_universe_symbols.json IN "
+                          "(thousands of symbols) instead of the ~700-symbol classified subset")
     ap.add_argument("--limit", type=int, default=None,
                      help="Cap the number of symbols (useful with --from-sector-cache)")
     ap.add_argument("--force", action="store_true", help="Refetch even if already cached")
+    ap.add_argument("--eps-only", action="store_true",
+                     help="Backfill fetch_actual_eps() alone for symbols missing an "
+                          "'actual_eps' row, without re-fetching board-meetings/"
+                          "financial-results a prior run already collected")
     a = ap.parse_args()
 
-    if a.from_sector_cache:
+    if a.full_universe:
+        symbols = json.load(open("cache_seed/full_universe_symbols.json"))["IN"]
+    elif a.from_sector_cache:
         cache = json.load(open("cache_seed/sector_map_cache.json"))
         symbols = [k[len("IN:"):] for k in cache if k.startswith("IN:")]
     elif a.symbols:
@@ -290,7 +395,7 @@ def main():
     if a.limit:
         symbols = symbols[:a.limit]
 
-    df = fetch_and_cache(symbols, force=a.force)
+    df = fetch_and_cache(symbols, force=a.force, eps_only=a.eps_only)
     n_symbols = df["symbol"].nunique() if not df.empty else 0
     print(f"\n[nse] cache now holds {len(df)} rows across {n_symbols} symbols -> {CACHE_PATH}")
     if not df.empty:

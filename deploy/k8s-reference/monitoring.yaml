@@ -1,0 +1,393 @@
+---
+# Prometheus ServiceMonitor for FastAPI backend
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: fastapi-backend-monitor
+  namespace: stock-analysis
+  labels:
+    app: fastapi-backend
+spec:
+  selector:
+    matchLabels:
+      app: fastapi-backend
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+      scrapeTimeout: 10s
+
+---
+# Prometheus ServiceMonitor for Frontend (Nginx)
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: frontend-monitor
+  namespace: stock-analysis
+  labels:
+    app: frontend
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+      scrapeTimeout: 10s
+
+---
+# Prometheus ServiceMonitor for PostgreSQL
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: postgresql-monitor
+  namespace: stock-analysis
+  labels:
+    app: postgresql
+spec:
+  selector:
+    matchLabels:
+      app: postgresql
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+      scrapeTimeout: 10s
+
+---
+# Prometheus ServiceMonitor for Cassandra
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cassandra-monitor
+  namespace: stock-analysis
+  labels:
+    app: cassandra
+spec:
+  selector:
+    matchLabels:
+      app: cassandra
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+      scrapeTimeout: 10s
+
+---
+# Prometheus ServiceMonitor for RabbitMQ
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: rabbitmq-monitor
+  namespace: stock-analysis
+  labels:
+    app: rabbitmq
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+      scrapeTimeout: 10s
+
+---
+# Prometheus ServiceMonitor for Redis
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: redis-monitor
+  namespace: stock-analysis
+  labels:
+    app: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+      scrapeTimeout: 10s
+
+---
+# PrometheusRule for application alerts
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: stock-analysis-alerts
+  namespace: stock-analysis
+  labels:
+    prometheus: kube-prometheus
+spec:
+  groups:
+    - name: stock-analysis.rules
+      interval: 30s
+      rules:
+        # Application availability alerts
+        - alert: FastAPIBackendDown
+          expr: up{job="fastapi-backend-monitor"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "FastAPI backend is down"
+            description: "FastAPI backend has been unreachable for 2 minutes"
+
+        - alert: FrontendDown
+          expr: up{job="frontend-monitor"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Frontend is down"
+            description: "Frontend has been unreachable for 2 minutes"
+
+        # Database alerts
+        - alert: PostgreSQLDown
+          expr: up{job="postgresql-monitor"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "PostgreSQL is down"
+            description: "PostgreSQL database has been unavailable for 1 minute"
+
+        - alert: PostgreSQLSlowQueries
+          expr: pg_stat_statements_mean_time > 1000
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "PostgreSQL slow queries detected"
+            description: "Average query time is above 1 second"
+
+        - alert: CassandraDown
+          expr: up{job="cassandra-monitor"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Cassandra is down"
+            description: "Cassandra database has been unavailable for 1 minute"
+
+        - alert: CassandraHighLatency
+          expr: cassandra_client_request_latency_seconds > 0.5
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Cassandra high latency"
+            description: "Request latency is above 500ms"
+
+        # Message queue alerts
+        - alert: RabbitMQDown
+          expr: up{job="rabbitmq-monitor"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "RabbitMQ is down"
+            description: "RabbitMQ message queue has been unavailable for 1 minute"
+
+        - alert: RabbitMQQueueBacklog
+          expr: rabbitmq_queue_messages > 50000
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "RabbitMQ queue backlog"
+            description: "Queue {{ $labels.queue }} has {{ $value }} messages backed up"
+
+        # Cache alerts
+        - alert: RedisDown
+          expr: up{job="redis-monitor"} == 0
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Redis is down"
+            description: "Redis cache has been unavailable for 2 minutes"
+
+        - alert: RedisHighMemory
+          expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Redis memory usage high"
+            description: "Redis memory usage is above 90%"
+
+        # HTTP error rate alerts
+        - alert: HighErrorRate
+          expr: (sum(rate(http_requests_total{status=~"5.."}[5m])) by (job) / sum(rate(http_requests_total[5m])) by (job)) > 0.05
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High HTTP error rate on {{ $labels.job }}"
+            description: "Error rate is above 5%"
+
+        - alert: HighLatency
+          expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m])) > 2
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High API latency"
+            description: "P99 latency is above 2 seconds"
+
+        # Pod disruption alerts
+        - alert: PodCrashLooping
+          expr: rate(kube_pod_container_status_restarts_total[30m]) > 0.1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Pod {{ $labels.pod }} is crash looping"
+            description: "Pod is restarting frequently"
+
+        - alert: PodNotReady
+          expr: kube_pod_status_phase{pod=~"fastapi-backend-.*|frontend-.*",phase!="Running"} == 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Pod {{ $labels.pod }} not ready"
+            description: "Pod has not been running for 5 minutes"
+
+        # Storage alerts
+        - alert: PersistentVolumeUsageHigh
+          expr: kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes > 0.85
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "PersistentVolume usage high"
+            description: "Volume {{ $labels.persistentvolumeclaim }} is {{ $value | humanizePercentage }} full"
+
+        - alert: PersistentVolumeInodeFull
+          expr: kubelet_volume_stats_inodes_used / kubelet_volume_stats_inodes > 0.9
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "PersistentVolume inodes exhausted"
+            description: "Volume {{ $labels.persistentvolumeclaim }} inodes are {{ $value | humanizePercentage }} full"
+
+---
+# Grafana Dashboard ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stock-analysis-dashboard
+  namespace: stock-analysis
+  labels:
+    grafana_dashboard: "1"
+data:
+  stock-analysis-dashboard.json: |
+    {
+      "dashboard": {
+        "title": "Stock Analysis Platform",
+        "tags": ["stock-analysis", "production"],
+        "timezone": "UTC",
+        "panels": [
+          {
+            "title": "API Request Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total[5m])) by (method)"
+              }
+            ]
+          },
+          {
+            "title": "API Error Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (method)"
+              }
+            ]
+          },
+          {
+            "title": "Database Connections",
+            "targets": [
+              {
+                "expr": "pg_stat_activity_count"
+              }
+            ]
+          },
+          {
+            "title": "Cassandra Reads/Writes",
+            "targets": [
+              {
+                "expr": "rate(cassandra_client_request_total[5m])"
+              }
+            ]
+          },
+          {
+            "title": "Pod CPU Usage",
+            "targets": [
+              {
+                "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"stock-analysis\"}[5m])) by (pod)"
+              }
+            ]
+          },
+          {
+            "title": "Pod Memory Usage",
+            "targets": [
+              {
+                "expr": "sum(container_memory_usage_bytes{namespace=\"stock-analysis\"}) by (pod)"
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+---
+# Loki LogQL ServiceMonitor for log aggregation
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-config
+  namespace: stock-analysis
+data:
+  loki-config.yaml: |
+    auth_enabled: false
+    ingester:
+      chunk_idle_period: 3m
+      max_chunk_age: 1h
+      max_streams_per_user: 0
+      chunk_retain_period: 1m
+    limits_config:
+      enforce_metric_name: false
+      reject_old_samples: true
+      reject_old_samples_max_age: 168h
+      ingestion_rate_mb: 8
+      ingestion_burst_size_mb: 16
+    schema_config:
+      configs:
+        - from: 2020-10-24
+          store: boltdb-shipper
+          object_store: filesystem
+          schema: v11
+          index:
+            prefix: index_
+            period: 24h
+    server:
+      http_listen_port: 3100
+      grpc_listen_port: 9096
+    storage_config:
+      boltdb_shipper:
+        active_index_directory: /loki/boltdb-shipper-active
+        cache_location: /loki/boltdb-shipper-cache
+        shared_store: filesystem
+      filesystem:
+        directory: /loki/chunks
+    chunk_store_config:
+      max_look_back_period: 0s
+    table_manager:
+      retention_deletes_enabled: false
+      retention_period: 0s

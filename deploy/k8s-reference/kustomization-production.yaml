@@ -1,0 +1,61 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: production
+
+commonLabels:
+  environment: production
+  app.kubernetes.io/name: event-stock-analysis
+
+bases:
+  - ../base
+
+replicas:
+  - name: backend-deployment
+    count: 5
+  - name: frontend-deployment
+    count: 3
+
+configMapGenerator:
+  - name: app-config
+    behavior: merge
+    literals:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=WARNING
+
+patchesJson6902:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: backend-deployment
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 5
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 500m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 1000m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 1Gi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 2Gi
+
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: frontend-deployment
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+
+resources:
+  - ingress.yaml
+  - poddisruptionbudget.yaml

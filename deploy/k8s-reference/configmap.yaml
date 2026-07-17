@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  labels:
+    component: configuration
+data:
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  CASSANDRA_HOSTS: "cassandra-cluster.cassandra:9042"
+  API_BASE_URL: "http://backend-service:8000"
+  MARKETS: "india,us,europe,japan,korea"
+  SCAN_INTERVAL: "3600"
+  CACHE_TTL: "1800"
+  MAX_RETRIES: "3"
+  REQUEST_TIMEOUT: "30"
+  BATCH_SIZE: "50"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  labels:
+    component: frontend
+data:
+  default.conf: |
+    server {
+        listen 3000 default_server;
+        listen [::]:3000 default_server;
+        server_name _;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            try_files $uri =404;
+        }
+        location /api/ {
+            proxy_pass http://backend-service:8000;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        location / {
+            try_files $uri $uri/ /index.html;
+            add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+            expires 0;
+        }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  labels:
+    component: monitoring
+data:
+  alert.rules: |
+    groups:
+    - name: event-stock-analysis
+      interval: 30s
+      rules:
+      - alert: HighErrorRate
+        expr: (sum(rate(requests_total{status=~"5.."}[5m])) by (job) / sum(rate(requests_total[5m])) by (job)) > 0.05
+        for: 5m
+      - alert: PodCrashLooping
+        expr: rate(kube_pod_container_status_restarts_total[30m]) > 0.1
+        for: 5m
+      - alert: HighMemoryUsage
+        expr: (sum(container_memory_usage_bytes) by (pod) / sum(kube_pod_container_resource_limits_memory_bytes) by (pod)) > 0.9
+        for: 5m

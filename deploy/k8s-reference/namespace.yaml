@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: stock-analysis
+  labels:
+    name: stock-analysis
+    environment: production

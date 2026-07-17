@@ -1,0 +1,437 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-backend
+  namespace: stock-analysis
+  labels:
+    app: fastapi-backend
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+    - port: 8001
+      targetPort: 8001
+      protocol: TCP
+      name: metrics
+  selector:
+    app: fastapi-backend
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-backend-lb
+  namespace: stock-analysis
+  labels:
+    app: fastapi-backend
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: fastapi-backend
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-backend
+  namespace: stock-analysis
+  labels:
+    app: fastapi-backend
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+  selector:
+    matchLabels:
+      app: fastapi-backend
+
+  template:
+    metadata:
+      labels:
+        app: fastapi-backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8001"
+        prometheus.io/path: "/metrics"
+
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
+
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - fastapi-backend
+                topologyKey: kubernetes.io/hostname
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 50
+              preference:
+                matchExpressions:
+                  - key: node-type
+                    operator: In
+                    values:
+                      - compute
+
+      serviceAccountName: fastapi-backend
+
+      initContainers:
+        - name: wait-for-db
+          image: postgres:15-alpine
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgres-primary.stock-analysis.svc.cluster.local -p 5432; do
+                echo "Waiting for PostgreSQL..."
+                sleep 2
+              done
+              echo "PostgreSQL is ready!"
+
+        - name: wait-for-cassandra
+          image: cassandra:4.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              until cqlsh -u cassandra -p cassandra cassandra-0.cassandra-headless.stock-analysis.svc.cluster.local 9042 -e "SELECT now() FROM system.local;" 2>/dev/null; do
+                echo "Waiting for Cassandra..."
+                sleep 5
+              done
+              echo "Cassandra is ready!"
+
+        - name: wait-for-rabbitmq
+          image: rabbitmq:3.12-alpine
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              until rabbitmq-diagnostics -q ping -n rabbit@rabbitmq-0.rabbitmq.stock-analysis.svc.cluster.local 2>/dev/null; do
+                echo "Waiting for RabbitMQ..."
+                sleep 5
+              done
+              echo "RabbitMQ is ready!"
+
+      containers:
+        - name: fastapi
+          image: stock-analysis-fastapi:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+              name: http
+            - containerPort: 8001
+              protocol: TCP
+              name: metrics
+
+          env:
+            # Core settings
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: FASTAPI_ENV
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LOG_LEVEL
+            - name: DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: FASTAPI_DEBUG
+
+            # Database configuration
+            - name: DATABASE_URL
+              value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres-primary.stock-analysis.svc.cluster.local:5432/$(POSTGRES_DATABASE)"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: postgres-password
+            - name: POSTGRES_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: POSTGRES_DATABASE
+            - name: POSTGRES_POOL_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: POSTGRES_POOL_SIZE
+            - name: POSTGRES_MAX_OVERFLOW
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: POSTGRES_MAX_OVERFLOW
+
+            # Cassandra configuration
+            - name: CASSANDRA_CONTACT_POINTS
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: CASSANDRA_CONTACT_POINTS
+            - name: CASSANDRA_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: CASSANDRA_PORT
+            - name: CASSANDRA_KEYSPACE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: CASSANDRA_KEYSPACE
+            - name: CASSANDRA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: cassandra-username
+            - name: CASSANDRA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: cassandra-password
+
+            # RabbitMQ configuration
+            - name: RABBITMQ_URL
+              value: "amqp://$(RABBITMQ_USER):$(RABBITMQ_PASSWORD)@rabbitmq.stock-analysis.svc.cluster.local:5672/"
+            - name: RABBITMQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: rabbitmq-username
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: rabbitmq-password
+
+            # Redis configuration
+            - name: REDIS_URL
+              value: "redis://redis.stock-analysis.svc.cluster.local:6379/0"
+
+            # Application settings
+            - name: MARKETS
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MARKETS
+            - name: MAX_WORKERS
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MAX_WORKERS
+            - name: BATCH_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: BATCH_SIZE
+
+            # API settings
+            - name: API_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: API_PREFIX
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: api-keys
+                  key: jwt-secret-key
+
+            # Email configuration
+            - name: SMTP_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SMTP_SERVER
+            - name: SMTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SMTP_PORT
+            - name: SENDER_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: email-credentials
+                  key: gmail-sender-email
+            - name: SENDER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: email-credentials
+                  key: gmail-app-password
+
+            # Broker configuration
+            - name: BROKER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: BROKER_NAME
+            - name: TRADING_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: TRADING_ENABLED
+            - name: KITE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: broker-credentials
+                  key: kite-api-key
+            - name: KITE_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: broker-credentials
+                  key: kite-api-secret
+
+            # Monitoring
+            - name: PROMETHEUS_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PROMETHEUS_ENABLED
+            - name: JAEGER_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: JAEGER_ENABLED
+            - name: JAEGER_AGENT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: JAEGER_AGENT_HOST
+
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+              ephemeral-storage: "5Gi"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+              ephemeral-storage: "10Gi"
+
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /api/ready
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+
+          volumeMounts:
+            - name: app-logs
+              mountPath: /var/log/app
+            - name: tmp
+              mountPath: /tmp
+
+      volumes:
+        - name: app-logs
+          persistentVolumeClaim:
+            claimName: app-logs
+        - name: tmp
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fastapi-backend
+  namespace: stock-analysis
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: fastapi-backend
+  namespace: stock-analysis
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: fastapi-backend
+  namespace: stock-analysis
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: fastapi-backend
+subjects:
+  - kind: ServiceAccount
+    name: fastapi-backend
+    namespace: stock-analysis
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: fastapi-pdb
+  namespace: stock-analysis
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: fastapi-backend

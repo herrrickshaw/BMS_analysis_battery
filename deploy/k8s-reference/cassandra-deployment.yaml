@@ -1,0 +1,285 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cassandra
+  namespace: stock-analysis
+  labels:
+    app: cassandra
+spec:
+  ports:
+    - port: 9042
+      targetPort: 9042
+      protocol: TCP
+      name: cassandra
+    - port: 9160
+      targetPort: 9160
+      protocol: TCP
+      name: thrift
+    - port: 7000
+      targetPort: 7000
+      protocol: TCP
+      name: internode
+    - port: 7001
+      targetPort: 7001
+      protocol: TCP
+      name: ssl-internode
+  clusterIP: None
+  selector:
+    app: cassandra
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cassandra-headless
+  namespace: stock-analysis
+  labels:
+    app: cassandra
+spec:
+  clusterIP: None
+  ports:
+    - port: 9042
+      targetPort: 9042
+      protocol: TCP
+      name: cassandra
+    - port: 7000
+      targetPort: 7000
+      protocol: TCP
+      name: internode
+  selector:
+    app: cassandra
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cassandra
+  namespace: stock-analysis
+  labels:
+    app: cassandra
+spec:
+  serviceName: cassandra-headless
+  replicas: 6
+  selector:
+    matchLabels:
+      app: cassandra
+  template:
+    metadata:
+      labels:
+        app: cassandra
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+    spec:
+      securityContext:
+        fsGroup: 999
+        runAsUser: 999
+        runAsNonRoot: true
+
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - cassandra
+              topologyKey: kubernetes.io/hostname
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: storage
+                    operator: In
+                    values:
+                      - fast-ssd
+
+      terminationGracePeriodSeconds: 1800
+
+      initContainers:
+        - name: chown
+          image: busybox:1.35
+          command:
+            - sh
+            - -c
+            - chown -R 999:999 /var/lib/cassandra
+          volumeMounts:
+            - name: cassandra-data
+              mountPath: /var/lib/cassandra
+
+      containers:
+        - name: cassandra
+          image: cassandra:4.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+
+          ports:
+            - containerPort: 9042
+              protocol: TCP
+              name: cassandra
+            - containerPort: 9160
+              protocol: TCP
+              name: thrift
+            - containerPort: 7000
+              protocol: TCP
+              name: internode
+            - containerPort: 7001
+              protocol: TCP
+              name: ssl-internode
+
+          env:
+            - name: CASSANDRA_CLUSTER_NAME
+              value: "Stock-Analysis-Cluster"
+            - name: CASSANDRA_NUM_TOKENS
+              value: "256"
+            - name: CASSANDRA_SEEDS
+              value: "cassandra-0.cassandra-headless.stock-analysis.svc.cluster.local,cassandra-1.cassandra-headless.stock-analysis.svc.cluster.local,cassandra-2.cassandra-headless.stock-analysis.svc.cluster.local"
+            - name: CASSANDRA_SEED_PROVIDER
+              value: "org.apache.cassandra.locator.SimpleSeedProvider"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CASSANDRA_DC
+              value: "dc1"
+            - name: CASSANDRA_RACK
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CASSANDRA_LISTEN_ADDRESS
+              value: "$(POD_IP)"
+            - name: CASSANDRA_RPC_ADDRESS
+              value: "0.0.0.0"
+            - name: CASSANDRA_BROADCAST_RPC_ADDRESS
+              value: "$(POD_IP)"
+            - name: CASSANDRA_AUTHENTICATOR
+              value: "org.apache.cassandra.auth.PasswordAuthenticator"
+            - name: CASSANDRA_AUTHORIZER
+              value: "org.apache.cassandra.auth.CassandraAuthorizer"
+            - name: CASSANDRA_ROLE_MANAGER
+              value: "org.apache.cassandra.auth.CassandraRoleManager"
+            - name: CASSANDRA_ROLES_VALIDITY_IN_MS
+              value: "0"
+            - name: CASSANDRA_PERMISSIONS_VALIDITY_IN_MS
+              value: "0"
+            - name: CASSANDRA_CREDENTIALS_VALIDITY_IN_MS
+              value: "0"
+
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "2000m"
+              ephemeral-storage: "10Gi"
+            limits:
+              memory: "8Gi"
+              cpu: "4000m"
+              ephemeral-storage: "20Gi"
+
+          livenessProbe:
+            tcpSocket:
+              port: 9042
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - nodetool status | grep -E "^UN\s+${POD_IP}"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/bash
+                  - -c
+                  - nodetool drain
+
+          volumeMounts:
+            - name: cassandra-data
+              mountPath: /var/lib/cassandra
+            - name: cassandra-logs
+              mountPath: /var/log/cassandra
+
+        - name: cassandra-exporter
+          image: prometheuscommunity/cassandra-exporter:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+              name: metrics
+
+          env:
+            - name: CASSANDRA_EXPORTER_ADDRESS
+              value: "0.0.0.0"
+            - name: CASSANDRA_EXPORTER_PORT
+              value: "8080"
+            - name: CASSANDRA_HOST
+              value: "localhost"
+            - name: CASSANDRA_PORT
+              value: "9042"
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+      volumes:
+        - name: cassandra-logs
+          emptyDir: {}
+
+  volumeClaimTemplates:
+    - metadata:
+        name: cassandra-data
+        labels:
+          app: cassandra
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: fast-ssd
+        resources:
+          requests:
+            storage: 1Ti
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: cassandra-pdb
+  namespace: stock-analysis
+spec:
+  minAvailable: 3
+  selector:
+    matchLabels:
+      app: cassandra

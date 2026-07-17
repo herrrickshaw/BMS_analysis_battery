@@ -225,6 +225,68 @@ def below_200dma_signals(ohlcv: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(out, columns=["symbol", "signal_date"])
 
 
+def short_term_reversal_signals(ohlcv: pd.DataFrame, lookback: int, bottom_quantile: float = 0.10,
+                                 min_universe: int = 200, min_price: float = 5.0) -> pd.DataFrame:
+    """v3 addition (2026-07-17): short-term reversal, per Lehmann (1990)
+    (lookback=5, weekly) and Jegadeesh (1990) (lookback=21, monthly) --
+    the two canonical short-horizon contrarian anomalies: stocks in the
+    bottom decile of trailing return earn abnormal returns going forward
+    ("buy last week's/month's losers"). Literature review for this
+    account's own factorial screener test found this was the one
+    well-established "what works in US markets" strategy family with NO
+    representative in the original 15 screeners -- below_200dma is a
+    trend-REGIME marker (200-day distance), a different mechanism from
+    the cross-sectional short-horizon reversal these two papers document.
+
+    UNLIKE every other screener in this file, this one is inherently
+    CROSS-SECTIONAL (a stock is a "loser" relative to the OTHER stocks
+    trading that day, not relative to its own history) -- see this
+    account's own D-14 decision (cross_sectional_momentum.py) for the
+    same cross-sectional-vs-time-series distinction applied to momentum.
+    That requires ranking across the whole panel per date rather than a
+    per-symbol rolling window, hence the vectorized (not per-symbol-loop)
+    implementation below.
+
+    MIN_PRICE FLOOR (added after the first run blew up to a +53,609% mean
+    return across the panel): a "bottom decile of trailing return" filter
+    disproportionately selects stocks whose price has collapsed toward
+    zero -- and once Close is a few tenths of a cent, a genuinely tiny
+    absolute bounce produces an astronomical PERCENTAGE return (one OTC
+    ticker, MNBEF, showed a +31 BILLION percent forward return; this is
+    percentage-math on a near-zero denominator, not a real trade anyone
+    could have made). Academic reversal studies standardly exclude sub-$5
+    names for exactly this reason (microstructure/bid-ask-bounce
+    dominance at low price levels) -- not an ad hoc fix invented to hide
+    an inconvenient number, a well-established convention this
+    implementation should have had from the start.
+
+    Signal = the first day a stock ENTERS the bottom `bottom_quantile` of
+    trailing `lookback`-day return, cross-sectionally ranked among all
+    OTHER stocks with a valid (non-split-contaminated, >=min_price)
+    trailing return that same day (same "fresh" convention as every other
+    screener here). `min_universe` guards against forming a percentile
+    rank from too few eligible names on days early in the panel."""
+    df = ohlcv.sort_values(["Symbol", "Date"]).copy()
+    g = df.groupby("Symbol", sort=False)
+    df["trail_ret"] = g["Close"].pct_change(lookback)
+    # a split inside the trailing window fakes an extreme negative "loser"
+    # return that isn't a real overreaction to revert from -- exclude it,
+    # same convention as _flag_split_days/attach_forward_returns elsewhere
+    split_in_window = g["likely_split"].transform(
+        lambda s: s.rolling(lookback + 1, min_periods=1).max().astype(bool))
+    df.loc[split_in_window, "trail_ret"] = np.nan
+    df.loc[df["Close"] < min_price, "trail_ret"] = np.nan
+
+    valid = df["trail_ret"].notna()
+    df["pct_rank"] = df.loc[valid].groupby("Date")["trail_ret"].rank(pct=True)
+    n_valid_that_date = df.loc[valid].groupby("Date")["trail_ret"].transform("count")
+    in_bottom = valid & (df["pct_rank"] <= bottom_quantile) & (n_valid_that_date >= min_universe)
+
+    fresh = in_bottom & ~in_bottom.groupby(df["Symbol"]).shift(1, fill_value=False)
+    out = df.loc[fresh, ["Symbol", "Date"]].rename(columns={"Symbol": "symbol", "Date": "signal_date"})
+    return out.reset_index(drop=True)
+
+
 # ── Fundamental screeners (from point-in-time SEC filings) ─────────────────
 
 def compute_fundamental_screens(fund: pd.DataFrame) -> pd.DataFrame:
@@ -525,10 +587,16 @@ def main():
     nh["screener"] = "new_highs"
     b200 = below_200dma_signals(ohlcv)
     b200["screener"] = "below_200dma"
+    rev_w = short_term_reversal_signals(ohlcv, lookback=5)
+    rev_w["screener"] = "reversal_weekly"
+    rev_m = short_term_reversal_signals(ohlcv, lookback=21)
+    rev_m["screener"] = "reversal_monthly"
     print(f"  golden_cross: {len(gc):,} signals across {gc['symbol'].nunique():,} symbols")
     print(f"  darvas: {len(dv):,} signals across {dv['symbol'].nunique():,} symbols")
     print(f"  new_highs: {len(nh):,} signals across {nh['symbol'].nunique():,} symbols")
     print(f"  below_200dma: {len(b200):,} signals across {b200['symbol'].nunique():,} symbols")
+    print(f"  reversal_weekly: {len(rev_w):,} signals across {rev_w['symbol'].nunique():,} symbols")
+    print(f"  reversal_monthly: {len(rev_m):,} signals across {rev_m['symbol'].nunique():,} symbols")
 
     print("\nComputing fundamental signals...")
     fund_scored = compute_fundamental_screens(fund)
@@ -558,6 +626,8 @@ def main():
                               dv[["symbol", "signal_date", "screener"]],
                               nh[["symbol", "signal_date", "screener"]],
                               b200[["symbol", "signal_date", "screener"]],
+                              rev_w[["symbol", "signal_date", "screener"]],
+                              rev_m[["symbol", "signal_date", "screener"]],
                               fund_long], ignore_index=True)
     all_signals["signal_date"] = pd.to_datetime(all_signals["signal_date"])
     all_signals["year"] = all_signals["signal_date"].dt.year

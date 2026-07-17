@@ -97,6 +97,8 @@ stock-extractor.pem
 /market-pipeline/code/python_files/sentiment_results/
 /market-pipeline/code/python_files/*.log
 /market-pipeline/code/python_files/brief_today.html
+/market-pipeline/code/python_files/brief_today_draft*.html
+/market-pipeline/code/python_files/action_brief_today.html
 
 # MemPalace per-project files (issue #185)
 mempalace.yaml

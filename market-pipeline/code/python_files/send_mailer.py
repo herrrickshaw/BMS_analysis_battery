@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
 # send_mailer.py
 # ==============
-# Build the Daily Market Brief and SEND it by email — with ZERO Claude/LLM tokens.
-# This is the token-free replacement for the Gmail-draft-via-MCP step: pure Python
-# + Gmail SMTP, so it can run unattended from cron/launchd.
+# Build the Daily Market Brief AND the Daily Action Brief and SEND both by
+# email — with ZERO Claude/LLM tokens. This is the token-free replacement
+# for the Gmail-draft-via-MCP step: pure Python + Gmail SMTP, so it can run
+# unattended from cron/launchd.
+#
+# Two separate emails, not one combined send: the action brief (build_
+# action_brief.py) is meant to be read FIRST and fast (triggers only); a
+# combined single email would bury it back inside the full analysis it's
+# deliberately kept apart from. Each brief fails independently -- if the
+# action brief build raises, the main brief still builds and sends, and
+# vice versa (see the two independent try/except blocks in __main__).
 #
 # Credentials via environment (never hard-code):
 #   GMAIL_USER          your gmail address
 #   GMAIL_APP_PASSWORD  a Google "App Password" (Account → Security → App passwords)
 #   MAIL_TO             recipient (defaults to GMAIL_USER)
 #
-#   python3 send_mailer.py            # build + send (or save .html if no creds)
-#   python3 send_mailer.py --draft    # just write brief_today.html, don't send
+#   python3 send_mailer.py            # build + send both briefs (or save .html if no creds)
+#   python3 send_mailer.py --draft    # just write both .html files, don't send
 #
 # Nothing here calls an LLM: data, screeners, sentiment (VADER) and assembly are
 # all local. The only network is market data + the SMTP send.
@@ -26,6 +34,7 @@ from email.mime.text import MIMEText
 from pathlib import Path
 
 from build_mailer import build
+from build_action_brief import build as build_action
 
 
 # Search order for a local, gitignored .env. send_mailer previously read the PROCESS
@@ -63,7 +72,7 @@ def _load_dotenv() -> None:
                 os.environ[key] = val
 
 
-def send(subject: str, text: str, html: str) -> bool:
+def send(subject: str, text: str, html: str, draft_path: str = "brief_today.html") -> bool:
     _load_dotenv()
     user = os.environ.get("GMAIL_USER")
     pw = os.environ.get("GMAIL_APP_PASSWORD")
@@ -72,12 +81,12 @@ def send(subject: str, text: str, html: str) -> bool:
     # people paste them that way. Strip whitespace rather than rejecting a valid key.
     pw = (pw or "").replace(" ", "").strip()
     if not (user and pw) or len(pw) < 16 or "PUT-YOUR" in pw:
-        Path("brief_today.html").write_text(html)
+        Path(draft_path).write_text(html)
         why = ("GMAIL_USER not set" if not user else
                "GMAIL_APP_PASSWORD not set" if not pw else
                f"GMAIL_APP_PASSWORD is {len(pw)} chars, expected 16" if len(pw) < 16 else
                "GMAIL_APP_PASSWORD is still a placeholder")
-        print(f"  NOT SENT — {why}. Saved brief_today.html instead.")
+        print(f"  NOT SENT — {why}. Saved {draft_path} instead.")
         print(f"  looked for a .env in: {', '.join(str(p) for p in _ENV_PATHS)}")
         return False
     msg = MIMEMultipart("alternative")
@@ -94,9 +103,27 @@ def send(subject: str, text: str, html: str) -> bool:
 
 
 if __name__ == "__main__":
-    subject, text, html = build()
-    if "--draft" in sys.argv:
-        Path("brief_today.html").write_text(html)
-        print(f"  draft saved → brief_today.html ({subject})")
-    else:
-        send(subject, text, html)
+    draft_only = "--draft" in sys.argv
+
+    try:
+        subject, text, html = build()
+        if draft_only:
+            Path("brief_today.html").write_text(html)
+            print(f"  draft saved → brief_today.html ({subject})")
+        else:
+            send(subject, text, html, draft_path="brief_today.html")
+    except Exception as e:
+        print(f"  [brief_today] build/send failed: {e}")
+
+    # Action brief is independent of the main brief above -- a failure here
+    # (or above) must not prevent the other from building/sending, matching
+    # every section's own graceful-degradation contract inside each builder.
+    try:
+        a_subject, a_text, a_html = build_action()
+        if draft_only:
+            Path("action_brief_today.html").write_text(a_html)
+            print(f"  draft saved → action_brief_today.html ({a_subject})")
+        else:
+            send(a_subject, a_text, a_html, draft_path="action_brief_today.html")
+    except Exception as e:
+        print(f"  [action_brief_today] build/send failed: {e}")

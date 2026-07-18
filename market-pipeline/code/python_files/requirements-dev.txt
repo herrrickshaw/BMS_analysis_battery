@@ -1,0 +1,9 @@
+# Dev tooling only -- not needed to run any pipeline script, only to lint/format/
+# typecheck/scan it. Install with `make install-dev` (or `pip install -r
+# requirements-dev.txt`). Versions pinned so `make lint`/`make format` give
+# identical results for everyone, matching the pinning convention already used
+# in ../../../repos/global-stock-screener/.github/workflows.
+ruff==0.15.20
+mypy==1.19.1
+pylint==3.3.9
+bandit==1.8.6

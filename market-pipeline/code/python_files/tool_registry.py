@@ -55,78 +55,92 @@
 
 from __future__ import annotations
 
-import functools
 from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional
 
 
 # ── Registry stores ───────────────────────────────────────────────────────────
 
+
 @dataclass
 class RegisteredScreener:
-    key:        str
+    key: str
     description: str
-    fn:         Callable          # (ScreeningCandidate) -> bool
-    tier_weight: int = 1          # contribution to multi-screen count
+    fn: Callable  # (ScreeningCandidate) -> bool
+    tier_weight: int = 1  # contribution to multi-screen count
 
 
 @dataclass
 class RegisteredNewsSource:
-    key:    str
-    feeds:  List[str] = field(default_factory=list)
+    key: str
+    feeds: List[str] = field(default_factory=list)
     market: str = "IN"
-    fn:     Optional[Callable] = None   # custom fetch(ticker)->list, else RSS default
+    fn: Optional[Callable] = None  # custom fetch(ticker)->list, else RSS default
 
 
 @dataclass
 class RegisteredAnalysis:
-    key:        str
+    key: str
     description: str
-    fn:         Callable          # (context) -> result
+    fn: Callable  # (context) -> result
 
 
-_SCREENERS:    Dict[str, RegisteredScreener]   = {}
+_SCREENERS: Dict[str, RegisteredScreener] = {}
 _NEWS_SOURCES: Dict[str, RegisteredNewsSource] = {}
-_ANALYSES:     Dict[str, RegisteredAnalysis]   = {}
+_ANALYSES: Dict[str, RegisteredAnalysis] = {}
 
 
 # ── Decorators (the "method to create more tools") ────────────────────────────
+
 
 def screener(key: str, description: str = "", tier_weight: int = 1):
     """Register a screener. The wrapped fn takes a ScreeningCandidate → bool.
 
     Adding a screener is now ~5 lines instead of a sheet + loop + spec class.
     """
+
     def deco(fn: Callable) -> Callable:
-        _SCREENERS[key] = RegisteredScreener(key, description or fn.__doc__ or key,
-                                             fn, tier_weight)
+        _SCREENERS[key] = RegisteredScreener(key, description or fn.__doc__ or key, fn, tier_weight)
         return fn
+
     return deco
 
 
 def news_source(key: str, feeds: List[str] = None, market: str = "IN"):
     """Register a news source. Provide RSS `feeds` for the default fetcher, or
     decorate a custom fetch(ticker, market)->list[dict] function."""
+
     def deco(fn: Callable) -> Callable:
         custom = None if (feeds and fn.__name__ == "_") else fn
         _NEWS_SOURCES[key] = RegisteredNewsSource(key, feeds or [], market, custom)
         return fn
+
     return deco
 
 
 def analysis(key: str, description: str = ""):
     """Register an analysis tool that the historical pipeline can run as a stage."""
+
     def deco(fn: Callable) -> Callable:
         _ANALYSES[key] = RegisteredAnalysis(key, description or fn.__doc__ or key, fn)
         return fn
+
     return deco
 
 
 # ── Discovery + execution ─────────────────────────────────────────────────────
 
-def list_screeners() -> List[str]:    return list(_SCREENERS)
-def list_news_sources() -> List[str]: return list(_NEWS_SOURCES)
-def list_analyses() -> List[str]:     return list(_ANALYSES)
+
+def list_screeners() -> List[str]:
+    return list(_SCREENERS)
+
+
+def list_news_sources() -> List[str]:
+    return list(_NEWS_SOURCES)
+
+
+def list_analyses() -> List[str]:
+    return list(_ANALYSES)
 
 
 def run_screener(key: str, candidate) -> bool:
@@ -137,8 +151,7 @@ def run_screener(key: str, candidate) -> bool:
 def run_all_screeners(candidate) -> List[str]:
     """Return the keys of every registered screener the candidate passes.
     Lets the scan loop replace N hard-coded if-blocks with one registry pass."""
-    return [k for k, s in _SCREENERS.items()
-            if _safe(s.fn, candidate)]
+    return [k for k, s in _SCREENERS.items() if _safe(s.fn, candidate)]
 
 
 def run_analysis(key: str, context):
@@ -161,25 +174,31 @@ def _safe(fn, arg) -> bool:
 # This shows how the legacy screeners fold into the registry so both old and new
 # code paths share one source of truth. Importing is lazy/optional.
 
+
 def register_builtin_screeners() -> int:
     """Wrap the existing Specification classes as registry entries (idempotent)."""
     try:
         import sys
         from pathlib import Path
+
         sys.path.insert(0, str(Path(__file__).parent / "stock_ddd"))
         from domain.screening.specifications import (
-            DarvasBoxSpec, GoldenCrossSpec, PiotroskiSpec,
-            CoffeeCanSpec, MagicFormulaSpec, BullCartelSpec,
+            DarvasBoxSpec,
+            GoldenCrossSpec,
+            PiotroskiSpec,
+            CoffeeCanSpec,
+            MagicFormulaSpec,
+            BullCartelSpec,
         )
     except Exception:
         return 0
     specs = {
-        "darvas":        DarvasBoxSpec(),
-        "golden_cross":  GoldenCrossSpec(),
-        "piotroski":     PiotroskiSpec(),
-        "coffee_can":    CoffeeCanSpec(),
+        "darvas": DarvasBoxSpec(),
+        "golden_cross": GoldenCrossSpec(),
+        "piotroski": PiotroskiSpec(),
+        "coffee_can": CoffeeCanSpec(),
         "magic_formula": MagicFormulaSpec(),
-        "bull_cartel":   BullCartelSpec(),
+        "bull_cartel": BullCartelSpec(),
     }
     for k, spec in specs.items():
         _SCREENERS[k] = RegisteredScreener(k, spec.explain(), spec.is_satisfied_by)
@@ -195,7 +214,8 @@ if __name__ == "__main__":
         df = getattr(c, "ohlc_df", None)
         if df is None or len(df) < 252:
             return False
-        last = float(df["Close"].iloc[-1]); hi = float(df["High"].tail(252).max())
+        last = float(df["Close"].iloc[-1])
+        hi = float(df["High"].tail(252).max())
         return hi > 0 and (last - hi) / hi >= -0.03
 
     @analysis("count_bars", "Trivial demo analysis")

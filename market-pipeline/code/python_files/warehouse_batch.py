@@ -8,6 +8,7 @@ it writes with that batch_id, and closes the batch (success/failed, final
 row_count) when done. See warehouse_versioning.sql for the schema and the
 "accumulate, don't overwrite" rationale.
 """
+
 from __future__ import annotations
 
 import subprocess
@@ -21,7 +22,9 @@ def git_commit_or_none() -> str | None:
         out = subprocess.run(
             ["git", "rev-parse", "HEAD"],
             cwd="/Users/umashankar",
-            capture_output=True, text=True, timeout=5,
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         return out.stdout.strip() if out.returncode == 0 else None
     except Exception:
@@ -43,7 +46,9 @@ def start_batch(conn, table_name: str, job_name: str, source_file: str | None) -
     return batch_id
 
 
-def finish_batch(conn, batch_id: int, row_count: int, status: str = "success", notes: str | None = None) -> None:
+def finish_batch(
+    conn, batch_id: int, row_count: int, status: str = "success", notes: str | None = None
+) -> None:
     assert status in ("success", "failed")
     with conn.cursor() as cur:
         cur.execute(

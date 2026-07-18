@@ -8,9 +8,17 @@
 #   _series()        — 8 copies
 #   yfinance MultiIndex extraction — 10+ inline copies
 #   bulk download with rate-limit retry — 10 copies
+#   darvas_box_core()          — the box-detection loop inside compute_darvas_box,
+#                                 verified line-identical across all 5
+#                                 full_*_market_scan.py files (their surrounding
+#                                 dict-shape/rounding genuinely differs per
+#                                 market and stays local -- see darvas_box_core's
+#                                 own docstring)
+#   compute_golden_crossover() — byte-identical across the 2 that had it (US/India)
 #
 # Import once:  from stock_utils import first_df, row, series, extract_ticker_df,
-#                                       bulk_download, fin_metric
+#                                       bulk_download, fin_metric,
+#                                       darvas_box_core, compute_golden_crossover
 #
 # Every script now shares ONE implementation. Bug fixes apply everywhere.
 
@@ -302,6 +310,85 @@ def bulk_download(tickers: List[str], period: str = "1y",
 def _strip_suffix(ticker: str) -> str:
     """RELIANCE.NS -> RELIANCE; AAPL -> AAPL."""
     return ticker.replace(".NS", "").replace(".BO", "")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TECHNICAL SCREENERS
+# ══════════════════════════════════════════════════════════════════════════════
+
+def darvas_box_core(highs: list, lows: list, confirm: int = 3):
+    """Core Darvas Box detection loop: given historical (current-bar-EXCLUDED)
+    high/low series and a confirm window, returns (box_top_idx, box_top,
+    box_bottom) -- box_top/box_bottom are None if no box was found.
+
+    This is the genuinely duplicated part of compute_darvas_box() across all 5
+    full_*_market_scan.py files -- verified line-by-line identical modulo
+    variable naming. Deliberately NOT extracting the surrounding dict-shape
+    logic: each market's compute_darvas_box() rounds to different precision
+    (JP/KR round to 0dp — JPY/KRW have no minor currency subunit in practice;
+    India/US/EU round to 2dp) and uses different output dict key names
+    (India: upside_to_top_pct/position_in_box_pct/box_range; JP/KR/EU:
+    upside_pct/pos_in_box, no box_range) that this repo's own daily_mailer
+    and downstream code already depend on per-market. Unifying THAT would be
+    a real behavior change to a live pipeline, not a refactor -- so each
+    file keeps its own compute_darvas_box() wrapper calling this core.
+    """
+    n = len(highs)
+    box_top_idx = box_top = None
+    for i in range(n - confirm - 1, -1, -1):
+        candidate = highs[i]
+        if candidate == 0:
+            continue
+        window = highs[i + 1 : i + 1 + confirm]
+        if len(window) == confirm and all(h < candidate for h in window):
+            box_top_idx, box_top = i, candidate
+            break
+
+    if box_top is None:
+        return None, None, None
+
+    segment = lows[box_top_idx:]
+    box_bottom = None
+    for i in range(len(segment) - confirm):
+        candidate = segment[i]
+        if candidate == 0:
+            continue
+        window = segment[i + 1 : i + 1 + confirm]
+        if len(window) == confirm and all(l > candidate for l in window):
+            box_bottom = candidate
+            break
+
+    if box_bottom is None:
+        valid = [l for l in segment if l > 0]
+        box_bottom = min(valid) if valid else None
+
+    return box_top_idx, box_top, box_bottom
+
+
+def compute_golden_crossover(df: pd.DataFrame) -> dict:
+    """
+    Detect if the 50 DMA just crossed above the 200 DMA (today's bar).
+    Uses only the already-downloaded bulk OHLC — zero extra API calls.
+    Requires 201+ bars (≈ 1 year of trading days).
+    """
+    if df is None or df.empty:
+        return {"gc_signal": False, "dma50_above_200": False, "dma50": None, "dma200": None}
+    closes = pd.to_numeric(df["Close"], errors="coerce").dropna()
+    if len(closes) < 201:
+        return {"gc_signal": False, "dma50_above_200": False, "dma50": None, "dma200": None}
+    dma50 = closes.rolling(50).mean()
+    dma200 = closes.rolling(200).mean()
+    d50_t, d200_t = float(dma50.iloc[-1]), float(dma200.iloc[-1])
+    d50_p, d200_p = float(dma50.iloc[-2]), float(dma200.iloc[-2])
+    gc_today = (d50_p < d200_p) and (d50_t > d200_t)
+    gap_pct = round((d50_t - d200_t) / d200_t * 100, 2) if d200_t else 0
+    return {
+        "gc_signal": gc_today,  # strict: crossed exactly today
+        "dma50_above_200": d50_t > d200_t,  # broader: currently above
+        "dma50": round(d50_t, 2),
+        "dma200": round(d200_t, 2),
+        "dma_gap_%": gap_pct,
+    }
 
 
 # ══════════════════════════════════════════════════════════════════════════════

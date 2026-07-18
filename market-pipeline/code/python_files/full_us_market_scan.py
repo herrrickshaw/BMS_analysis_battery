@@ -425,6 +425,12 @@ def bulk_download_ohlc(tickers: list[str], period: str = "1y") -> dict[str, pd.D
 
 
 # ── Darvas Box ─────────────────────────────────────────────────────────────────
+# The box-detection loop (darvas_box_core) is shared with the other 4
+# full_*_market_scan.py files via stock_utils.py -- verified line-identical.
+# This wrapper's column lookup, rounding (2dp), and output dict shape stay
+# local: genuinely different per market (see darvas_box_core's docstring).
+from stock_utils import darvas_box_core  # noqa: E402
+
 
 def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
     """Darvas Box detection. Current bar excluded from box formation."""
@@ -449,36 +455,12 @@ def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
     current = all_closes[-1]
     highs   = all_highs[:-1]
     lows    = all_lows[:-1]
-    n       = len(highs)
 
-    box_top_idx, box_top = None, None
-    for i in range(n - confirm - 1, -1, -1):
-        candidate = highs[i]
-        if candidate == 0:
-            continue
-        window = highs[i + 1: i + 1 + confirm]
-        if len(window) == confirm and all(h < candidate for h in window):
-            box_top_idx, box_top = i, candidate
-            break
+    box_top_idx, box_top, box_bottom = darvas_box_core(highs, lows, confirm)
 
     if box_top is None:
         return {"signal": "NO_BOX", "box_top": None, "box_bottom": None,
                 "current_price": round(current, 2)}
-
-    segment    = lows[box_top_idx:]
-    box_bottom = None
-    for i in range(len(segment) - confirm):
-        candidate = segment[i]
-        if candidate == 0:
-            continue
-        window = segment[i + 1: i + 1 + confirm]
-        if len(window) == confirm and all(l > candidate for l in window):
-            box_bottom = candidate
-            break
-
-    if box_bottom is None:
-        valid = [l for l in segment if l > 0]
-        box_bottom = min(valid) if valid else None
 
     if box_bottom is None:
         return {"signal": "NO_BOX", "box_top": round(box_top, 2), "box_bottom": None,
@@ -503,32 +485,13 @@ def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
 
 
 # ── Golden Crossover ──────────────────────────────────────────────────────────
-
-def compute_golden_crossover(df: pd.DataFrame) -> dict:
-    """50 DMA crossed above 200 DMA today. Uses bulk OHLC — zero extra API calls."""
-    if df is None or df.empty:
-        return {"gc_signal": False, "dma50_above_200": False, "dma50": None, "dma200": None}
-    closes = pd.to_numeric(df["Close"], errors="coerce").dropna()
-    if len(closes) < 201:
-        return {"gc_signal": False, "dma50_above_200": False, "dma50": None, "dma200": None}
-    dma50  = closes.rolling(50).mean()
-    dma200 = closes.rolling(200).mean()
-    d50_t, d200_t = float(dma50.iloc[-1]), float(dma200.iloc[-1])
-    d50_p, d200_p = float(dma50.iloc[-2]), float(dma200.iloc[-2])
-    gap_pct = round((d50_t - d200_t) / d200_t * 100, 2) if d200_t else 0
-    return {
-        "gc_signal":       (d50_p < d200_p) and (d50_t > d200_t),
-        "dma50_above_200": d50_t > d200_t,
-        "dma50":           round(d50_t, 2),
-        "dma200":          round(d200_t, 2),
-        "dma_gap_%":       gap_pct,
-    }
-
+# Verified byte-identical to India's copy (the only other file that had this
+# function) -- shared directly, no local wrapper needed.
 
 # ── Fundamental scan ───────────────────────────────────────────────────────────
 
 # Shared helpers (see stock_utils.py) — aliased to keep existing call sites.
-from stock_utils import first_df as _first_df, row as _row
+from stock_utils import first_df as _first_df, row as _row, compute_golden_crossover
 
 
 def fundamental_scan(symbol: str) -> dict:

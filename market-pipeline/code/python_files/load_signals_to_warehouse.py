@@ -39,6 +39,7 @@ Design notes:
     used instead of executemany/to_sql because the US screener file
     alone is ~1.4M rows and row-by-row INSERT would be far too slow.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -170,15 +171,15 @@ def load_screener_file(conn, path: Path, market: str, chunksize: int = 200_000) 
                 f"""
                 INSERT INTO fact_screener_signal (
                     stock_id, market_id, signal_date, screener, signal_year,
-                    {', '.join(SCREENER_RET_DEST)}, dollar_vol_63d, log_liquidity, volatility_63d, batch_id
+                    {", ".join(SCREENER_RET_DEST)}, dollar_vol_63d, log_liquidity, volatility_63d, batch_id
                 )
                 SELECT DISTINCT ON (stock_id, signal_date, screener)
                     stock_id, market_id, signal_date, screener, signal_year,
-                    {', '.join(SCREENER_RET_DEST)}, dollar_vol_63d, log_liquidity, volatility_63d, batch_id
+                    {", ".join(SCREENER_RET_DEST)}, dollar_vol_63d, log_liquidity, volatility_63d, batch_id
                 FROM stg_screener_signal
                 ORDER BY stock_id, signal_date, screener
                 ON CONFLICT (stock_id, signal_date, screener, batch_id) DO UPDATE SET
-                    {', '.join(f"{c} = EXCLUDED.{c}" for c in SCREENER_RET_DEST)},
+                    {", ".join(f"{c} = EXCLUDED.{c}" for c in SCREENER_RET_DEST)},
                     dollar_vol_63d = EXCLUDED.dollar_vol_63d,
                     log_liquidity = EXCLUDED.log_liquidity,
                     volatility_63d = EXCLUDED.volatility_63d,
@@ -271,8 +272,8 @@ def load_short_interest(conn, path: Path, chunksize: int = 50_000) -> int:
         with conn.cursor() as cur:
             cur.execute(
                 f"""
-                INSERT INTO fact_short_interest ({', '.join(staging_cols)})
-                SELECT {', '.join(staging_cols)} FROM stg_short_interest
+                INSERT INTO fact_short_interest ({", ".join(staging_cols)})
+                SELECT {", ".join(staging_cols)} FROM stg_short_interest
                 ON CONFLICT (stock_id, settlement_date, batch_id) DO UPDATE SET
                     accounting_year_month_number = EXCLUDED.accounting_year_month_number,
                     issue_name = EXCLUDED.issue_name,
@@ -367,8 +368,8 @@ def load_insider_transactions(conn, path: Path, chunksize: int = 50_000) -> int:
             # every row for load-lineage.
             cur.execute(
                 f"""
-                INSERT INTO fact_insider_transaction ({', '.join(staging_cols)})
-                SELECT {', '.join(staging_cols)} FROM stg_insider_transaction
+                INSERT INTO fact_insider_transaction ({", ".join(staging_cols)})
+                SELECT {", ".join(staging_cols)} FROM stg_insider_transaction
                 ON CONFLICT (accession_number, stock_id, trans_date, trans_code, trans_shares, trans_price_per_share)
                 DO NOTHING
             """
@@ -440,7 +441,7 @@ def main():
         for name in jobs:
             t0 = time.time()
             n = JOBS[name](conn)
-            log(f"=== {name} done: {n:,} rows affected in {time.time()-t0:.1f}s ===\n")
+            log(f"=== {name} done: {n:,} rows affected in {time.time() - t0:.1f}s ===\n")
     finally:
         conn.close()
 

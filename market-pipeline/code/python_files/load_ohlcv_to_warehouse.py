@@ -47,6 +47,7 @@ Usage:
     .venv/bin/python3 load_ohlcv_to_warehouse.py --only korea
     .venv/bin/python3 load_ohlcv_to_warehouse.py --dry-run        # parse + resolve stock_ids, no writes
 """
+
 from __future__ import annotations
 
 import argparse
@@ -159,9 +160,9 @@ def load_ohlcv_file(
             # creating duplicate history rows for the same batch.
             cur.execute(
                 f"""
-                INSERT INTO ohlcv_history ({', '.join(STAGING_COLS)})
+                INSERT INTO ohlcv_history ({", ".join(STAGING_COLS)})
                 SELECT DISTINCT ON (stock_id, date)
-                    {', '.join(STAGING_COLS)}
+                    {", ".join(STAGING_COLS)}
                 FROM stg_ohlcv
                 ORDER BY stock_id, date
                 ON CONFLICT (stock_id, date, batch_id) DO UPDATE SET
@@ -218,7 +219,7 @@ def main():
             n, n_new = JOBS[name](conn, args.dry_run)
             log(
                 f"=== {name} done: {n:,} rows affected, {n_new} new stocks rows, "
-                f"{time.time()-t0:.1f}s ===\n"
+                f"{time.time() - t0:.1f}s ===\n"
             )
     finally:
         conn.close()

@@ -141,6 +141,7 @@ except ImportError:
 # NSE data fetcher — nsepython + yfinance unified layer
 try:
     from nse_data_fetcher import NSEDataFetcher as _NSEFetcher, get_nse_symbols as _get_nse_syms
+
     _NSE_FETCHER = _NSEFetcher()
     _USE_NSE_FETCHER = True
 except ImportError:
@@ -149,22 +150,22 @@ except ImportError:
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-OUT_DIR       = Path("./wf_backtest")
+OUT_DIR = Path("./wf_backtest")
 OUT_DIR.mkdir(exist_ok=True)
 
-TRANSACTION_COST = 0.002   # 0.2% round-trip (STT + brokerage)
-DARVAS_CONFIRM   = 3
-COOLDOWN_BARS    = 10
-MAX_WORKERS      = 8
-BATCH_SIZE       = 200
+TRANSACTION_COST = 0.002  # 0.2% round-trip (STT + brokerage)
+DARVAS_CONFIRM = 3
+COOLDOWN_BARS = 10
+MAX_WORKERS = 8
+BATCH_SIZE = 200
 
 HORIZONS = {
-    "T+1d":   1,
-    "T+3d":   3,
-    "T+5d":   5,
-    "T+10d":  10,
-    "T+21d":  21,
-    "T+63d":  63,
+    "T+1d": 1,
+    "T+3d": 3,
+    "T+5d": 5,
+    "T+10d": 10,
+    "T+21d": 21,
+    "T+63d": 63,
     "T+126d": 126,
     "T+252d": 252,
 }
@@ -174,30 +175,30 @@ HORIZONS = {
 # Ratios: 60% train / 20% test / 20% validation — strictly chronological
 PERIODS = {
     "3y": {
-        "label":       "3-Year (2023–2026)",
-        "yf_period":   "3y",
-        "start":       "2023-01-02",
-        "test_start":  "2025-01-02",   # last 18 months split 50/50
-        "val_start":   "2025-07-01",
-        "val_end":     "2026-06-30",
+        "label": "3-Year (2023–2026)",
+        "yf_period": "3y",
+        "start": "2023-01-02",
+        "test_start": "2025-01-02",  # last 18 months split 50/50
+        "val_start": "2025-07-01",
+        "val_end": "2026-06-30",
         "description": "Recent 3-year window. Covers post-COVID recovery, rate hikes, Liberation Day sell-off.",
     },
     "5y": {
-        "label":       "5-Year (2021–2026)",
-        "yf_period":   "5y",
-        "start":       "2021-01-04",
-        "test_start":  "2024-01-02",   # 60/20/20
-        "val_start":   "2025-01-02",
-        "val_end":     "2026-06-30",
+        "label": "5-Year (2021–2026)",
+        "yf_period": "5y",
+        "start": "2021-01-04",
+        "test_start": "2024-01-02",  # 60/20/20
+        "val_start": "2025-01-02",
+        "val_end": "2026-06-30",
         "description": "5-year window. Covers COVID recovery, bull run 2021–24, correction 2025.",
     },
     "10y": {
-        "label":       "10-Year (2016–2026)",
-        "yf_period":   "10y",
-        "start":       "2016-01-04",
-        "test_start":  "2022-01-03",   # 60/20/20
-        "val_start":   "2024-01-02",
-        "val_end":     "2026-06-30",
+        "label": "10-Year (2016–2026)",
+        "yf_period": "10y",
+        "start": "2016-01-04",
+        "test_start": "2022-01-03",  # 60/20/20
+        "val_start": "2024-01-02",
+        "val_end": "2026-06-30",
         "description": "Full decade. Covers demonetisation, GST, COVID crash, recovery, Liberation Day.",
     },
 }
@@ -205,7 +206,7 @@ PERIODS = {
 SPLIT_LABELS = ["TRAIN", "TEST", "VAL"]
 
 # Market regime thresholds
-REGIME_SIDEWAYS_PCT = 1.5   # price within 1.5% of 200 DMA = sideways
+REGIME_SIDEWAYS_PCT = 1.5  # price within 1.5% of 200 DMA = sideways
 
 INDEX_SYM = "^NSEI"
 
@@ -213,14 +214,29 @@ INDEX_SYM = "^NSEI"
 FUNDAMENTAL_DATA_LIMIT_YEARS = 4
 
 # Filing trend: minimum consecutive improving quarters for "strong" classification
-TREND_STRONG    = 3
-TREND_EMERGING  = 1
+TREND_STRONG = 3
+TREND_EMERGING = 1
 
 # Financial sector (excluded from ROIC/ROCE screeners)
 FINANCIAL_KEYWORDS = {
-    "bank", "finance", "financial", "insurance", "nbfc", "housing",
-    "capital", "leasing", "credit", "hdfc", "icici", "kotak",
-    "axis", "sbi", "bajaj fin", "shriram", "muthoot", "manappuram",
+    "bank",
+    "finance",
+    "financial",
+    "insurance",
+    "nbfc",
+    "housing",
+    "capital",
+    "leasing",
+    "credit",
+    "hdfc",
+    "icici",
+    "kotak",
+    "axis",
+    "sbi",
+    "bajaj fin",
+    "shriram",
+    "muthoot",
+    "manappuram",
 }
 
 DISCLAIMER = (
@@ -234,6 +250,7 @@ DISCLAIMER = (
 # 1. DATA LAYER
 # ══════════════════════════════════════════════════════════════════════════════
 
+
 def fetch_ohlc_bulk(tickers: list, period: str = "10y") -> dict:
     """
     Bulk-download OHLC with retry and exponential backoff on rate limits.
@@ -242,20 +259,23 @@ def fetch_ohlc_bulk(tickers: list, period: str = "10y") -> dict:
     """
     result = {}
     # Smaller batches for longer periods (more data per request)
-    batch_sz = 100 if period in ("5y","10y") else BATCH_SIZE
-    batches  = [tickers[i:i+batch_sz] for i in range(0, len(tickers), batch_sz)]
-    print(f"  Downloading {len(tickers)} tickers in {len(batches)} batches "
-          f"({period}, batch_size={batch_sz}) …")
+    batch_sz = 100 if period in ("5y", "10y") else BATCH_SIZE
+    batches = [tickers[i : i + batch_sz] for i in range(0, len(tickers), batch_sz)]
+    print(
+        f"  Downloading {len(tickers)} tickers in {len(batches)} batches "
+        f"({period}, batch_size={batch_sz}) …"
+    )
 
     for idx, batch in enumerate(batches, 1):
-        print(f"    Batch {idx}/{len(batches)} ({len(batch)} tickers) …",
-              end=" ", flush=True)
-        for attempt in range(3):   # retry up to 3 times on rate limit
+        print(f"    Batch {idx}/{len(batches)} ({len(batch)} tickers) …", end=" ", flush=True)
+        for attempt in range(3):  # retry up to 3 times on rate limit
             try:
-                raw = yf.download(batch, period=period, auto_adjust=True,
-                                  threads=True, progress=False)
+                raw = yf.download(
+                    batch, period=period, auto_adjust=True, threads=True, progress=False
+                )
                 if raw.empty:
-                    print("empty"); break
+                    print("empty")
+                    break
                 if isinstance(raw.columns, pd.MultiIndex):
                     for t in batch:
                         try:
@@ -276,8 +296,9 @@ def fetch_ohlc_bulk(tickers: list, period: str = "10y") -> dict:
                     print(f"\n    Rate limit hit — waiting {wait}s …", end=" ", flush=True)
                     time.sleep(wait)
                 else:
-                    print(f"ERROR — {e}"); break
-        sleep_t = 3.0 if period in ("5y","10y") else 1.5
+                    print(f"ERROR — {e}")
+                    break
+        sleep_t = 3.0 if period in ("5y", "10y") else 1.5
         if idx < len(batches):
             time.sleep(sleep_t)
     return result
@@ -291,10 +312,10 @@ def fetch_index(period: str = "10y") -> pd.DataFrame:
         if isinstance(df.columns, pd.MultiIndex):
             df = df.xs(INDEX_SYM, axis=1, level=1)
         df = df.dropna()
-        df["dma50"]     = df["Close"].rolling(50).mean()
-        df["dma200"]    = df["Close"].rolling(200).mean()
-        df["dma200_sl"] = df["dma200"].diff(5)   # 5-bar slope
-        df["vol20"]     = df["Close"].pct_change().rolling(20).std() * 100  # annualised vol proxy
+        df["dma50"] = df["Close"].rolling(50).mean()
+        df["dma200"] = df["Close"].rolling(200).mean()
+        df["dma200_sl"] = df["dma200"].diff(5)  # 5-bar slope
+        df["vol20"] = df["Close"].pct_change().rolling(20).std() * 100  # annualised vol proxy
         print(f"OK ({len(df)} bars, {df.index[0].date()} – {df.index[-1].date()})")
         return df
     except Exception as e:
@@ -313,7 +334,8 @@ def get_nse_symbols(top: int = 0) -> list:
         try:
             syms = _get_nse_syms()
             if syms and len(syms) > 100:
-                if top: syms = syms[:top]
+                if top:
+                    syms = syms[:top]
                 return [(s, ".NS") for s in syms]
         except Exception:
             pass
@@ -322,6 +344,7 @@ def get_nse_symbols(top: int = 0) -> list:
     syms = []
     try:
         from nse import NSE
+
         today = datetime.today()
         with NSE(download_folder=str(OUT_DIR), server=False) as nse:
             for offset in range(7):
@@ -331,12 +354,13 @@ def get_nse_symbols(top: int = 0) -> list:
                     if hasattr(result, "exists") and result.exists():
                         df = pd.read_csv(result)
                         if "SctySrs" in df.columns:
-                            syms = sorted(df[df["SctySrs"]=="EQ"]["TckrSymb"]
-                                          .dropna().str.strip().tolist())
+                            syms = sorted(
+                                df[df["SctySrs"] == "EQ"]["TckrSymb"].dropna().str.strip().tolist()
+                            )
                         elif any("SERIES" in c.upper() for c in df.columns):
-                            sc  = next(c for c in df.columns if "SERIES" in c.upper())
-                            syc = next(c for c in df.columns if c.upper() in ("SYMBOL","TCKRSYMB"))
-                            syms = df[df[sc]=="EQ"][syc].dropna().str.strip().tolist()
+                            sc = next(c for c in df.columns if "SERIES" in c.upper())
+                            syc = next(c for c in df.columns if c.upper() in ("SYMBOL", "TCKRSYMB"))
+                            syms = df[df[sc] == "EQ"][syc].dropna().str.strip().tolist()
                         if syms:
                             print(f"  NSE bhavcopy {d.date()}: {len(syms)} EQ symbols")
                             break
@@ -347,16 +371,56 @@ def get_nse_symbols(top: int = 0) -> list:
     if not syms:
         print("  ⚠️  NSE library unavailable — using Nifty 50 fallback")
         syms = [
-            "ADANIENT","ADANIPORTS","APOLLOHOSP","ASIANPAINT","AXISBANK",
-            "BAJAJ-AUTO","BAJFINANCE","BAJAJFINSV","BPCL","BHARTIARTL",
-            "BRITANNIA","CIPLA","COALINDIA","DIVISLAB","DRREDDY",
-            "EICHERMOT","GRASIM","HCLTECH","HDFCBANK","HDFCLIFE",
-            "HEROMOTOCO","HINDALCO","HINDUNILVR","ICICIBANK","ITC",
-            "INDUSINDBK","INFY","JSWSTEEL","KOTAKBANK","LT",
-            "M&M","MARUTI","NTPC","NESTLEIND","ONGC",
-            "POWERGRID","RELIANCE","SBILIFE","SHRIRAMFIN","SBIN",
-            "SUNPHARMA","TCS","TATACONSUM","TATAMOTORS","TATASTEEL",
-            "TECHM","TITAN","TRENT","ULTRACEMCO","WIPRO",
+            "ADANIENT",
+            "ADANIPORTS",
+            "APOLLOHOSP",
+            "ASIANPAINT",
+            "AXISBANK",
+            "BAJAJ-AUTO",
+            "BAJFINANCE",
+            "BAJAJFINSV",
+            "BPCL",
+            "BHARTIARTL",
+            "BRITANNIA",
+            "CIPLA",
+            "COALINDIA",
+            "DIVISLAB",
+            "DRREDDY",
+            "EICHERMOT",
+            "GRASIM",
+            "HCLTECH",
+            "HDFCBANK",
+            "HDFCLIFE",
+            "HEROMOTOCO",
+            "HINDALCO",
+            "HINDUNILVR",
+            "ICICIBANK",
+            "ITC",
+            "INDUSINDBK",
+            "INFY",
+            "JSWSTEEL",
+            "KOTAKBANK",
+            "LT",
+            "M&M",
+            "MARUTI",
+            "NTPC",
+            "NESTLEIND",
+            "ONGC",
+            "POWERGRID",
+            "RELIANCE",
+            "SBILIFE",
+            "SHRIRAMFIN",
+            "SBIN",
+            "SUNPHARMA",
+            "TCS",
+            "TATACONSUM",
+            "TATAMOTORS",
+            "TATASTEEL",
+            "TECHM",
+            "TITAN",
+            "TRENT",
+            "ULTRACEMCO",
+            "WIPRO",
         ]
     if top:
         syms = syms[:top]
@@ -366,6 +430,7 @@ def get_nse_symbols(top: int = 0) -> list:
 # ══════════════════════════════════════════════════════════════════════════════
 # 2. SIGNAL LAYER
 # ══════════════════════════════════════════════════════════════════════════════
+
 
 def classify_regime(dt: pd.Timestamp, index_df: pd.DataFrame) -> str:
     if index_df is None or index_df.empty:
@@ -389,12 +454,13 @@ def classify_regime(dt: pd.Timestamp, index_df: pd.DataFrame) -> str:
     return "SIDEWAYS"
 
 
-def darvas_signals(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM,
-                   cooldown: int = COOLDOWN_BARS) -> list:
+def darvas_signals(
+    df: pd.DataFrame, confirm: int = DARVAS_CONFIRM, cooldown: int = COOLDOWN_BARS
+) -> list:
     """Walk-forward Darvas Box breakout signals with volume confirmation."""
     if df is None or len(df) < confirm + 20:
         return []
-    h  = df["High"].values.astype(float)
+    h = df["High"].values.astype(float)
     lo = df["Low"].values.astype(float)
     cl = df["Close"].values.astype(float)
     vol = df["Volume"].values.astype(float) if "Volume" in df.columns else np.ones(len(cl))
@@ -405,18 +471,20 @@ def darvas_signals(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM,
         hs, n = h[:i], len(h[:i])
         box_top = box_top_idx = None
         for j in range(n - confirm - 1, max(0, n - 60) - 1, -1):
-            if hs[j] == 0: continue
-            win = hs[j+1:j+1+confirm]
+            if hs[j] == 0:
+                continue
+            win = hs[j + 1 : j + 1 + confirm]
             if len(win) == confirm and all(x < hs[j] for x in win):
                 box_top, box_top_idx = hs[j], j
                 break
         if box_top is None:
             continue
-        if cl[i] > box_top and cl[i-1] <= box_top and (i - last_sig >= cooldown):
-            avg_vol = np.mean(vol[max(0,i-20):i]) if i >= 20 else vol[i]
+        if cl[i] > box_top and cl[i - 1] <= box_top and (i - last_sig >= cooldown):
+            avg_vol = np.mean(vol[max(0, i - 20) : i]) if i >= 20 else vol[i]
             if vol[i] >= avg_vol * 1.1:  # volume confirmation
-                signals.append({"date": dates[i], "entry": cl[i],
-                                 "box_top": round(box_top, 2), "idx": i})
+                signals.append(
+                    {"date": dates[i], "entry": cl[i], "box_top": round(box_top, 2), "idx": i}
+                )
                 last_sig = i
     return signals
 
@@ -425,19 +493,25 @@ def golden_cross_signals(df: pd.DataFrame) -> list:
     """50 DMA crosses above 200 DMA — strictly the day of the cross."""
     if df is None or len(df) < 205:
         return []
-    cl    = df["Close"].astype(float)
-    d50   = cl.rolling(50).mean()
-    d200  = cl.rolling(200).mean()
-    sigs  = []
+    cl = df["Close"].astype(float)
+    d50 = cl.rolling(50).mean()
+    d200 = cl.rolling(200).mean()
+    sigs = []
     for i in range(1, len(cl)):
         d50t, d200t = d50.iloc[i], d200.iloc[i]
-        d50p, d200p = d50.iloc[i-1], d200.iloc[i-1]
+        d50p, d200p = d50.iloc[i - 1], d200.iloc[i - 1]
         if any(pd.isna(x) for x in [d50t, d200t, d50p, d200p]):
             continue
         if d50p < d200p and d50t > d200t:
-            sigs.append({"date": df.index[i], "entry": float(cl.iloc[i]),
-                          "dma50": round(float(d50t), 2), "dma200": round(float(d200t), 2),
-                          "idx": i})
+            sigs.append(
+                {
+                    "date": df.index[i],
+                    "entry": float(cl.iloc[i]),
+                    "dma50": round(float(d50t), 2),
+                    "dma200": round(float(d200t), 2),
+                    "idx": i,
+                }
+            )
     return sigs
 
 
@@ -447,15 +521,15 @@ from stock_utils import first_df as _first_df, row as _row
 
 def is_financial(symbol: str, info: dict = None) -> bool:
     s = symbol.lower()
-    if any(k in s for k in FINANCIAL_KEYWORDS): return True
+    if any(k in s for k in FINANCIAL_KEYWORDS):
+        return True
     if info:
         sector = (info.get("sector") or "").lower()
-        return any(k in sector for k in ("bank","financial","insurance","capital markets"))
+        return any(k in sector for k in ("bank", "financial", "insurance", "capital markets"))
     return False
 
 
-def fundamental_signals(symbol: str, suffix: str, screener: str,
-                         ohlc_df: pd.DataFrame) -> list:
+def fundamental_signals(symbol: str, suffix: str, screener: str, ohlc_df: pd.DataFrame) -> list:
     """
     Return list of signal dicts for a fundamental screener.
     Uses annual July-1 rebalancing dates (Preet et al. 2021) within the
@@ -469,14 +543,18 @@ def fundamental_signals(symbol: str, suffix: str, screener: str,
     # Only compute for the ~4y of available financial data
     try:
         ticker = yf.Ticker(f"{symbol}{suffix}")
-        inc    = _first_df(ticker, "income_stmt", "financials")
-        bal    = _first_df(ticker, "balance_sheet")
-        cf     = _first_df(ticker, "cash_flow", "cashflow")
-        inc_q  = _first_df(ticker, "quarterly_income_stmt", "quarterly_financials")
-        try: info = ticker.info or {}
-        except Exception: info = {}
-        try: mcap = ticker.fast_info.market_cap or 0
-        except Exception: mcap = info.get("marketCap", 0) or 0
+        inc = _first_df(ticker, "income_stmt", "financials")
+        bal = _first_df(ticker, "balance_sheet")
+        cf = _first_df(ticker, "cash_flow", "cashflow")
+        inc_q = _first_df(ticker, "quarterly_income_stmt", "quarterly_financials")
+        try:
+            info = ticker.info or {}
+        except Exception:
+            info = {}
+        try:
+            mcap = ticker.fast_info.market_cap or 0
+        except Exception:
+            mcap = info.get("marketCap", 0) or 0
     except Exception:
         return []
 
@@ -492,89 +570,124 @@ def fundamental_signals(symbol: str, suffix: str, screener: str,
     def check_fundamental(col_offset: int = 0) -> bool:
         """Check if screener criteria are met using financials at col_offset."""
         if screener == "piotroski":
-            if inc is None: return False
+            if inc is None:
+                return False
             ni0 = _row(inc, "Net Income", col=col_offset)
-            a0  = _row(bal, "Total Assets", col=col_offset)
-            ni1 = _row(inc, "Net Income", col=col_offset+1)
-            a1  = _row(bal, "Total Assets", col=col_offset+1)
-            roa0 = (ni0/a0) if (ni0 and a0) else None
-            roa1 = (ni1/a1) if (ni1 and a1) else None
-            ocf0 = _row(cf, "Operating Cash Flow", "Total Cash From Operating Activities",
-                         col=col_offset)
+            a0 = _row(bal, "Total Assets", col=col_offset)
+            ni1 = _row(inc, "Net Income", col=col_offset + 1)
+            a1 = _row(bal, "Total Assets", col=col_offset + 1)
+            roa0 = (ni0 / a0) if (ni0 and a0) else None
+            roa1 = (ni1 / a1) if (ni1 and a1) else None
+            ocf0 = _row(
+                cf, "Operating Cash Flow", "Total Cash From Operating Activities", col=col_offset
+            )
             ltd0 = _row(bal, "Long Term Debt", col=col_offset) or 0
-            ltd1 = _row(bal, "Long Term Debt", col=col_offset+1) or 0
+            ltd1 = _row(bal, "Long Term Debt", col=col_offset + 1) or 0
             ca0 = _row(bal, "Current Assets", "Total Current Assets", col=col_offset)
             cl0 = _row(bal, "Current Liabilities", "Total Current Liabilities", col=col_offset)
-            ca1 = _row(bal, "Current Assets", "Total Current Assets", col=col_offset+1)
-            cl1 = _row(bal, "Current Liabilities", "Total Current Liabilities", col=col_offset+1)
+            ca1 = _row(bal, "Current Assets", "Total Current Assets", col=col_offset + 1)
+            cl1 = _row(bal, "Current Liabilities", "Total Current Liabilities", col=col_offset + 1)
             sh0 = _row(bal, "Share Issued", col=col_offset)
-            sh1 = _row(bal, "Share Issued", col=col_offset+1)
+            sh1 = _row(bal, "Share Issued", col=col_offset + 1)
             rev0 = _row(inc, "Total Revenue", col=col_offset)
-            gp0  = _row(inc, "Gross Profit", col=col_offset)
-            rev1 = _row(inc, "Total Revenue", col=col_offset+1)
-            gp1  = _row(inc, "Gross Profit", col=col_offset+1)
+            gp0 = _row(inc, "Gross Profit", col=col_offset)
+            rev1 = _row(inc, "Total Revenue", col=col_offset + 1)
+            gp1 = _row(inc, "Gross Profit", col=col_offset + 1)
             sc = (
-                (1 if (roa0 and roa0 > 0) else 0) +
-                (1 if (ocf0 and ocf0 > 0) else 0) +
-                (1 if (roa0 and roa1 and roa0 > roa1) else 0) +
-                (1 if (ocf0 and a0 and roa0 and (ocf0/a0) > roa0) else 0) +
-                (1 if (a0 and a1 and (ltd0/a0) < (ltd1/a1)) else 0) +
-                (1 if (ca0 and cl0 and ca1 and cl1 and (ca0/cl0) > (ca1/cl1)) else 0) +
-                ((1 if sh0<=sh1 else 0) if (sh0 and sh1) else 1) +
-                (1 if (gp0 and rev0 and gp1 and rev1 and (gp0/rev0) > (gp1/rev1)) else 0) +
-                (1 if (rev0 and a0 and rev1 and a1 and (rev0/a0) > (rev1/a1)) else 0)
+                (1 if (roa0 and roa0 > 0) else 0)
+                + (1 if (ocf0 and ocf0 > 0) else 0)
+                + (1 if (roa0 and roa1 and roa0 > roa1) else 0)
+                + (1 if (ocf0 and a0 and roa0 and (ocf0 / a0) > roa0) else 0)
+                + (1 if (a0 and a1 and (ltd0 / a0) < (ltd1 / a1)) else 0)
+                + (1 if (ca0 and cl0 and ca1 and cl1 and (ca0 / cl0) > (ca1 / cl1)) else 0)
+                + ((1 if sh0 <= sh1 else 0) if (sh0 and sh1) else 1)
+                + (1 if (gp0 and rev0 and gp1 and rev1 and (gp0 / rev0) > (gp1 / rev1)) else 0)
+                + (1 if (rev0 and a0 and rev1 and a1 and (rev0 / a0) > (rev1 / a1)) else 0)
             )
             return sc >= 7
 
         elif screener == "coffee_can":
-            if inc is None: return False
+            if inc is None:
+                return False
+
             def series(df, *rows):
                 for nm in rows:
                     if df is not None and nm in df.index:
                         return [float(v) for v in df.loc[nm].dropna() if pd.notna(v)]
                 return []
+
             revs = series(inc, "Total Revenue")
-            cagr = ((revs[0]/revs[-1])**(1/(len(revs)-1))-1)*100 if len(revs)>=2 and revs[-1]>0 else None
+            cagr = (
+                ((revs[0] / revs[-1]) ** (1 / (len(revs) - 1)) - 1) * 100
+                if len(revs) >= 2 and revs[-1] > 0
+                else None
+            )
             ebit_s = series(inc, "EBIT", "Operating Income", "Ebit")
-            ta_s   = series(bal, "Total Assets")
-            cl_s   = series(bal, "Current Liabilities", "Total Current Liabilities")
-            roce_l = [ebit_s[i]/(ta_s[i]-cl_s[i])*100
-                      for i in range(min(len(ebit_s),len(ta_s),len(cl_s))) if (ta_s[i]-cl_s[i])>0]
-            avg_roce = sum(roce_l)/len(roce_l) if roce_l else None
+            ta_s = series(bal, "Total Assets")
+            cl_s = series(bal, "Current Liabilities", "Total Current Liabilities")
+            roce_l = [
+                ebit_s[i] / (ta_s[i] - cl_s[i]) * 100
+                for i in range(min(len(ebit_s), len(ta_s), len(cl_s)))
+                if (ta_s[i] - cl_s[i]) > 0
+            ]
+            avg_roce = sum(roce_l) / len(roce_l) if roce_l else None
             de_raw = info.get("debtToEquity")
-            de = (de_raw/100 if de_raw and de_raw>10 else de_raw) if de_raw else None
-            mcap_cr = mcap/1e7
+            de = (de_raw / 100 if de_raw and de_raw > 10 else de_raw) if de_raw else None
+            mcap_cr = mcap / 1e7
             ni_s = series(inc, "Net Income")
-            return bool(cagr and cagr>10 and avg_roce and avg_roce>15
-                        and de is not None and de<1 and mcap_cr>=500
-                        and ni_s and all(n>0 for n in ni_s))
+            return bool(
+                cagr
+                and cagr > 10
+                and avg_roce
+                and avg_roce > 15
+                and de is not None
+                and de < 1
+                and mcap_cr >= 500
+                and ni_s
+                and all(n > 0 for n in ni_s)
+            )
 
         elif screener == "magic_formula":
-            if inc is None: return False
+            if inc is None:
+                return False
             ebit = _row(inc, "EBIT", "Operating Income", "Ebit", col=col_offset)
-            a0   = _row(bal, "Total Assets", col=col_offset)
-            cl0  = _row(bal, "Current Liabilities", "Total Current Liabilities", col=col_offset)
-            cap  = (a0-(cl0 or 0)) if a0 else None
-            td   = info.get("totalDebt", 0) or 0
+            a0 = _row(bal, "Total Assets", col=col_offset)
+            cl0 = _row(bal, "Current Liabilities", "Total Current Liabilities", col=col_offset)
+            cap = (a0 - (cl0 or 0)) if a0 else None
+            td = info.get("totalDebt", 0) or 0
             cash = info.get("totalCash", 0) or 0
-            ev   = (mcap + td - cash) if mcap else None
-            roic = (ebit/cap*100) if (ebit and cap and cap>0) else None
-            ey   = (ebit/ev*100)   if (ebit and ev  and ev>0)  else None
-            bv   = info.get("bookValue")
-            ni   = _row(inc, "Net Income", col=col_offset)
-            return bool(roic and roic>15 and ey and ey>8
-                        and bv and bv>0 and (mcap/1e7)>100 and ni and ni>0)
+            ev = (mcap + td - cash) if mcap else None
+            roic = (ebit / cap * 100) if (ebit and cap and cap > 0) else None
+            ey = (ebit / ev * 100) if (ebit and ev and ev > 0) else None
+            bv = info.get("bookValue")
+            ni = _row(inc, "Net Income", col=col_offset)
+            return bool(
+                roic
+                and roic > 15
+                and ey
+                and ey > 8
+                and bv
+                and bv > 0
+                and (mcap / 1e7) > 100
+                and ni
+                and ni > 0
+            )
 
         elif screener == "bull_cartel":
-            if inc_q is None or len(inc_q.columns) < 5: return False
+            if inc_q is None or len(inc_q.columns) < 5:
+                return False
             rev_q0 = _row(inc_q, "Total Revenue", col=col_offset)
-            rev_q4 = _row(inc_q, "Total Revenue", col=col_offset+4)
-            ni_q0  = _row(inc_q, "Net Income",    col=col_offset)
-            ni_q4  = _row(inc_q, "Net Income",    col=col_offset+4)
-            sg = ((rev_q0-rev_q4)/abs(rev_q4)*100) if (rev_q0 and rev_q4 and rev_q4!=0) else None
-            pg = ((ni_q0-ni_q4)/abs(ni_q4)*100)    if (ni_q0  and ni_q4  and ni_q4!=0)  else None
-            nc = ni_q0/1e7 if ni_q0 else None
-            return bool(sg and sg>15 and pg and pg>20 and nc and nc>1)
+            rev_q4 = _row(inc_q, "Total Revenue", col=col_offset + 4)
+            ni_q0 = _row(inc_q, "Net Income", col=col_offset)
+            ni_q4 = _row(inc_q, "Net Income", col=col_offset + 4)
+            sg = (
+                ((rev_q0 - rev_q4) / abs(rev_q4) * 100)
+                if (rev_q0 and rev_q4 and rev_q4 != 0)
+                else None
+            )
+            pg = ((ni_q0 - ni_q4) / abs(ni_q4) * 100) if (ni_q0 and ni_q4 and ni_q4 != 0) else None
+            nc = ni_q0 / 1e7 if ni_q0 else None
+            return bool(sg and sg > 15 and pg and pg > 20 and nc and nc > 1)
         return False
 
     # Try multiple rebalancing offsets to generate multiple historical data points
@@ -598,17 +711,23 @@ def fundamental_signals(symbol: str, suffix: str, screener: str,
                 sig_dt = pd.Timestamp(datetime.today().strftime("%Y-07-01"))
 
             # Clamp to available OHLC
-            si = ohlc_ts.searchsorted(sig_dt.tz_localize(None) if sig_dt.tz else sig_dt,
-                                       side="right") - 1
+            si = (
+                ohlc_ts.searchsorted(
+                    sig_dt.tz_localize(None) if sig_dt.tz else sig_dt, side="right"
+                )
+                - 1
+            )
             if not (5 <= si < len(ohlc_df)):
                 continue
             entry = float(ohlc_df["Close"].iloc[si])
-            qualifying.append({
-                "date":  ohlc_df.index[si],
-                "entry": entry,
-                "idx":   si,
-                "col_offset": col_offset,
-            })
+            qualifying.append(
+                {
+                    "date": ohlc_df.index[si],
+                    "entry": entry,
+                    "idx": si,
+                    "col_offset": col_offset,
+                }
+            )
         except Exception:
             continue
 
@@ -618,6 +737,7 @@ def fundamental_signals(symbol: str, suffix: str, screener: str,
 # ══════════════════════════════════════════════════════════════════════════════
 # 3. FILING TREND LAYER
 # ══════════════════════════════════════════════════════════════════════════════
+
 
 def compute_filing_trend(symbol: str, suffix: str) -> dict:
     """
@@ -642,15 +762,20 @@ def compute_filing_trend(symbol: str, suffix: str) -> dict:
       WEAK      (score ≤ 3)  — inconsistent or deteriorating
     """
     result = {
-        "symbol": symbol, "rev_streak": 0, "profit_streak": 0,
-        "ocf_streak": 0, "debt_streak": 0, "piotroski_trend": 0,
-        "filing_score": 0, "filing_class": "WEAK",
+        "symbol": symbol,
+        "rev_streak": 0,
+        "profit_streak": 0,
+        "ocf_streak": 0,
+        "debt_streak": 0,
+        "piotroski_trend": 0,
+        "filing_score": 0,
+        "filing_class": "WEAK",
     }
     try:
         ticker = yf.Ticker(f"{symbol}{suffix}")
-        inc_q  = _first_df(ticker, "quarterly_income_stmt", "quarterly_financials")
-        bal_q  = _first_df(ticker, "quarterly_balance_sheet", "quarterly_balance_sheet")
-        cf_q   = _first_df(ticker, "quarterly_cash_flow", "quarterly_cashflow")
+        inc_q = _first_df(ticker, "quarterly_income_stmt", "quarterly_financials")
+        bal_q = _first_df(ticker, "quarterly_balance_sheet", "quarterly_balance_sheet")
+        cf_q = _first_df(ticker, "quarterly_cash_flow", "quarterly_cashflow")
     except Exception:
         return result
 
@@ -660,18 +785,21 @@ def compute_filing_trend(symbol: str, suffix: str) -> dict:
     n_qtrs = len(inc_q.columns)
 
     def q_val(df, row, col):
-        if df is None or col >= len(df.columns): return None
+        if df is None or col >= len(df.columns):
+            return None
         return _row(df, row, col=col)
 
     # Revenue streak: consecutive quarters where YoY revenue growth > 10%
     rev_streak = 0
     for q in range(min(6, n_qtrs - 4)):
-        r_now  = q_val(inc_q, "Total Revenue", q)
+        r_now = q_val(inc_q, "Total Revenue", q)
         r_yago = q_val(inc_q, "Total Revenue", q + 4)
         if r_now and r_yago and r_yago != 0:
             growth = (r_now - r_yago) / abs(r_yago) * 100
-            if growth > 10: rev_streak += 1
-            else: break
+            if growth > 10:
+                rev_streak += 1
+            else:
+                break
         else:
             break
     result["rev_streak"] = rev_streak
@@ -679,12 +807,14 @@ def compute_filing_trend(symbol: str, suffix: str) -> dict:
     # Profit streak: consecutive quarters YoY net income growth > 15%
     profit_streak = 0
     for q in range(min(6, n_qtrs - 4)):
-        ni_now  = q_val(inc_q, "Net Income", q)
+        ni_now = q_val(inc_q, "Net Income", q)
         ni_yago = q_val(inc_q, "Net Income", q + 4)
         if ni_now and ni_yago and ni_yago != 0:
             growth = (ni_now - ni_yago) / abs(ni_yago) * 100
-            if growth > 15 and ni_now > 0: profit_streak += 1
-            else: break
+            if growth > 15 and ni_now > 0:
+                profit_streak += 1
+            else:
+                break
         else:
             break
     result["profit_streak"] = profit_streak
@@ -692,20 +822,27 @@ def compute_filing_trend(symbol: str, suffix: str) -> dict:
     # OCF streak: consecutive quarters positive operating cash flow
     ocf_streak = 0
     for q in range(min(8, n_qtrs)):
-        ocf = q_val(cf_q, "Operating Cash Flow", "Total Cash From Operating Activities", q) \
-              if cf_q is not None else None
-        if ocf is not None and ocf > 0: ocf_streak += 1
-        else: break
-    result["ocf_streak"] = min(ocf_streak, 3)   # cap at 3 for scoring
+        ocf = (
+            q_val(cf_q, "Operating Cash Flow", "Total Cash From Operating Activities", q)
+            if cf_q is not None
+            else None
+        )
+        if ocf is not None and ocf > 0:
+            ocf_streak += 1
+        else:
+            break
+    result["ocf_streak"] = min(ocf_streak, 3)  # cap at 3 for scoring
 
     # Debt reduction streak: consecutive quarters with falling total debt
     debt_streak = 0
     if bal_q is not None and len(bal_q.columns) >= 4:
         for q in range(min(4, len(bal_q.columns) - 1)):
-            d_now  = q_val(bal_q, "Long Term Debt", q) or 0
+            d_now = q_val(bal_q, "Long Term Debt", q) or 0
             d_prev = q_val(bal_q, "Long Term Debt", q + 1) or 0
-            if d_now < d_prev: debt_streak += 1
-            else: break
+            if d_now < d_prev:
+                debt_streak += 1
+            else:
+                break
     result["debt_streak"] = debt_streak
 
     # Piotroski trend: is current score higher than 1 year ago?
@@ -714,41 +851,42 @@ def compute_filing_trend(symbol: str, suffix: str) -> dict:
         ticker2 = yf.Ticker(f"{symbol}{suffix}")
         inc_a = _first_df(ticker2, "income_stmt", "financials")
         bal_a = _first_df(ticker2, "balance_sheet")
-        cf_a  = _first_df(ticker2, "cash_flow", "cashflow")
+        cf_a = _first_df(ticker2, "cash_flow", "cashflow")
         if inc_a is not None and len(inc_a.columns) >= 3:
+
             def piotroski_score(offset):
                 ni0 = _row(inc_a, "Net Income", col=offset)
-                a0  = _row(bal_a, "Total Assets", col=offset)
-                roa0 = (ni0/a0) if (ni0 and a0) else None
+                a0 = _row(bal_a, "Total Assets", col=offset)
+                roa0 = (ni0 / a0) if (ni0 and a0) else None
                 ocf0 = _row(cf_a, "Operating Cash Flow", col=offset)
-                return sum([
-                    1 if (roa0 and roa0 > 0) else 0,
-                    1 if (ocf0 and ocf0 > 0) else 0,
-                ])
+                return sum(
+                    [
+                        1 if (roa0 and roa0 > 0) else 0,
+                        1 if (ocf0 and ocf0 > 0) else 0,
+                    ]
+                )
+
             pt = piotroski_score(0) - piotroski_score(1)
             result["piotroski_trend"] = max(0, min(3, pt + 1))  # 0-3
     except Exception:
         pass
 
     score = (
-        min(result["rev_streak"],     3) +
-        min(result["profit_streak"],  3) +
-        result["ocf_streak"]           +
-        min(result["debt_streak"],    3) +
-        result["piotroski_trend"]
+        min(result["rev_streak"], 3)
+        + min(result["profit_streak"], 3)
+        + result["ocf_streak"]
+        + min(result["debt_streak"], 3)
+        + result["piotroski_trend"]
     )
     result["filing_score"] = score
-    result["filing_class"] = (
-        "STRONG"   if score >= 9  else
-        "EMERGING" if score >= 4  else
-        "WEAK"
-    )
+    result["filing_class"] = "STRONG" if score >= 9 else "EMERGING" if score >= 4 else "WEAK"
     return result
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 4. SPLIT LAYER
 # ══════════════════════════════════════════════════════════════════════════════
+
 
 def assign_split(signal_date: pd.Timestamp, period_cfg: dict) -> str:
     """
@@ -772,15 +910,21 @@ def assign_split(signal_date: pd.Timestamp, period_cfg: dict) -> str:
 # 5. RETURN LAYER
 # ══════════════════════════════════════════════════════════════════════════════
 
-def forward_returns(ohlc_df: pd.DataFrame, entry_idx: int, entry_price: float,
-                    index_df: pd.DataFrame, signal_date: pd.Timestamp) -> dict:
+
+def forward_returns(
+    ohlc_df: pd.DataFrame,
+    entry_idx: int,
+    entry_price: float,
+    index_df: pd.DataFrame,
+    signal_date: pd.Timestamp,
+) -> dict:
     """
     Compute net returns (after 0.2% transaction cost) and alpha vs Nifty 50
     at each of the 8 horizons.
     """
     closes = ohlc_df["Close"].values
-    n      = len(closes)
-    cost   = TRANSACTION_COST * 100
+    n = len(closes)
+    cost = TRANSACTION_COST * 100
 
     ret, alpha = {}, {}
     for label, offset in HORIZONS.items():
@@ -793,7 +937,11 @@ def forward_returns(ohlc_df: pd.DataFrame, entry_idx: int, entry_price: float,
 
         # Nifty buy-and-hold over same period
         try:
-            dt_naive = signal_date.tz_localize(None) if hasattr(signal_date,"tz") and signal_date.tz else signal_date
+            dt_naive = (
+                signal_date.tz_localize(None)
+                if hasattr(signal_date, "tz") and signal_date.tz
+                else signal_date
+            )
             idx_naive = index_df.index.tz_localize(None) if index_df.index.tz else index_df.index
             si = idx_naive.searchsorted(dt_naive, side="right") - 1
             xi = si + offset
@@ -813,53 +961,55 @@ def forward_returns(ohlc_df: pd.DataFrame, entry_idx: int, entry_price: float,
 # 6. ANALYSIS LAYER
 # ══════════════════════════════════════════════════════════════════════════════
 
+
 def compute_stats(vals: pd.Series, bh_vals: pd.Series = None) -> dict:
     """Full statistics for a set of return values."""
     vals = vals.dropna()
     if len(vals) < 3:
         return {}
-    n        = len(vals)
-    hits     = (vals > 0).sum()
+    n = len(vals)
+    hits = (vals > 0).sum()
     hit_rate = hits / n * 100
-    avg      = vals.mean()
-    med      = vals.median()
-    std      = vals.std()
-    wins     = vals[vals > 0]
-    losses   = vals[vals < 0]
+    avg = vals.mean()
+    med = vals.median()
+    std = vals.std()
+    wins = vals[vals > 0]
+    losses = vals[vals < 0]
     down_std = losses.std() if len(losses) > 1 else 1e-9
-    pf       = wins.sum() / abs(losses.sum()) if len(losses) > 0 else np.inf
-    sharpe   = avg / std   if std   > 0 else 0
-    sortino  = avg / down_std if down_std > 0 else 0
+    pf = wins.sum() / abs(losses.sum()) if len(losses) > 0 else np.inf
+    sharpe = avg / std if std > 0 else 0
+    sortino = avg / down_std if down_std > 0 else 0
     # Drawdown
     sorted_v = vals.sort_values().reset_index(drop=True)
-    cumul    = (1 + sorted_v/100).cumprod()
-    peak     = cumul.cummax()
-    dd       = (cumul - peak) / peak * 100
-    max_dd   = dd.min() if not dd.empty else 0
-    calmar   = avg / abs(max_dd) if max_dd < 0 else 0
-    ev       = (hit_rate/100) * (wins.mean() if len(wins)>0 else 0) + \
-               (1 - hit_rate/100) * (losses.mean() if len(losses)>0 else 0)
+    cumul = (1 + sorted_v / 100).cumprod()
+    peak = cumul.cummax()
+    dd = (cumul - peak) / peak * 100
+    max_dd = dd.min() if not dd.empty else 0
+    calmar = avg / abs(max_dd) if max_dd < 0 else 0
+    ev = (hit_rate / 100) * (wins.mean() if len(wins) > 0 else 0) + (1 - hit_rate / 100) * (
+        losses.mean() if len(losses) > 0 else 0
+    )
     stat = {
-        "N":            n,
-        "Hit_Rate%":    round(hit_rate, 1),
-        "Avg_Return%":  round(avg,      2),
-        "Median%":      round(med,      2),
-        "Std%":         round(std,      2),
-        "Sharpe":       round(sharpe,   3),
-        "Sortino":      round(sortino,  3),
+        "N": n,
+        "Hit_Rate%": round(hit_rate, 1),
+        "Avg_Return%": round(avg, 2),
+        "Median%": round(med, 2),
+        "Std%": round(std, 2),
+        "Sharpe": round(sharpe, 3),
+        "Sortino": round(sortino, 3),
         "Profit_Factor": round(pf, 2) if pf != np.inf else 999,
-        "Max_DD%":      round(max_dd,   2),
-        "Calmar":       round(calmar,   3),
-        "EV%":          round(ev,       2),
-        "Max_Win%":     round(vals.max(), 2),
-        "Max_Loss%":    round(vals.min(), 2),
-        "p25%":         round(vals.quantile(0.25), 2),
-        "p75%":         round(vals.quantile(0.75), 2),
+        "Max_DD%": round(max_dd, 2),
+        "Calmar": round(calmar, 3),
+        "EV%": round(ev, 2),
+        "Max_Win%": round(vals.max(), 2),
+        "Max_Loss%": round(vals.min(), 2),
+        "p25%": round(vals.quantile(0.25), 2),
+        "p75%": round(vals.quantile(0.75), 2),
     }
     if bh_vals is not None:
         bh = bh_vals.dropna()
         if len(bh) >= 3:
-            stat["BH_Avg%"]   = round(bh.mean(), 2)
+            stat["BH_Avg%"] = round(bh.mean(), 2)
             stat["Alpha_Avg%"] = round(avg - bh.mean(), 2)
     return stat
 
@@ -873,11 +1023,14 @@ def analyze_all(signals_df: pd.DataFrame, period_label: str) -> pd.DataFrame:
     if signals_df.empty:
         return pd.DataFrame()
 
-    screeners  = signals_df["screener"].unique()
-    splits     = ["TRAIN", "TEST", "VAL", "ALL"]
-    regimes    = ["BULL", "BEAR", "SIDEWAYS", "ALL"]
-    filing_cls = signals_df["filing_class"].unique().tolist() + ["ALL"] \
-                 if "filing_class" in signals_df.columns else ["ALL"]
+    screeners = signals_df["screener"].unique()
+    splits = ["TRAIN", "TEST", "VAL", "ALL"]
+    regimes = ["BULL", "BEAR", "SIDEWAYS", "ALL"]
+    filing_cls = (
+        signals_df["filing_class"].unique().tolist() + ["ALL"]
+        if "filing_class" in signals_df.columns
+        else ["ALL"]
+    )
     filing_cls = list(dict.fromkeys(filing_cls))
 
     for sc in screeners:
@@ -897,7 +1050,7 @@ def analyze_all(signals_df: pd.DataFrame, period_label: str) -> pd.DataFrame:
                         continue
 
                     for horizon in HORIZONS:
-                        ret_col   = f"ret_{horizon}"
+                        ret_col = f"ret_{horizon}"
                         alpha_col = f"alpha_{horizon}"
                         if ret_col not in sub.columns:
                             continue
@@ -908,15 +1061,17 @@ def analyze_all(signals_df: pd.DataFrame, period_label: str) -> pd.DataFrame:
                         s = compute_stats(vals)
                         if not s:
                             continue
-                        s.update({
-                            "Period":       period_label,
-                            "Screener":     sc,
-                            "Split":        split,
-                            "Regime":       regime,
-                            "FilingClass":  fcl,
-                            "Horizon":      horizon,
-                            "Stat_Flag":    "⚠️ LOW N" if s["N"] < 20 else "OK",
-                        })
+                        s.update(
+                            {
+                                "Period": period_label,
+                                "Screener": sc,
+                                "Split": split,
+                                "Regime": regime,
+                                "FilingClass": fcl,
+                                "Horizon": horizon,
+                                "Stat_Flag": "⚠️ LOW N" if s["N"] < 20 else "OK",
+                            }
+                        )
                         if bh_vals is not None and not bh_vals.empty:
                             s["Alpha_Avg%"] = round(vals.mean() - bh_vals.mean(), 2)
                         rows.append(s)
@@ -934,26 +1089,31 @@ def overfitting_report(stats_df: pd.DataFrame) -> pd.DataFrame:
     if stats_df.empty:
         return pd.DataFrame()
     for (period, sc, regime, horizon), grp in stats_df.groupby(
-            ["Period", "Screener", "Regime", "Horizon"]):
-        train = grp[grp["Split"]=="TRAIN"]["Sharpe"].mean()
-        test  = grp[grp["Split"]=="TEST"]["Sharpe"].mean()
-        val   = grp[grp["Split"]=="VAL"]["Sharpe"].mean()
+        ["Period", "Screener", "Regime", "Horizon"]
+    ):
+        train = grp[grp["Split"] == "TRAIN"]["Sharpe"].mean()
+        test = grp[grp["Split"] == "TEST"]["Sharpe"].mean()
+        val = grp[grp["Split"] == "VAL"]["Sharpe"].mean()
         if pd.isna(train) or pd.isna(val):
             continue
         decay = (train - val) / abs(train) * 100 if train != 0 else np.nan
-        rows.append({
-            "Period":         period,
-            "Screener":       sc,
-            "Regime":         regime,
-            "Horizon":        horizon,
-            "Sharpe_TRAIN":   round(train, 3),
-            "Sharpe_TEST":    round(test,  3) if not pd.isna(test) else np.nan,
-            "Sharpe_VAL":     round(val,   3),
-            "Sharpe_Decay%":  round(decay, 1) if not pd.isna(decay) else np.nan,
-            "Overfit_Risk":   "HIGH"   if (not pd.isna(decay) and decay > 50) else
-                              "MEDIUM" if (not pd.isna(decay) and decay > 20) else
-                              "LOW",
-        })
+        rows.append(
+            {
+                "Period": period,
+                "Screener": sc,
+                "Regime": regime,
+                "Horizon": horizon,
+                "Sharpe_TRAIN": round(train, 3),
+                "Sharpe_TEST": round(test, 3) if not pd.isna(test) else np.nan,
+                "Sharpe_VAL": round(val, 3),
+                "Sharpe_Decay%": round(decay, 1) if not pd.isna(decay) else np.nan,
+                "Overfit_Risk": "HIGH"
+                if (not pd.isna(decay) and decay > 50)
+                else "MEDIUM"
+                if (not pd.isna(decay) and decay > 20)
+                else "LOW",
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -966,57 +1126,70 @@ def strategy_matrix(stats_df: pd.DataFrame) -> pd.DataFrame:
     if stats_df.empty:
         return pd.DataFrame()
 
-    val = stats_df[(stats_df["Split"]=="VAL") | (stats_df["Split"]=="ALL")]
-    val = val[val["N"] >= 5]   # minimum sample size
+    val = stats_df[(stats_df["Split"] == "VAL") | (stats_df["Split"] == "ALL")]
+    val = val[val["N"] >= 5]  # minimum sample size
 
     rows = []
     for (period, regime, horizon), grp in val.groupby(["Period", "Regime", "Horizon"]):
         best = grp.sort_values("EV%", ascending=False).iloc[0] if not grp.empty else None
-        if best is None: continue
-        rows.append({
-            "Period":           period,
-            "Regime":           regime,
-            "Horizon":          horizon,
-            "Best_Screener":    best["Screener"],
-            "EV%":              best["EV%"],
-            "Hit_Rate%":        best["Hit_Rate%"],
-            "Avg_Return%":      best["Avg_Return%"],
-            "Sharpe":           best["Sharpe"],
-            "N_Signals":        best["N"],
-            "Stat_Flag":        best.get("Stat_Flag", ""),
-        })
-    return pd.DataFrame(rows).sort_values(["Period","Regime","Horizon"])
+        if best is None:
+            continue
+        rows.append(
+            {
+                "Period": period,
+                "Regime": regime,
+                "Horizon": horizon,
+                "Best_Screener": best["Screener"],
+                "EV%": best["EV%"],
+                "Hit_Rate%": best["Hit_Rate%"],
+                "Avg_Return%": best["Avg_Return%"],
+                "Sharpe": best["Sharpe"],
+                "N_Signals": best["N"],
+                "Stat_Flag": best.get("Stat_Flag", ""),
+            }
+        )
+    return pd.DataFrame(rows).sort_values(["Period", "Regime", "Horizon"])
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 7. REPORT LAYER
 # ══════════════════════════════════════════════════════════════════════════════
 
-def save_excel(all_stats: pd.DataFrame, overfit: pd.DataFrame,
-               matrix: pd.DataFrame, all_signals: pd.DataFrame,
-               filing_trends: pd.DataFrame) -> Path:
-    ts   = datetime.now().strftime("%Y%m%d_%H%M")
+
+def save_excel(
+    all_stats: pd.DataFrame,
+    overfit: pd.DataFrame,
+    matrix: pd.DataFrame,
+    all_signals: pd.DataFrame,
+    filing_trends: pd.DataFrame,
+) -> Path:
+    ts = datetime.now().strftime("%Y%m%d_%H%M")
     path = OUT_DIR / f"walk_forward_{ts}.xlsx"
 
     with pd.ExcelWriter(path, engine="openpyxl") as w:
         # Disclaimer
-        pd.DataFrame({"DISCLAIMER": [
-            DISCLAIMER, "",
-            "FRAMEWORK: Walk-forward Train/Test/Validation (60/20/20 chronological split)",
-            "PERIODS: 3y (2023–2026), 5y (2021–2026), 10y (2016–2026)",
-            "HORIZONS: T+1d T+3d T+5d T+10d T+21d T+63d T+126d T+252d",
-            "COSTS: 0.2% round-trip (STT + brokerage) deducted from all returns",
-            "ALPHA: Net return minus Nifty 50 buy-and-hold over same period",
-            "FILING TREND: Consecutive-quarter improvement score (max 15)",
-            "  STRONG ≥9: persistent fundamental improvement",
-            "  EMERGING 4-8: recent turnaround, watch for continuation",
-            "  WEAK ≤3: inconsistent or deteriorating",
-            "",
-            "OVERFITTING CHECK: Sharpe ratio decay from TRAIN → VAL",
-            "  HIGH risk: Sharpe drops >50% — strategy may be curve-fitted",
-            "  MEDIUM risk: drops 20–50% — use with caution",
-            "  LOW risk: drops <20% — robust signal",
-        ]}).to_excel(w, sheet_name="DISCLAIMER", index=False)
+        pd.DataFrame(
+            {
+                "DISCLAIMER": [
+                    DISCLAIMER,
+                    "",
+                    "FRAMEWORK: Walk-forward Train/Test/Validation (60/20/20 chronological split)",
+                    "PERIODS: 3y (2023–2026), 5y (2021–2026), 10y (2016–2026)",
+                    "HORIZONS: T+1d T+3d T+5d T+10d T+21d T+63d T+126d T+252d",
+                    "COSTS: 0.2% round-trip (STT + brokerage) deducted from all returns",
+                    "ALPHA: Net return minus Nifty 50 buy-and-hold over same period",
+                    "FILING TREND: Consecutive-quarter improvement score (max 15)",
+                    "  STRONG ≥9: persistent fundamental improvement",
+                    "  EMERGING 4-8: recent turnaround, watch for continuation",
+                    "  WEAK ≤3: inconsistent or deteriorating",
+                    "",
+                    "OVERFITTING CHECK: Sharpe ratio decay from TRAIN → VAL",
+                    "  HIGH risk: Sharpe drops >50% — strategy may be curve-fitted",
+                    "  MEDIUM risk: drops 20–50% — use with caution",
+                    "  LOW risk: drops <20% — robust signal",
+                ]
+            }
+        ).to_excel(w, sheet_name="DISCLAIMER", index=False)
 
         # Strategy matrix (most actionable)
         if not matrix.empty:
@@ -1025,29 +1198,33 @@ def save_excel(all_stats: pd.DataFrame, overfit: pd.DataFrame,
         # Overfitting report
         if not overfit.empty:
             overfit.sort_values("Sharpe_Decay%", ascending=False).to_excel(
-                w, sheet_name="Overfitting_Check", index=False)
+                w, sheet_name="Overfitting_Check", index=False
+            )
 
         # Full stats per period
         for period in all_stats["Period"].unique() if not all_stats.empty else []:
-            sub = all_stats[all_stats["Period"]==period]
-            nm  = period.replace(" ","_").replace("(","").replace(")","").replace("–","_")[:28]
+            sub = all_stats[all_stats["Period"] == period]
+            nm = period.replace(" ", "_").replace("(", "").replace(")", "").replace("–", "_")[:28]
             sub.to_excel(w, sheet_name=f"Stats_{nm}", index=False)
 
         # Screener heatmaps (hit rate × horizon × regime for VAL set)
         if not all_stats.empty:
-            val_stats = all_stats[(all_stats["Split"]=="VAL") & (all_stats["Regime"].isin(["BULL","BEAR","ALL"]))]
+            val_stats = all_stats[
+                (all_stats["Split"] == "VAL") & (all_stats["Regime"].isin(["BULL", "BEAR", "ALL"]))
+            ]
             if not val_stats.empty:
                 pivot = val_stats.pivot_table(
-                    index=["Screener","Regime"], columns="Horizon",
-                    values="Hit_Rate%", aggfunc="mean"
+                    index=["Screener", "Regime"],
+                    columns="Horizon",
+                    values="Hit_Rate%",
+                    aggfunc="mean",
                 )
                 ordered = [h for h in HORIZONS if h in pivot.columns]
                 if ordered:
                     pivot[ordered].to_excel(w, sheet_name="HitRate_Heatmap_VAL")
 
                 pivot_ev = val_stats.pivot_table(
-                    index=["Screener","Regime"], columns="Horizon",
-                    values="EV%", aggfunc="mean"
+                    index=["Screener", "Regime"], columns="Horizon", values="EV%", aggfunc="mean"
                 )
                 if ordered:
                     pivot_ev[ordered].to_excel(w, sheet_name="EV_Heatmap_VAL")
@@ -1055,22 +1232,24 @@ def save_excel(all_stats: pd.DataFrame, overfit: pd.DataFrame,
         # Filing trends
         if not filing_trends.empty:
             filing_trends.sort_values("filing_score", ascending=False).to_excel(
-                w, sheet_name="Filing_Trends", index=False)
+                w, sheet_name="Filing_Trends", index=False
+            )
 
         # All signals log
         if not all_signals.empty:
-            all_signals.sort_values(["screener","signal_date"]).to_excel(
-                w, sheet_name="All_Signals", index=False)
+            all_signals.sort_values(["screener", "signal_date"]).to_excel(
+                w, sheet_name="All_Signals", index=False
+            )
 
     print(f"\n  📊  Walk-forward Excel → {path}")
     return path
 
 
 def print_summary(matrix: pd.DataFrame, overfit: pd.DataFrame, all_stats: pd.DataFrame):
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print("  WALK-FORWARD BACKTEST — STRATEGY RECOMMENDATION MATRIX")
     print(f"  {DISCLAIMER}")
-    print(f"{'='*80}")
+    print(f"{'=' * 80}")
 
     if matrix.empty:
         print("  No results to display.")
@@ -1078,7 +1257,7 @@ def print_summary(matrix: pd.DataFrame, overfit: pd.DataFrame, all_stats: pd.Dat
 
     print("\n  Best screener per (Period × Regime × Horizon) — VAL set only")
     print("  Columns: Period | Regime | Horizon | Best Screener | EV% | Hit% | Avg% | N | Flag")
-    print("  " + "─"*78)
+    print("  " + "─" * 78)
 
     prev_period = prev_regime = None
     for _, r in matrix.iterrows():
@@ -1089,68 +1268,85 @@ def print_summary(matrix: pd.DataFrame, overfit: pd.DataFrame, all_stats: pd.Dat
             print(f"    {r['Regime']}")
             prev_regime = r["Regime"]
         flag = f"  {r['Stat_Flag']}" if r.get("Stat_Flag") == "⚠️ LOW N" else ""
-        print(f"      {r['Horizon']:<8}  {r['Best_Screener']:<18}  "
-              f"EV={r['EV%']:>+6.2f}%  Hit={r['Hit_Rate%']:>5.1f}%  "
-              f"Avg={r['Avg_Return%']:>+6.2f}%  N={int(r['N_Signals'])}  {flag}")
+        print(
+            f"      {r['Horizon']:<8}  {r['Best_Screener']:<18}  "
+            f"EV={r['EV%']:>+6.2f}%  Hit={r['Hit_Rate%']:>5.1f}%  "
+            f"Avg={r['Avg_Return%']:>+6.2f}%  N={int(r['N_Signals'])}  {flag}"
+        )
 
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print("  OVERFITTING CHECK — Top 10 highest Sharpe decay (TRAIN→VAL)")
-    print(f"  {'Screener':<18} {'Regime':<10} {'Horizon':<8} "
-          f"{'Train Sharpe':>13} {'Val Sharpe':>11} {'Decay%':>8} {'Risk':<8}")
-    print("  " + "─"*70)
+    print(
+        f"  {'Screener':<18} {'Regime':<10} {'Horizon':<8} "
+        f"{'Train Sharpe':>13} {'Val Sharpe':>11} {'Decay%':>8} {'Risk':<8}"
+    )
+    print("  " + "─" * 70)
     if not overfit.empty:
         for _, r in overfit.sort_values("Sharpe_Decay%", ascending=False).head(10).iterrows():
-            print(f"  {r['Screener']:<18} {r['Regime']:<10} {r['Horizon']:<8} "
-                  f"{r['Sharpe_TRAIN']:>13.3f} {r['Sharpe_VAL']:>11.3f} "
-                  f"{r['Sharpe_Decay%']:>8.1f}% {r['Overfit_Risk']:<8}")
+            print(
+                f"  {r['Screener']:<18} {r['Regime']:<10} {r['Horizon']:<8} "
+                f"{r['Sharpe_TRAIN']:>13.3f} {r['Sharpe_VAL']:>11.3f} "
+                f"{r['Sharpe_Decay%']:>8.1f}% {r['Overfit_Risk']:<8}"
+            )
 
     print(f"\n  Key findings:")
     # Best screeners per regime across all periods
     for regime in ["BULL", "BEAR", "SIDEWAYS"]:
-        sub = matrix[matrix["Regime"]==regime]
-        if sub.empty: continue
+        sub = matrix[matrix["Regime"] == regime]
+        if sub.empty:
+            continue
         best = sub.sort_values("EV%", ascending=False).iloc[0]
-        print(f"  • {regime:<10} → {best['Best_Screener']:<18} "
-              f"(best EV={best['EV%']:+.2f}% at {best['Horizon']})")
-    print(f"{'='*80}\n")
+        print(
+            f"  • {regime:<10} → {best['Best_Screener']:<18} "
+            f"(best EV={best['EV%']:+.2f}% at {best['Horizon']})"
+        )
+    print(f"{'=' * 80}\n")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 8. MAIN ORCHESTRATOR
 # ══════════════════════════════════════════════════════════════════════════════
 
-def run_period(period_cfg: dict,
-               ohlc_map: dict, index_df: pd.DataFrame,
-               symbol_list: list, filing_cache: dict,
-               workers: int, run_filings: bool) -> pd.DataFrame:
+
+def run_period(
+    period_cfg: dict,
+    ohlc_map: dict,
+    index_df: pd.DataFrame,
+    symbol_list: list,
+    filing_cache: dict,
+    workers: int,
+    run_filings: bool,
+) -> pd.DataFrame:
     """
     Run the full backtest pipeline for one period (3y / 5y / 10y).
     Returns a DataFrame of all signal records enriched with returns,
     alpha, split, regime, and filing trend class.
     """
     start_ts = pd.Timestamp(period_cfg["start"])
-    end_ts   = pd.Timestamp(period_cfg["val_end"])
-    label    = period_cfg["label"]
-    print(f"\n{'─'*70}")
+    end_ts = pd.Timestamp(period_cfg["val_end"])
+    label = period_cfg["label"]
+    print(f"\n{'─' * 70}")
     print(f"  PERIOD: {label}  ({period_cfg['start']} – {period_cfg['val_end']})")
-    print(f"  Splits: TRAIN < {period_cfg['test_start']} | "
-          f"TEST < {period_cfg['val_start']} | VAL ≤ {period_cfg['val_end']}")
-    print(f"{'─'*70}")
+    print(
+        f"  Splits: TRAIN < {period_cfg['test_start']} | "
+        f"TEST < {period_cfg['val_start']} | VAL ≤ {period_cfg['val_end']}"
+    )
+    print(f"{'─' * 70}")
 
     all_records = []
 
     # ── Technical screeners (Darvas, Golden Cross) ────────────────────────────
-    for sc_name, sc_func in [("darvas", darvas_signals),
-                              ("golden_cross", golden_cross_signals)]:
-        print(f"  {sc_name}: walking forward through {len(ohlc_map)} tickers …",
-              end=" ", flush=True)
+    for sc_name, sc_func in [("darvas", darvas_signals), ("golden_cross", golden_cross_signals)]:
+        print(
+            f"  {sc_name}: walking forward through {len(ohlc_map)} tickers …", end=" ", flush=True
+        )
         sc_count = 0
         for yf_tkr, df in ohlc_map.items():
             # Trim to period
             df_p = df.loc[(df.index >= start_ts) & (df.index <= end_ts)]
             if len(df_p) < 50:
                 continue
-            sym = yf_tkr.replace(".NS","")
+            sym = yf_tkr.replace(".NS", "")
             sigs = sc_func(df_p)
             for sig in sigs:
                 fr = forward_returns(df_p, sig["idx"], sig["entry"], index_df, sig["date"])
@@ -1159,18 +1355,18 @@ def run_period(period_cfg: dict,
                     continue
                 regime = classify_regime(sig["date"], index_df)
                 rec = {
-                    "period":       label,
-                    "screener":     sc_name,
-                    "symbol":       sym,
-                    "signal_date":  sig["date"],
-                    "entry_price":  sig["entry"],
-                    "split":        split,
-                    "regime":       regime,
+                    "period": label,
+                    "screener": sc_name,
+                    "symbol": sym,
+                    "signal_date": sig["date"],
+                    "entry_price": sig["entry"],
+                    "split": split,
+                    "regime": regime,
                     "filing_class": filing_cache.get(sym, {}).get("filing_class", "N/A"),
                     "filing_score": filing_cache.get(sym, {}).get("filing_score", 0),
                 }
                 for h in HORIZONS:
-                    rec[f"ret_{h}"]   = fr["ret"].get(h, np.nan)
+                    rec[f"ret_{h}"] = fr["ret"].get(h, np.nan)
                     rec[f"alpha_{h}"] = fr["alpha"].get(h, np.nan)
                 all_records.append(rec)
                 sc_count += 1
@@ -1186,7 +1382,7 @@ def run_period(period_cfg: dict,
         def _process(item):
             sym, suffix = item
             yf_tkr = f"{sym}{suffix}"
-            ohlc   = ohlc_map.get(yf_tkr)
+            ohlc = ohlc_map.get(yf_tkr)
             if ohlc is None:
                 return []
             ohlc_p = ohlc.loc[(ohlc.index >= start_ts) & (ohlc.index <= end_ts)]
@@ -1195,24 +1391,24 @@ def run_period(period_cfg: dict,
             sigs = fundamental_signals(sym, suffix, sc_name, ohlc_p)
             recs = []
             for sig in sigs:
-                fr     = forward_returns(ohlc_p, sig["idx"], sig["entry"], index_df, sig["date"])
-                split  = assign_split(sig["date"], period_cfg)
+                fr = forward_returns(ohlc_p, sig["idx"], sig["entry"], index_df, sig["date"])
+                split = assign_split(sig["date"], period_cfg)
                 if split == "OUT_OF_RANGE":
                     continue
                 regime = classify_regime(sig["date"], index_df)
                 rec = {
-                    "period":       label,
-                    "screener":     sc_name,
-                    "symbol":       sym,
-                    "signal_date":  sig["date"],
-                    "entry_price":  sig["entry"],
-                    "split":        split,
-                    "regime":       regime,
+                    "period": label,
+                    "screener": sc_name,
+                    "symbol": sym,
+                    "signal_date": sig["date"],
+                    "entry_price": sig["entry"],
+                    "split": split,
+                    "regime": regime,
                     "filing_class": filing_cache.get(sym, {}).get("filing_class", "N/A"),
                     "filing_score": filing_cache.get(sym, {}).get("filing_score", 0),
                 }
                 for h in HORIZONS:
-                    rec[f"ret_{h}"]   = fr["ret"].get(h, np.nan)
+                    rec[f"ret_{h}"] = fr["ret"].get(h, np.nan)
                     rec[f"alpha_{h}"] = fr["alpha"].get(h, np.nan)
                 recs.append(rec)
             return recs
@@ -1237,16 +1433,15 @@ def run_period(period_cfg: dict,
     return df
 
 
-def main(periods: list = None, top: int = 0, workers: int = MAX_WORKERS,
-         run_filings: bool = True):
+def main(periods: list = None, top: int = 0, workers: int = MAX_WORKERS, run_filings: bool = True):
 
-    print(f"\n{'#'*72}")
+    print(f"\n{'#' * 72}")
     print(f"  WALK-FORWARD BACKTEST — TRAIN / TEST / VALIDATION")
     print(f"  Started: {datetime.now().strftime('%d %b %Y  %H:%M:%S')}")
     print(f"  Periods: {periods or list(PERIODS.keys())}")
     print(f"  Horizons: {list(HORIZONS.keys())}")
-    print(f"  Transaction cost: {TRANSACTION_COST*100:.1f}% round-trip")
-    print(f"{'#'*72}\n")
+    print(f"  Transaction cost: {TRANSACTION_COST * 100:.1f}% round-trip")
+    print(f"{'#' * 72}\n")
     print(DISCLAIMER + "\n")
 
     # Live market context — show regime, VIX, FII, upcoming results
@@ -1256,8 +1451,7 @@ def main(periods: list = None, top: int = 0, workers: int = MAX_WORKERS,
         except Exception:
             pass
 
-    active_periods = {k: v for k, v in PERIODS.items()
-                      if periods is None or k in periods}
+    active_periods = {k: v for k, v in PERIODS.items() if periods is None or k in periods}
 
     # ── Step 1: Symbols ───────────────────────────────────────────────────────
     print("Step 1 — Symbol universe …")
@@ -1271,11 +1465,10 @@ def main(periods: list = None, top: int = 0, workers: int = MAX_WORKERS,
         print(f"  {len(symbol_list)} symbols\n")
 
     # ── Step 2: OHLC (longest window needed = 10y) ────────────────────────────
-    yf_period = "10y" if "10y" in active_periods else (
-                 "5y" if "5y"  in active_periods else "3y")
+    yf_period = "10y" if "10y" in active_periods else ("5y" if "5y" in active_periods else "3y")
     print(f"Step 2 — Bulk OHLC download ({yf_period}) …")
     yf_tickers = [f"{s}{sfx}" for s, sfx in symbol_list]
-    ohlc_map   = fetch_ohlc_bulk(yf_tickers, period=yf_period)
+    ohlc_map = fetch_ohlc_bulk(yf_tickers, period=yf_period)
     print(f"  {len(ohlc_map)} tickers with data\n")
 
     # ── Step 3: Index ─────────────────────────────────────────────────────────
@@ -1289,10 +1482,7 @@ def main(periods: list = None, top: int = 0, workers: int = MAX_WORKERS,
         print(f"Step 4 — Filing trend analysis ({len(symbol_list)} stocks, {workers} workers) …")
         done = 0
         with ThreadPoolExecutor(max_workers=workers) as pool:
-            futures = {
-                pool.submit(compute_filing_trend, s, sfx): s
-                for s, sfx in symbol_list
-            }
+            futures = {pool.submit(compute_filing_trend, s, sfx): s for s, sfx in symbol_list}
             for future in as_completed(futures):
                 sym = futures[future]
                 done += 1
@@ -1302,7 +1492,9 @@ def main(periods: list = None, top: int = 0, workers: int = MAX_WORKERS,
                 except Exception:
                     pass
                 if done % 200 == 0 or done == len(symbol_list):
-                    strong = sum(1 for v in filing_cache.values() if v.get("filing_class")=="STRONG")
+                    strong = sum(
+                        1 for v in filing_cache.values() if v.get("filing_class") == "STRONG"
+                    )
                     print(f"  {done}/{len(symbol_list)} done — {strong} STRONG trend stocks")
     else:
         print("Step 4 — Filing trends skipped (--no-filings)\n")
@@ -1311,12 +1503,13 @@ def main(periods: list = None, top: int = 0, workers: int = MAX_WORKERS,
 
     # ── Step 5: Run each period ───────────────────────────────────────────────
     all_signals_list = []
-    all_stats_list   = []
+    all_stats_list = []
 
     for pk, pcfg in active_periods.items():
         print(f"\nStep 5 — Backtesting period: {pk} …")
-        sig_df = run_period(pcfg, ohlc_map, index_df,
-                            symbol_list, filing_cache, workers, run_filings)
+        sig_df = run_period(
+            pcfg, ohlc_map, index_df, symbol_list, filing_cache, workers, run_filings
+        )
         if sig_df.empty:
             print(f"  No signals for period {pk}")
             continue
@@ -1326,15 +1519,15 @@ def main(periods: list = None, top: int = 0, workers: int = MAX_WORKERS,
         stats = analyze_all(sig_df, pcfg["label"])
         all_stats_list.append(stats)
 
-    all_signals = pd.concat(all_signals_list, ignore_index=True) \
-                  if all_signals_list else pd.DataFrame()
-    all_stats   = pd.concat(all_stats_list,   ignore_index=True) \
-                  if all_stats_list   else pd.DataFrame()
+    all_signals = (
+        pd.concat(all_signals_list, ignore_index=True) if all_signals_list else pd.DataFrame()
+    )
+    all_stats = pd.concat(all_stats_list, ignore_index=True) if all_stats_list else pd.DataFrame()
 
     # ── Step 6: Overfitting + strategy matrix ─────────────────────────────────
     print("\nStep 6 — Overfitting check + strategy matrix …")
     overfit = overfitting_report(all_stats)
-    matrix  = strategy_matrix(all_stats)
+    matrix = strategy_matrix(all_stats)
 
     # ── Step 7: Save ──────────────────────────────────────────────────────────
     print("\nStep 7 — Saving results …")
@@ -1344,11 +1537,11 @@ def main(periods: list = None, top: int = 0, workers: int = MAX_WORKERS,
 
     return {
         "signals": all_signals,
-        "stats":   all_stats,
-        "matrix":  matrix,
+        "stats": all_stats,
+        "matrix": matrix,
         "overfit": overfit,
-        "filing":  filing_df,
-        "excel":   str(path),
+        "filing": filing_df,
+        "excel": str(path),
     }
 
 
@@ -1362,41 +1555,181 @@ if __name__ == "__main__":
         ),
         epilog="⚠️  Educational/research use only. NOT investment advice.",
     )
-    parser.add_argument("--period",  nargs="+", choices=["3y","5y","10y"], default=None,
-                        help="Periods to analyse (default: all three)")
-    parser.add_argument("--top",     type=int, default=0,
-                        help="Limit to first N symbols (0 = all NSE EQ)")
-    parser.add_argument("--liquid",  action="store_true", default=False,
-                        help="Use Nifty 500 liquid stocks only (recommended for 5y/10y runs)")
-    parser.add_argument("--workers", type=int, default=MAX_WORKERS,
-                        help=f"Parallel workers (default {MAX_WORKERS})")
-    parser.add_argument("--no-filings", action="store_true", default=False,
-                        help="Skip filing trend analysis (faster)")
+    parser.add_argument(
+        "--period",
+        nargs="+",
+        choices=["3y", "5y", "10y"],
+        default=None,
+        help="Periods to analyse (default: all three)",
+    )
+    parser.add_argument(
+        "--top", type=int, default=0, help="Limit to first N symbols (0 = all NSE EQ)"
+    )
+    parser.add_argument(
+        "--liquid",
+        action="store_true",
+        default=False,
+        help="Use Nifty 500 liquid stocks only (recommended for 5y/10y runs)",
+    )
+    parser.add_argument(
+        "--workers", type=int, default=MAX_WORKERS, help=f"Parallel workers (default {MAX_WORKERS})"
+    )
+    parser.add_argument(
+        "--no-filings",
+        action="store_true",
+        default=False,
+        help="Skip filing trend analysis (faster)",
+    )
     args = parser.parse_args()
 
     if args.liquid:
         # Nifty 500 proxy — well-known liquid stocks guaranteed to have 5-10y history
         NIFTY500_SAMPLE = [
-            "RELIANCE","TCS","HDFCBANK","ICICIBANK","INFY","HINDUNILVR","ITC","SBIN",
-            "BAJFINANCE","BHARTIARTL","KOTAKBANK","LT","AXISBANK","ASIANPAINT","MARUTI",
-            "TITAN","SUNPHARMA","WIPRO","ULTRACEMCO","NESTLEIND","TECHM","HCLTECH",
-            "POWERGRID","NTPC","ONGC","COALINDIA","BPCL","GRASIM","JSWSTEEL","TATASTEEL",
-            "CIPLA","DIVISLAB","DRREDDY","APOLLOHOSP","BAJAJ-AUTO","HEROMOTOCO","EICHERMOT",
-            "TATACONSUM","BRITANNIA","HINDALCO","ADANIPORTS","M&M","BAJAJFINSV","INDUSINDBK",
-            "SHRIRAMFIN","TRENT","ADANIENT","SBILIFE","HDFCLIFE","PIDILITIND","HAVELLS",
-            "DABUR","MARICO","GODREJCP","COLPAL","MCDOWELL-N","BERGEPAINT","KANSAINER",
-            "PAGEIND","RELAXO","MUTHOOTFIN","CHOLAFIN","MANAPPURAM","ABCAPITAL","RECLTD",
-            "PFC","IRFC","HUDCO","SAIL","NMDC","HINDCOPPER","NATIONALUM","APLAPOLLO",
-            "TATAMOTORS","M&MFIN","BAJAJHLDNG","EXIDEIND","AMARARAJA","CEATLTD","MRF",
-            "ZOMATO","NYKAA","PAYTM","DMART","HDFCAMC","NIPPONLIFE","ICICIPRULIFE",
-            "SBICARD","BANDHANBNK","RBLBANK","FEDERALBNK","IDFCFIRSTB","CANBK","BANKBARODA",
-            "PNB","UNIONBANK","INDIANB","IOB","UCOBANK","CENTRALBK","MAHABANK",
-            "MOTHERSON","BOSCHLTD","BHEL","SIEMENS","ABB","CUMMINSIND","THERMAX","VOLTAS",
-            "WHIRLPOOL","BLUE STAR","CROMPTON","HAVELLS","LEGRAND","POLYCAB","FINOLEX",
-            "AUROPHARMA","LUPIN","ALKEM","TORNTPHARM","GLAXO","PFIZER","SANOFI","ABBOTINDIA",
-            "PERSISTENT","MPHASIS","COFORGE","LTIM","LTTS","KPITTECH","TATAELXSI",
-            "ZYDUSLIFE","MANKIND","IPCA","NATCOPHARM","GRANULES","LAURUSLABS","STRIDES",
-            "OFSS","NAUKRI","IRCTC","INDIAMART","JUSTDIAL","POLICYBZR","CARTRADE",
+            "RELIANCE",
+            "TCS",
+            "HDFCBANK",
+            "ICICIBANK",
+            "INFY",
+            "HINDUNILVR",
+            "ITC",
+            "SBIN",
+            "BAJFINANCE",
+            "BHARTIARTL",
+            "KOTAKBANK",
+            "LT",
+            "AXISBANK",
+            "ASIANPAINT",
+            "MARUTI",
+            "TITAN",
+            "SUNPHARMA",
+            "WIPRO",
+            "ULTRACEMCO",
+            "NESTLEIND",
+            "TECHM",
+            "HCLTECH",
+            "POWERGRID",
+            "NTPC",
+            "ONGC",
+            "COALINDIA",
+            "BPCL",
+            "GRASIM",
+            "JSWSTEEL",
+            "TATASTEEL",
+            "CIPLA",
+            "DIVISLAB",
+            "DRREDDY",
+            "APOLLOHOSP",
+            "BAJAJ-AUTO",
+            "HEROMOTOCO",
+            "EICHERMOT",
+            "TATACONSUM",
+            "BRITANNIA",
+            "HINDALCO",
+            "ADANIPORTS",
+            "M&M",
+            "BAJAJFINSV",
+            "INDUSINDBK",
+            "SHRIRAMFIN",
+            "TRENT",
+            "ADANIENT",
+            "SBILIFE",
+            "HDFCLIFE",
+            "PIDILITIND",
+            "HAVELLS",
+            "DABUR",
+            "MARICO",
+            "GODREJCP",
+            "COLPAL",
+            "MCDOWELL-N",
+            "BERGEPAINT",
+            "KANSAINER",
+            "PAGEIND",
+            "RELAXO",
+            "MUTHOOTFIN",
+            "CHOLAFIN",
+            "MANAPPURAM",
+            "ABCAPITAL",
+            "RECLTD",
+            "PFC",
+            "IRFC",
+            "HUDCO",
+            "SAIL",
+            "NMDC",
+            "HINDCOPPER",
+            "NATIONALUM",
+            "APLAPOLLO",
+            "TATAMOTORS",
+            "M&MFIN",
+            "BAJAJHLDNG",
+            "EXIDEIND",
+            "AMARARAJA",
+            "CEATLTD",
+            "MRF",
+            "ZOMATO",
+            "NYKAA",
+            "PAYTM",
+            "DMART",
+            "HDFCAMC",
+            "NIPPONLIFE",
+            "ICICIPRULIFE",
+            "SBICARD",
+            "BANDHANBNK",
+            "RBLBANK",
+            "FEDERALBNK",
+            "IDFCFIRSTB",
+            "CANBK",
+            "BANKBARODA",
+            "PNB",
+            "UNIONBANK",
+            "INDIANB",
+            "IOB",
+            "UCOBANK",
+            "CENTRALBK",
+            "MAHABANK",
+            "MOTHERSON",
+            "BOSCHLTD",
+            "BHEL",
+            "SIEMENS",
+            "ABB",
+            "CUMMINSIND",
+            "THERMAX",
+            "VOLTAS",
+            "WHIRLPOOL",
+            "BLUE STAR",
+            "CROMPTON",
+            "HAVELLS",
+            "LEGRAND",
+            "POLYCAB",
+            "FINOLEX",
+            "AUROPHARMA",
+            "LUPIN",
+            "ALKEM",
+            "TORNTPHARM",
+            "GLAXO",
+            "PFIZER",
+            "SANOFI",
+            "ABBOTINDIA",
+            "PERSISTENT",
+            "MPHASIS",
+            "COFORGE",
+            "LTIM",
+            "LTTS",
+            "KPITTECH",
+            "TATAELXSI",
+            "ZYDUSLIFE",
+            "MANKIND",
+            "IPCA",
+            "NATCOPHARM",
+            "GRANULES",
+            "LAURUSLABS",
+            "STRIDES",
+            "OFSS",
+            "NAUKRI",
+            "IRCTC",
+            "INDIAMART",
+            "JUSTDIAL",
+            "POLICYBZR",
+            "CARTRADE",
         ]
         # Deduplicate and convert to list of tuples
         seen, syms = set(), []
@@ -1407,14 +1740,15 @@ if __name__ == "__main__":
         print(f"  Using Nifty 500 liquid proxy: {len(syms)} stocks")
         # Monkey-patch get_nse_symbols to return our list
         import builtins
+
         _orig = builtins.__dict__.get("_wf_sym_override")
         globals()["_LIQUID_OVERRIDE"] = syms
     else:
         globals()["_LIQUID_OVERRIDE"] = None
 
     main(
-        periods     = args.period,
-        top         = args.top,
-        workers     = args.workers,
-        run_filings = not args.no_filings,
+        periods=args.period,
+        top=args.top,
+        workers=args.workers,
+        run_filings=not args.no_filings,
     )

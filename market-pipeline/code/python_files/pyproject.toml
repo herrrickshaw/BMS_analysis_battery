@@ -1,13 +1,55 @@
-[tool.black]
-line-length = 100
-target-version = ["py310"]
-
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+# deoldify.py is a Colab notebook export with `!pip install` magics -- not valid
+# Python, same exclusion global-stock-screener's pyproject.toml already uses.
+extend-exclude = ["deoldify.py"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "W"]   # pyflakes (dead code/imports), pycodestyle, isort
+# Modern Ruff-only stack (2026): Ruff replaces Black/isort/Flake8/pyupgrade in one binary.
+#   E/F/W  -- pycodestyle + pyflakes (dead code/imports, style)
+#   I      -- isort (import ordering)
+#   UP     -- pyupgrade (modernize syntax: f-strings, removed py2-isms, etc.)
+#   B      -- flake8-bugbear (likely-bug patterns: mutable default args, etc.)
+#   C4     -- flake8-comprehensions (unnecessary list()/dict() wrapping, etc.)
+#   SIM    -- flake8-simplify (needlessly complex conditionals/boolean logic)
+select = ["E", "F", "I", "W", "UP", "B", "C4", "SIM"]
 # E402 (lazy/conditional imports) and E741 (short names like l) are intentional here;
-# E501 line length is handled by black.
+# E501 line length is handled by the formatter, not the linter.
 ignore = ["E402", "E741", "E501"]
+
+# UP/B/C4/SIM were added but NOT yet swept across the existing 108-file codebase --
+# `make lint` surfaces ~306 pre-existing findings (191 auto-fixable) that predate this
+# config. That's an intentional, separate follow-up pass (like the full_*_market_scan.py
+# duplication cluster), not something auto-fixed by adding the rule. New/edited code
+# should satisfy the full set going forward.
+
+[tool.ruff.format]
+# ruff format replaces black; verified compatible output on this repo's existing
+# black-formatted files (only cosmetic differences: a blank line after module
+# docstrings, operator spacing inside f-strings).
+
+[tool.mypy]
+python_version = "3.10"
+exclude = ["deoldify\\.py", "\\.venv/", "cache_seed/", "docs_cache/"]
+ignore_missing_imports = true
+# This codebase has no type-annotation coverage yet (research/data-science scripts,
+# not a typed library). mypy is wired up and available (`make typecheck`) but left
+# permissive rather than strict -- tighten incrementally, module by module, as real
+# type annotations get added, instead of retrofitting `Any` everywhere to silence it.
+check_untyped_defs = false
+disallow_untyped_defs = false
+
+[tool.pylint.similarities]
+# pylint --disable=all --enable=duplicate-code, i.e. `make duplicates` --
+# a second, cross-file duplication detector alongside jscpd, since Pylint's is
+# Python-AST-aware (catches renamed-variable near-duplicates jscpd's tokenizer can
+# miss) where jscpd is faster and language-agnostic.
+min-similarity-lines = 10
+ignore-comments = true
+ignore-docstrings = true
+ignore-imports = true
+
+[tool.bandit]
+# `make security` -- exclude generated/data directories, not source code.
+exclude_dirs = [".venv", "cache_seed", "docs_cache"]

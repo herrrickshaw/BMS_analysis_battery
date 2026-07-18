@@ -8,6 +8,7 @@ it writes with that batch_id, and closes the batch (success/failed, final
 row_count) when done. See warehouse_versioning.sql for the schema and the
 "accumulate, don't overwrite" rationale.
 """
+
 from __future__ import annotations
 
 import subprocess

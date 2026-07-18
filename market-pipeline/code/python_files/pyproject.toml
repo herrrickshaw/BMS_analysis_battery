@@ -1,0 +1,13 @@
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]   # pyflakes (dead code/imports), pycodestyle, isort
+# E402 (lazy/conditional imports) and E741 (short names like l) are intentional here;
+# E501 line length is handled by black.
+ignore = ["E402", "E741", "E501"]

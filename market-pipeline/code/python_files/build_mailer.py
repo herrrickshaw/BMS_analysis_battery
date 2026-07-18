@@ -116,9 +116,20 @@ def _market_picks_rows(data: dict, market: str, cap: int = 12):
     return rows
 
 
-def _eu_picks_rows(top: int = 15):
-    """Europe has no combined JSON — read the EU scan's Fundamentals sheet directly."""
-    files = sorted(glob.glob("european_scan/european_market_scan*.xlsx"))
+def _pio(v):
+    try:
+        return int(float(v))
+    except Exception:
+        return None
+
+
+def _fundamentals_picks_rows(glob_pattern: str, ticker_cols: list, has_strong_flag: bool,
+                              coffee_col: str, top: int = 15):
+    """Shared by _eu_picks_rows()/_jp_picks_rows()/_kr_picks_rows() -- these 3 markets
+    have no combined JSON, so each reads its own scan's Fundamentals sheet directly.
+    EU has no Piotroski_Strong flag (has_strong_flag=False collapses pio_ok to a plain
+    score>=7 check, matching EU's original filter exactly); JP/KR do."""
+    files = sorted(glob.glob(glob_pattern))
     if not files:
         return []
     try:
@@ -129,119 +140,57 @@ def _eu_picks_rows(top: int = 15):
     except Exception:
         return []
 
-    def _pio(v):
-        try:
-            return int(float(v))
-        except Exception:
-            return None
-
     cands = []
     for _, r in fd.iterrows():
         pio = _pio(r.get("Piotroski_Score"))
-        cc = str(r.get("CoffeeCan_Class", "")).upper() == "PASS"
-        if not ((pio is not None and pio >= 7) or cc):
-            continue
-        cands.append((pio, cc, r))
-    cands.sort(key=lambda x: -(x[0] if x[0] is not None else -1))
-
-    rows = []
-    for pio, cc, r in cands[:top]:
-        sym = str(r.get("Symbol", "")).strip()
-        name = str(r.get("Name", "") or sym).split(",")[0]
-        tier = "Triple Hit" if (pio is not None and pio >= 7 and cc) else "Multi-Screen"
-        screens = "+".join(s for s, ok in (("Piotroski", pio is not None and pio >= 7),
-                                            ("CoffeeCan", cc)) if ok) or "—"
-        rows.append(f"<tr><td style='padding:4px 8px'><b>{sym}</b></td><td>{name}</td>"
-                    f"<td>{tier}</td><td>{screens}</td>"
-                    f"<td>{'n/a' if pio is None else pio}</td></tr>")
-    return rows
-
-
-def _jp_picks_rows(top: int = 15):
-    """Japan has no combined JSON — read the JP scan's Fundamentals sheet directly.
-    Mirrors _eu_picks_rows(); Japan's sheet uses Piotroski_Strong (YES/NO) and a
-    plain CoffeeCan (PASS/FAIL) column rather than EU's *_Class columns."""
-    files = sorted(glob.glob("japan_scan/japan_market_scan*.xlsx"))
-    if not files:
-        return []
-    try:
-        xl = pd.ExcelFile(files[-1])
-        if "Fundamentals" not in xl.sheet_names:
-            return []
-        fd = pd.read_excel(files[-1], sheet_name="Fundamentals")
-    except Exception:
-        return []
-
-    def _pio(v):
-        try:
-            return int(float(v))
-        except Exception:
-            return None
-
-    cands = []
-    for _, r in fd.iterrows():
-        pio = _pio(r.get("Piotroski_Score"))
-        strong = str(r.get("Piotroski_Strong", "")).upper() == "YES"
-        cc = str(r.get("CoffeeCan", "")).upper() == "PASS"
-        if not (strong or cc or (pio is not None and pio >= 7)):
-            continue
-        cands.append((pio, strong, cc, r))
-    cands.sort(key=lambda x: -(x[0] if x[0] is not None else -1))
-
-    rows = []
-    for pio, strong, cc, r in cands[:top]:
-        code = str(r.get("Code", "") or r.get("YF_Ticker", "") or "").strip()
-        name = str(r.get("Name", "") or code).split(",")[0]
+        strong = has_strong_flag and str(r.get("Piotroski_Strong", "")).upper() == "YES"
+        cc = str(r.get(coffee_col, "")).upper() == "PASS"
         pio_ok = strong or (pio is not None and pio >= 7)
+        if not (pio_ok or cc):
+            continue
+        cands.append((pio, pio_ok, cc, r))
+    cands.sort(key=lambda x: -(x[0] if x[0] is not None else -1))
+
+    rows = []
+    for pio, pio_ok, cc, r in cands[:top]:
+        code = ""
+        for c in ticker_cols:
+            code = str(r.get(c, "") or "").strip()
+            if code:
+                break
+        name = str(r.get("Name", "") or code).split(",")[0]
         tier = "Triple Hit" if (pio_ok and cc) else "Multi-Screen"
         screens = "+".join(s for s, ok in (("Piotroski", pio_ok), ("CoffeeCan", cc)) if ok) or "—"
         rows.append(f"<tr><td style='padding:4px 8px'><b>{code}</b></td><td>{name}</td>"
                     f"<td>{tier}</td><td>{screens}</td>"
                     f"<td>{'n/a' if pio is None else pio}</td></tr>")
     return rows
+
+
+def _eu_picks_rows(top: int = 15):
+    """Europe has no combined JSON — read the EU scan's Fundamentals sheet directly."""
+    return _fundamentals_picks_rows(
+        "european_scan/european_market_scan*.xlsx",
+        ticker_cols=["Symbol"], has_strong_flag=False, coffee_col="CoffeeCan_Class", top=top,
+    )
+
+
+def _jp_picks_rows(top: int = 15):
+    """Japan has no combined JSON — read the JP scan's Fundamentals sheet directly.
+    Uses Piotroski_Strong (YES/NO) and a plain CoffeeCan (PASS/FAIL) column."""
+    return _fundamentals_picks_rows(
+        "japan_scan/japan_market_scan*.xlsx",
+        ticker_cols=["Code", "YF_Ticker"], has_strong_flag=True, coffee_col="CoffeeCan", top=top,
+    )
 
 
 def _kr_picks_rows(top: int = 15):
     """Korea has no combined JSON — read the KR scan's Fundamentals sheet directly.
     Same shape as _jp_picks_rows() (Piotroski_Strong YES/NO + CoffeeCan PASS/FAIL)."""
-    files = sorted(glob.glob("korea_scan/korea_market_scan*.xlsx"))
-    if not files:
-        return []
-    try:
-        xl = pd.ExcelFile(files[-1])
-        if "Fundamentals" not in xl.sheet_names:
-            return []
-        fd = pd.read_excel(files[-1], sheet_name="Fundamentals")
-    except Exception:
-        return []
-
-    def _pio(v):
-        try:
-            return int(float(v))
-        except Exception:
-            return None
-
-    cands = []
-    for _, r in fd.iterrows():
-        pio = _pio(r.get("Piotroski_Score"))
-        strong = str(r.get("Piotroski_Strong", "")).upper() == "YES"
-        cc = str(r.get("CoffeeCan", "")).upper() == "PASS"
-        if not (strong or cc or (pio is not None and pio >= 7)):
-            continue
-        cands.append((pio, strong, cc, r))
-    cands.sort(key=lambda x: -(x[0] if x[0] is not None else -1))
-
-    rows = []
-    for pio, strong, cc, r in cands[:top]:
-        code = str(r.get("Code", "") or r.get("YF_Ticker", "") or "").strip()
-        name = str(r.get("Name", "") or code).split(",")[0]
-        pio_ok = strong or (pio is not None and pio >= 7)
-        tier = "Triple Hit" if (pio_ok and cc) else "Multi-Screen"
-        screens = "+".join(s for s, ok in (("Piotroski", pio_ok), ("CoffeeCan", cc)) if ok) or "—"
-        rows.append(f"<tr><td style='padding:4px 8px'><b>{code}</b></td><td>{name}</td>"
-                    f"<td>{tier}</td><td>{screens}</td>"
-                    f"<td>{'n/a' if pio is None else pio}</td></tr>")
-    return rows
+    return _fundamentals_picks_rows(
+        "korea_scan/korea_market_scan*.xlsx",
+        ticker_cols=["Code", "YF_Ticker"], has_strong_flag=True, coffee_col="CoffeeCan", top=top,
+    )
 
 
 def _convergence_html(label: str, data: dict) -> str:

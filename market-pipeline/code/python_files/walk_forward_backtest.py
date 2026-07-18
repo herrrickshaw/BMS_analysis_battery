@@ -125,7 +125,7 @@ import sys
 import time
 import warnings
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timedelta, date as _date
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import numpy as np
@@ -1119,7 +1119,7 @@ def print_summary(matrix: pd.DataFrame, overfit: pd.DataFrame, all_stats: pd.Dat
 # 8. MAIN ORCHESTRATOR
 # ══════════════════════════════════════════════════════════════════════════════
 
-def run_period(period_key: str, period_cfg: dict,
+def run_period(period_cfg: dict,
                ohlc_map: dict, index_df: pd.DataFrame,
                symbol_list: list, filing_cache: dict,
                workers: int, run_filings: bool) -> pd.DataFrame:
@@ -1315,7 +1315,7 @@ def main(periods: list = None, top: int = 0, workers: int = MAX_WORKERS,
 
     for pk, pcfg in active_periods.items():
         print(f"\nStep 5 — Backtesting period: {pk} …")
-        sig_df = run_period(pk, pcfg, ohlc_map, index_df,
+        sig_df = run_period(pcfg, ohlc_map, index_df,
                             symbol_list, filing_cache, workers, run_filings)
         if sig_df.empty:
             print(f"  No signals for period {pk}")

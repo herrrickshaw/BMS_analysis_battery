@@ -97,7 +97,6 @@ except ImportError:
     _USE_NSE_FETCHER = False
 
 try:
-    import bseindia
     import bseindia.libutil as _bse_lib
     _BSE_SECURITY_URL = _bse_lib.SECURITY_MASTER_URL
 except ImportError:

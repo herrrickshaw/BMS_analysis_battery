@@ -291,6 +291,13 @@ def bulk_download_ohlc(tickers: list[str], period: str = "1y") -> dict[str, pd.D
 
 
 # ── Darvas Box ────────────────────────────────────────────────────────────────
+# The box-detection loop (darvas_box_core) is shared with the other 4
+# full_*_market_scan.py files via stock_utils.py -- verified line-identical.
+# This wrapper's rounding (0dp -- JPY has no minor currency subunit in
+# practice) and output dict shape (upside_pct/pos_in_box, no box_range) stay
+# local: genuinely different per market (see darvas_box_core's docstring).
+from stock_utils import darvas_box_core  # noqa: E402
+
 
 def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
     if df is None or df.empty or len(df) < confirm + 5:
@@ -303,34 +310,11 @@ def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
     current = closes[-1]
     h = highs[:-1]   # exclude current bar
     l = lows[:-1]
-    n = len(h)
 
-    box_top_idx = box_top = None
-    for i in range(n - confirm - 1, -1, -1):
-        c = h[i]
-        if c == 0:
-            continue
-        w = h[i + 1: i + 1 + confirm]
-        if len(w) == confirm and all(x < c for x in w):
-            box_top_idx, box_top = i, c
-            break
+    box_top_idx, box_top, box_bottom = darvas_box_core(h, l, confirm)
 
     if box_top is None:
         return {"signal": "NO_BOX", "box_top": None, "box_bottom": None, "current_price": current}
-
-    seg = l[box_top_idx:]
-    box_bottom = None
-    for i in range(len(seg) - confirm):
-        c = seg[i]
-        if c == 0:
-            continue
-        w = seg[i + 1: i + 1 + confirm]
-        if len(w) == confirm and all(x > c for x in w):
-            box_bottom = c
-            break
-    if box_bottom is None:
-        valid = [x for x in seg if x > 0]
-        box_bottom = min(valid) if valid else None
 
     if box_bottom is None:
         return {"signal": "NO_BOX", "box_top": round(box_top, 0), "box_bottom": None,
@@ -355,35 +339,9 @@ def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
 
 
 # ── Fundamental helpers ───────────────────────────────────────────────────────
-
-def _first_df(ticker, *attrs):
-    for attr in attrs:
-        df = getattr(ticker, attr, None)
-        if df is not None and isinstance(df, pd.DataFrame) and not df.empty:
-            return df
-    return None
-
-
-def _row(df, *names, col: int = 0):
-    if df is None or df.empty:
-        return None
-    for name in names:
-        if name in df.index:
-            try:
-                val = df.loc[name].iloc[col]
-                return float(val) if pd.notna(val) else None
-            except Exception:
-                pass
-    return None
-
-
-def _series(df, *names):
-    if df is None or df.empty:
-        return []
-    for name in names:
-        if name in df.index:
-            return [float(v) for v in df.loc[name].dropna() if pd.notna(v)]
-    return []
+# Verified byte-identical (modulo *args naming) to the copies already removed
+# from full_indian_market_scan.py / full_us_market_scan.py in favor of these.
+from stock_utils import first_df as _first_df, row as _row, series as _series  # noqa: E402
 
 
 # ── Fundamental scan ─────────────────────────────────────────────────────────

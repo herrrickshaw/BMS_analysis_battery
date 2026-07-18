@@ -34,6 +34,14 @@ Design mirrors load_signals_to_warehouse.py:
     class of bug load_signals_to_warehouse.py hit and fixed for
     fact_screener_signal.
 
+Versioning (see warehouse_versioning.sql): every run opens a load_batches
+row via warehouse_batch.start_batch(), tags every staged row with that
+batch_id, and the natural key is (stock_id, date, batch_id) -- so a reload
+no longer overwrites the prior load's values in place, it adds a new,
+separately-queryable version. Query ohlcv_history_current for "latest
+value per (stock_id, date)", matching this script's pre-versioning
+behavior.
+
 Usage:
     .venv/bin/python3 load_ohlcv_to_warehouse.py                 # load all 3, smallest first (korea, japan, usa)
     .venv/bin/python3 load_ohlcv_to_warehouse.py --only korea
@@ -50,6 +58,8 @@ from pathlib import Path
 import pandas as pd
 import psycopg2
 import psycopg2.extras
+
+from warehouse_batch import start_batch, finish_batch
 
 SRC_DIR = Path("/Users/umashankar/repos/global-stock-screener/cache_seed/ltm")
 
@@ -137,7 +147,7 @@ def copy_dataframe(conn, df: pd.DataFrame, table: str, columns: list[str]) -> No
 
 
 STAGING_COLS = ["stock_id", "date", "open_price", "high_price", "low_price",
-                 "close_price", "volume", "adj_close"]
+                 "close_price", "volume", "adj_close", "batch_id"]
 
 
 def load_ohlcv_file(conn, path: Path, market: str, dry_run: bool = False,
@@ -177,43 +187,57 @@ def load_ohlcv_file(conn, path: Path, market: str, dry_run: bool = False,
         "Open": "open_price", "High": "high_price", "Low": "low_price",
         "Close": "close_price", "Volume": "volume",
     })
-    df = df[STAGING_COLS]
 
     if dry_run:
         log(f"  [dry-run] would stage/upsert {len(df):,} rows, {n_new} new stocks rows")
         return len(df), n_new
 
+    batch_id = start_batch(conn, "ohlcv_history", f"ohlcv_{market}", str(path))
+    df["batch_id"] = batch_id
+    df = df[STAGING_COLS]
+    log(f"  opened batch_id={batch_id}")
+
     total = 0
-    with conn.cursor() as cur:
-        cur.execute("DROP TABLE IF EXISTS stg_ohlcv")
-        cur.execute("CREATE TEMP TABLE stg_ohlcv (LIKE ohlcv_history INCLUDING DEFAULTS)")
-        cur.execute("ALTER TABLE stg_ohlcv DROP COLUMN ohlcv_id, DROP COLUMN created_at")
-    conn.commit()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("DROP TABLE IF EXISTS stg_ohlcv")
+            cur.execute("CREATE TEMP TABLE stg_ohlcv (LIKE ohlcv_history INCLUDING DEFAULTS)")
+            cur.execute("ALTER TABLE stg_ohlcv DROP COLUMN ohlcv_id, DROP COLUMN created_at")
+        conn.commit()
 
-    for start in range(0, len(df), chunksize):
-        chunk = df.iloc[start:start + chunksize]
-        copy_dataframe(conn, chunk, "stg_ohlcv", STAGING_COLS)
-        total += len(chunk)
-        log(f"  staged {total:,}/{len(df):,} rows")
+        for start in range(0, len(df), chunksize):
+            chunk = df.iloc[start:start + chunksize]
+            copy_dataframe(conn, chunk, "stg_ohlcv", STAGING_COLS)
+            total += len(chunk)
+            log(f"  staged {total:,}/{len(df):,} rows")
 
-    with conn.cursor() as cur:
-        cur.execute(f"""
-            INSERT INTO ohlcv_history ({', '.join(STAGING_COLS)})
-            SELECT DISTINCT ON (stock_id, date)
-                {', '.join(STAGING_COLS)}
-            FROM stg_ohlcv
-            ORDER BY stock_id, date
-            ON CONFLICT (stock_id, date) DO UPDATE SET
-                open_price = EXCLUDED.open_price,
-                high_price = EXCLUDED.high_price,
-                low_price = EXCLUDED.low_price,
-                close_price = EXCLUDED.close_price,
-                volume = EXCLUDED.volume,
-                adj_close = EXCLUDED.adj_close
-        """)
-        inserted = cur.rowcount
-    conn.commit()
-    log(f"  upserted {inserted:,} rows into ohlcv_history")
+        with conn.cursor() as cur:
+            # batch_id is always new here, so ON CONFLICT (stock_id, date,
+            # batch_id) only fires if this exact batch is resumed after a
+            # crash -- DO UPDATE keeps that resume idempotent without
+            # creating duplicate history rows for the same batch.
+            cur.execute(f"""
+                INSERT INTO ohlcv_history ({', '.join(STAGING_COLS)})
+                SELECT DISTINCT ON (stock_id, date)
+                    {', '.join(STAGING_COLS)}
+                FROM stg_ohlcv
+                ORDER BY stock_id, date
+                ON CONFLICT (stock_id, date, batch_id) DO UPDATE SET
+                    open_price = EXCLUDED.open_price,
+                    high_price = EXCLUDED.high_price,
+                    low_price = EXCLUDED.low_price,
+                    close_price = EXCLUDED.close_price,
+                    volume = EXCLUDED.volume,
+                    adj_close = EXCLUDED.adj_close
+            """)
+            inserted = cur.rowcount
+        conn.commit()
+        log(f"  inserted {inserted:,} rows into ohlcv_history (batch_id={batch_id})")
+        finish_batch(conn, batch_id, inserted, status="success")
+    except Exception as e:
+        conn.rollback()
+        finish_batch(conn, batch_id, 0, status="failed", notes=str(e)[:500])
+        raise
     return inserted, n_new
 
 

@@ -13,7 +13,11 @@ market_data Postgres warehouse's new fact tables:
     fact_short_interest       <- short_interest_us.parquet
     fact_insider_transaction  <- insider_transactions_us.parquet
 
-See warehouse_schema_signals.sql for the DDL / ON CONFLICT rationale.
+See warehouse_schema_signals.sql for the DDL / ON CONFLICT rationale, and
+warehouse_versioning.sql for how batch_id versioning changes that (each
+run's rows accumulate as a new batch instead of overwriting the prior
+run's values in place -- query the `<table>_current` views for "latest
+value per natural key", matching this script's pre-versioning behavior).
 
 Usage:
     .venv/bin/python3 load_signals_to_warehouse.py                # load all 7, smallest first
@@ -46,6 +50,8 @@ from pathlib import Path
 import pandas as pd
 import psycopg2
 import psycopg2.extras
+
+from warehouse_batch import start_batch, finish_batch
 
 CACHE_DIR = Path("/Users/umashankar/market-pipeline/code/python_files/cache_seed")
 
@@ -157,6 +163,9 @@ def load_screener_file(conn, path: Path, market: str, chunksize: int = 200_000) 
     df = pd.read_parquet(path)
     log(f"  read {len(df):,} rows, columns={list(df.columns)}")
 
+    batch_id = start_batch(conn, "fact_screener_signal", f"screener_{market}", str(path))
+    log(f"  opened batch_id={batch_id}")
+
     df["bare_ticker"] = df["symbol"].map(lambda s: strip_suffix(s, market))
     ticker_map = resolve_stock_ids(conn, df["bare_ticker"], market)
     df["stock_id"] = df["bare_ticker"].map(ticker_map)
@@ -170,13 +179,14 @@ def load_screener_file(conn, path: Path, market: str, chunksize: int = 200_000) 
     df["stock_id"] = df["stock_id"].astype(int)
     df["market_id"] = MARKET_IDS[market]
     df["signal_date"] = pd.to_datetime(df["signal_date"]).dt.date
+    df["batch_id"] = batch_id
 
     rename = dict(zip(SCREENER_RET_COLS, SCREENER_RET_DEST))
     df = df.rename(columns=rename)
 
     staging_cols = [
         "stock_id", "market_id", "signal_date", "screener", "year",
-        *SCREENER_RET_DEST, "dollar_vol_63d", "log_liquidity", "volatility_63d",
+        *SCREENER_RET_DEST, "dollar_vol_63d", "log_liquidity", "volatility_63d", "batch_id",
     ]
     for c in staging_cols:
         if c not in df.columns:
@@ -184,41 +194,50 @@ def load_screener_file(conn, path: Path, market: str, chunksize: int = 200_000) 
     df = df[staging_cols].rename(columns={"year": "signal_year"})
     staging_cols = [c if c != "year" else "signal_year" for c in staging_cols]
 
-    total = 0
-    with conn.cursor() as cur:
-        cur.execute("DROP TABLE IF EXISTS stg_screener_signal")
-        cur.execute("CREATE TEMP TABLE stg_screener_signal (LIKE fact_screener_signal INCLUDING DEFAULTS)")
-        cur.execute("ALTER TABLE stg_screener_signal DROP COLUMN signal_id, DROP COLUMN loaded_at")
-    conn.commit()
+    try:
+        total = 0
+        with conn.cursor() as cur:
+            cur.execute("DROP TABLE IF EXISTS stg_screener_signal")
+            cur.execute("CREATE TEMP TABLE stg_screener_signal (LIKE fact_screener_signal INCLUDING DEFAULTS)")
+            cur.execute("ALTER TABLE stg_screener_signal DROP COLUMN signal_id, DROP COLUMN loaded_at")
+        conn.commit()
 
-    for start in range(0, len(df), chunksize):
-        chunk = df.iloc[start:start + chunksize]
-        copy_dataframe(conn, chunk, "stg_screener_signal", staging_cols)
-        total += len(chunk)
-        log(f"  staged {total:,}/{len(df):,} rows")
+        for start in range(0, len(df), chunksize):
+            chunk = df.iloc[start:start + chunksize]
+            copy_dataframe(conn, chunk, "stg_screener_signal", staging_cols)
+            total += len(chunk)
+            log(f"  staged {total:,}/{len(df):,} rows")
 
-    with conn.cursor() as cur:
-        cur.execute(f"""
-            INSERT INTO fact_screener_signal (
-                stock_id, market_id, signal_date, screener, signal_year,
-                {', '.join(SCREENER_RET_DEST)}, dollar_vol_63d, log_liquidity, volatility_63d
-            )
-            SELECT DISTINCT ON (stock_id, signal_date, screener)
-                stock_id, market_id, signal_date, screener, signal_year,
-                {', '.join(SCREENER_RET_DEST)}, dollar_vol_63d, log_liquidity, volatility_63d
-            FROM stg_screener_signal
-            ORDER BY stock_id, signal_date, screener
-            ON CONFLICT (stock_id, signal_date, screener) DO UPDATE SET
-                {', '.join(f"{c} = EXCLUDED.{c}" for c in SCREENER_RET_DEST)},
-                dollar_vol_63d = EXCLUDED.dollar_vol_63d,
-                log_liquidity = EXCLUDED.log_liquidity,
-                volatility_63d = EXCLUDED.volatility_63d,
-                signal_year = EXCLUDED.signal_year,
-                loaded_at = CURRENT_TIMESTAMP
-        """)
-        inserted = cur.rowcount
-    conn.commit()
-    log(f"  upserted {inserted:,} rows into fact_screener_signal")
+        with conn.cursor() as cur:
+            # batch_id is always new here, so ON CONFLICT (nat key, batch_id)
+            # only fires on a resumed/re-run of this exact batch -- DO UPDATE
+            # keeps that resume idempotent without duplicating history rows.
+            cur.execute(f"""
+                INSERT INTO fact_screener_signal (
+                    stock_id, market_id, signal_date, screener, signal_year,
+                    {', '.join(SCREENER_RET_DEST)}, dollar_vol_63d, log_liquidity, volatility_63d, batch_id
+                )
+                SELECT DISTINCT ON (stock_id, signal_date, screener)
+                    stock_id, market_id, signal_date, screener, signal_year,
+                    {', '.join(SCREENER_RET_DEST)}, dollar_vol_63d, log_liquidity, volatility_63d, batch_id
+                FROM stg_screener_signal
+                ORDER BY stock_id, signal_date, screener
+                ON CONFLICT (stock_id, signal_date, screener, batch_id) DO UPDATE SET
+                    {', '.join(f"{c} = EXCLUDED.{c}" for c in SCREENER_RET_DEST)},
+                    dollar_vol_63d = EXCLUDED.dollar_vol_63d,
+                    log_liquidity = EXCLUDED.log_liquidity,
+                    volatility_63d = EXCLUDED.volatility_63d,
+                    signal_year = EXCLUDED.signal_year,
+                    loaded_at = CURRENT_TIMESTAMP
+            """)
+            inserted = cur.rowcount
+        conn.commit()
+        log(f"  inserted {inserted:,} rows into fact_screener_signal (batch_id={batch_id})")
+        finish_batch(conn, batch_id, inserted, status="success")
+    except Exception as e:
+        conn.rollback()
+        finish_batch(conn, batch_id, 0, status="failed", notes=str(e)[:500])
+        raise
     return inserted
 
 
@@ -226,6 +245,9 @@ def load_short_interest(conn, path: Path, chunksize: int = 50_000) -> int:
     log(f"Loading short interest file {path.name} (market=usa)")
     df = pd.read_parquet(path)
     log(f"  read {len(df):,} rows, columns={list(df.columns)}")
+
+    batch_id = start_batch(conn, "fact_short_interest", "short_interest_us", str(path))
+    log(f"  opened batch_id={batch_id}")
 
     ticker_map = resolve_stock_ids(conn, df["symbol"], "usa")
     df["stock_id"] = df["symbol"].map(ticker_map)
@@ -257,45 +279,52 @@ def load_short_interest(conn, path: Path, chunksize: int = 50_000) -> int:
         "issuer_services_group_exchange_code", "market_class_code",
         "current_short_position_quantity", "previous_short_position_quantity",
         "stock_split_flag", "average_daily_volume_quantity", "days_to_cover_quantity",
-        "revision_flag", "change_percent", "change_previous_number",
+        "revision_flag", "change_percent", "change_previous_number", "batch_id",
     ]
+    df["batch_id"] = batch_id
     df = df[staging_cols]
 
-    total = 0
-    with conn.cursor() as cur:
-        cur.execute("DROP TABLE IF EXISTS stg_short_interest")
-        cur.execute("CREATE TEMP TABLE stg_short_interest (LIKE fact_short_interest INCLUDING DEFAULTS)")
-        cur.execute("ALTER TABLE stg_short_interest DROP COLUMN short_interest_id, DROP COLUMN loaded_at")
-    conn.commit()
+    try:
+        total = 0
+        with conn.cursor() as cur:
+            cur.execute("DROP TABLE IF EXISTS stg_short_interest")
+            cur.execute("CREATE TEMP TABLE stg_short_interest (LIKE fact_short_interest INCLUDING DEFAULTS)")
+            cur.execute("ALTER TABLE stg_short_interest DROP COLUMN short_interest_id, DROP COLUMN loaded_at")
+        conn.commit()
 
-    for start in range(0, len(df), chunksize):
-        chunk = df.iloc[start:start + chunksize]
-        copy_dataframe(conn, chunk, "stg_short_interest", staging_cols)
-        total += len(chunk)
-    log(f"  staged {total:,} rows")
+        for start in range(0, len(df), chunksize):
+            chunk = df.iloc[start:start + chunksize]
+            copy_dataframe(conn, chunk, "stg_short_interest", staging_cols)
+            total += len(chunk)
+        log(f"  staged {total:,} rows")
 
-    with conn.cursor() as cur:
-        cur.execute(f"""
-            INSERT INTO fact_short_interest ({', '.join(staging_cols)})
-            SELECT {', '.join(staging_cols)} FROM stg_short_interest
-            ON CONFLICT (stock_id, settlement_date) DO UPDATE SET
-                accounting_year_month_number = EXCLUDED.accounting_year_month_number,
-                issue_name = EXCLUDED.issue_name,
-                issuer_services_group_exchange_code = EXCLUDED.issuer_services_group_exchange_code,
-                market_class_code = EXCLUDED.market_class_code,
-                current_short_position_quantity = EXCLUDED.current_short_position_quantity,
-                previous_short_position_quantity = EXCLUDED.previous_short_position_quantity,
-                stock_split_flag = EXCLUDED.stock_split_flag,
-                average_daily_volume_quantity = EXCLUDED.average_daily_volume_quantity,
-                days_to_cover_quantity = EXCLUDED.days_to_cover_quantity,
-                revision_flag = EXCLUDED.revision_flag,
-                change_percent = EXCLUDED.change_percent,
-                change_previous_number = EXCLUDED.change_previous_number,
-                loaded_at = CURRENT_TIMESTAMP
-        """)
-        inserted = cur.rowcount
-    conn.commit()
-    log(f"  upserted {inserted:,} rows into fact_short_interest")
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                INSERT INTO fact_short_interest ({', '.join(staging_cols)})
+                SELECT {', '.join(staging_cols)} FROM stg_short_interest
+                ON CONFLICT (stock_id, settlement_date, batch_id) DO UPDATE SET
+                    accounting_year_month_number = EXCLUDED.accounting_year_month_number,
+                    issue_name = EXCLUDED.issue_name,
+                    issuer_services_group_exchange_code = EXCLUDED.issuer_services_group_exchange_code,
+                    market_class_code = EXCLUDED.market_class_code,
+                    current_short_position_quantity = EXCLUDED.current_short_position_quantity,
+                    previous_short_position_quantity = EXCLUDED.previous_short_position_quantity,
+                    stock_split_flag = EXCLUDED.stock_split_flag,
+                    average_daily_volume_quantity = EXCLUDED.average_daily_volume_quantity,
+                    days_to_cover_quantity = EXCLUDED.days_to_cover_quantity,
+                    revision_flag = EXCLUDED.revision_flag,
+                    change_percent = EXCLUDED.change_percent,
+                    change_previous_number = EXCLUDED.change_previous_number,
+                    loaded_at = CURRENT_TIMESTAMP
+            """)
+            inserted = cur.rowcount
+        conn.commit()
+        log(f"  inserted {inserted:,} rows into fact_short_interest (batch_id={batch_id})")
+        finish_batch(conn, batch_id, inserted, status="success")
+    except Exception as e:
+        conn.rollback()
+        finish_batch(conn, batch_id, 0, status="failed", notes=str(e)[:500])
+        raise
     return inserted
 
 
@@ -303,6 +332,9 @@ def load_insider_transactions(conn, path: Path, chunksize: int = 50_000) -> int:
     log(f"Loading insider transactions file {path.name} (market=usa)")
     df = pd.read_parquet(path)
     log(f"  read {len(df):,} rows, columns={list(df.columns)}")
+
+    batch_id = start_batch(conn, "fact_insider_transaction", "insider_transactions_us", str(path))
+    log(f"  opened batch_id={batch_id}")
 
     ticker_map = resolve_stock_ids(conn, df["symbol"], "usa")
     df["stock_id"] = df["symbol"].map(ticker_map)
@@ -325,34 +357,46 @@ def load_insider_transactions(conn, path: Path, chunksize: int = 50_000) -> int:
 
     staging_cols = [
         "stock_id", "accession_number", "trans_date", "filing_date",
-        "trans_code", "trans_shares", "trans_price_per_share", "quarter",
+        "trans_code", "trans_shares", "trans_price_per_share", "quarter", "batch_id",
     ]
+    df["batch_id"] = batch_id
     df = df[staging_cols]
 
-    total = 0
-    with conn.cursor() as cur:
-        cur.execute("DROP TABLE IF EXISTS stg_insider_transaction")
-        cur.execute("CREATE TEMP TABLE stg_insider_transaction (LIKE fact_insider_transaction INCLUDING DEFAULTS)")
-        cur.execute("ALTER TABLE stg_insider_transaction DROP COLUMN insider_txn_id, DROP COLUMN loaded_at")
-    conn.commit()
+    try:
+        total = 0
+        with conn.cursor() as cur:
+            cur.execute("DROP TABLE IF EXISTS stg_insider_transaction")
+            cur.execute("CREATE TEMP TABLE stg_insider_transaction (LIKE fact_insider_transaction INCLUDING DEFAULTS)")
+            cur.execute("ALTER TABLE stg_insider_transaction DROP COLUMN insider_txn_id, DROP COLUMN loaded_at")
+        conn.commit()
 
-    for start in range(0, len(df), chunksize):
-        chunk = df.iloc[start:start + chunksize]
-        copy_dataframe(conn, chunk, "stg_insider_transaction", staging_cols)
-        total += len(chunk)
-    log(f"  staged {total:,} rows")
+        for start in range(0, len(df), chunksize):
+            chunk = df.iloc[start:start + chunksize]
+            copy_dataframe(conn, chunk, "stg_insider_transaction", staging_cols)
+            total += len(chunk)
+        log(f"  staged {total:,} rows")
 
-    with conn.cursor() as cur:
-        cur.execute(f"""
-            INSERT INTO fact_insider_transaction ({', '.join(staging_cols)})
-            SELECT {', '.join(staging_cols)} FROM stg_insider_transaction
-            ON CONFLICT (accession_number, stock_id, trans_date, trans_code, trans_shares, trans_price_per_share)
-            DO NOTHING
-        """)
-        inserted = cur.rowcount
-    conn.commit()
-    log(f"  inserted {inserted:,} new rows into fact_insider_transaction "
-        f"({len(df) - inserted:,} were exact-duplicate natural keys, skipped)")
+        with conn.cursor() as cur:
+            # Natural key is NOT extended with batch_id here -- a filed
+            # Form 4 transaction is immutable, so a reload hitting the same
+            # key is the same record, not a new version (see
+            # warehouse_versioning.sql). batch_id is still recorded on
+            # every row for load-lineage.
+            cur.execute(f"""
+                INSERT INTO fact_insider_transaction ({', '.join(staging_cols)})
+                SELECT {', '.join(staging_cols)} FROM stg_insider_transaction
+                ON CONFLICT (accession_number, stock_id, trans_date, trans_code, trans_shares, trans_price_per_share)
+                DO NOTHING
+            """)
+            inserted = cur.rowcount
+        conn.commit()
+        log(f"  inserted {inserted:,} new rows into fact_insider_transaction (batch_id={batch_id}) "
+            f"({len(df) - inserted:,} were exact-duplicate natural keys, skipped)")
+        finish_batch(conn, batch_id, inserted, status="success")
+    except Exception as e:
+        conn.rollback()
+        finish_batch(conn, batch_id, 0, status="failed", notes=str(e)[:500])
+        raise
     return inserted
 
 

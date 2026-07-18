@@ -16,6 +16,13 @@
 --
 -- Apply with:
 --   psql -h /tmp -U umashankar -d market_data -f warehouse_schema_signals.sql
+--
+-- Versioning note: warehouse_versioning.sql (applied after this file) adds
+-- a batch_id column + load_batches lineage table to every table below
+-- except fact_insider_transaction's natural key, so reloads accumulate
+-- history instead of overwriting in place. Query the `<table>_current`
+-- views it creates for "latest value per natural key" (same shape as
+-- querying these base tables directly, pre-versioning).
 
 -- =====================================================================
 -- fact_screener_signal

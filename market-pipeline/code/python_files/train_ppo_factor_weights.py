@@ -180,6 +180,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--market", choices=["us", "india"], required=True)
     ap.add_argument("--timesteps", type=int, default=TOTAL_TIMESTEPS)
+    ap.add_argument("--ent-coef", type=float, default=0.0,
+                     help="PPO entropy bonus coefficient (sb3 default 0.0 -- no exploration "
+                          "pressure beyond the policy's own Gaussian noise). Phase 4's baseline "
+                          "run at 0.0 produced corner-solution weight vectors (US BULL put 96%% "
+                          "of weight on 2 of 11 factors) alongside large TRAIN-TEST gaps -- a "
+                          "classic small-sample overfitting signature. A positive value penalizes "
+                          "low-entropy (concentrated) actions during training, pushing toward more "
+                          "diffuse weight vectors that are less likely to be fitting training-period "
+                          "noise in 1-2 factors.")
     args = ap.parse_args()
 
     factors = CURATED_FACTORS_COMMON + (US_ONLY_FACTORS if args.market == "us" else [])
@@ -205,8 +214,10 @@ def main():
     train_env = Monitor(RegimeWeightedScoreEnv(train_df, factors, min_n=MIN_N, seed=42))
     test_env_raw = RegimeWeightedScoreEnv(test_df, factors, min_n=MIN_N, seed=43)
 
-    print(f"\n=== Training PPO ({args.timesteps:,} timesteps, {len(factors)} factors) ===")
-    model = PPO("MlpPolicy", train_env, verbose=0, seed=42, n_steps=256, batch_size=64)
+    print(f"\n=== Training PPO ({args.timesteps:,} timesteps, {len(factors)} factors, "
+          f"ent_coef={args.ent_coef}) ===")
+    model = PPO("MlpPolicy", train_env, verbose=0, seed=42, n_steps=256, batch_size=64,
+                ent_coef=args.ent_coef)
     model.learn(total_timesteps=args.timesteps)
 
     print("\n=== Per-regime PPO weight vectors + train/test reward ===")
@@ -219,7 +230,8 @@ def main():
         ppo_weights[r] = weights
         train_rew, train_info = RegimeWeightedScoreEnv(train_df, factors, min_n=MIN_N).score_and_reward(r, weights)
         test_rew, test_info = test_env_raw.score_and_reward(r, weights)
-        print(f"\n  {r}:")
+        eff_n = 1.0 / np.sum(weights ** 2)  # inverse-Herfindahl "effective number of factors"
+        print(f"\n  {r}:  (effective # factors carrying weight: {eff_n:.2f} of {len(factors)})")
         for f, w in sorted(zip(factors, weights), key=lambda x: -x[1]):
             print(f"    {f:<20s} {w:6.3f}")
         train_note = train_info.get("note")

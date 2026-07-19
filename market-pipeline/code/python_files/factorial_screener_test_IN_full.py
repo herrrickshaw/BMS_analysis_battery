@@ -54,6 +54,7 @@ import factorial_screener_test as fst  # noqa: E402  -- reused verbatim, not rei
 import factorial_screener_test_IN as fst_in  # noqa: E402  -- reuse its OHLCV loader + technical wiring
 
 FUND_PATH_IN = "/Users/umashankar/repos/global-stock-screener/cache_seed/fundamentals_history/IN.parquet"
+BACKUP_PATH_IN = "/Users/umashankar/repos/global-stock-screener/cache_seed/fundamentals_history/IN_screener_only_backup.parquet"
 OUT_PATH = "/Users/umashankar/market-pipeline/code/python_files/cache_seed/factorial_screener_signals_IN_full.parquet"
 SMOKE_OUT_PATH = "/Users/umashankar/market-pipeline/code/python_files/cache_seed/factorial_screener_signals_IN_full_SMOKETEST.parquet"
 
@@ -94,11 +95,67 @@ def fix_currency_scaled_thresholds(merged: pd.DataFrame) -> pd.DataFrame:
     return merged
 
 
+def merge_backup_fields(fund: pd.DataFrame) -> pd.DataFrame:
+    """Merge in receivables/inventory/industry/cogs from IN_screener_only_
+    backup.parquet -- collected earlier this session but never merged into
+    the main IN.parquet panel (confirmed via 2026-07-18 gap analysis: these
+    three columns don't exist in IN.parquet at all). Left-merge on (ticker,
+    fy_end); coverage is PARTIAL (receivables 2,660/3,054 rows, inventory
+    2,363/3,054 in the backup file itself, and only 2,859/3,054 backup rows
+    have a matching (ticker, fy_end) in the main panel) -- missing stays
+    NaN, not fabricated, same convention as every other field in this file.
+
+    2026-07-19: backup file refreshed with a full re-collection that adds
+    dividend_amount (48.5% populated -- non-payers legitimately NaN, not
+    missing) and promoter/FII/DII/public_holding + num_shareholders (~27-30%
+    overall, but 93.6% for fy_end>=2024 specifically -- screener.in only
+    exposes a trailing ~3-year shareholding window, so older fiscal years
+    are structurally unreachable, not a collection gap; see
+    screener_history_collector.py's module docstring)."""
+    backup = pd.read_parquet(BACKUP_PATH_IN)[
+        ["ticker", "fy_end", "receivables", "inventory", "industry", "cogs",
+         "dividend_amount", "promoter_holding", "fii_holding", "dii_holding",
+         "public_holding", "num_shareholders"]
+    ]
+    backup["fy_end"] = pd.to_datetime(backup["fy_end"])
+    return fund.merge(backup, on=["ticker", "fy_end"], how="left")
+
+
+def add_working_capital_ratios(fund_scored: pd.DataFrame) -> pd.DataFrame:
+    """Quick ratio, inventory turnover (+ N-years-back), debtor days (+
+    N-years-back) -- unlocked by merge_backup_fields()'s receivables/
+    inventory/cogs columns. India-only: the backup file this depends on
+    has no US equivalent, so this stays local rather than going into the
+    shared compute_fundamental_screens()/attach_market_cap() -- same
+    "don't touch US-tested internals" discipline as
+    fix_currency_scaled_thresholds() above.
+
+    quick_ratio_pass uses >1.0, the standard textbook liquidity threshold
+    (same convention level as current_ratio elsewhere in this pipeline).
+    inventory_turnover and debtor_days are exposed as VALUES only, no
+    _pass threshold -- unlike quick ratio, a single universal cutoff for
+    either isn't a textbook convention (both are industry-dependent), so
+    inventing one here would be an ungrounded threshold, not a reused one."""
+    df = fund_scored.sort_values(["ticker", "fy_end"]).copy()
+    g = df.groupby("ticker")
+    df["quick_ratio"] = (df["current_assets"] - df["inventory"]) / df["current_liabilities"]
+    df["quick_ratio_pass"] = (df["quick_ratio"] > 1.0).astype(int)
+    df["inventory_turnover"] = df["cogs"] / df["inventory"]
+    for _n in (3, 5, 7, 10):
+        df[f"inventory_turnover_{_n}y_back"] = g["inventory_turnover"].shift(_n)
+    df["debtor_days"] = df["receivables"] / df["revenue"] * 365
+    for _n in (3, 5):
+        df[f"debtor_days_{_n}y_back"] = g["debtor_days"].shift(_n)
+    return df
+
+
 def run_fundamental_screeners(fund: pd.DataFrame, ohlcv: pd.DataFrame) -> pd.DataFrame:
     print("\nComputing fundamental signals (India)...")
+    fund = merge_backup_fields(fund)
     fund_scored = fst.compute_fundamental_screens(fund)
     fund_scored = fst.attach_market_cap(fund_scored, ohlcv)
     fund_scored = fix_currency_scaled_thresholds(fund_scored)
+    fund_scored = add_working_capital_ratios(fund_scored)
     fund_sig = fst.build_fundamental_signal_dates(fund_scored)
 
     cols = ["piotroski_pass", "coffee_can_pass", "magic_formula_pass", "bull_cartel_pass",
@@ -108,9 +165,13 @@ def run_fundamental_screeners(fund: pd.DataFrame, ohlcv: pd.DataFrame) -> pd.Dat
             "net_margin_pass", "operating_margin_pass", "pb_pass", "ps_pass",
             "ev_ebitda_pass", "peg_pass", "fcf_yield_pass",
             "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass",
-            "low_asset_growth_pass", "buyback_yield_pass"]
+            "low_asset_growth_pass", "buyback_yield_pass", "pe_pass"]
     for c in cols:
         print(f"  {c}: {fund_sig[c].sum():,} filing-level passes")
+    # quick_ratio_pass isn't in build_fundamental_signal_dates()'s shared,
+    # US-facing cols list (it depends on the India-only backup merge above)
+    # -- reported and melted separately, straight off fund_scored.
+    print(f"  quick_ratio_pass: {fund_scored['quick_ratio_pass'].sum():,} filing-level passes")
 
     fund_long = []
     for c, name in [("piotroski_pass", "piotroski"), ("coffee_can_pass", "coffee_can"),
@@ -136,10 +197,19 @@ def run_fundamental_screeners(fund: pd.DataFrame, ohlcv: pd.DataFrame) -> pd.Dat
                      ("net_debt_ebitda_pass", "net_debt_ebitda"),
                      ("ev_sales_pass", "ev_sales"),
                      ("low_asset_growth_pass", "low_asset_growth"),
-                     ("buyback_yield_pass", "buyback_yield")]:
+                     ("buyback_yield_pass", "buyback_yield"),
+                     ("pe_pass", "pe_value")]:
         sub = fund_sig[fund_sig[c] == 1][["symbol", "signal_date"]].copy()
         sub["screener"] = name
         fund_long.append(sub)
+
+    quick_sub = fund_scored.dropna(subset=["filed"])
+    quick_sub = quick_sub[quick_sub["quick_ratio_pass"] == 1][["ticker", "filed"]].rename(
+        columns={"ticker": "symbol", "filed": "signal_date"}
+    )
+    quick_sub["screener"] = "quick_ratio"
+    fund_long.append(quick_sub)
+
     fund_long = pd.concat(fund_long, ignore_index=True)
     fund_long["signal_date"] = pd.to_datetime(fund_long["signal_date"])
     fund_long["year"] = fund_long["signal_date"].dt.year
@@ -159,7 +229,7 @@ def main():
     fund_signals = run_fundamental_screeners(fund, ohlcv)
 
     all_signals = pd.concat([tech_signals, fund_signals], ignore_index=True)
-    print(f"\nTotal signals (7 technical + 27 fundamental screeners): {len(all_signals):,}")
+    print(f"\nTotal signals (7 technical + 29 fundamental screeners): {len(all_signals):,}")
     print(all_signals["screener"].value_counts())
 
     print("\nComputing forward returns (reads the full OHLCV panel into memory per symbol)...")

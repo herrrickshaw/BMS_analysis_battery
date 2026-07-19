@@ -137,7 +137,13 @@ def check_coverage(conn, market: str, peak: str, trough: str) -> pd.DataFrame:
     natural trading-day count of the market's OWN data in that window as the
     denominator (not a fixed calendar-day count), since holiday calendars
     differ by market and this avoids penalizing every symbol for exchange
-    holidays that aren't gaps."""
+    holidays that aren't gaps.
+
+    Excludes synthetic placeholder seed rows -- confirmed present in stocks
+    under names like 'USA Company 2' (1,018 rows, market_id=2) and 'South
+    Korea Company 1' (416 rows, market_id=7), i.e. `^<Market> Company <N>$`.
+    No real listed company is named that way, and no data source will ever
+    resolve these -- fetching them just wastes yfinance calls."""
     market_id = MARKET_IDS[market]
     query = """
         SELECT s.ticker, count(DISTINCT o.date) AS days_present
@@ -145,6 +151,7 @@ def check_coverage(conn, market: str, peak: str, trough: str) -> pd.DataFrame:
         LEFT JOIN ohlcv_history o
           ON o.stock_id = s.stock_id AND o.date BETWEEN %s AND %s
         WHERE s.market_id = %s
+          AND s.name !~ '^[A-Za-z ]+ Company [0-9]+$'
         GROUP BY s.ticker
     """
     df = pd.read_sql(query, conn, params=(peak, trough, market_id))
@@ -154,16 +161,79 @@ def check_coverage(conn, market: str, peak: str, trough: str) -> pd.DataFrame:
     return df.sort_values("coverage_pct")
 
 
+_KR_SUFFIX_MAP = None  # lazy, cached: bare Korea ticker -> ".KS"/".KQ"
+
+
+def _korea_suffix_map() -> dict:
+    """bare Korea ticker -> yfinance suffix (.KS for KOSPI, .KQ for KOSDAQ/
+    KOSDAQ GLOBAL). Unlike India/Japan (one suffix fits the whole market),
+    Korea genuinely needs a per-ticker lookup -- a bare 6-digit code alone
+    doesn't say which exchange it's on. pykrx (this repo's usual KRX
+    source) returned an empty ticker list on every date tried 2026-07-19 --
+    a live break in that library/its upstream, not something to route
+    around silently -- so this uses FinanceDataReader's StockListing('KRX')
+    instead, confirmed working the same day (2,872 rows, real KOSPI/KOSDAQ
+    split). KONEX-listed tickers are left unmapped (no reliable yfinance
+    suffix convention for that board) rather than guessed."""
+    global _KR_SUFFIX_MAP
+    if _KR_SUFFIX_MAP is not None:
+        return _KR_SUFFIX_MAP
+    try:
+        import FinanceDataReader as fdr
+        listing = fdr.StockListing("KRX")
+        sfx = {"KOSPI": ".KS", "KOSDAQ": ".KQ", "KOSDAQ GLOBAL": ".KQ"}
+        _KR_SUFFIX_MAP = {
+            str(row.Code): sfx[row.Market]
+            for row in listing.itertuples()
+            if row.Market in sfx
+        }
+    except Exception as e:
+        log(f"[korea] WARNING: FinanceDataReader KOSPI/KOSDAQ lookup failed ({e}) "
+            f"-- Korea backfill will skip unmapped tickers")
+        _KR_SUFFIX_MAP = {}
+    return _KR_SUFFIX_MAP
+
+
 def backfill_gaps(market: str, tickers: list[str], peak: str, trough: str) -> dict:
     """bulk_download scoped to just the bear window -- not a full
-    re-collection. yfinance's `start=` needs a suffix-qualified ticker per
-    this repo's existing per-market convention (bare for US/India, .T/.KS/
-    various for JP/KR/EU); tickers passed in should already carry whatever
-    suffix that market's own scan script uses when calling yfinance."""
+    re-collection. `end` is bounded a few days past `trough` (not left open
+    to today) so the fetch doesn't waste calls re-pulling years of already-
+    covered recent history and so the returned rows are actually dominated
+    by the window we're trying to fill.
+
+    Warehouse tickers are stored bare for India/Japan/Korea (yfinance needs
+    a suffix to resolve any of them) but pre-suffixed for Europe (RIO.L is
+    the warehouse's own convention there, not a yfinance-only addition).
+    CORRECTED 2026-07-19: this docstring previously claimed Japan/Korea
+    were "already stored pre-suffixed" -- checked directly against the
+    `stocks` table and that was wrong for both (0/3,709 Japan and 0/3,184
+    Korea tickers carry any suffix). That false assumption is why every
+    Japan/Korea backfill attempt returned 0 rows loaded in the runs before
+    this fix -- yfinance was being asked for bare "7203"/"005930", which it
+    can't resolve to the right exchange. `stock_utils.bulk_download` strips
+    .NS/.BO/.T/.KS/.KQ back off its result keys, so the caller still gets
+    back bare tickers matching the `stocks` table regardless of market."""
     if not tickers:
         return {}
-    log(f"[{market}] backfilling {len(tickers)} symbols for {peak} to {trough} …")
-    return bulk_download(tickers, start=peak, batch_size=100, sleep_between=1.5)
+    if market == "india":
+        query_tickers = [f"{t}.NS" for t in tickers]
+    elif market == "japan":
+        query_tickers = [f"{t}.T" for t in tickers]
+    elif market == "korea":
+        sfx_map = _korea_suffix_map()
+        query_tickers = [t + sfx_map[t] for t in tickers if t in sfx_map]
+        skipped = len(tickers) - len(query_tickers)
+        if skipped:
+            log(f"[korea] skipping {skipped}/{len(tickers)} tickers with no "
+                f"KOSPI/KOSDAQ match (KONEX-listed or delisted)")
+    else:
+        query_tickers = tickers
+    if not query_tickers:
+        return {}
+    end = (pd.to_datetime(trough) + pd.Timedelta(days=5)).strftime("%Y-%m-%d")
+    log(f"[{market}] backfilling {len(query_tickers)} symbols for {peak} to {end} …")
+    return bulk_download(query_tickers, start=peak, end=end, batch_size=100,
+                          sleep_between=1.5, min_bars=5)
 
 
 def load_backfill_to_warehouse(conn, market: str, data: dict[str, pd.DataFrame],
@@ -181,6 +251,7 @@ def load_backfill_to_warehouse(conn, market: str, data: dict[str, pd.DataFrame],
         "Low": "low_price", "Close": "close_price", "Volume": "volume",
     })
     combined["date"] = pd.to_datetime(combined["date"]).dt.date
+    combined["volume"] = pd.to_numeric(combined["volume"], errors="coerce").round().astype("Int64")
     combined["adj_close"] = None
 
     market_id = MARKET_IDS[market]

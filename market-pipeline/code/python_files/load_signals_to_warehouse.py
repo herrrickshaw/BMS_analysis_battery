@@ -6,7 +6,10 @@ Loads 7 newly-collected screener-research parquet files into the
 market_data Postgres warehouse's new fact tables:
 
     fact_screener_signal      <- factorial_screener_signals_us.parquet
-                               <- factorial_screener_signals_IN_technical.parquet
+                               <- factorial_screener_signals_IN_full.parquet (7 technical +
+                                  27 fundamental screeners; supersedes the old IN_technical-only
+                                  file -- same technical-screener row counts, verified byte-
+                                  identical, plus 13,673 new fundamental-screener rows)
                                <- factorial_screener_signals_JP_technical.parquet
                                <- factorial_screener_signals_KR_technical.parquet
                                <- factorial_screener_signals_CN_technical.parquet
@@ -396,7 +399,7 @@ JOBS = {
         conn, CACHE_DIR / "insider_transactions_us.parquet"
     ),
     "screener_IN": lambda conn: load_screener_file(
-        conn, CACHE_DIR / "factorial_screener_signals_IN_technical.parquet", "india"
+        conn, CACHE_DIR / "factorial_screener_signals_IN_full.parquet", "india"
     ),
     "screener_KR": lambda conn: load_screener_file(
         conn, CACHE_DIR / "factorial_screener_signals_KR_technical.parquet", "korea"

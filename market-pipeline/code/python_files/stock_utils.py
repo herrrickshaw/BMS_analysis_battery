@@ -245,12 +245,17 @@ def is_rate_limited(err: Exception) -> bool:
 def bulk_download(tickers: List[str], period: str = "1y",
                   batch_size: int = 100, sleep_between: float = 1.5,
                   max_retries: int = 3, min_bars: int = 30,
-                  start=None, verbose: bool = True) -> Dict[str, pd.DataFrame]:
+                  start=None, end=None, verbose: bool = True) -> Dict[str, pd.DataFrame]:
     """Batch yfinance download with rate-limit retry + back-off.
 
     Single implementation replacing the bulk-download loop copy-pasted in
     market_data_cache, full_indian_market_scan, full_us_market_scan,
     walk_forward_backtest, ipo_tracker, and backtest_screeners.
+
+    `end` is only honored when `start` is also given (yfinance's `period=`
+    path is mutually exclusive with `start`/`end`). Omitting it when
+    fetching a bounded historical window means every call fetches through
+    today instead of stopping at the window's end.
 
     Returns {ticker: OHLCV DataFrame} (key strips .NS/.BO suffix).
     """
@@ -270,6 +275,8 @@ def bulk_download(tickers: List[str], period: str = "1y",
                 kwargs = dict(auto_adjust=True, threads=True, progress=False)
                 if start is not None:
                     kwargs["start"] = start
+                    if end is not None:
+                        kwargs["end"] = end
                 else:
                     kwargs["period"] = period
                 raw = yf.download(batch, **kwargs)
@@ -300,8 +307,21 @@ def bulk_download(tickers: List[str], period: str = "1y",
 
 
 def _strip_suffix(ticker: str) -> str:
-    """RELIANCE.NS -> RELIANCE; AAPL -> AAPL."""
-    return ticker.replace(".NS", "").replace(".BO", "")
+    """RELIANCE.NS -> RELIANCE; 7203.T -> 7203; 005930.KS -> 005930; AAPL -> AAPL.
+
+    Covers every market whose WAREHOUSE convention stores tickers bare but
+    whose yfinance QUERY needs a suffix to resolve (India .NS/.BO, Japan .T,
+    Korea .KS/.KQ -- confirmed 2026-07-19 via a direct `stocks` table check:
+    all 3,709 Japan and 3,184 Korea tickers are stored bare, contrary to
+    what CLAUDE.md's ticker-format table claimed ("pre-suffixed") -- that
+    doc was simply wrong for these two markets). Deliberately does NOT
+    strip Europe's suffixes (.DE/.F/.L/.PA/...) -- for Europe the suffix
+    IS the warehouse's own bare-ticker convention, not a yfinance-only
+    addition, so stripping it here would corrupt those tickers instead of
+    normalizing them."""
+    for sfx in (".NS", ".BO", ".T", ".KS", ".KQ"):
+        ticker = ticker.replace(sfx, "")
+    return ticker
 
 
 # ══════════════════════════════════════════════════════════════════════════════

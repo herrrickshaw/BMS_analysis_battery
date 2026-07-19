@@ -47,3 +47,14 @@ scipy>=1.10
 # European universe discovery (Investing.com lists; price API blocked)
 investpy>=1.0.8
 networkx
+
+# analysis/ML/validation additions (2026-07-18) — curated, well-maintained
+# alternatives after data-science-toolkit (single-maintainer, still pre-1.0)
+# and pymltoolkit (unmaintained since 2020) were evaluated and rejected
+scikit-learn>=1.6    # ML — was the one real gap in this venv's analysis stack
+polars>=1.36         # fast columnar DataFrame, complements pandas on large screener universes
+sqlalchemy>=2.0      # proper DB layer alongside raw psycopg2
+pandera>=0.26        # DataFrame schema/data-quality validation
+statsmodels>=0.14    # econometric regression (OLS/consistency work)
+seaborn>=0.13        # statistical visualization — correlation heatmaps etc.
+pyportfolioopt>=1.6  # Modern Portfolio Theory (efficient frontier, Black-Litterman)

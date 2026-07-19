@@ -657,6 +657,71 @@ def compute_fundamental_screens(fund: pd.DataFrame) -> pd.DataFrame:
     df["fcf_margin"] = df["fcf"] / df["revenue"]
     df["fcf_margin_pass"] = (df["fcf_margin"] > 0.10).astype(int)
 
+    # --- 2026-07-18 addition: screener.in field-list gap-fill (Bucket B) --
+    # Every field below is derived from columns already computed in this
+    # function -- no new data collection. See the "Recent"/"Preceding"/
+    # "Historical" screener.in field list this responds to (session notes).
+    # Window periods (3/5/7/10yr, or a subset) match exactly what that list
+    # asked for per metric -- not applied uniformly to every metric.
+
+    # Preceding-year values ("Preceding" column group). Same shift(1)
+    # pattern as equity_prior_bal/total_assets_prior_bal above.
+    df["roa_prior"] = g["roa"].shift(1)
+    df["roe_prior"] = g["roe"].shift(1)
+    df["roce_prior"] = g["roce"].shift(1)
+
+    # Earning Power (Graham): EBIT / total assets -- a pre-tax, pre-leverage
+    # profitability measure, distinct from ROA (which uses net income).
+    df["earning_power"] = df["ebit"] / df["total_assets"]
+
+    # Real Graham Number: sqrt(22.5 x EPS x BVPS) -- the textbook Benjamin
+    # Graham fair-value estimate. NOT the same test as graham_10y_pass
+    # (attach_market_cap, below) -- that implements a DIFFERENT Graham
+    # screen (P/E vs 10yr-avg-EPS < 15). Both are legitimate Graham
+    # screens under the same author's name; don't collapse them.
+    df["bvps"] = df["equity"] / df["shares"]
+    df["graham_number"] = (22.5 * df["eps"] * df["bvps"]).clip(lower=0) ** 0.5
+
+    # DuPont Financial Leverage: avg total assets / avg equity -- the
+    # textbook multiplier in ROE = net margin x asset turnover x financial
+    # leverage. Distinct from the existing `leverage` field above
+    # (long_term_debt / total_assets, a simplified debt-only proxy --
+    # flagged as a VARIANT in RATIO_DEFINITIONS_CFA.md). Do not conflate
+    # the two under one name.
+    df["financial_leverage_dupont"] = df["avg_total_assets"] / df["avg_equity"]
+
+    # Historical averages/medians ("Historical" column group). Same
+    # rolling(N, min_periods=...) pattern as roce_5y_mean above.
+    # CAVEAT: median fiscal-period depth per India ticker is only 3 --
+    # 10yr windows resolve for a minority of tickers (~16% per the
+    # 2026-07-18 gap analysis). min_periods already returns NaN rather
+    # than a fabricated average for thin history -- don't "fix" this by
+    # lowering min_periods to force more coverage out of less data.
+    def _min_periods(n):
+        return max(2, -(-n * 6 // 10))  # ceil(n * 0.6), floored at 2
+
+    for _n in (3, 5, 7, 10):
+        _mp = _min_periods(_n)
+        df[f"roe_{_n}y_mean"] = g["roe"].rolling(_n, min_periods=_mp).mean().reset_index(level=0, drop=True)
+        df[f"roce_{_n}y_mean"] = g["roce"].rolling(_n, min_periods=_mp).mean().reset_index(level=0, drop=True)
+    for _n in (5, 10):
+        df[f"roce_{_n}y_median"] = g["roce"].rolling(_n, min_periods=_min_periods(_n)).median().reset_index(level=0, drop=True)
+    for _n in (5, 10):
+        df[f"opm_{_n}y_mean"] = g["operating_margin"].rolling(_n, min_periods=_min_periods(_n)).mean().reset_index(level=0, drop=True)
+    for _n in (3, 5):
+        df[f"roic_{_n}y_mean"] = g["roic"].rolling(_n, min_periods=_min_periods(_n)).mean().reset_index(level=0, drop=True)
+        df[f"roa_{_n}y_mean"] = g["roa"].rolling(_n, min_periods=_min_periods(_n)).mean().reset_index(level=0, drop=True)
+
+    # ROE 5-year growth: current ROE vs ROE 5 periods back.
+    df["roe_5y_ago"] = g["roe"].shift(5)
+    df["roe_5y_growth"] = (df["roe"] - df["roe_5y_ago"]) / df["roe_5y_ago"].abs()
+
+    # N-years-back raw values ("Historical" group: Number of equity shares
+    # 10 years back, Book value 3/5/10 years back).
+    df["shares_10y_back"] = g["shares"].shift(10)
+    for _n in (3, 5, 10):
+        df[f"bvps_{_n}y_back"] = g["bvps"].shift(_n)
+
     return df
 
 
@@ -783,6 +848,30 @@ def attach_market_cap(fund: pd.DataFrame, ohlcv: pd.DataFrame) -> pd.DataFrame:
     merged["fcf_yield"] = merged["fcf"] / merged["mcap"]
     merged["fcf_yield_pass"] = (merged["fcf_yield"] > 0.05).astype(int)
 
+    # --- 2026-07-18 addition: screener.in field-list gap-fill (Bucket B),
+    # market-cap-dependent part -- these need the price join above, so they
+    # live here rather than in compute_fundamental_screens(). `merged` is
+    # sorted by `filed` (from the merge_asof above), and each ticker's own
+    # rows are a monotonic ascending subsequence of that sort, so
+    # groupby("ticker").shift(N) below correctly walks N filings back per
+    # ticker -- same ordering guarantee compute_fundamental_screens()
+    # relies on via its own explicit sort_values(["ticker", "fy_end"]).
+    g2 = merged.groupby("ticker")
+
+    # Expose PE as its own screener (pe_ttm was already computed above,
+    # but only ever consumed as an intermediate for peg_ratio until now).
+    # <25 is a conventional "not obviously expensive" ceiling; loss-makers
+    # (net_income<=0) produce a negative/undefined PE and are excluded,
+    # same convention as peg_pass's net_income>0 gate above.
+    merged["pe_pass"] = ((merged["net_income"] > 0) & (merged["pe_ttm"] > 0) & (merged["pe_ttm"] < 25)).astype(int)
+
+    # Historical PE / PBV N-years-back and Market Cap N-years-back
+    # ("Historical" column group).
+    for _n in (3, 5, 7, 10):
+        merged[f"pe_{_n}y_back"] = g2["pe_ttm"].shift(_n)
+        merged[f"pbv_{_n}y_back"] = g2["pb_ratio"].shift(_n)
+        merged[f"mcap_{_n}y_back"] = g2["mcap"].shift(_n)
+
     return merged
 
 
@@ -798,7 +887,7 @@ def build_fundamental_signal_dates(fund_scored: pd.DataFrame) -> pd.DataFrame:
             "net_margin_pass", "operating_margin_pass", "pb_pass", "ps_pass",
             "ev_ebitda_pass", "peg_pass", "fcf_yield_pass",
             "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass",
-            "low_asset_growth_pass", "buyback_yield_pass"]
+            "low_asset_growth_pass", "buyback_yield_pass", "pe_pass"]
     df = fund_scored.dropna(subset=["filed"]).copy()
     df["any_pass"] = df[cols].sum(axis=1) > 0
     df = df[df["any_pass"]]
@@ -955,7 +1044,7 @@ def main():
               "net_margin_pass", "operating_margin_pass", "pb_pass", "ps_pass",
               "ev_ebitda_pass", "peg_pass", "fcf_yield_pass",
             "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass",
-              "low_asset_growth_pass", "buyback_yield_pass"]:
+              "low_asset_growth_pass", "buyback_yield_pass", "pe_pass"]:
         print(f"  {c}: {fund_sig[c].sum():,} filing-level passes")
 
     # --- Melt fundamental wide-passes into long screener rows -----------------
@@ -983,7 +1072,8 @@ def main():
                      ("net_debt_ebitda_pass", "net_debt_ebitda"),
                      ("ev_sales_pass", "ev_sales"),
                      ("low_asset_growth_pass", "low_asset_growth"),
-                     ("buyback_yield_pass", "buyback_yield")]:
+                     ("buyback_yield_pass", "buyback_yield"),
+                     ("pe_pass", "pe_value")]:
         sub = fund_sig[fund_sig[c] == 1][["symbol", "signal_date"]].copy()
         sub["screener"] = name
         fund_long.append(sub)

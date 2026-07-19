@@ -58,3 +58,13 @@ pandera>=0.26        # DataFrame schema/data-quality validation
 statsmodels>=0.14    # econometric regression (OLS/consistency work)
 seaborn>=0.13        # statistical visualization — correlation heatmaps etc.
 pyportfolioopt>=1.6  # Modern Portfolio Theory (efficient frontier, Black-Litterman)
+
+# regime-conditional factor-weight PPO (2026-07-19) -- contextual-bandit-style
+# RL for train_ppo_factor_weights.py. Both are the standard, actively-
+# maintained choices (Farama Foundation / DLR-RM), already this repo's own
+# established optional-dependency for RL (see global-stock-screener's
+# rl_trader.py --ppo path, which follows this exact stable_baselines3 +
+# gymnasium pairing) -- not a new library family, just the second use of an
+# already-vetted one.
+gymnasium>=0.29
+stable_baselines3>=2.3

@@ -1,0 +1,255 @@
+#!/usr/bin/env python3
+"""
+earnings_dates_yahooquery.py — replaces the fragile per-ticker
+yfinance.get_earnings_dates() approach (earnings_dates_cache.py) with
+yahooquery's BATCH-FRIENDLY, OFFICIAL-endpoint equivalent.
+
+WHY THIS EXISTS: earnings_dates_cache.py hit Yahoo's rate limit repeatedly
+this session (full multi-hundred-symbol batches returning 0 results even
+with exponential backoff — see yf_session.py's investigation) and Korea in
+particular never recovered past 68/579 symbols (12%) across many retries.
+yahooquery batches MANY tickers into ONE request (`Ticker([...],
+asynchronous=True)`) against Yahoo's quoteSummary endpoint instead of one
+HTTP call per ticker — empirically this sidesteps whatever specifically
+rate-limited yfinance's per-ticker calls this session:
+
+    EMPIRICAL TEST (2026-07-16): all 700 classified Korea symbols in ONE
+    batch call -> 699/700 succeeded in 8.7 seconds (the 1 failure was a
+    genuine "no fundamentals data" ticker, not a rate limit). Compare
+    against yfinance's per-ticker approach, which needed 5+ retry rounds
+    over ~40 minutes to reach even 68/579 (12%) for the same market.
+
+TWO DATA SOURCES PER TICKER, both from yahooquery's Ticker object:
+  1. `.calendar_events` — forward-looking: next earnings date + consensus
+     EPS/revenue estimate range (High/Low/Average). Mirrors
+     earnings_key_dates.py's "point estimate" layer.
+  2. `.earnings` -> `earningsChart.quarterly` — HISTORICAL: last ~4
+     quarters, each with `reportedDate` (the REAL announcement timestamp,
+     not just a quarter-end), `actual`, `estimate`, `surprisePct`. This is
+     a full substitute for pead_sector_spillover_v2.py's event source
+     (earnings_dates_cache.py's Reported EPS / EPS Estimate / Surprise(%)
+     columns), with the same semantics.
+
+OUTPUT: cache_seed/earnings_dates_yahooquery/{market}.parquet — one row per
+(ticker, quarter), columns: ticker, market, reported_date, period_end_date,
+actual, estimate, surprise_pct, fiscal_quarter, calendar_quarter,
+next_earnings_date, next_earnings_is_estimate, source="yahooquery".
+
+RECONCILIATION: same discipline as the other independent sources built
+this session (earnings_dates_sec_8k.py, earnings_dates_nse.py) — this does
+NOT overwrite earnings_dates_cache.py's yfinance-sourced parquet, it's a
+parallel, independently-sourced table. pead_sector_spillover_v2.py can be
+pointed at whichever source has better coverage for a given market (this
+one, for Korea specifically, given the coverage gap above).
+
+Usage:
+    python3 earnings_dates_yahooquery.py --market IN US JP KR
+    python3 earnings_dates_yahooquery.py --market KR --batch-size 250
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import time
+from pathlib import Path
+
+import pandas as pd
+
+SECTOR_CACHE = Path("cache_seed/sector_map_cache.json")
+OUT_DIR = Path("cache_seed/earnings_dates_yahooquery")
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _yf_ticker(market: str, symbol: str) -> str:
+    if market == "IN":
+        return f"{symbol}.NS"
+    return symbol  # US bare; JP/KR already suffixed in our data
+
+
+def _classified_symbols(market: str) -> list[str]:
+    cache = json.loads(SECTOR_CACHE.read_text())
+    key = f"{market}:"
+    return [k[len(key):] for k, v in cache.items() if k.startswith(key) and v != "Unknown"]
+
+
+FULL_UNIVERSE_CACHE = Path("cache_seed/full_universe_symbols.json")
+
+
+def _full_universe_symbols(market: str) -> list[str]:
+    """The complete OHLCV-panel universe (thousands/market), not just the
+    ~700/market sector-classified subset — for the own-stock date+price-
+    change dataset, which needs no sector label at all (only the
+    sector-spillover 'good performer moves peers' analysis does)."""
+    return json.loads(FULL_UNIVERSE_CACHE.read_text())[market]
+
+
+def _chunks(lst: list, n: int):
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+
+def fetch_batch(market: str, symbols: list[str]) -> list[dict]:
+    from yahooquery import Ticker
+    yf_syms = [_yf_ticker(market, s) for s in symbols]
+    sym_map = dict(zip(yf_syms, symbols))  # yf ticker -> original symbol
+    t = Ticker(yf_syms, asynchronous=True, max_workers=10)
+
+    rows = []
+    try:
+        earnings = t.earnings
+    except Exception as e:
+        print(f"  [{market}] .earnings batch call failed: {e}")
+        earnings = {}
+    try:
+        cal = t.calendar_events
+    except Exception as e:
+        print(f"  [{market}] .calendar_events batch call failed: {e}")
+        cal = {}
+
+    for yf_sym, orig_sym in sym_map.items():
+        edata = earnings.get(yf_sym) if isinstance(earnings, dict) else None
+        cdata = cal.get(yf_sym) if isinstance(cal, dict) else None
+
+        next_date, next_is_est = None, None
+        if isinstance(cdata, dict):
+            ed = cdata.get("earnings", {}).get("earningsDate")
+            if ed:
+                next_date = ed[0]
+            next_is_est = cdata.get("earnings", {}).get("isEarningsDateEstimate")
+
+        chart = None
+        if isinstance(edata, dict):
+            chart = edata.get("earningsChart", {}).get("quarterly")
+        if not chart:
+            # still record the forward-looking date even with no history
+            rows.append({"ticker": orig_sym, "market": market, "reported_date": None,
+                         "period_end_date": None, "actual": None, "estimate": None,
+                         "surprise_pct": None, "fiscal_quarter": None, "calendar_quarter": None,
+                         "next_earnings_date": next_date, "next_earnings_is_estimate": next_is_est,
+                         "source": "yahooquery"})
+            continue
+
+        for q in chart:
+            reported = q.get("reportedDate")
+            reported_dt = pd.to_datetime(reported, unit="s") if reported else None
+            period_end = q.get("periodEndDate")
+            period_end_dt = pd.to_datetime(period_end, unit="s") if period_end else None
+            rows.append({
+                "ticker": orig_sym, "market": market,
+                "reported_date": reported_dt, "period_end_date": period_end_dt,
+                "actual": q.get("actual"), "estimate": q.get("estimate"),
+                "surprise_pct": float(q["surprisePct"]) if q.get("surprisePct") not in (None, "") else None,
+                "fiscal_quarter": q.get("fiscalQuarter"), "calendar_quarter": q.get("calendarQuarter"),
+                "next_earnings_date": next_date, "next_earnings_is_estimate": next_is_est,
+                "source": "yahooquery",
+            })
+    return rows
+
+
+def run_market(market: str, batch_size: int = 300, resume: bool = True,
+               full_universe: bool = False, batch_delay_seconds: int = 0) -> pd.DataFrame:
+    """resume=True (default): skip tickers that already have a row with
+    real historical data (reported_date notna) from a prior run — makes
+    retries actually accumulate progress instead of re-fetching (and
+    re-risking rate-limit gaps for) the same symbols every time, matching
+    the resumability contract earnings_dates_cache.py already established.
+    Tickers with ONLY a null-history row (no earnings chart data at all,
+    e.g. ETFs/indices) are retried every time, since that null could be a
+    rate-limit artifact rather than a genuine "no data" result.
+
+    full_universe=True switches from the ~700/market sector-classified
+    subset (cache_seed/sector_map_cache.json) to the COMPLETE OHLCV-panel
+    universe (cache_seed/full_universe_symbols.json, thousands/market) and
+    writes to a SEPARATE output directory (earnings_dates_yahooquery_full/)
+    so it never collides with or disturbs the classified-subset parquet
+    pead_sector_spillover_v3.py already depends on. The own-stock
+    date+price-change dataset needs no sector label at all — only the
+    sector-spillover "good performer moves peers" analysis does, and that
+    stays scoped to the classified subset.
+
+    batch_delay_seconds: real time.sleep() between batches, for when
+    back-to-back retries have already plateaued at 0 new results (observed
+    for India after several successive full-script retries: progress each
+    time until a point, then every batch in every retry returns 0 no
+    matter how long real-world time passes between separate process
+    invocations) — a within-run pause gives Yahoo's rate window more room
+    to recover than launching a fresh process immediately does. Each batch
+    is checkpointed to disk (see below) so a long paced run's progress
+    survives even if it's killed partway through."""
+    symbols = _full_universe_symbols(market) if full_universe else _classified_symbols(market)
+    out_dir = Path("cache_seed/earnings_dates_yahooquery_full") if full_universe else OUT_DIR
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / f"{market}.parquet"
+    prior = pd.read_parquet(out_path) if resume and out_path.exists() else pd.DataFrame()
+
+    if not prior.empty:
+        have_history = set(prior[prior["reported_date"].notna()]["ticker"].unique())
+        symbols = [s for s in symbols if s not in have_history]
+        print(f"[{market}] {len(have_history)} tickers already have historical data cached, "
+              f"{len(symbols)} still to fetch...")
+    else:
+        print(f"[{market}] {len(symbols)} symbols ({'full universe' if full_universe else 'classified'}), "
+              f"batching by {batch_size}...")
+
+    def _merge_and_save(prior_df: pd.DataFrame, new_rows: list) -> pd.DataFrame:
+        new_df = pd.DataFrame(new_rows)
+        if not prior_df.empty and not new_df.empty:
+            refreshed_tickers = set(new_df["ticker"].unique())
+            merged = pd.concat([prior_df[~prior_df["ticker"].isin(refreshed_tickers)], new_df],
+                                ignore_index=True)
+        elif not new_df.empty:
+            merged = new_df
+        else:
+            merged = prior_df
+        if not merged.empty:
+            merged = merged.drop_duplicates(subset=["ticker", "period_end_date"])
+            merged.to_parquet(out_path, index=False)
+        return merged
+
+    all_rows = []
+    n_batches = len(list(_chunks(symbols, batch_size)))
+    for i, batch in enumerate(_chunks(symbols, batch_size), 1):
+        t0 = time.time()
+        rows = fetch_batch(market, batch)
+        all_rows.extend(rows)
+        n_with_history = len(set(r["ticker"] for r in rows if r["reported_date"] is not None))
+        print(f"  [{market}] batch {i}/{n_batches}: {len(batch)} symbols in {time.time()-t0:.1f}s, "
+              f"{n_with_history} with historical earnings data")
+        if batch_delay_seconds > 0:
+            # checkpoint every batch so a long paced run's progress survives
+            # even if it's killed partway through
+            prior = _merge_and_save(prior, all_rows)
+            all_rows = []
+            if i < n_batches:
+                print(f"  [{market}] sleeping {batch_delay_seconds}s before next batch...")
+                time.sleep(batch_delay_seconds)
+
+    df = _merge_and_save(prior, all_rows)
+    if not df.empty:
+        n_tickers = df["ticker"].nunique()
+        n_with_hist = df[df["reported_date"].notna()]["ticker"].nunique()
+        n_with_next = df.dropna(subset=["next_earnings_date"])["ticker"].nunique()
+        print(f"[{market}] -> {out_path}: {len(df)} rows, {n_tickers} tickers total, "
+              f"{n_with_hist} with historical data, {n_with_next} with a next earnings date")
+    return df
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--market", nargs="+", default=["IN", "US", "JP", "KR"])
+    ap.add_argument("--batch-size", type=int, default=300)
+    ap.add_argument("--full-universe", action="store_true",
+                     help="use the complete OHLCV-panel universe (thousands/market) instead "
+                          "of the ~700/market sector-classified subset")
+    ap.add_argument("--batch-delay-seconds", type=int, default=0,
+                     help="real sleep between batches, for retries that have already "
+                          "plateaued at 0 new results with no delay -- also enables "
+                          "per-batch checkpointing so a long paced run survives being killed")
+    a = ap.parse_args()
+    for m in a.market:
+        run_market(m, a.batch_size, full_universe=a.full_universe,
+                   batch_delay_seconds=a.batch_delay_seconds)
+
+
+if __name__ == "__main__":
+    main()

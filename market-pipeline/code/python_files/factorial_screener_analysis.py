@@ -68,7 +68,8 @@ SCREENERS = ["darvas", "golden_cross", "new_highs", "below_200dma",
              "ev_ebitda_value", "peg_value", "fcf_yield", "low_beta",
              "eps_growth", "roic_value", "fcf_margin", "net_debt_ebitda", "ev_sales",  # v7: financial-media gap check
              "low_asset_growth", "buyback_yield",  # v8: Cooper/Gulen/Schill (2008) asset growth + buyback yield
-             "insider_buying", "short_interest_decline"]  # v8: Form 4 + FINRA short interest, S&P 500 scope only
+             "insider_buying", "short_interest_decline",  # v8: Form 4 + FINRA short interest, S&P 500 scope only
+             "operating_profit_growth", "debt_reduction_and_opgrowth"]  # 2026-07-19: user-requested combined filter
 CONTROLS = ["log_liquidity", "volatility_63d"]
 HORIZON_LABELS = ["T+5d", "T+21d", "T+63d", "T+126d", "T+252d"]
 HORIZONS = [f"xret_{h}" for h in HORIZON_LABELS]        # primary: excess return over SPY

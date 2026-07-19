@@ -650,6 +650,26 @@ def compute_fundamental_screens(fund: pd.DataFrame) -> pd.DataFrame:
     df["net_margin_pass"] = (df["net_margin"] > 0.10).astype(int)
     df["operating_margin_pass"] = (df["operating_margin"] > 0.15).astype(int)
 
+    # 2026-07-19 addition: Operating Profit Growth -- YoY EBIT growth,
+    # DISTINCT from operating_margin above (a LEVEL, EBIT/Revenue). Same
+    # growth-metric convention as rev_growth/ni_growth/eps_growth elsewhere
+    # in this file (>15% threshold matches eps_growth_pass exactly, not a
+    # new arbitrary cutoff).
+    df["ebit_prior"] = g["ebit"].shift(1)
+    df["ebit_growth"] = (df["ebit"] - df["ebit_prior"]) / df["ebit_prior"].abs()
+    df["operating_profit_growth_pass"] = (df["ebit_growth"] > 0.15).astype(int)
+
+    # User-requested combined filter: debt reduction AND operating profit
+    # growth together, not either ingredient alone -- "improving core
+    # profitability while genuinely deleveraging" is a distinct quality/
+    # turnaround signal from either half in isolation (expanding EBIT
+    # funding real debt paydown, not financial engineering or a one-off
+    # asset sale). Named separately from both inputs so it can be
+    # backtested as its own screener.
+    df["debt_reduction_and_opgrowth_pass"] = (
+        (df["debt_reduction_pass"] == 1) & (df["operating_profit_growth_pass"] == 1)
+    ).astype(int)
+
     # v7 addition: FCF Margin (FCF/Revenue) -- an EFFICIENCY metric, distinct
     # from FCF Yield (FCF/market cap, a VALUATION metric already computed
     # in attach_market_cap). A company can have a healthy FCF margin while
@@ -887,7 +907,8 @@ def build_fundamental_signal_dates(fund_scored: pd.DataFrame) -> pd.DataFrame:
             "net_margin_pass", "operating_margin_pass", "pb_pass", "ps_pass",
             "ev_ebitda_pass", "peg_pass", "fcf_yield_pass",
             "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass",
-            "low_asset_growth_pass", "buyback_yield_pass", "pe_pass"]
+            "low_asset_growth_pass", "buyback_yield_pass", "pe_pass",
+            "operating_profit_growth_pass", "debt_reduction_and_opgrowth_pass"]
     df = fund_scored.dropna(subset=["filed"]).copy()
     df["any_pass"] = df[cols].sum(axis=1) > 0
     df = df[df["any_pass"]]
@@ -1044,7 +1065,8 @@ def main():
               "net_margin_pass", "operating_margin_pass", "pb_pass", "ps_pass",
               "ev_ebitda_pass", "peg_pass", "fcf_yield_pass",
             "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass",
-              "low_asset_growth_pass", "buyback_yield_pass", "pe_pass"]:
+              "low_asset_growth_pass", "buyback_yield_pass", "pe_pass",
+              "operating_profit_growth_pass", "debt_reduction_and_opgrowth_pass"]:
         print(f"  {c}: {fund_sig[c].sum():,} filing-level passes")
 
     # --- Melt fundamental wide-passes into long screener rows -----------------
@@ -1073,7 +1095,9 @@ def main():
                      ("ev_sales_pass", "ev_sales"),
                      ("low_asset_growth_pass", "low_asset_growth"),
                      ("buyback_yield_pass", "buyback_yield"),
-                     ("pe_pass", "pe_value")]:
+                     ("pe_pass", "pe_value"),
+                     ("operating_profit_growth_pass", "operating_profit_growth"),
+                     ("debt_reduction_and_opgrowth_pass", "debt_reduction_and_opgrowth")]:
         sub = fund_sig[fund_sig[c] == 1][["symbol", "signal_date"]].copy()
         sub["screener"] = name
         fund_long.append(sub)

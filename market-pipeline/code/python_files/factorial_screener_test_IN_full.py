@@ -165,7 +165,8 @@ def run_fundamental_screeners(fund: pd.DataFrame, ohlcv: pd.DataFrame) -> pd.Dat
             "net_margin_pass", "operating_margin_pass", "pb_pass", "ps_pass",
             "ev_ebitda_pass", "peg_pass", "fcf_yield_pass",
             "eps_growth_pass", "roic_pass", "fcf_margin_pass", "net_debt_ebitda_pass", "ev_sales_pass",
-            "low_asset_growth_pass", "buyback_yield_pass", "pe_pass"]
+            "low_asset_growth_pass", "buyback_yield_pass", "pe_pass",
+            "operating_profit_growth_pass", "debt_reduction_and_opgrowth_pass"]
     for c in cols:
         print(f"  {c}: {fund_sig[c].sum():,} filing-level passes")
     # quick_ratio_pass isn't in build_fundamental_signal_dates()'s shared,
@@ -198,7 +199,9 @@ def run_fundamental_screeners(fund: pd.DataFrame, ohlcv: pd.DataFrame) -> pd.Dat
                      ("ev_sales_pass", "ev_sales"),
                      ("low_asset_growth_pass", "low_asset_growth"),
                      ("buyback_yield_pass", "buyback_yield"),
-                     ("pe_pass", "pe_value")]:
+                     ("pe_pass", "pe_value"),
+                     ("operating_profit_growth_pass", "operating_profit_growth"),
+                     ("debt_reduction_and_opgrowth_pass", "debt_reduction_and_opgrowth")]:
         sub = fund_sig[fund_sig[c] == 1][["symbol", "signal_date"]].copy()
         sub["screener"] = name
         fund_long.append(sub)
@@ -229,7 +232,7 @@ def main():
     fund_signals = run_fundamental_screeners(fund, ohlcv)
 
     all_signals = pd.concat([tech_signals, fund_signals], ignore_index=True)
-    print(f"\nTotal signals (7 technical + 29 fundamental screeners): {len(all_signals):,}")
+    print(f"\nTotal signals (7 technical + 31 fundamental screeners): {len(all_signals):,}")
     print(all_signals["screener"].value_counts())
 
     print("\nComputing forward returns (reads the full OHLCV panel into memory per symbol)...")

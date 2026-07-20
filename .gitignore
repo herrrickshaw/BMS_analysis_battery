@@ -92,3 +92,5 @@ stock-extractor.pem
 # MemPalace per-project files (issue #185)
 mempalace.yaml
 entities.json
+com.umashankar.*.plist
+*.plist.bak

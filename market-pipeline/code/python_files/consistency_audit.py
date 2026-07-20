@@ -49,7 +49,45 @@ from datetime import datetime
 
 import pandas as pd
 
-FLOOR_USD = 120_000
+# ── per-market liquidity floors ──────────────────────────────────────────────
+# WAS a single FLOOR_USD = 120_000 applied to all five markets. That is India's
+# POLICY floor (Rs 1 crore/day), and using it everywhere broke the check twice:
+#
+#  1. Non-India markets were judged against a floor nobody chose for them. The
+#     scans gate on adaptive_liquidity.scan_floor(), which is the STRUCTURAL
+#     floor ($10k/day) unless a policy floor was actually set — and one was set
+#     only for India. So every US/JP/KR/EU name between $10k and $120k was
+#     reported "below the floor" while being correctly admitted by the gate.
+#     That is the 872/858/652/82 warnings on 2026-07-20: all false positives.
+#  2. India's Median_Turnover column is in RUPEES, not USD. Comparing it to a
+#     USD constant is a unit error that silently PASSED — rupee turnover is ~87x
+#     the USD figure, so everything cleared 120_000 regardless of liquidity.
+#     India's real gate is Rs 1 crore, and it must be checked in rupees.
+#
+# Floors are therefore stated per market in the SAME currency as that market's
+# turnover column, and sourced from the modules the scans themselves gate on so
+# the audit cannot drift from the gate again.
+def _floors() -> dict:
+    struct, india = 10_000.0, 10_000_000.0
+    try:
+        import adaptive_liquidity as _AL
+        struct = float(_AL.scan_floor(""))          # structural, no policy floor
+    except Exception:
+        pass
+    try:
+        import scan_bhavcopy as _SB
+        india = float(_SB.LIQ_FLOOR)                # Rs 1 crore/day, native INR
+    except Exception:
+        pass
+    # (floor, currency of the market's turnover column)
+    return {"India":  (india,  "INR"),
+            "US":     (struct, "USD"),
+            "Europe": (struct, "USD"),
+            "Japan":  (struct, "USD"),
+            "Korea":  (struct, "USD")}
+
+
+FLOORS = _floors()
 MIN_BARS_FOR_200DMA = 200
 
 MARKETS = [
@@ -100,12 +138,15 @@ def audit_market(name, pat, sym, ltp, tcol) -> dict:
         elif unknown > len(d) * 0.05:
             r["issues"].append(("WARN", f"{unknown:,} rows UNKNOWN ({unknown/len(d)*100:.0f}%)"))
     if tcol in d.columns:
-        below = int((pd.to_numeric(d[tcol], errors="coerce") < FLOOR_USD).sum())
+        floor, ccy = FLOORS.get(name, (0.0, "USD"))
+        below = int((pd.to_numeric(d[tcol], errors="coerce") < floor).sum())
         r["below_floor"] = below
+        r["floor"] = f"{floor:,.0f} {ccy}"
         if below and below == len(d):
-            r["issues"].append(("ERROR", f"every row below the liquidity floor — gate not applied"))
+            r["issues"].append(("ERROR", "every row below the liquidity floor — gate not applied"))
         elif below:
-            r["issues"].append(("WARN", f"{below:,} rows below the floor"))
+            r["issues"].append(("WARN",
+                                f"{below:,} rows below the {floor:,.0f} {ccy} floor"))
     else:
         r["issues"].append(("WARN", f"no turnover column ({tcol})"))
 

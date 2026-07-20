@@ -61,7 +61,9 @@ try:
 except ImportError:
     _SK_OK = False
 
-CACHE_DIR = Path.home() / "Downloads" / "market_cache" / "ohlc"
+import os as _os
+_MC = Path(_os.environ.get("MARKET_CACHE", Path.home() / "Downloads" / "market_cache"))
+CACHE_DIR = _MC / "ohlc"
 REF_DIR   = Path.home() / "nse_screener_reference" / "ohlc_cache"
 OUT_DIR   = Path("./dl_strategy_results"); OUT_DIR.mkdir(exist_ok=True)
 

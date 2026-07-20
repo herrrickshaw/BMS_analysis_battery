@@ -44,6 +44,79 @@ import pandas as pd
 
 warnings.filterwarnings("ignore")
 
+
+# ── per-source wall-clock deadline ────────────────────────────────────────────
+# FinanceDataReader (Korea, HKEX) and akshare (China) expose NO timeout
+# parameter, so a stalled remote blocks forever inside the SSL read. Measured
+# 2026-07-20: this step normally takes 14 min; on the very next run it sat at
+# 22 min at 0.0% CPU with every stack sample parked in ssl3_read_n. Under the
+# 00:15 schedule that is unbounded — ingest never finishes, and because mailer.sh
+# hard-gates on ingest, the brief never gets built either. One hung HTTP read in
+# a nice-to-have symbol table takes out the entire morning.
+#
+# WHY NOT socket.setdefaulttimeout ALONE (the first attempt at this fix):
+# it bounds each individual socket OPERATION, not the total call. A server that
+# trickles a byte at a time resets the timer on every read, so the call still
+# runs unbounded — which is precisely the slow-drip shape of the hang observed.
+# It is also silently inert whenever the library passes its own explicit timeout
+# down to urllib3. Necessary, not sufficient.
+#
+# SIGALRM gives the real guarantee: the kernel interrupts the blocking syscall,
+# Python raises in the middle of the C call, and the deadline is WALL-CLOCK
+# regardless of how the vendor library does its I/O. Safe here — this module is
+# single-threaded (SIGALRM is main-thread only) and Unix-only, which macOS is.
+# Both mechanisms are used together: the alarm is the hard ceiling, the socket
+# timeout still trims individual stalled reads well before it.
+import contextlib
+import signal
+import socket
+import threading
+import time
+
+NET_TIMEOUT_S = 90
+
+
+class SourceTimeout(Exception):
+    """A single upstream source exceeded its wall-clock deadline."""
+
+
+@contextlib.contextmanager
+def _deadline(seconds: int = NET_TIMEOUT_S, label: str = "source"):
+    """Hard wall-clock bound on a block that performs network I/O.
+
+    Raises SourceTimeout at `seconds` regardless of what the callee is doing.
+    Falls back to socket-timeout-only where SIGALRM is unavailable (non-main
+    thread, or a non-Unix platform) rather than pretending to guarantee a bound
+    it cannot deliver.
+    """
+    prev_sock = socket.getdefaulttimeout()
+    socket.setdefaulttimeout(min(seconds, 30))
+
+    can_alarm = (hasattr(signal, "SIGALRM")
+                 and threading.current_thread() is threading.main_thread())
+    if not can_alarm:
+        try:
+            yield
+        finally:
+            socket.setdefaulttimeout(prev_sock)
+        return
+
+    def _fire(signum, frame):
+        raise SourceTimeout(f"{label}: exceeded {seconds}s wall-clock deadline")
+
+    prev_handler = signal.signal(signal.SIGALRM, _fire)
+    signal.setitimer(signal.ITIMER_REAL, seconds)
+    t0 = time.time()
+    try:
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, prev_handler)
+        socket.setdefaulttimeout(prev_sock)
+        el = time.time() - t0
+        if el > seconds * 0.5:
+            print(f"  ⏱  {label}: {el:.0f}s (deadline {seconds}s)")
+
 # MARKET_CACHE mirrors the existing BHAV_CACHE idiom so the whole tree can live
 # outside ~/Downloads. That matters for more than tidiness: macOS TCC denies
 # launchd ALL access to ~/Downloads, so anything rooted there is unreadable to the
@@ -214,7 +287,13 @@ def _korea_names() -> list:
         import FinanceDataReader as fdr
         for mkt, sfx, exch in [("KOSPI", ".KS", "KOSPI"), ("KOSDAQ", ".KQ", "KOSDAQ")]:
             try:
-                df = fdr.StockListing(mkt)
+                with _deadline(label=f"Korea/{mkt}"):
+                    df = fdr.StockListing(mkt)
+            except SourceTimeout as e:
+                # Loud, not silent. The pre-existing `except Exception: continue`
+                # made a hang look identical to an empty listing.
+                print(f"  ✗ {e} — skipping {mkt}")
+                continue
             except Exception:
                 continue
             for _, x in df.iterrows():
@@ -252,7 +331,8 @@ def _china_names() -> list:
         import warnings as _w
         _w.filterwarnings("ignore")
         import akshare as ak
-        df = ak.stock_info_a_code_name()
+        with _deadline(label="China/akshare"):
+            df = ak.stock_info_a_code_name()
         for _, x in df.iterrows():
             code = str(x.get("code", "")).strip().zfill(6)
             name = str(x.get("name", "")).strip()
@@ -319,7 +399,8 @@ def _hongkong_names() -> list:
         import warnings as _w
         _w.filterwarnings("ignore")
         import FinanceDataReader as fdr
-        df = fdr.StockListing("HKEX")
+        with _deadline(label="HK/HKEX"):
+            df = fdr.StockListing("HKEX")
         for _, x in df.iterrows():
             sym = str(x.get("Symbol", "")).strip()
             name = str(x.get("Name", "")).strip()

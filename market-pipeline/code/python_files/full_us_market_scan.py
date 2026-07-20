@@ -441,10 +441,19 @@ def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
 
     if not all([h_col, l_col, c_col]) or len(df) < confirm + 5:
         return {"signal": "INSUFFICIENT_DATA", "box_top": None, "box_bottom": None}
+    # 🔴 Trailing NaN bars must be DROPPED, never zero-filled.
+    # .fillna(0) turned a missing final close into current=0, and 0 is below
+    # every box bottom — so the whole universe reported BREAKDOWN_SELL. Korea
+    # 2026-07-21: 2,472 of 2,480 rows, with Position_in_Box% reading -1990.9
+    # ((0-2190)/110*100) instead of the true 59.1. The zero also never reached
+    # LTP, which is computed with .dropna(), so the sheet showed a real price
+    # beside a signal derived from zero — self-contradictory and hard to spot.
+    # Zero is a PRICE here, not a null; coercing missing data to a valid-looking
+    # value is what made this silent.
 
-    all_highs  = pd.to_numeric(df[h_col], errors="coerce").fillna(0).tolist()
-    all_lows   = pd.to_numeric(df[l_col], errors="coerce").fillna(0).tolist()
-    all_closes = pd.to_numeric(df[c_col], errors="coerce").fillna(0).tolist()
+    all_highs  = pd.to_numeric(df[h_col], errors="coerce").tolist()
+    all_lows   = pd.to_numeric(df[l_col], errors="coerce").tolist()
+    all_closes = pd.to_numeric(df[c_col], errors="coerce").tolist()
 
     current = all_closes[-1]
     highs   = all_highs[:-1]

@@ -295,12 +295,40 @@ def bulk_download_ohlc(tickers: list[str], period: str = "1y") -> dict[str, pd.D
 def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
     if df is None or df.empty or len(df) < confirm + 5:
         return {"signal": "INSUFFICIENT_DATA", "box_top": None, "box_bottom": None}
+    # Drop trailing bars with no close BEFORE anything else. pykrx/yfinance
+    # append a row for the current session as soon as the date exists, so a scan
+    # run before the market prints sees a NaN final bar. The correct "current
+    # price" is then the last SETTLED close, not a null and certainly not zero.
+    try:
+        _c = pd.to_numeric(df["Close"], errors="coerce")
+        _last = _c.last_valid_index()
+        if _last is None:
+            return {"signal": "NO_DATA", "box_top": None, "box_bottom": None,
+                    "current_price": None}
+        df = df.loc[:_last]
+    except Exception:
+        pass
+    # 🔴 Trailing NaN bars must be DROPPED, never zero-filled.
+    # .fillna(0) turned a missing final close into current=0, and 0 is below
+    # every box bottom — so the whole universe reported BREAKDOWN_SELL. Korea
+    # 2026-07-21: 2,472 of 2,480 rows, with Position_in_Box% reading -1990.9
+    # ((0-2190)/110*100) instead of the true 59.1. The zero also never reached
+    # LTP, which is computed with .dropna(), so the sheet showed a real price
+    # beside a signal derived from zero — self-contradictory and hard to spot.
+    # Zero is a PRICE here, not a null; coercing missing data to a valid-looking
+    # value is what made this silent.
 
-    highs  = pd.to_numeric(df["High"],  errors="coerce").fillna(0).tolist()
-    lows   = pd.to_numeric(df["Low"],   errors="coerce").fillna(0).tolist()
-    closes = pd.to_numeric(df["Close"], errors="coerce").fillna(0).tolist()
+    highs  = pd.to_numeric(df["High"],  errors="coerce").tolist()
+    lows   = pd.to_numeric(df["Low"],   errors="coerce").tolist()
+    closes = pd.to_numeric(df["Close"], errors="coerce").tolist()
 
     current = closes[-1]
+    if current is None or current != current or current <= 0:
+        # Explicit: a missing final bar is NO_DATA. Falling through would make
+        # every comparison False and silently report IN_BOX — a different wrong
+        # answer, not a right one.
+        return {"signal": "NO_DATA", "box_top": None, "box_bottom": None,
+                "current_price": None}
     h = highs[:-1]   # exclude current bar
     l = lows[:-1]
     n = len(h)

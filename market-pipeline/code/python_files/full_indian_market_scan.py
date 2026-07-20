@@ -384,9 +384,9 @@ def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
     if not all([h_col, l_col, c_col]) or len(df) < confirm + 5:
         return {"signal": "INSUFFICIENT_DATA", "box_top": None, "box_bottom": None}
 
-    all_highs = pd.to_numeric(df[h_col], errors="coerce").fillna(0).tolist()
-    all_lows = pd.to_numeric(df[l_col], errors="coerce").fillna(0).tolist()
-    all_closes = pd.to_numeric(df[c_col], errors="coerce").fillna(0).tolist()
+    all_highs = pd.to_numeric(df[h_col], errors="coerce").tolist()
+    all_lows = pd.to_numeric(df[l_col], errors="coerce").tolist()
+    all_closes = pd.to_numeric(df[c_col], errors="coerce").tolist()
 
     current = all_closes[-1]
     highs = all_highs[:-1]

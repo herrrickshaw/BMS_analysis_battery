@@ -22,28 +22,37 @@ section_start "ingest"
   # and all three downstream sections build on stale data without knowing it.
   # Four deps were silently absent on 2026-07-15 and each failure looked exactly
   # like a bad network day.
-  run_critical "[1/6] dependency check" $PY check_deps.py
+  run_critical "[1/7] dependency check" $PY check_deps.py
 
   # India EOD. Official bhavcopy, incremental — 1-2 new trading days per run.
-  run "[2/6] India EOD refresh (bhavcopy, incremental)" \
+  run "[2/7] India EOD refresh (bhavcopy, incremental)" \
       $PY bhavcopy_history.py 400
 
   # FX for the liquidity gate. Refreshed here rather than inside each scan so all
   # five markets are gated against ONE rate set — on 2026-07-15 Europe and Japan
   # ran with no gate at all because the per-scan FX fetch failed independently.
-  run "[3/6] FX rates for liquidity gate" \
+  run "[3/7] FX rates for liquidity gate" \
       $PY -c "import liquidity, json; r = liquidity.scan_fx(); liquidity._fx_write_cache(r); print(f'  fx: {len(r)} currencies cached')"
 
   # Cross-market symbol normalisation.
-  run "[4/6] symbol master refresh" $PY symbol_master.py
+  run "[4/7] symbol master refresh" $PY symbol_master.py
 
   # screener.in cash-conversion-cycle screen, plus its scrape test. The test is
   # here rather than in the mailer because a broken scrape must be known before
   # the brief is built, not while it is being sent.
-  run "[5/6] India CCC screen (screener.in)" \
+  run "[5/7] India CCC screen (screener.in)" \
       $PY -c "import screener_in as s; s.ccc_screen().to_parquet('cache_seed/india_ccc_screen.parquet', index=False)"
 
-  run "[6/6] test: validate screener.in CCC scrape" $PY test_screener_in.py
+  run "[6/7] test: validate screener.in CCC scrape" $PY test_screener_in.py
+
+  # ── fold today's bars into the deep panels ──────────────────────────────────
+  # Without this the LFS panels drift stale (IN was 8d behind, US 19d) while the
+  # daily stores stay current — and every analysis then had to guess which store
+  # to read. Guessing wrong never errored, it just returned a plausible wrong
+  # number: a 3-year return from the 36-bar LMDB, or entry==ltp printing "+0.0%".
+  # Append-only and refuses to write if rows fall or symbols vanish.
+  run "[7/7] fold fresh bars into the deep price panels" \
+      $PY warehouse_update.py
 
   # Close the section by reporting what actually landed. This is the artifact the
   # mailer's gate reads, so printing it here makes a blocked mailer explainable

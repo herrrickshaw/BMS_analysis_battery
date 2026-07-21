@@ -18,6 +18,51 @@ mistakes were made, and the mistakes here have repeated.
 
 ---
 
+## 2026-07-21 (night, correction)
+
+### 🔴 CORRECTION: the daily mailer was never failing — I was breaking it
+
+Recorded because the earlier entries in this file assert the opposite, and a
+changelog that keeps a wrong diagnosis is worse than one with a gap.
+
+Full run history for 2026-07-21:
+
+| run ended | failed steps | outcome |
+|---|---|---|
+| 04:10 | 0 | **SENT** |
+| 06:59 | 0 | **SENT** |
+| 13:52 | 0 | not sent — market open, screener.in serving live quotes |
+| 15:19 | 2 | not sent |
+| 16:39 | 2 | not sent |
+| 18:56 | 2 | not sent |
+| 19:04 | 2 | not sent |
+| 19:12 | 0 | **SENT** |
+
+The scheduled runs sent cleanly. Every failure was a manually-invoked run.
+
+**Cause: `pipeline_lib.sh` resolved its interpreter from the caller's PATH**
+(`PY="${PY:-python3}"`). The launchd plists put `.venv/bin` first, so scheduled
+runs used the venv; a plain shell used `/usr/bin/python3`, which lacks
+`bseindia`. `[1/9] India full screener scan` therefore died instantly in manual
+runs only — and since no fresh India scan was produced, the brief validated a
+stale **13:36 intraday** workbook, where HDFCBANK showed 777.6 against
+screener.in's 761.0 close. That identical 2.18% "mismatch" recurred in four
+consecutive runs and read as a data fault; it was a wrong-interpreter fault.
+
+Consequences: four wasted runs, five spurious failure-alert emails, and a
+defect recorded against `[1/9]` that never existed.
+
+**Fixed:** `pipeline_lib.sh` resolves `$HERE/.venv/bin/python` by construction,
+warns if it is absent, and still honours an explicit `$PY`. Same defect class as
+the two cache trees and the two bhavcopy stores — one thing, two resolutions,
+silent divergence — and the third time today it produced a confident wrong
+answer rather than an error.
+
+**Validation was right every time.** Widening the tolerance to clear HDFCBANK
+would have shipped an intraday brief as a daily one.
+
+---
+
 ## 2026-07-21 (night)
 
 ### Signal tracking now works — it was structurally empty before
@@ -146,8 +191,10 @@ per market. 2,110 → 20, scores 90–100, evenly split across EU/JP/KR/US.
 The ledger still records **every** pass (2,369 entries) — nothing is lost for
 analysis. Only watchlist intake is bounded. Watchlist went +14 instead of +1,928.
 
-⚠️ India contributed no technical signals: its scan step `[1/9]` failed again
-this run, so `harvest_technical` had no India workbook to read.
+⚠️ India contributed no technical signals this run. **Correction (see the
+`night` entry): this was NOT a pipeline defect.** `[1/9]` failed only in
+manually-invoked runs, because of the interpreter split — the scheduled 04:10
+and 06:59 runs completed with 0 failed steps and sent normally.
 
 ### Do not run the screener.in collector alongside the mailer
 

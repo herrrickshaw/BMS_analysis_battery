@@ -41,9 +41,38 @@
 
 set -uo pipefail
 
-PY="${PY:-python3}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$HERE" || exit 1
+
+# Resolve the interpreter from the REPO, not from the caller's PATH.
+#
+# This was `PY="${PY:-python3}"`, which meant the pipeline ran under whatever
+# `python3` happened to mean to whoever invoked it. The launchd plists put
+# .venv/bin first on PATH, so SCHEDULED runs used the venv; a plain shell has no
+# such PATH, so MANUAL runs used /usr/bin/python3 — a different interpreter with
+# a different dependency set.
+#
+# On 2026-07-21 that produced a whole afternoon of phantom failures: the 04:10
+# and 06:59 scheduled runs sent cleanly with 0 failed steps, while five manual
+# runs died at `[1/9] India full screener scan` on a missing `bseindia` that was
+# only absent from the system interpreter. Because no fresh India scan was
+# produced, the brief then validated a stale 13:36 intraday workbook and
+# HDFCBANK "mismatched" screener.in by 2.18% every time — which read as a data
+# fault and was really a wrong-interpreter fault, plus five spurious alert
+# emails. Same shape as the two cache trees and the two bhavcopy stores: one
+# thing, two resolutions, silent divergence.
+#
+# $PY still wins if set explicitly, so a caller can target another interpreter
+# deliberately — but the DEFAULT is now the venv this repo owns.
+if [ -n "${PY:-}" ]; then
+  :                                   # explicit override, respect it
+elif [ -x "$HERE/.venv/bin/python" ]; then
+  PY="$HERE/.venv/bin/python"
+else
+  PY="python3"
+  echo "  ⚠️  $HERE/.venv/bin/python not found — falling back to PATH python3;" \
+       "dependency set may differ from the scheduled runs" >&2
+fi
 
 FAILURES=()
 SECTION=""

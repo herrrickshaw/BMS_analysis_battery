@@ -251,3 +251,52 @@ def score_breakout(df: pd.DataFrame) -> Optional[dict]:
                              and out["ema_confirmed"]
                              and score >= GOOD_SCORE)
     return out
+
+
+# Column names the scanners emit. signal_tracker.harvest_technical() keys off
+# Quality_Grade: a scan missing that column is SKIPPED ENTIRELY, silently. On
+# 2026-07-21 only the Korea scanner emitted these, so all 110 `technical` signals
+# were Korean and the watchlist went from 3 KR names to 110 — a fact about
+# instrumentation coverage that read as a fact about Korean markets.
+ROW_FIELDS = ("EMA50", "Above_EMA50", "EMA50_Rising", "Quality_Score",
+              "Quality_Grade", "Rel_Volume", "Compression_Ratio", "Body_Pct",
+              "Actionable", "Recomputed_Signal")
+
+
+def row_fields(df: "pd.DataFrame", price_round: int = 2) -> dict:
+    """Breakout-quality columns for a scanner row, mirroring golden_cross.row_fields.
+
+    Call this INSIDE the per-ticker loop, on the same df the Darvas box was
+    computed from — never as a post-pass join on a finished frame. Joining is how
+    Darvas_Signal drifted out of alignment with its own Box_Top/Box_Bottom (2,461
+    contradictory rows on 2026-07-21).
+
+    `price_round` is the decimal places for EMA50, which is a PRICE and so
+    follows the market's convention: 0 for KRW/JPY where a decimal is noise, 2
+    for INR/USD/EUR. Every other field rounds identically everywhere.
+
+    Returns all keys with None values when history is too short, so the columns
+    exist on every row. A missing column makes the whole market invisible to the
+    harvester; a None value merely makes one row not qualify.
+    """
+    try:
+        q = score_breakout(df) or {}
+    except Exception:
+        q = {}
+
+    def _r(key, nd):
+        v = q.get(key)
+        return round(v, nd) if isinstance(v, (int, float)) and v == v else None
+
+    return {
+        "EMA50":             _r("ema50", price_round),
+        "Above_EMA50":       q.get("above_ema50"),
+        "EMA50_Rising":      q.get("ema50_rising"),
+        "Quality_Score":     q.get("quality_score"),
+        "Quality_Grade":     q.get("quality_grade"),
+        "Rel_Volume":        _r("rel_volume", 2),
+        "Compression_Ratio": _r("compression_ratio", 2),
+        "Body_Pct":          _r("body_pct", 0),
+        "Actionable":        q.get("actionable"),
+        "Recomputed_Signal": q.get("signal"),
+    }

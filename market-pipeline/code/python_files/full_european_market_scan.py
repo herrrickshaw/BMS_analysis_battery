@@ -80,6 +80,20 @@ try:
 except ImportError:
     OPENPYXL_OK = False
 
+
+try:
+    from breakout_quality import row_fields as _bq_fields
+except ImportError:                                  # pragma: no cover
+    # Return the KEYS with None values, never {}. signal_tracker.harvest_technical()
+    # SKIPS any market whose scan lacks a Quality_Grade column, so an empty dict
+    # would silently drop this market from the technical filter entirely — the
+    # exact failure this wiring exists to fix (only Korea emitted these columns on
+    # 2026-07-21, so all 110 technical signals were Korean).
+    def _bq_fields(df, price_round=2):
+        return {k: None for k in
+                ("EMA50", "Above_EMA50", "EMA50_Rising", "Quality_Score",
+                 "Quality_Grade", "Rel_Volume", "Compression_Ratio", "Body_Pct",
+                 "Actionable", "Recomputed_Signal")}
 # ── Configuration & Constants ────────────────────────────────────────────────
 DOWNLOAD_DIR = Path("./european_scan")
 DOWNLOAD_DIR.mkdir(exist_ok=True)
@@ -608,6 +622,9 @@ def main():
                 "Change%":            chg_pct,
                 "Turnover_USD":       round(tv_usd),
                 "Liquidity_Tier":     liq_tier,
+                # Computed from THIS df in THIS iteration, not joined afterwards.
+                # Without these columns signal_tracker skips Europe entirely.
+                **_bq_fields(df, price_round=2),
                 "200_Day_MA":         ma_200,
                 **_gc_fields(df),
                 "Distance_to_200MA%": dist_ma,

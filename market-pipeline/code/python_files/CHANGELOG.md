@@ -18,6 +18,52 @@ mistakes were made, and the mistakes here have repeated.
 
 ---
 
+## 2026-07-21 (later still)
+
+### `breakout_quality` wired into all five scanners
+
+Fixes the coverage defect recorded below. India, US, Japan and Europe now emit
+the ten `breakout_quality` columns, so `harvest_technical()` can see them
+instead of skipping them.
+
+**Decision: one shared helper, not four copies.** Added
+`breakout_quality.row_fields(df, price_round)`, mirroring the existing
+`golden_cross.row_fields` idiom, and migrated Korea onto it too. Four pasted
+copies of the same block is how two implementations drift apart, and this
+repo has already paid for that once.
+
+`price_round` is the only per-market difference: 0 for JPY/KRW where a decimal
+on a price is noise, 2 for INR/USD/EUR. Everything else rounds identically.
+
+**Two things found while doing it:**
+
+*Korea's inline block had a latent bug.* It guarded with
+`round(q["rel_volume"], 2) if q.get("rel_volume") else None` — falsy for a
+genuine `0.0`, so a real zero became `None` in 15 of 353 sampled rows. Verified
+before migrating that the signal-bearing fields (`Quality_Grade`,
+`Above_EMA50`, `EMA50_Rising`, `Recomputed_Signal`, `Actionable`) are identical
+across old and new; only `Rel_Volume` and `Body_Pct` change, and only where the
+true value was zero. Korea's *signals* are therefore unaffected by the
+migration.
+
+*The import fallback returns keys, not `{}`.* An empty dict would omit the
+`Quality_Grade` column and silently remove that market from the technical
+filter — reproducing the exact bug being fixed. Returning all ten keys as
+`None` means a row fails to qualify rather than a market disappearing.
+
+**Verified end-to-end**, not just by import: a real 60-ticker US scan emitted
+all ten columns with a sane grade spread (A 1, B 24, C 13, D 22), and
+`harvest_technical()` picked up 11 US signals where it previously saw zero.
+The test workbook was then deleted — being the newest US scan, it would have
+had the mailer harvest signals from a 60-name universe.
+
+⚠️ **India, Japan and Europe emit these columns only after their NEXT full
+scan.** Their current workbooks predate this change, so the harvester still
+sees Korea alone until then. The watchlist stays Korea-skewed in the meantime;
+that is expected, not a regression.
+
+---
+
 ## 2026-07-21 (later)
 
 ### `technical` filter can only ever fire for Korea

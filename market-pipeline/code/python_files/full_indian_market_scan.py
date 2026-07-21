@@ -119,6 +119,20 @@ except Exception as _e:  # pragma: no cover
     _BHAV_OK = False
     print(f"  ⚠️  bhavcopy_fetcher unavailable ({_e}); OHLC falls back to yfinance")
 
+
+try:
+    from breakout_quality import row_fields as _bq_fields
+except ImportError:                                  # pragma: no cover
+    # Return the KEYS with None values, never {}. signal_tracker.harvest_technical()
+    # SKIPS any market whose scan lacks a Quality_Grade column, so an empty dict
+    # would silently drop this market from the technical filter entirely — the
+    # exact failure this wiring exists to fix (only Korea emitted these columns on
+    # 2026-07-21, so all 110 technical signals were Korean).
+    def _bq_fields(df, price_round=2):
+        return {k: None for k in
+                ("EMA50", "Above_EMA50", "EMA50_Rising", "Quality_Score",
+                 "Quality_Grade", "Rel_Volume", "Compression_Ratio", "Body_Pct",
+                 "Actionable", "Recomputed_Signal")}
 # ── Constants ──────────────────────────────────────────────────────────────────
 DOWNLOAD_DIR = Path("./indian_full_scan")
 DOWNLOAD_DIR.mkdir(exist_ok=True)
@@ -852,6 +866,12 @@ def main(nse_only: bool = False, top: int = 0, run_scans: bool = True, workers: 
             "LTP": ltp,
             "Prev_Close": prev,
             "Change%": chg,
+            # Breakout quality + EMA-50 trend, computed from THIS df in THIS
+            # iteration — never a post-pass join, which is how Darvas_Signal
+            # drifted out of alignment with its own box (2,461 contradictory
+            # rows, 2026-07-21). Without these columns signal_tracker skips
+            # India entirely.
+            **_bq_fields(df, price_round=2),
             # Darvas
             "Darvas_Signal": darvas.get("signal"),
             "Box_Top": darvas.get("box_top"),

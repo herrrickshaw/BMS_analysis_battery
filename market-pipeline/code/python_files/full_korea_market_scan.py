@@ -65,6 +65,18 @@ except Exception:                                    # pragma: no cover
     def _gc_fields(df):
         return {}
 
+try:
+    from breakout_quality import row_fields as _bq_fields
+except ImportError:                                  # pragma: no cover
+    # Return the KEYS with None values, never {}. signal_tracker.harvest_technical()
+    # SKIPS any market whose scan lacks a Quality_Grade column, so an empty dict
+    # would silently drop this market from the technical filter entirely.
+    def _bq_fields(df, price_round=2):
+        return {k: None for k in
+                ("EMA50", "Above_EMA50", "EMA50_Rising", "Quality_Score",
+                 "Quality_Grade", "Rel_Volume", "Compression_Ratio", "Body_Pct",
+                 "Actionable", "Recomputed_Signal")}
+
 
 # Liquidity gate (shared, currency-aware). Lazy so the scan still runs if the
 # module is unavailable; _LiqStub then tags everything UNKNOWN rather than
@@ -652,11 +664,6 @@ def main():
         # drifted out of alignment with its own Box_Top/Box_Bottom that way
         # (2,461 contradictory rows on 2026-07-21), and a join is exactly
         # how that happens.
-        try:
-            import breakout_quality as _bq
-            qual = _bq.score_breakout(df) or {}
-        except Exception:
-            qual = {}
         closes  = pd.to_numeric(df["Close"], errors="coerce").dropna()
         ltp     = round(float(closes.iloc[-1]), 0)  if not closes.empty  else None
         prev    = round(float(closes.iloc[-2]), 0)  if len(closes) >= 2  else None
@@ -686,16 +693,15 @@ def main():
             "Change%":            chg_pct,
             "Turnover_USD":       round(tv_usd),
             "Liquidity_Tier":     liq_tier,
-            "EMA50":              round(qual["ema50"], 0) if qual.get("ema50") else None,
-            "Above_EMA50":        qual.get("above_ema50"),
-            "EMA50_Rising":       qual.get("ema50_rising"),
-            "Quality_Score":      qual.get("quality_score"),
-            "Quality_Grade":      qual.get("quality_grade"),
-            "Rel_Volume":         round(qual["rel_volume"], 2) if qual.get("rel_volume") else None,
-            "Compression_Ratio":  round(qual["compression_ratio"], 2) if qual.get("compression_ratio") else None,
-            "Body_Pct":           round(qual["body_pct"], 0) if qual.get("body_pct") else None,
-            "Actionable":         qual.get("actionable"),
-            "Recomputed_Signal":  qual.get("signal"),
+            # Migrated to the shared helper so all five markets emit these
+            # columns from ONE implementation. The old inline block guarded with
+            # `if qual.get("rel_volume")`, which is falsy for a genuine 0.0 and
+            # turned a real zero into None — 15 of 353 sampled rows. Verified
+            # before migrating: the signal-bearing fields (Quality_Grade,
+            # Above_EMA50, EMA50_Rising, Recomputed_Signal, Actionable) are
+            # byte-identical; only Rel_Volume and Body_Pct change, and only
+            # where the true value was zero.
+            **_bq_fields(df, price_round=0),
             "200_Day_MA":         ma200,
             **_gc_fields(df),
             "Distance_to_200MA%": dist_ma,

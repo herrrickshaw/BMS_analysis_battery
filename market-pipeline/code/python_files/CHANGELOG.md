@@ -18,6 +18,73 @@ mistakes were made, and the mistakes here have repeated.
 
 ---
 
+## 2026-07-21 (night)
+
+### Signal tracking now works — it was structurally empty before
+
+`--report` printed "no aged entries could be priced" and returned nothing. Not a
+data outage: it required `price_at_signal`, and **all 121 trackable entries were
+backfilled `golden_cross` rows that never recorded an entry price**. The report
+could never have produced a number, and said so in a way that read like missing
+data.
+
+Applied the watchlist model — the same `basis` distinction `watchlist_pnl`
+already uses:
+
+- `signal-price` — recorded when the filter fired (a record)
+- `panel-close` — the panel's close on the signal date (an estimate: no fill, no
+  slippage, and for a backfilled row only *close to* what the brief quoted)
+
+All 138 currently-tracked rows are `panel-close`. That is labelled on every row
+and called out in the summary rather than presented as measured entry prices.
+
+**Skips are now counted and named, not silent.** 1,152 entries are stamped today
+and have no forward bar — that is what forward tracking *means*, so it is
+reported as "too early, by design" rather than dropped.
+
+### 🔴 The India benchmark was filtered out of its own panel
+
+`vs mkt` was `nan` for every India entry. `NIFTYBEES` is in the panel but its
+last bar is **2026-07-13**, a week behind the panel itself: it is an ETF (ISIN
+prefix `INF`) and the equity-only bhavcopy filter — added after an ETF shipped
+as a golden-cross pick — stopped updating it. The benchmark was removed as
+collateral damage from a correct fix.
+
+**Decision: fall back to the panel's cross-sectional median, and label it.**
+That is a *different* benchmark — equal-weighted market, not NIFTY 50 — so
+substituting it silently would misrepresent what the comparison is. India now
+reads +0.67% vs mkt / 62% win, with the substitution printed above the table.
+
+### EU/JP/KR tracking via `--fetch-missing`
+
+Those markets have no persisted panel, which hid 1,119 of the ledger's entries —
+most of the shortlist. Opt-in yfinance fetch, reusing the watchlist's symbol
+resolver (Korea's codes need zero-padding to six digits plus a .KS/.KQ board
+suffix; Japan needs .T).
+
+Entries stamped today are filtered out **before** the network calls: 1,069 of
+the 1,119 could not have a forward bar, so fetching the group would mean 1,119
+sequential requests to track 50.
+
+No benchmark for these markets — there is no index series in any local store,
+and synthesising one from the handful of shortlisted names would compare each
+signal against itself. `xret_pct` stays NaN and shows as `nan%`.
+
+Output: `reports/signal_tracking.csv`, one row per shortlisted name with
+`signal_date`, `as_of`, `held_days`, `entry_used`, `basis`, `ret_pct`.
+
+⚠️ 138 tracked rows over 3-6 days is a diary, not a result. Every row is
+`golden_cross` — the newer filters were all stamped today.
+
+### Trickle confirmed working
+
+`runs = 1`, exit 0, logged at 17:30:06. The earlier `runs = 0` was the counter
+resetting when the job was booted out and back in — **not** the never-fired
+failure seen on the daily-pipeline job. The 17:30 run was refused (screener.in
+still blocking this machine after the 16:45 hard block); gate unchanged at 143.
+
+---
+
 ## 2026-07-21 (evening, collection)
 
 ### `--refresh-thin` was queueing the collector's own good data for re-fetch

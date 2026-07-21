@@ -247,7 +247,63 @@ def record() -> int:
     return 0
 
 
-def report(min_days: int) -> int:
+def _track_via_yf(grp: pd.DataFrame, mkt: str, min_days: int) -> list:
+    """Forward-track EU/JP/KR signals from yfinance — markets with no local panel.
+
+    Symbol conventions are the watchlist's, reused rather than re-derived:
+    Korea's bare codes have lost their leading zeros (38880 is 038880) and need
+    re-padding plus a .KS/.KQ board suffix; Japan needs .T; EU symbols already
+    carry their exchange suffix.
+
+    No benchmark: there is no index series for these markets in any local store,
+    and inventing one from the handful of shortlisted names would compare each
+    signal against itself. `xret_pct` stays NaN and the summary shows it as such.
+    """
+    try:
+        import yfinance as yf
+        from watchlist_pnl import _yf_candidates
+    except ImportError:
+        return []
+    # Drop entries that cannot possibly have a forward bar BEFORE hitting the
+    # network. 1,069 of the 1,119 EU/JP/KR entries are stamped today, so fetching
+    # the whole group would make 1,119 sequential requests to track 50.
+    grp = grp[pd.to_datetime(grp["signal_date"]) < pd.Timestamp(date.today())]
+    out = []
+    for _, r in grp.iterrows():
+        sd = pd.Timestamp(r["signal_date"])
+        entry_px = r.get("price_at_signal")
+        for t in _yf_candidates(mkt, str(r["symbol"])):
+            try:
+                h = yf.Ticker(t).history(start=(sd - pd.Timedelta(days=7)).strftime("%Y-%m-%d"),
+                                         auto_adjust=False)
+            except Exception:
+                continue
+            if h is None or h.empty or "Close" not in h.columns:
+                continue
+            c = pd.to_numeric(h["Close"], errors="coerce").dropna()
+            if c.empty:
+                continue
+            idx = pd.to_datetime(c.index).tz_localize(None)
+            after = c[idx >= sd]
+            if after.empty:
+                break                     # resolved, but no bar since the signal
+            entry, basis = entry_px, "signal-price"
+            if entry != entry or not entry:
+                prior = c[idx <= sd]
+                if prior.empty:
+                    break
+                entry, basis = float(prior.iloc[-1]), "panel-close"
+            last_dt = pd.to_datetime(after.index[-1]).tz_localize(None)
+            out.append({**r.to_dict(), "entry_used": entry, "basis": basis,
+                        "as_of": last_dt, "benchmark": None,
+                        "held_days": (last_dt - sd).days,
+                        "ret_pct": (float(after.iloc[-1]) / entry - 1) * 100,
+                        "xret_pct": np.nan})
+            break
+    return out
+
+
+def report(min_days: int, fetch_missing: bool = False) -> int:
     if not LEDGER.exists():
         print("  no ledger yet — run --record first"); return 1
     led = pd.read_parquet(LEDGER)
@@ -269,42 +325,154 @@ def report(min_days: int) -> int:
             print(f"     {f:<18} {n:>4} tracked")
         return 0
 
-    rows = []
+    # Why an entry drops out matters as much as the return, so count the reasons
+    # rather than silently `continue`. The old version skipped anything without a
+    # price_at_signal and printed "no aged entries could be priced" — which was
+    # true but useless: ALL 121 trackable entries were backfilled golden_cross
+    # rows that never recorded an entry price, so the report was structurally
+    # empty and looked like a data outage.
+    rows, skipped = [], {"no_panel": 0, "not_in_panel": 0, "signal_after_panel": 0,
+                         "no_entry_price": 0}
+    bench_notes = []
     for mkt, grp in ready.groupby("market"):
         p = PANELS.get(mkt)
         if not p or not p.exists():
+            # EU/JP/KR have no persisted panel — their scans fetch live and keep
+            # nothing. That is 1,119 of the ledger's entries, i.e. most of the
+            # shortlist, invisible to tracking. --fetch-missing pulls them from
+            # yfinance; off by default because this is otherwise a pure read of
+            # local stores.
+            if fetch_missing:
+                got = _track_via_yf(grp, mkt, min_days)
+                rows.extend(got)
+                skipped["no_panel"] += len(grp) - len(got)
+            else:
+                skipped["no_panel"] += len(grp)
             continue
         px = pd.read_parquet(p, columns=["Date", "Symbol", "Close"])
         px["Symbol"] = px["Symbol"].astype(str).str.upper()
         wide = px.pivot_table(index="Date", columns="Symbol", values="Close",
                               aggfunc="last").sort_index()
+        panel_end = wide.index.max()
+        # BENCHMARK, with a staleness check.
+        #
+        # NIFTYBEES is in the IN panel but its last bar is 2026-07-13, a week
+        # behind the panel itself: it is an ETF (ISIN prefix INF) and the
+        # equity-only bhavcopy filter — added after an ETF shipped as a
+        # golden-cross pick — stopped updating it. Using it regardless yields a
+        # benchmark window of <2 bars for every recent signal, so `vs mkt` came
+        # out NaN for all 52 India entries with no explanation.
+        #
+        # Falling back to the panel's cross-sectional median is a DIFFERENT
+        # benchmark — equal-weighted market, not NIFTY 50 — so it is labelled
+        # rather than silently substituted.
         b = BENCH.get(mkt)
-        bench = wide[b] if b in wide.columns else wide.median(axis=1)
+        bench, bench_name = None, None
+        if b in wide.columns:
+            cand = wide[b].dropna()
+            if len(cand) and cand.index.max() >= panel_end - pd.Timedelta(days=3):
+                bench, bench_name = cand, b
+        if bench is None:
+            bench, bench_name = wide.median(axis=1), "panel-median (equal-wt)"
+            if b in wide.columns:
+                stale_to = wide[b].dropna().index.max()
+                bench_notes.append(
+                    f"{mkt}: {b} last bar {stale_to:%Y-%m-%d} vs panel {panel_end:%Y-%m-%d}"
+                    f" — using {bench_name}")
         for _, r in grp.iterrows():
-            if r["symbol"] not in wide.columns or r["price_at_signal"] != r["price_at_signal"]:
+            sym = str(r["symbol"]).upper()
+            if sym not in wide.columns:
+                skipped["not_in_panel"] += 1
                 continue
-            s = wide[r["symbol"]].dropna()
+            # A signal stamped today has no forward price yet. That is not a
+            # failure — it is what forward tracking means — but it must be
+            # reported as "too early", never folded into the sample.
+            if pd.Timestamp(r["signal_date"]) > panel_end:
+                skipped["signal_after_panel"] += 1
+                continue
+            s = wide[sym].dropna()
             after = s[s.index >= r["signal_date"]]
             if after.empty:
+                skipped["signal_after_panel"] += 1
                 continue
-            ret = (after.iloc[-1] / r["price_at_signal"] - 1) * 100
+
+            # ENTRY PRICE, with its provenance labelled — the watchlist model.
+            #   signal-price = recorded when the filter fired (a record)
+            #   panel-close  = the panel's close on the signal date (an estimate:
+            #                  no fill, no slippage, and for a backfilled row it
+            #                  is only close to what the brief actually quoted)
+            entry, basis = r.get("price_at_signal"), "signal-price"
+            if entry != entry or not entry:
+                prior = s[s.index <= r["signal_date"]]
+                if prior.empty:
+                    skipped["no_entry_price"] += 1
+                    continue
+                entry, basis = float(prior.iloc[-1]), "panel-close"
+
+            ret = (after.iloc[-1] / entry - 1) * 100
             ba = bench[bench.index >= r["signal_date"]].dropna()
             bret = ((ba.iloc[-1] / ba.iloc[0] - 1) * 100) if len(ba) > 1 else np.nan
-            rows.append({**r.to_dict(), "ret_pct": ret,
+            rows.append({**r.to_dict(), "entry_used": entry, "basis": basis,
+                         "as_of": after.index[-1], "benchmark": bench_name,
+                         "held_days": (after.index[-1] - pd.Timestamp(r["signal_date"])).days,
+                         "ret_pct": ret,
                          "xret_pct": ret - bret if bret == bret else np.nan})
+
     if not rows:
-        print("\n  no aged entries could be priced"); return 0
+        print("\n  no aged entries could be priced. Why:")
+        for k, v in skipped.items():
+            if v:
+                print(f"     {k:<20} {v:>5}")
+        return 0
     r = pd.DataFrame(rows)
-    print(f"\n  {len(r)} entries aged >= {min_days}d\n")
-    print(f"  {'filter':<18} {'n':>4} {'med ret':>9} {'med vs mkt':>11} {'win%':>6} {'med days':>9}")
-    print("  " + "-" * 62)
-    for f, g in r.groupby("filter"):
-        print(f"  {f:<18} {len(g):>4} {g['ret_pct'].median():>8.2f}% "
-              f"{g['xret_pct'].median():>10.2f}% "
-              f"{(g['xret_pct'] > 0).mean()*100:>5.0f}% {g['days_held'].median():>8.0f}")
+    print(f"\n  TRACKED: {len(r)} of {len(ready)} entries, each from its own shortlist date\n")
+
+    print(f"  {'filter':<18} {'market':<7} {'n':>4} {'med ret':>9} {'med vs mkt':>11} "
+          f"{'win%':>6} {'med days':>9}  basis")
+    print("  " + "-" * 78)
+    for (f, m), g in r.groupby(["filter", "market"]):
+        bases = "/".join(sorted(g["basis"].unique()))
+        xr = g["xret_pct"].dropna()
+        print(f"  {f:<18} {m:<7} {len(g):>4} {g['ret_pct'].median():>8.2f}% "
+              f"{(xr.median() if len(xr) else float('nan')):>10.2f}% "
+              f"{((xr > 0).mean()*100 if len(xr) else float('nan')):>5.0f}% "
+              f"{g['held_days'].median():>8.0f}  {bases}")
+
+    if bench_notes:
+        print("\n  benchmark substitutions:")
+        for n in bench_notes:
+            print(f"     {n}")
+
+    if any(skipped.values()):
+        print(f"\n  NOT TRACKED — {sum(skipped.values())} entries, by reason:")
+        labels = {
+            "signal_after_panel": "signalled today / after the panel's last bar — too early, "
+                                  "by design",
+            "no_panel":           "market has no price panel (EU/JP/KR are not configured)",
+            "not_in_panel":       "symbol absent from its market's panel",
+            "no_entry_price":     "no entry price and no panel bar on the signal date",
+        }
+        for k, v in skipped.items():
+            if v:
+                print(f"     {v:>5}  {labels[k]}")
+
+    n_est = int((r["basis"] == "panel-close").sum())
+    if n_est:
+        print(f"\n  ⚠ {n_est} of {len(r)} use a panel-close entry, not a recorded signal price.")
+        print("    Backfilled rows never stored what the brief quoted, so their entry is")
+        print("    the panel's close that day — close to it, but not the same number.")
     print("\n  'med vs mkt' is the number that matters — beating the index, not the")
     print("  sign of the raw return. n is small early on; treat it as a diary, not")
     print("  a result, until each filter has dozens of entries across many dates.")
+
+    out = HERE / "reports" / "signal_tracking.csv"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    cols = ["symbol", "market", "filter", "detail", "score", "signal_date", "as_of",
+            "held_days", "entry_used", "basis", "ret_pct", "xret_pct", "provenance", "source"]
+    r[[c for c in cols if c in r.columns]].sort_values(
+        ["market", "signal_date", "ret_pct"], ascending=[True, True, False]
+    ).to_csv(out, index=False)
+    print(f"\n  → {out.relative_to(HERE)}  ({len(r)} rows, one per shortlisted name)")
     return 0
 
 
@@ -313,11 +481,13 @@ def main() -> int:
     ap.add_argument("--record", action="store_true", help="stamp today's passes")
     ap.add_argument("--report", action="store_true", help="performance since signal")
     ap.add_argument("--min-days", type=int, default=5)
+    ap.add_argument("--fetch-missing", action="store_true",
+                    help="track EU/JP/KR from yfinance (no local panel)")
     a = ap.parse_args()
     if a.record:
         return record()
     if a.report:
-        return report(a.min_days)
+        return report(a.min_days, a.fetch_missing)
     ap.print_help()
     return 0
 

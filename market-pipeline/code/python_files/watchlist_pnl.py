@@ -103,7 +103,17 @@ def entry_dates() -> pd.DataFrame:
     return d.drop_duplicates(subset=["symbol", "market"], keep="first")
 
 
-def _current_prices(market: str):
+def _cap(s: pd.Series, asof: Optional[pd.Timestamp]) -> pd.Series:
+    """Drop bars after `asof`. A no-op when asof is None."""
+    if asof is None or not len(s):
+        return s
+    try:
+        return s[pd.to_datetime(s.index) <= asof]
+    except Exception:
+        return s
+
+
+def _current_prices(market: str, asof: Optional[pd.Timestamp] = None):
     """(price, as_of_date) per symbol from the FRESHEST store, not the deepest.
 
     Returns the DATE alongside the price, always. A price without the date it
@@ -120,8 +130,15 @@ def _current_prices(market: str):
 
     So: history from the LFS panel, TODAY from the daily store. Neither source
     is right for both ends.
+
+    `asof` caps every series at a date. Today's bar is an unsettled intraday
+    tick until the close prints — the 2026-07-21 brief failed validation for
+    exactly that reason, screener.in serving live quotes mid-session — so a mark
+    dated today is not comparable to an entry dated on a close. Passing an asof
+    makes "priced to yesterday" a property of the run rather than an accident of
+    when the stores last happened to update.
     """
-    px, asof = {}, {}
+    px, dates = {}, {}
     if market == "US":
         try:
             import data_registry as R
@@ -130,10 +147,11 @@ def _current_prices(market: str):
                     d = pd.read_parquet(f, columns=["Close"]).dropna()
                 except Exception:
                     continue
-                if not len(d):
+                c = _cap(d["Close"], asof)
+                if not len(c):
                     continue
-                px[f.stem.upper()] = float(d["Close"].iloc[-1])
-                asof[f.stem.upper()] = pd.to_datetime(d.index[-1])
+                px[f.stem.upper()] = float(c.iloc[-1])
+                dates[f.stem.upper()] = pd.to_datetime(c.index[-1])
         except Exception:
             pass
     elif market == "IN":
@@ -146,19 +164,110 @@ def _current_prices(market: str):
                     continue
                 if df is None or df.empty or "Close" not in df.columns:
                     continue
-                c = pd.to_numeric(df["Close"], errors="coerce").dropna()
+                c = _cap(pd.to_numeric(df["Close"], errors="coerce").dropna(), asof)
                 if not len(c):
                     continue
                 k = str(sym).upper()
                 px[k] = float(c.iloc[-1])
-                idx = df.index[df.index.isin(c.index)] if hasattr(df.index, "isin") else df.index
-                asof[k] = pd.to_datetime(idx[-1]) if len(idx) else pd.NaT
+                dates[k] = pd.to_datetime(c.index[-1])
         except Exception:
             pass
-    return pd.Series(px, dtype=float), pd.Series(asof)
+    return pd.Series(px, dtype=float), pd.Series(dates)
 
 
-def build(market: Optional[str], status: Optional[str]) -> pd.DataFrame:
+def _yf_candidates(market: str, symbol: str) -> list:
+    """Local watchlist symbol -> yfinance ticker candidates.
+
+    Korea stores bare codes that have LOST their leading zeros (38880 is really
+    038880), so the code must be re-padded to six digits before a suffix is
+    added; .KS is KOSPI and .KQ is KOSDAQ, and only trying one silently drops
+    every listing on the other board.
+    """
+    s = str(symbol).strip().upper()
+    if market == "JP":
+        return [f"{s}.T"]
+    if market == "KR":
+        try:
+            p = f"{int(s):06d}"
+        except ValueError:
+            p = s
+        return [f"{p}.KS", f"{p}.KQ"]
+    return [s]          # EU symbols already carry their exchange suffix
+
+
+def _fetch_missing(d: pd.DataFrame, asof: Optional[pd.Timestamp]) -> pd.DataFrame:
+    """Fill prices for markets with no local store (EU/JP/KR) from yfinance.
+
+    OHLC_DIR holds US names only and bhavcopy holds India, so EU/JP/KR names sit
+    in the watchlist with no mark at all — 50 of 651 rows. Their scans fetch
+    live at scan time and retain nothing, so there is no history to read.
+
+    Opt-in (--fetch-missing) because this reaches the network from what is
+    otherwise a pure reporting tool. Bars after `asof` are dropped, so a name
+    whose market was shut on the as-of date reports its last real session rather
+    than being silently forward-filled — Japan was closed 2026-07-20 for Marine
+    Day, so JP legitimately marks to 07-17.
+    """
+    try:
+        import yfinance as yf
+    except ImportError:
+        print("  --fetch-missing: yfinance unavailable, skipping")
+        return d
+
+    need = d[d["ltp"].isna()] if "ltp" in d.columns else d.iloc[0:0]
+    if need.empty:
+        return d
+    print(f"  --fetch-missing: {len(need)} unpriced names from yfinance …")
+
+    start = (pd.to_datetime(need["date_added"]).min() - pd.Timedelta(days=7))
+    if pd.isna(start):
+        start = (asof or pd.Timestamp.today()) - pd.Timedelta(days=400)
+    end = ((asof or pd.Timestamp.today()) + pd.Timedelta(days=1))
+
+    ok = 0
+    for i, r in need.iterrows():
+        for t in _yf_candidates(str(r["market"]), str(r["symbol"])):
+            try:
+                h = yf.Ticker(t).history(start=start.strftime("%Y-%m-%d"),
+                                         end=end.strftime("%Y-%m-%d"),
+                                         auto_adjust=False)
+            except Exception:
+                continue
+            if h is None or h.empty or "Close" not in h.columns:
+                continue
+            c = _cap(pd.to_numeric(h["Close"], errors="coerce").dropna(), asof)
+            if not len(c):
+                continue
+            idx = pd.to_datetime(c.index).tz_localize(None)
+            last_dt = idx[-1]
+            d.at[i, "ltp"] = float(c.iloc[-1])
+            d.at[i, "as_of"] = last_dt
+            d0 = r.get("date_added")
+            if pd.notna(d0):
+                prior = c[idx <= pd.Timestamp(d0)]
+                if len(prior):
+                    e = float(prior.iloc[-1])
+                    d.at[i, "entry_price"] = e
+                    d.at[i, "basis"] = "panel-close"
+                    # Same guard build() applies, and for the same reason: a mark
+                    # dated BEFORE the entry cannot measure a return. Japan was
+                    # shut 2026-07-20 (Marine Day), so 15 JP names entered on the
+                    # 20th resolved both entry and mark to the SAME 07-17 bar —
+                    # differencing it against itself printed a confident +0.0%,
+                    # indistinguishable from a stock that genuinely did not move.
+                    if last_dt < pd.Timestamp(d0):
+                        d.at[i, "pct_since"] = float("nan")
+                    else:
+                        d.at[i, "pct_since"] = (float(c.iloc[-1]) / e - 1) * 100
+                    d.at[i, "held_days"] = (last_dt - pd.Timestamp(d0)).days
+            ok += 1
+            break
+    print(f"  --fetch-missing: priced {ok}/{len(need)}")
+    return d
+
+
+def build(market: Optional[str], status: Optional[str],
+          asof: Optional[pd.Timestamp] = None) -> pd.DataFrame:
     wl = pd.read_csv(WATCHLIST)
     wl["symbol"] = wl["symbol"].astype(str).str.upper()
     wl["market"] = wl["market"].astype(str).str.upper()
@@ -168,11 +277,23 @@ def build(market: Optional[str], status: Optional[str]) -> pd.DataFrame:
         wl = wl[wl["status"] == status]
 
     ed = entry_dates()
+    # A name signalled AFTER the as-of date has not entered the book yet as of
+    # that date. Keeping it would show a position that did not exist, or one
+    # whose entry postdates its own mark.
+    if asof is not None and not ed.empty:
+        ed = ed[pd.to_datetime(ed["date_added"]) <= asof]
     wl = wl.merge(ed, on=["symbol", "market"], how="left")
 
     # A date embedded in the note is a fallback for rows the ledger missed.
     note_dt = wl["note"].astype(str).str.extract(DATE_RE)[0]
     wl["date_added"] = wl["date_added"].fillna(pd.to_datetime(note_dt, errors="coerce"))
+
+    # Apply the as-of cap AFTER the note fallback, not only to the ledger.
+    # Filtering the ledger alone let five KR names stamped 2026-07-21 through,
+    # because their date came from the note regex instead — a second entry
+    # path around the same guard.
+    if asof is not None:
+        wl = wl[wl["date_added"].isna() | (pd.to_datetime(wl["date_added"]) <= asof)]
 
     bridge = _bse_bridge()
     out = []
@@ -185,12 +306,17 @@ def build(market: Optional[str], status: Optional[str]) -> pd.DataFrame:
         px["Date"] = pd.to_datetime(px["Date"])
         wide = px.pivot_table(index="Date", columns="Symbol", values="Close",
                               aggfunc="last").sort_index()
+        if asof is not None:
+            wide = wide[wide.index <= asof]
         b = BENCH.get(mkt)
         bench = wide[b] if b in wide.columns else wide.median(axis=1)
 
-        fresh, fresh_asof = _current_prices(mkt)   # LFS panel is days behind
+        fresh, fresh_asof = _current_prices(mkt, asof)   # LFS panel is days behind
         mkt_latest = fresh_asof.max() if len(fresh_asof) else pd.NaT
-        ltp, entry, pct, xpct, basis, asof, stale = [], [], [], [], [], [], []
+        # NB: not `asof` — that is the as-of CAP parameter. Reusing the name
+        # rebound it to a list on the second market iteration and the panel cap
+        # then compared an index against a list ("Lengths must match").
+        ltp, entry, pct, xpct, basis, asof_col, stale = [], [], [], [], [], [], []
         for _, r in grp.iterrows():
             key = bridge.get(r["symbol"], r["symbol"])
             if key not in wide.columns:
@@ -202,7 +328,7 @@ def build(market: Optional[str], status: Optional[str]) -> pd.DataFrame:
             ao = fresh_asof.get(key, fresh_asof.get(r["symbol"], pd.NaT))
             if cur != cur and len(s):
                 cur = float(s.iloc[-1]); ao = pd.to_datetime(s.index[-1])
-            ltp.append(cur); asof.append(ao)
+            ltp.append(cur); asof_col.append(ao)
             # Days between this symbol's last bar and the freshest bar anywhere
             # in its market. 0 = traded on the most recent session; a large
             # number is a suspended, delisted or illiquid name whose "current"
@@ -235,7 +361,7 @@ def build(market: Optional[str], status: Optional[str]) -> pd.DataFrame:
         g = grp.copy()
         g["ltp"], g["entry_price"], g["pct_since"], g["vs_mkt"], g["basis"] = \
             ltp, entry, pct, xpct, basis
-        g["as_of"], g["stale_days"] = asof, stale
+        g["as_of"], g["stale_days"] = asof_col, stale
         out.append(g)
     return pd.concat(out, ignore_index=True) if out else pd.DataFrame()
 
@@ -247,11 +373,25 @@ def main() -> int:
     ap.add_argument("--sort", choices=["default", "pct", "date"], default="default")
     ap.add_argument("--top", type=int, default=0, help="limit rows printed per market")
     ap.add_argument("--out")
+    ap.add_argument("--asof", help="cap all prices at this date (YYYY-MM-DD), "
+                                   "e.g. yesterday's close; 'yesterday' accepted")
+    ap.add_argument("--fetch-missing", action="store_true",
+                    help="fetch EU/JP/KR prices from yfinance (no local store)")
     a = ap.parse_args()
 
-    d = build(a.market, a.status)
+    asof = None
+    if a.asof:
+        if a.asof == "yesterday":
+            asof = pd.Timestamp.today().normalize() - pd.Timedelta(days=1)
+        else:
+            asof = pd.Timestamp(a.asof)
+        print(f"  as-of cap: {asof:%Y-%m-%d} — bars after this date are excluded")
+
+    d = build(a.market, a.status, asof)
     if d.empty:
         print("  nothing to show"); return 1
+    if a.fetch_missing:
+        d = _fetch_missing(d, asof)
 
     # Requested ordering: market, then date added, then LTP.
     if a.sort == "pct":
@@ -294,9 +434,21 @@ def main() -> int:
         if v.empty:
             continue
         x = g["vs_mkt"].dropna()
+        # A row whose mark falls on its entry date has a zero-day holding
+        # period: its 0.0% is arithmetic, not performance. Folding those into
+        # the median makes a list that has barely been held look like a list
+        # that went nowhere. Report the held subset separately rather than
+        # publishing one number that means two different things.
+        held = g[(g["as_of"].notna()) & (g["date_added"].notna())
+                 & (pd.to_datetime(g["as_of"]) > pd.to_datetime(g["date_added"]))]
+        hv = held["pct_since"].dropna()
+        zero_day = len(v) - len(hv)
+        med_h = f"{hv.median():+7.1f}%" if len(hv) else "     n/a"
         print(f"    {mkt} {st:<7} n={len(v):>3}  med {v.median():>+7.1f}%   "
               f"vs mkt {x.median() if len(x) else float('nan'):>+7.1f}   "
-              f"win {(x > 0).mean()*100 if len(x) else float('nan'):>3.0f}%")
+              f"win {(x > 0).mean()*100 if len(x) else float('nan'):>3.0f}%"
+              f"   held>0d n={len(hv):>3} med {med_h}"
+              + (f"  [{zero_day} zero-day]" if zero_day else ""))
     st = d["stale_days"].dropna() if "stale_days" in d.columns else pd.Series(dtype=float)
     if len(st):
         n_stale = int((st > 7).sum())

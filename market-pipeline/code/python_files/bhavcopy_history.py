@@ -38,8 +38,9 @@ except ImportError:
     clean_ohlcv = None
 
 import os
-CACHE = Path(os.environ.get("BHAV_CACHE",
-                            Path.home() / "Downloads" / "data" / "bhavcopy_cache"))
+# Default resolves through the registry, NOT ~/Downloads — see bhavcopy_store.
+import data_registry as _R
+CACHE = Path(os.environ.get("BHAV_CACHE", _R.BHAV_CACHE))
 (NSE_DIR := CACHE / "nse").mkdir(parents=True, exist_ok=True)
 (BSE_DIR := CACHE / "bse").mkdir(parents=True, exist_ok=True)
 ASSEMBLED = CACHE / "assembled_long.parquet"   # consolidated raw (Date,Symbol,OHLCV)
@@ -76,6 +77,70 @@ def _equity_only(df: Optional["pd.DataFrame"]) -> Optional["pd.DataFrame"]:
     if df is None or df.empty or "ISIN" not in df.columns:
         return df
     return df[df["ISIN"].astype(str).str.startswith("INE")]
+
+
+def _lmdb_max_date() -> Optional["pd.Timestamp"]:
+    """Newest bar in the LMDB, by MEDIAN symbol — never by max.
+
+    Anchoring on the newest symbol would let one recently-updated name mask a
+    store-wide lag; anchoring on the oldest would let a handful of delisted
+    names force a needless rebuild every run. The median moves only when the
+    bulk of the store moves, which is the question being asked.
+    """
+    try:
+        import bhavcopy_store as bs
+        syms = bs.symbols()
+        if not syms:
+            return None
+        # A sample is enough to place the median and keeps this guard cheap
+        # enough to run on every invocation.
+        step = max(1, len(syms) // 200)
+        last = []
+        for s in syms[::step]:
+            try:
+                df = bs.get(s)
+            except Exception:
+                continue
+            if df is None or df.empty or "Close" not in df.columns:
+                continue
+            c = pd.to_numeric(df["Close"], errors="coerce").dropna()
+            if len(c):
+                last.append(pd.Timestamp(c.index[-1]))
+        return pd.Series(last).median() if last else None
+    except Exception:
+        return None
+
+
+def _lmdb_behind_cleaned() -> bool:
+    """True when the LMDB lags the cleaned parquet that feeds it.
+
+    🔴 The LMDB is a THIRD store, and until 2026-07-21 nothing checked it. The
+    sync at the end of fetch_history() sits AFTER the fast path's early return,
+    so once the fast path started being taken every run the LMDB simply stopped
+    advancing: cleaned and assembled both reached 2026-07-20 while the LMDB
+    stayed pinned at 2026-07-15, three sessions behind.
+
+    Nothing errored. bhavcopy_store.get() kept returning a real DataFrame with
+    real prices — just five days old — so watchlist_pnl marked India positions
+    to 15 Jul closes and warehouse_update folded 15 Jul bars into the deep panel
+    as though they were current.
+
+    This is the same defect the comment on the fast path below already
+    describes, applied to a consumer that fix did not cover. Guarding cleaned
+    against assembled while leaving the LMDB unguarded fixed one of three
+    stores.
+    """
+    if not CLEANED.exists():
+        return False
+    try:
+        cl = pd.read_parquet(CLEANED, columns=["Date"])["Date"]
+        cl_max = pd.Timestamp(pd.to_datetime(cl).max())
+    except Exception:
+        return False
+    lm = _lmdb_max_date()
+    if lm is None:
+        return True          # no store at all → build it
+    return pd.Timestamp(lm).normalize() < cl_max.normalize()
 
 
 def _cleaned_behind_assembled(cached: "pd.DataFrame", want_dates: set) -> bool:
@@ -289,8 +354,27 @@ def fetch_history(n_days: int = 400, workers: int = 8, exchanges=("NSE", "BSE"),
     if not new_rows and CLEANED.exists() and not _cleaned_behind_assembled(cached, want_dates):
         try:
             out = _from_cleaned(min_bars)
-            if verbose:
-                print(f"  ⚡ fast path (no new EOD yet): {len(out)} symbols, skipped rebuild")
+            # The pivot+clean is genuinely skippable here, but the LMDB sync is
+            # NOT: it lives past the return below, so taking this path without
+            # it is what pinned the store at 2026-07-15 while cleaned advanced
+            # to 07-20. Sync from the frame already in hand — cheap, and only
+            # when actually behind.
+            if _lmdb_behind_cleaned():
+                try:
+                    from bhavcopy_store import build as _build_store
+                    n = _build_store(out, verbose=False)
+                    if verbose:
+                        print(f"  ⚡ fast path (no new EOD yet): {len(out)} symbols, "
+                              f"skipped rebuild; LMDB was behind → synced {n} symbols")
+                except Exception as e:
+                    # Loud: a stale LMDB returns plausible old prices rather
+                    # than failing, so silence here is indistinguishable from
+                    # success.
+                    print(f"  ⚠️  LMDB sync FAILED ({type(e).__name__}: {e}) — "
+                          "bhavcopy_store is stale; India prices will lag")
+            elif verbose:
+                print(f"  ⚡ fast path (no new EOD yet): {len(out)} symbols, "
+                      "skipped rebuild; LMDB current")
             return out
         except Exception:
             pass

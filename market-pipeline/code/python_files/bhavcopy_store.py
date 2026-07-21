@@ -27,8 +27,13 @@ import pyarrow as pa
 import pyarrow.feather as feather
 
 import os
-CACHE = Path(os.environ.get("BHAV_CACHE",
-                            Path.home() / "Downloads" / "data" / "bhavcopy_cache"))
+# Default resolves through the registry, NOT ~/Downloads. Both trees exist and
+# both look plausible, so an interactive run that defaulted to Downloads read a
+# separate, older copy with no error — which is exactly how a stale-LMDB bug was
+# "found" on 2026-07-21 that did not exist: the parquet came from one tree and
+# the LMDB from the other.
+import data_registry as _R
+CACHE = Path(os.environ.get("BHAV_CACHE", _R.BHAV_CACHE))
 STORE = CACHE / "ohlcv.lmdb"
 CLEANED = CACHE / "cleaned_long.parquet"
 _MAP_SIZE = 512 * 1024 * 1024          # 512 MB virtual cap (sparse; grows as used)

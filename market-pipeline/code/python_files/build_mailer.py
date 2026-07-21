@@ -63,6 +63,37 @@ def _tv(x):
     return f"${x / 1e6:.1f}M" if pd.notna(x) else "—"
 
 
+def _fund_coverage_note() -> str:
+    """A one-line caveat on the fundamental screeners' alphabet coverage.
+
+    The Piotroski picks now span the whole universe (served from the off-hours
+    store, one yfinance call = none, no throttle). Coffee Can / Bull Cartel /
+    Magic Formula still fetch live per-ticker and throttle alphabetically, so
+    they remain A-skewed until Phases 2-3. Stating this stops a reader reading an
+    A-heavy list as 'the best fundamental names in India' when it is partly an
+    artifact of which names have been collected. The count is computed live so
+    the note self-corrects as the store fills.
+    """
+    try:
+        import data_registry as _R
+        d = pd.read_parquet(_R.FUND_DIR / "IN_current.parquet")
+        n = d.dropna(subset=["cfo", "total_assets"])["ticker"].nunique()
+        letters = d.dropna(subset=["cfo", "total_assets"])["ticker"].astype(str).str[0].nunique()
+    except Exception:
+        n, letters = 0, 0
+    if n < 50:
+        return ("<p class='mut' style='font-size:11px;margin:2px 0'>⚠ Fundamentals "
+                "coverage is still filling from the off-hours collector. Piotroski "
+                "picks may be alphabet-skewed until it completes; Coffee Can / Bull "
+                "Cartel / Magic Formula remain live-fetched and A-skewed pending "
+                "Phase 2.</p>")
+    return (f"<p class='mut' style='font-size:11px;margin:2px 0'>Piotroski now spans "
+            f"the universe ({n} names, {letters} first-letters, off-hours store). "
+            f"Coffee Can / Bull Cartel / Magic Formula are still live-fetched and "
+            f"remain A-skewed until Phase 2 — read those three by conviction, not "
+            f"alphabet.</p>")
+
+
 def _table(headers, rows):
     """A table that scrolls inside its own box instead of breaking the layout.
 
@@ -690,6 +721,7 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇮🇳 India <span style="font-weight:400;color:#666;font-size:13px">— mood {mood["mood"]} ({mood["score"]:+.2f}) from {mood.get("n_articles", 0)} articles</span></h2>
 <h3 style="font-size:13px;margin:12px 0 4px;color:#333">Screener — most tradable</h3>
+{_fund_coverage_note()}
 {_table(["Symbol", "Tier", "Screens", "Turnover", "Liquidity"], ind_picks_rows) if ind_picks_rows else "<p>no picks</p>"}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">Cash Conversion Cycle <span style="font-weight:400;color:#777" class="mut">(screener.in 228040)</span></h3>
 <p style="font-size:11px;color:#666;margin:2px 0">Lowest/negative CCC = collects from customers before paying suppliers.</p>

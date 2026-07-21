@@ -95,6 +95,54 @@ policy convergence). No pipeline decisions recovered.
 
 ---
 
+## 2026-07-22 (fundamentals coverage)
+
+### 🔴 The A-bias was TWO bugs, not one — and the live scan was the bigger
+
+Confirmed the brief's Piotroski/CoffeeCan/BullCartel/MagicFormula picks are
+89-96% A-names, and isolated the cause precisely: the Darvas/GoldenCross picks
+span the full alphabet (25 first-letters), but the FUNDAMENTAL screeners do not,
+because fundamentals come from two paths that both truncate alphabetically:
+
+  * screener.in PIT collector — blocked after 50-155 requests (already fixed,
+    hash ordering).
+  * the LIVE scan's Stage 4 — fetches one yfinance Ticker() per stock in
+    PARALLEL, Yahoo throttles after ~250, and the survivors are the
+    alphabetically-first. Measured: the Fundamentals sheet stops at BAJAJELEC;
+    the fundamentals store is 161 usable tickers, 133 of them A.
+
+### Off-hours multi-source collector + store-first Piotroski (Phase 1)
+
+`fundamentals_offhours.py` pre-collects current fundamentals for the clean
+equity universe (~1,348 names) from yfinance, hash-ordered, off-hours (weekends
++ weeknights), into a store the scan reads. Verified yfinance returns full
+Piotroski inputs for the non-A names screener.in never reached.
+
+The scan's `fundamental_scan` is now STORE-FIRST with fallback: a store hit costs
+zero yfinance calls (never throttles) and computes Piotroski identically; a store
+miss is byte-identical to before. Piotroski becomes alphabet-complete; the other
+three screeners abstain on a store hit (they need mcap/EBIT/equity/quarterly not
+yet stored) — Phases 2-3.
+
+**Decision: bhavcopy is NOT a fundamentals source.** It is price data; listing it
+would create a field that never populates. yfinance is primary; screener.in is
+optional deep-history enrichment.
+
+### Verification caught a field-extraction bug before it shipped
+
+First wired run: store f=5 vs live f=4 for AADHARHFC. The collector's `_pick`
+used SUBSTRING matching, so "current assets" matched "Total/Net/Other Current
+Assets" (218B stored vs 56B real) and "borrowings" grabbed "Total Debt" (187B)
+where the scan reads "Long Term Debt" (152B). Fixed to exact-match-first; field
+renamed borrowings->long_term_debt. Re-verified 8/8 tickers now score
+identically store-vs-live. The wrong store was cleared and re-seeded.
+
+⚠️ Coverage fills over hours/days as the collector runs. A self-correcting
+caveat on the brief's fundamentals section states current coverage so an A-heavy
+list is not read as 'the best fundamental names in India'.
+
+---
+
 ## 2026-07-21 (night, correction)
 
 ### 🔴 CORRECTION: the daily mailer was never failing — I was breaking it

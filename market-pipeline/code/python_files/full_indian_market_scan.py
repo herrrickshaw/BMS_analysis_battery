@@ -517,7 +517,41 @@ def fundamental_scan(symbol: str, yf_suffix: str = ".NS") -> dict:
     One yfinance Ticker() → one set of HTTP calls → four screener results.
     This is the core efficiency mechanism for running all screeners on the full universe.
     """
-    try:
+    # STORE-FIRST (Phase 1: Piotroski). The off-hours collector fills
+    # IN_current.parquet across the whole alphabet; the live per-ticker yfinance
+    # fetch below throttles under ThreadPoolExecutor after ~250 names and
+    # truncates ALPHABETICALLY (its Fundamentals sheet stopped at BAJAJELEC on
+    # 2026-07-22), which is why the brief's fundamental picks were 94% A-names.
+    #
+    # A store hit costs ZERO yfinance calls, so it never contends for the rate
+    # limit. The store serves ANNUAL statements only, and reproduces yfinance's
+    # values bit-identically (verified AADHARHFC/AARTIPHARM/ABFRL), so the
+    # Piotroski block below computes an identical score. Coffee Can, Magic
+    # Formula and Bull Cartel need market cap / EBIT / equity / quarterly data
+    # the store does not yet hold, so they simply do not fire on a store hit —
+    # the SAME outcome those names already had while throttled, not a
+    # regression. Phases 2-3 add those fields and quarterly data.
+    #
+    # A store MISS falls through to the exact live path, byte-identical to
+    # before: this change can only ADD Piotroski coverage, never remove any.
+    inc = bal = cf = inc_q = None
+    mcap, info = 0, {}
+    _store_hit = False
+    if yf_suffix == ".NS":
+        try:
+            import fundamentals_store_reader as _fsr
+            inc, bal, cf = _fsr.statements(symbol)
+            _store_hit = inc is not None and bal is not None
+        except Exception:
+            inc = bal = cf = None
+            _store_hit = False
+
+    if _store_hit:
+        # inc_q stays None (no quarterly in the store) -> Bull Cartel abstains;
+        # mcap stays 0 -> Coffee Can / Magic Formula abstain. Deliberate.
+        out = {"symbol": symbol, "error": "", "_source": "store"}
+    else:
+      try:
         ticker = yf.Ticker(f"{symbol}{yf_suffix}")
         inc = _first_df(ticker, "income_stmt", "financials")
         bal = _first_df(ticker, "balance_sheet")
@@ -531,7 +565,7 @@ def fundamental_scan(symbol: str, yf_suffix: str = ".NS") -> dict:
             info = ticker.info or {}
         except Exception:
             info = {}
-    except Exception as e:
+      except Exception as e:
         return {
             "symbol": symbol,
             "error": str(e),

@@ -80,12 +80,18 @@ FRESH_DAYS = 30       # a name collected within this many days is skipped
 
 # yfinance row-label -> our field. First matching label wins; labels vary across
 # yfinance versions, so several aliases are listed.
+# Candidate labels are the SCAN's exact lookups, in its priority order, so
+# _pick (exact-match-first) selects the identical row the scan would. Field names
+# are chosen to match what the scan reads: long_term_debt, NOT borrowings — the
+# scan's Piotroski and Coffee Can both read "Long Term Debt", and grabbing the
+# larger "Total Debt" row instead is precisely the bug that made the store
+# disagree with a live run.
 YF_MAP = {
     "net_income":          ["Net Income", "Net Income Common Stockholders"],
     "revenue":             ["Total Revenue", "Operating Revenue"],
     "cfo":                 ["Operating Cash Flow", "Total Cash From Operating Activities"],
     "total_assets":        ["Total Assets"],
-    "borrowings":          ["Total Debt", "Long Term Debt"],
+    "long_term_debt":      ["Long Term Debt"],
     "current_assets":      ["Current Assets", "Total Current Assets"],
     "current_liabilities": ["Current Liabilities", "Total Current Liabilities"],
     "gross_profit":        ["Gross Profit"],
@@ -154,13 +160,32 @@ def universe() -> list:
 
 # ── extraction ────────────────────────────────────────────────────────────────
 def _pick(df: "pd.DataFrame", labels) -> Optional["pd.Series"]:
-    """First row whose label matches, as a year-indexed Series, or None."""
+    """Row for the first matching label, EXACT match preferred.
+
+    🔴 Substring matching corrupted three fields. "current assets" as a substring
+    matched "Total Current Assets" AND "Net Current Assets" AND "Other Current
+    Assets" — whichever came first in the index — so the store held 218B where
+    the real Current Assets was 56B, and Piotroski scored differently from a live
+    run. The consuming code (stock_utils.row) matches EXACTLY, so the store must
+    too, or the two sources disagree.
+
+    Exact match across ALL candidate labels first; only if none match exactly
+    fall back to substring, which is still useful for genuinely-varying labels
+    but never overrides an exact hit.
+    """
     if df is None or df.empty:
         return None
+    idx = {str(i): i for i in df.index}
     idx_lower = {str(i).lower(): i for i in df.index}
-    for want in labels:
+    for want in labels:                       # exact, case-sensitive first
+        if want in idx:
+            return df.loc[idx[want]]
+    for want in labels:                       # exact, case-insensitive
+        if want.lower() in idx_lower:
+            return df.loc[idx_lower[want.lower()]]
+    for want in labels:                       # last resort: substring
         for low, orig in idx_lower.items():
-            if want.lower() == low or want.lower() in low:
+            if want.lower() in low:
                 return df.loc[orig]
     return None
 
@@ -183,7 +208,7 @@ def from_yfinance(ticker: str) -> list:
 
     series = {}
     for field, labels in YF_MAP.items():
-        src = bs if field in ("total_assets", "borrowings", "current_assets",
+        src = bs if field in ("total_assets", "long_term_debt", "current_assets",
                               "current_liabilities", "shares") else (
               cf if field == "cfo" else is_)
         series[field] = _pick(src, labels)

@@ -49,7 +49,7 @@ FIELD_TO_LABEL = {
     "revenue":             ("inc", "Total Revenue"),
     "gross_profit":        ("inc", "Gross Profit"),
     "total_assets":        ("bal", "Total Assets"),
-    "borrowings":          ("bal", "Long Term Debt"),   # scan reads Long Term Debt
+    "long_term_debt":       ("bal", "Long Term Debt"),
     "current_assets":      ("bal", "Current Assets"),
     "current_liabilities": ("bal", "Current Liabilities"),
     "shares":              ("bal", "Share Issued"),

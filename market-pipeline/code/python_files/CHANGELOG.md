@@ -18,6 +18,83 @@ mistakes were made, and the mistakes here have repeated.
 
 ---
 
+## 2026-07-21 (night, sampling)
+
+### 🔴 EVERY India factor result so far is an ALPHABETICAL sample
+
+Found while checking why the news-convergence output was all A-names. The India
+factor panel held 135 tickers:
+
+    {'2': 1, '3': 3, '5': 1, '6': 1, 'A': 127, 'B': 2}
+
+**127 of 135 begin with "A"**, and the list stops at `BAGFILMS`.
+
+`screener_history_collector._universe()` returned `sorted(set(...))` and the
+caller takes `universe[:limit]`. screener.in hard-blocks after ~50-155 requests
+per session, so every session ever run collected an alphabetical PREFIX.
+
+**This invalidates the factor work to date.** Piotroski, ROCE, debt-cycle and
+every combination test was a statement about companies whose name starts with A,
+presented as a statement about the Indian market. Worse, the panel growing
+108 → 135 earlier today *looked* like progress while adding only more A's — the
+sample appeared to improve while staying exactly as biased.
+
+Alphabetical order correlates with nothing financial, which is precisely why a
+truncated alphabetical sample looks random until the first letters are counted.
+This is the **same defect already recorded for the US price panel** (an
+interrupted alphabetical collection missing CME/CMI). Second occurrence, same
+root cause, different dataset.
+
+**Fixed** (`global-stock-screener` `b785dec`): the universe is ordered by symbol
+hash. Deterministic — same universe, same sequence, so runs stay reproducible
+and resumption still works via the `done` set — but uncorrelated with the
+alphabet, so a session that dies early leaves a representative sample. Verified:
+first 150 names span **28 distinct first letters, was 2**.
+
+⚠️ The existing 220 collected tickers remain alphabetically skewed. The panel
+only becomes representative as the trickle collects under the new ordering.
+**Do not quote a factor result off the current panel.**
+
+### `news_convergence.py` — do the headlines contradict the picks?
+
+For each stock passing a filter, pull Moneycontrol/ET/Mint coverage and report
+`CONVERGENT` / `NEUTRAL` / `DIVERGENT` / `NO_NEWS`.
+
+**Decision: the useful output is DIVERGENCE, not convergence.** "The filter
+picked it and the news is good, so the filter worked" is confirmation bias — it
+would make every filter look good on a day the market rose. What earns its keep
+is a technically immaculate stock carrying a fraud probe or an auditor
+resignation, i.e. something public the filter cannot see. Only forward returns
+can say a filter works; `signal_tracker.py` does that.
+
+Two guards that materially change the output:
+
+- **Stricter matching than `sentiment_pipeline`.** The RSS feeds are
+  market-wide. The default matcher scored RELIANCE `POSITIVE` off two copies of
+  *"Market wrap: Top gainers and losers on Nifty and Sensex today"* — a headline
+  naming dozens of companies and characterising none. Here a headline counts
+  only if the company is named in the **title**, market-wraps are excluded, and
+  duplicates collapse. Recall traded for precision deliberately.
+- **Red-flag terms outrank the average.** VADER is general-purpose: "SEBI probe"
+  and "CFO resigns" score near-neutral in ordinary English, and those are exactly
+  the headlines that matter. Three routine positives must not bury one auditor
+  resignation, which is what averaging does.
+
+`NO_NEWS` is its own category, never folded into `NEUTRAL`: 20 of 30 names had
+no company-specific coverage, and "nothing bad was written" versus "nobody was
+looking" are different facts.
+
+### Export mined — little there for the mailer
+
+The supplied 59MB export is **claude.ai web chats**; the pipeline engineering
+happened in Claude Code, whose transcripts live in `~/.claude/projects/` and are
+not in it. 39 of 180 conversations mention the mailer/pipeline, but the
+moneycontrol references are all generic (Moneycontrol as a website for screening
+or FII/DII flows) and the `convergence` hits are unrelated (Navier-Stokes,
+policy convergence). No pipeline decisions recovered.
+
+---
+
 ## 2026-07-21 (night, correction)
 
 ### 🔴 CORRECTION: the daily mailer was never failing — I was breaking it

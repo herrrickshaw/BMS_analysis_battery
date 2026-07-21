@@ -172,15 +172,39 @@ def _darvas_from_df(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
     if df is None or df.empty or len(df) < confirm + 5:
         return {"signal": "INSUFFICIENT_DATA", "box_top": None, "box_bottom": None}
 
-    # yf.download columns: Open, High, Low, Close, Volume
+    # Trim to the last SETTLED bar. Vendors append a row for the current session
+    # before it prints, and that empty row is what became current = 0.
     try:
-        highs  = pd.to_numeric(df["High"],  errors="coerce").fillna(0).tolist()
-        lows   = pd.to_numeric(df["Low"],   errors="coerce").fillna(0).tolist()
-        closes = pd.to_numeric(df["Close"], errors="coerce").fillna(0).tolist()
+        _c = pd.to_numeric(df["Close"], errors="coerce")
+        _last = _c.last_valid_index()
+        if _last is None:
+            return {"signal": "NO_DATA", "box_top": None, "box_bottom": None,
+                    "current_price": None}
+        df = df.loc[:_last]
+    except KeyError:
+        return {"signal": "INSUFFICIENT_DATA", "box_top": None, "box_bottom": None}
+
+    # 🔴 Trailing NaN bars must be DROPPED, never zero-filled.
+    # .fillna(0) turned a missing final close into current=0, and 0 is below
+    # every box bottom — so the whole universe reported BREAKDOWN_SELL. Korea
+    # 2026-07-21: 2,472 of 2,480 rows. The zero never reached LTP, which is
+    # computed with .dropna(), so the sheet showed a real price beside a signal
+    # derived from zero. Zero is a PRICE here, not a null; coercing missing data
+    # to a valid-looking value is what made this silent.
+    try:
+        highs  = pd.to_numeric(df["High"],  errors="coerce").tolist()
+        lows   = pd.to_numeric(df["Low"],   errors="coerce").tolist()
+        closes = pd.to_numeric(df["Close"], errors="coerce").tolist()
     except KeyError:
         return {"signal": "INSUFFICIENT_DATA", "box_top": None, "box_bottom": None}
 
     current = closes[-1]
+    if current is None or current != current or current <= 0:
+        # Explicit: a missing final bar is NO_DATA. Falling through would make
+        # every comparison False and silently report IN_BOX — a different wrong
+        # answer, not a right one.
+        return {"signal": "NO_DATA", "box_top": None, "box_bottom": None,
+                "current_price": None}
     highs_h = highs[:-1]    # historical only
     lows_h  = lows[:-1]
     n       = len(highs_h)

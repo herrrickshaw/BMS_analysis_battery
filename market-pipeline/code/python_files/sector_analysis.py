@@ -47,9 +47,10 @@ try:
 except ImportError:
     _SK_OK = False
 
-CACHE_DIR    = Path.home() / "Downloads" / "market_cache" / "ohlc"
+import data_registry as _R
+CACHE_DIR    = _R.OHLC_DIR
 REF_DIR      = Path.home() / "nse_screener_reference" / "ohlc_cache"
-SECTOR_CACHE = Path.home() / "Downloads" / "market_cache" / "sector_map.json"
+SECTOR_CACHE = _R.MARKET_CACHE / "sector_map.json"
 OUT_DIR      = Path("./sector_results"); OUT_DIR.mkdir(exist_ok=True)
 
 DISCLAIMER = ("⚠️  Sector classifications from yfinance; return patterns are "

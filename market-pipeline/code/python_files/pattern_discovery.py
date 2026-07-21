@@ -50,7 +50,8 @@ try:
 except ImportError:
     _SK_OK = False
 
-CACHE_DIR = Path.home() / "Downloads" / "market_cache" / "ohlc"
+import data_registry as _R
+CACHE_DIR = _R.OHLC_DIR
 REF_DIR   = Path.home() / "nse_screener_reference" / "ohlc_cache"
 OUT_DIR   = Path("./pattern_results"); OUT_DIR.mkdir(exist_ok=True)
 

@@ -33,8 +33,8 @@ import requests
 
 warnings.filterwarnings("ignore")
 
-CACHE = Path(os.environ.get("REF_DATA_CACHE",
-                            Path.home() / "Downloads" / "data" / "reference_data"))
+import data_registry as _R
+CACHE = Path(os.environ.get("REF_DATA_CACHE", _R.REPO / "data" / "reference_data"))
 CACHE.mkdir(parents=True, exist_ok=True)
 _UA = {"User-Agent": "Mozilla/5.0 (academic-research)"}
 

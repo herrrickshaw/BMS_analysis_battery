@@ -64,10 +64,18 @@ def _tv(x):
 
 
 def _table(headers, rows):
+    """A table that scrolls inside its own box instead of breaking the layout.
+
+    Without the wrapper an 8-column table renders at ~800px inside a 375px phone
+    viewport, so the whole brief is scaled down to fit and every number becomes
+    unreadable. Most of this is read on a phone. The table scrolls sideways on
+    its own now; the page does not.
+    """
     h = "".join(f"<th align='left' style='padding:5px 8px'>{x}</th>" for x in headers)
     return (
-        f"<table style='border-collapse:collapse;width:100%;font-size:13px'>"
-        f"<tr style='background:#eef'>{h}</tr>{''.join(rows)}</table>"
+        "<div class='tw' style='overflow-x:auto;-webkit-overflow-scrolling:touch'>"
+        f"<table style='border-collapse:collapse;width:100%;font-size:13px;min-width:520px'>"
+        f"<tr class='hd' style='background:#eef'>{h}</tr>{''.join(rows)}</table></div>"
     )
 
 
@@ -93,7 +101,7 @@ def _news_rows(market: str, top: int = 8):
             f"<td>{p['name']}</td>"
             f"<td style='color:{_SENT_COL.get(p['label'], '#777')};font-weight:600'>{p['label']} ({p['score']:+.2f})</td>"
             f"<td>{p['mentions']}</td>"
-            f"<td style='color:#555'>{p['headline']}</td></tr>"
+            f"<td class='mut' style='color:#555'>{p['headline']}</td></tr>"
         )
     return rows
 
@@ -307,16 +315,16 @@ def _darvas_section(market: str, cap: int = 15) -> str:
     (a full-universe scan can surface 100+ "fresh" breakouts — the header still
     reports the true Tier-1/Tier-2 totals, only the table is truncated)."""
     if dbrk is None:
-        return "<p style='color:#777'>Darvas fragment unavailable (darvas_breakouts.py not importable).</p>"
+        return "<p class='mut' style='color:#777'>Darvas fragment unavailable (darvas_breakouts.py not importable).</p>"
     label = _DARVAS_LABEL.get(market, market)
     try:
         _, df = dbrk.build(market, write_csv=False)
     except Exception as e:
-        return f"<p style='color:#777'>Darvas fragment for {market} unavailable ({e}).</p>"
+        return f"<p class='mut' style='color:#777'>Darvas fragment for {market} unavailable ({e}).</p>"
     if df.empty:
         return (
             f"<h3>📈 {label} — Darvas Breakouts</h3>"
-            f'<p style="color:#777">No fresh breakouts in the latest scan.</p>'
+            f'<p class="mut" style="color:#777" class="mut">No fresh breakouts in the latest scan.</p>'
         )
     n1 = int((df["Tier"] == 1).sum())
     n2 = int((df["Tier"] == 2).sum())
@@ -329,7 +337,7 @@ def _darvas_section(market: str, cap: int = 15) -> str:
     body = dbrk.rows_html(df.head(cap), market)
     return (
         f"<h3>📈 {label} — Darvas Breakouts "
-        f'<span style="font-weight:400;color:#777">({n1} Tier-1 · {n2} Tier-2{shown_note})</span></h3>'
+        f'<span style="font-weight:400;color:#777" class="mut">({n1} Tier-1 · {n2} Tier-2{shown_note})</span></h3>'
         f'<div class="trail" style="overflow-x:auto">'
         f'<table style="border-collapse:collapse;width:100%;font-size:12.5px">'
         f"{head}{body}</table></div>"
@@ -456,7 +464,7 @@ def _as_of_html() -> str:
         for a, b, c in rows
     )
     return (
-        "<div style='background:#fffbe6;border-left:3px solid #f9a825;padding:8px 11px;"
+        "<div class='note' style='background:#fffbe6;border-left:3px solid #f9a825;padding:8px 11px;"
         "margin:0 0 14px;font-size:11.5px;color:#444'>"
         f"<b>⏱ Prices are last official closes — not live.</b> This brief was generated "
         f"<b>{gen:%d %b %Y, %H:%M}</b> and the figures below were accurate as of that moment. "
@@ -635,35 +643,63 @@ def build():
     try:
         corr_html = _corr_section()
     except Exception:
-        corr_html = "<p style='color:#777'>Correlation scan unavailable.</p>"
+        corr_html = "<p class='mut' style='color:#777'>Correlation scan unavailable.</p>"
 
-    html = f"""<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:820px;color:#1a1a1a">
+    html = f"""<div class="brief" style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:820px;width:100%;color:#1a1a1a;background:#ffffff">
 <style>
 h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 .trail{{overflow-x:auto;margin:6px 0}}
 .trail table{{border-collapse:collapse;width:100%;font-size:12.5px}}
 .trail th{{background:#eef;text-align:left;padding:5px 8px}}
 .trail td{{padding:4px 8px;border-bottom:1px solid #f0f0f0}}
+
+/* DARK MODE — this brief was unreadable in it.
+   Every heading, the Convergence block and the Symbol column are set to greys
+   (#333/#555/#777) on an implicit white page. A dark-theme client darkens the
+   background but keeps those greys, so on 2026-07-21 the title, every section
+   heading and the whole Convergence section rendered dark-on-dark: invisible,
+   with no error and no clue that anything was missing.
+
+   Overrides are deliberately NARROW — headings, muted text, table chrome. The
+   inline green/red on gains, losses and sentiment carries meaning, so it is
+   left alone; a blanket `.brief * {{color:...!important}}` would erase exactly
+   the signal the colour is there to convey. */
+@media (prefers-color-scheme: dark) {{
+  .brief {{background:#151515 !important;color:#e8e8e8 !important}}
+  .brief h1, .brief h2, .brief h3 {{color:#f3f3f3 !important}}
+  .brief .muted, .brief .sub {{color:#b0b0b0 !important}}
+  .brief .hd th {{background:#22304a !important;color:#f3f3f3 !important}}
+  .brief td {{border-bottom-color:#2e2e2e !important}}
+  .brief .note {{background:#221f14 !important;color:#e0dcc8 !important;
+                 border-color:#5a4b1e !important}}
+  .brief .liq {{background:#161d2b !important;color:#cfd8e8 !important}}
+  .brief .tw {{background:transparent !important}}
+}}
+@media (max-width:600px) {{
+  .brief h1 {{font-size:19px}}
+  .brief h2 {{font-size:15px}}
+  .brief table {{font-size:12px}}
+}}
 </style>
 <h1 style="font-size:21px;margin:0 0 2px">📈 Daily Market Brief — {today}</h1>
-<p style="color:#666;font-size:13px;margin:0 0 10px">One block per market — screener, fundamentals, news and breakouts together · then global context</p>
+<p class="sub" style="color:#666;font-size:13px;margin:0 0 10px">One block per market — screener, fundamentals, news and breakouts together · then global context</p>
 {as_of_html}
-<p style="font-size:11px;color:#555;margin:0 0 14px;background:#f6f8fc;border-left:3px solid #1a73e8;padding:6px 9px">Every pick clears a liquidity floor (~₹1cr/day in India, ~$120k elsewhere) — untradable microcaps, ETFs and bonds are excluded. <b>Tier</b>: T1 mega ≥$12M/day · T2 large ≥$3M · T3 mid ≥$600k · T4 small ≥$120k.</p>
+<p class="liq" style="font-size:11px;color:#555;margin:0 0 14px;background:#f6f8fc;border-left:3px solid #1a73e8;padding:6px 9px">Every pick clears a liquidity floor (~₹1cr/day in India, ~$120k elsewhere) — untradable microcaps, ETFs and bonds are excluded. <b>Tier</b>: T1 mega ≥$12M/day · T2 large ≥$3M · T3 mid ≥$600k · T4 small ≥$120k.</p>
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px">🌍 Market Snapshot</h2>
 {snapshot_html}
 
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇮🇳 India <span style="font-weight:400;color:#666;font-size:13px">— mood {mood["mood"]} ({mood["score"]:+.2f}) from {mood.get("n_articles", 0)} articles</span></h2>
 <h3 style="font-size:13px;margin:12px 0 4px;color:#333">Screener — most tradable</h3>
 {_table(["Symbol", "Tier", "Screens", "Turnover", "Liquidity"], ind_picks_rows) if ind_picks_rows else "<p>no picks</p>"}
-<h3 style="font-size:13px;margin:14px 0 4px;color:#333">Cash Conversion Cycle <span style="font-weight:400;color:#777">(screener.in 228040)</span></h3>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">Cash Conversion Cycle <span style="font-weight:400;color:#777" class="mut">(screener.in 228040)</span></h3>
 <p style="font-size:11px;color:#666;margin:2px 0">Lowest/negative CCC = collects from customers before paying suppliers.</p>
 {_table(["Symbol", "Name", "CCC days", "ROCE", "Liquidity"], ccc_rows) if ccc_rows else "<p>n/a</p>"}
-<h3 style="font-size:13px;margin:14px 0 4px;color:#333">⭐ Convergence <span style="font-weight:400;color:#777">— fundamentals &amp; the street agree</span></h3>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">⭐ Convergence <span style="font-weight:400;color:#777" class="mut">— fundamentals &amp; the street agree</span></h3>
 {conv_in}
-<h3 style="font-size:13px;margin:14px 0 4px;color:#333">🔥 News picks <span style="font-weight:400;color:#777">— buzz, NOT a recommendation</span></h3>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">🔥 News picks <span style="font-weight:400;color:#777" class="mut">— buzz, NOT a recommendation</span></h3>
 {_table(["Symbol", "Name", "Sentiment", "Mentions", "Headline"], in_news_rows) if in_news_rows else "<p>n/a</p>"}
-<h3 style="font-size:13px;margin:14px 0 4px;color:#333">🗞️ Talk on the Street <span style="font-weight:400;color:#777">— per-ticker sentiment</span></h3>
-{_table(["Symbol", "Sentiment", "Score", "Articles"], in_talk_rows) if in_talk_rows else "<p style='color:#777'>No per-ticker news matches today.</p>"}
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">🗞️ Talk on the Street <span style="font-weight:400;color:#777" class="mut">— per-ticker sentiment</span></h3>
+{_table(["Symbol", "Sentiment", "Score", "Articles"], in_talk_rows) if in_talk_rows else "<p class='mut' style='color:#777'>No per-ticker news matches today.</p>"}
 {darvas_in}
 
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇺🇸 US <span style="font-weight:400;color:#666;font-size:13px">— mood {us_mood["mood"]} ({us_mood["score"]:+.2f}) from {us_mood.get("n_articles", 0)} articles</span></h2>
@@ -671,10 +707,10 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 {_table(["Symbol", "Tier", "Screens", "Turnover", "Liquidity"], us_picks_rows) if us_picks_rows else "<p>no picks (run daily_combined_report.py --market US)</p>"}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">⭐ Convergence</h3>
 {conv_us}
-<h3 style="font-size:13px;margin:14px 0 4px;color:#333">🔥 News picks <span style="font-weight:400;color:#777">— buzz, NOT a recommendation</span></h3>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">🔥 News picks <span style="font-weight:400;color:#777" class="mut">— buzz, NOT a recommendation</span></h3>
 {_table(["Symbol", "Name", "Sentiment", "Mentions", "Headline"], us_news_rows) if us_news_rows else "<p>n/a</p>"}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">🗞️ Talk on the Street</h3>
-{_table(["Symbol", "Sentiment", "Score", "Articles"], us_talk_rows) if us_talk_rows else "<p style='color:#777'>No per-ticker news matches today.</p>"}
+{_table(["Symbol", "Sentiment", "Score", "Articles"], us_talk_rows) if us_talk_rows else "<p class='mut' style='color:#777'>No per-ticker news matches today.</p>"}
 {darvas_us}
 
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🇪🇺 Europe</h2>
@@ -693,11 +729,11 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px;margin-top:26px">🌍 Global context</h2>
 <h3 style="font-size:13px;margin:12px 0 4px;color:#333">Momentum — top 15 across 20 markets</h3>
 {_table(["Mkt", "Symbol", "6mo %", "RSI"], g_rows)}
-<h3 style="font-size:13px;margin:14px 0 4px;color:#333">Other markets — top tradable mover each <span style="font-weight:400;color:#777">(≥$1M/day)</span></h3>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">Other markets — top tradable mover each <span style="font-weight:400;color:#777" class="mut">(≥$1M/day)</span></h3>
 {_table(["Market", "Symbol", "6mo %", "Liquidity"], other_rows) if other_rows else "<p>n/a</p>"}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">20-market 5-year scoreboard</h3>
 {_table(["Mkt", "Index", "5y CAGR%", "1y %", "Sharpe"], p_rows)}
-<h3 style="font-size:13px;margin:14px 0 4px;color:#333">💱 Carry-trade FX <span style="font-weight:400;color:#777">— the cross-asset channel into JP/KR/IN equities</span></h3>
+<h3 style="font-size:13px;margin:14px 0 4px;color:#333">💱 Carry-trade FX <span style="font-weight:400;color:#777" class="mut">— the cross-asset channel into JP/KR/IN equities</span></h3>
 {carry_html_}
 <h3 style="font-size:13px;margin:14px 0 4px;color:#333">🔗 Correlation highlights</h3>
 <p style="font-size:11px;color:#666;margin:2px 0">Top correlated-stock clusters per market, 1y returns. Statistical (not causal) groupings; they break down in stressed markets.</p>

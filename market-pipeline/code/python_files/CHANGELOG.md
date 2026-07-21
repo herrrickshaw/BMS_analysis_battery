@@ -18,6 +18,45 @@ mistakes were made, and the mistakes here have repeated.
 
 ---
 
+## 2026-07-21 (evening, collection)
+
+### `--refresh-thin` was queueing the collector's own good data for re-fetch
+
+(in `global-stock-screener`, commit `45afa1d`)
+
+Its "usable" test required `source == "screener_in"`, but rows written by the
+current collector path carry a **null** source. So 201 fully-populated tickers
+— cfo 94.7%, borrowings 88.3%, median 10 fiscal years — were classed as thin and
+queued for re-fetch. screener.in hard-blocks after roughly 50–155 requests per
+session, so that is two entire sessions spent re-downloading data already held.
+
+**Decision: drop the source condition entirely.** It was standing in for "not a
+yfinance-only row", and cfo presence already establishes that (yfinance supplies
+cfo on 2.9% of rows). Usable 281 → 524; re-fetch 1,575 → 1,332.
+
+### Collection state — blocked, and the trickle is the only way forward
+
+| | start of session | end |
+|---|---|---|
+| store | 8,429 rows / 1,846 tickers | 8,668 / 1,860 |
+| complete-path tickers | 193 | 220 |
+| ≥5 fully-populated years | 94 | 120 |
+| panel tickers per rebalance | 108 | 135 |
+
+The refresh run **aborted at 19 tickers** on a hard block; the circuit breaker
+behaved correctly. The budget was already spent by the earlier concurrent
+session (see above), so this is a self-inflicted ceiling for today rather than a
+new limit.
+
+⚠️ **The panel is still statistically thin.** Forward-return coverage is 60–110
+firms per rebalance year, not the ~300–600 needed for the factor comparison to
+separate signal from noise. Any factor result quoted off this panel remains
+directionally suggestive at best — the same caveat as before, now with 135
+tickers instead of 108. The launchd trickle is the mechanism that closes this,
+over days, not in one session.
+
+---
+
 ## 2026-07-21 (evening, post-close run)
 
 ### `technical` now capped at 5 per market — wiring it everywhere broke the watchlist

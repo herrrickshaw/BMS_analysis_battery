@@ -32,20 +32,46 @@
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional
 
 # ── roots ─────────────────────────────────────────────────────────────────────
-# Defaults stay on the historical ~/Downloads locations so interactive use is
-# unchanged; launchd overrides both via the plist, which is what moves the whole
-# tree out of TCC's way. Every consumer must read these rather than rebuilding
-# the expression, or we reintroduce the US-scan bug in a new file.
+# Defaults resolve from the REPO, not from ~/Downloads.
+#
+# They used to default to ~/Downloads "so interactive use is unchanged", with
+# launchd overriding via the plist. That split the tree in two and the halves
+# diverged, silently:
+#
+#     ~/Downloads/market_cache          7,656 parquets, last write 20 Jul 04:59
+#     ~/market-pipeline/market_cache    7,657 parquets, last write 21 Jul 13:50
+#
+# Scheduled runs wrote the second; anything run by hand read the first, a day
+# behind, with no error and no visible difference. Same split for bhavcopy
+# (795M stale / 856M live). The registry existed to stop exactly this, and its
+# own default was the thing causing it.
+#
+# Deriving from __file__ means the default equals the plist value by
+# construction rather than by two places agreeing. It is also outside TCC's
+# reach, so a job that forgets the env var now works instead of dying on
+# PermissionError mid-download.
 HOME = Path.home()
 CODE = Path(__file__).resolve().parent
+REPO = CODE.parent.parent            # .../market-pipeline/code/python_files -> .../market-pipeline
 
-MARKET_CACHE = Path(os.environ.get("MARKET_CACHE", HOME / "Downloads" / "market_cache"))
-BHAV_CACHE = Path(os.environ.get("BHAV_CACHE", HOME / "Downloads" / "data" / "bhavcopy_cache"))
+MARKET_CACHE = Path(os.environ.get("MARKET_CACHE", REPO / "market_cache"))
+BHAV_CACHE = Path(os.environ.get("BHAV_CACHE", REPO / "data" / "bhavcopy_cache"))
+
+# An override pointing back into ~/Downloads is almost certainly the stale copy
+# — and under launchd it is unreadable outright. Say so rather than returning
+# yesterday's prices as though they were today's.
+for _name, _p in (("MARKET_CACHE", MARKET_CACHE), ("BHAV_CACHE", BHAV_CACHE)):
+    if "Downloads" in _p.parts:
+        print(f"data_registry: WARNING — {_name}={_p} is under ~/Downloads. "
+              "launchd cannot read it (macOS TCC), and it is likely the stale "
+              "pre-migration copy. Unset the variable to use the repo default.",
+              file=sys.stderr)
 
 OHLC_DIR = MARKET_CACHE / "ohlc"
 FUND_DIR = MARKET_CACHE / "fundamentals"

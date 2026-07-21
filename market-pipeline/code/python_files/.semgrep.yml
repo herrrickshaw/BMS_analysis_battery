@@ -1,0 +1,172 @@
+# .semgrep.yml — rules derived from bugs that ACTUALLY SHIPPED in this repo.
+#
+# Deliberately NOT the generic AI-code ruleset. eval() and pickle do not appear
+# here and never have; every rule below encodes a specific incident, with the
+# measured cost in its message. A rule that has never fired teaches nothing.
+#
+# The shared shape: all of these are SYNTACTICALLY VALID and SEMANTICALLY WRONG.
+# Type checkers and generic linters pass them. They return a plausible number,
+# which is exactly why they survived review — including repeated review by the
+# person who wrote them.
+#
+#   semgrep --config .semgrep.yml .
+#   semgrep --config .semgrep.yml --severity ERROR .     # blocking set only
+
+rules:
+  # ── 1. zero-filled prices ───────────────────────────────────────────────────
+  - id: price-series-fillna-zero
+    languages: [python]
+    severity: ERROR
+    message: >-
+      .fillna(0) on a price series turns a MISSING bar into a price of ZERO.
+      Zero is below every Darvas box bottom, so on 2026-07-21 this reported
+      BREAKDOWN_SELL for 2,472 of 2,480 Korean stocks — and the same line was
+      present in all five market scans. It stayed hidden because LTP was
+      computed separately with .dropna(), so a real price printed beside a
+      signal derived from zero. Drop trailing empty bars instead
+      (`s.last_valid_index()`), or use safe_prices.PriceSeries, whose .last()
+      returns None rather than a fabricated value.
+    patterns:
+      - pattern-either:
+          - pattern: pd.to_numeric($DF[$COL], errors="coerce").fillna(0)
+          - pattern: pd.to_numeric($DF[$COL], errors='coerce').fillna(0)
+          - pattern: $DF[$COL].fillna(0).tolist()
+      - metavariable-regex:
+          metavariable: $COL
+          regex: (?i).*(close|open|high|low|price|ltp|adj).*
+
+  # ── 2. freshness from the newest member ─────────────────────────────────────
+  - id: freshness-from-max-mtime
+    languages: [python]
+    severity: ERROR
+    message: >-
+      max() over mtimes/dates measures the FRESHEST member, but a dataset is
+      only as current as its WORST one. data_index reported "all datasets fresh"
+      while 4,344 of 7,641 cached tickers were four days stale — one file
+      seconds old was enough. Use a median or a coverage fraction. The inverse
+      error is equally live: anchoring to max(bar_date) let 22 outlier tickers
+      make 7,454 healthy ones look stale and blocked the brief.
+    patterns:
+      - pattern-either:
+          - pattern: max($X.stat().st_mtime for ... in ...)
+          - pattern: max($MTIMES)
+      - pattern-inside: |
+          def $F(...):
+            ...
+      - metavariable-regex:
+          metavariable: $MTIMES
+          regex: (?i).*(mtime|age|fresh|stale|bar_date|last_bar).*
+
+  # ── 3. cross-currency comparison ────────────────────────────────────────────
+  - id: bare-float-vs-currency-floor
+    languages: [python]
+    severity: WARNING
+    message: >-
+      A bare number compared against a *_FLOOR / *_USD / *_INR constant carries
+      no currency. consistency_audit compared India's Median_Turnover (RUPEES)
+      to a USD floor and the check PASSED — rupee turnover is ~87x the dollar
+      figure, so every row cleared the bar regardless of liquidity. A unit error
+      that passes is worse than one that fails. Use safe_prices.Money, which
+      raises TypeError at the comparison site.
+    patterns:
+      - pattern-either:
+          - pattern: $X < $FLOOR
+          - pattern: $X > $FLOOR
+          - pattern: $X <= $FLOOR
+          - pattern: $X >= $FLOOR
+      - metavariable-regex:
+          metavariable: $FLOOR
+          regex: ^[A-Z_]*(FLOOR|_USD|_INR|_KRW|_JPY|_EUR)[A-Z_]*$
+
+  # ── 4. vacuously-true isinstance on pandas types ────────────────────────────
+  - id: vacuous-isinstance-date
+    languages: [python]
+    severity: WARNING
+    message: >-
+      isinstance(x, date) is ALWAYS True for a pd.Timestamp — Timestamp
+      subclasses datetime subclasses date. A guard of "convert only if not
+      already a date" therefore never fires, and the Timestamp survives to fail
+      later on `date - Timestamp`. This shipped inside safe_prices.py itself,
+      in the file arguing against unenforced invariants. Normalise
+      unconditionally with pd.Timestamp(x).date().
+    # The `pattern-not-inside: import datetime` exclusion suppressed EVERY hit,
+    # because that import is at module scope and therefore encloses the whole
+    # file. A filter that excludes everything is indistinguishable from a rule
+    # that does not work — the same vacuous-guard failure this rule is about.
+    pattern-either:
+      - pattern: not isinstance($X, date)
+      - pattern: isinstance($X, date)
+      - pattern: not isinstance($X, datetime.date)
+      - pattern: isinstance($X, datetime.date)
+
+  # ── 5. bare except swallowing a diagnosis ───────────────────────────────────
+  - id: bare-except-hides-import-error
+    languages: [python]
+    severity: WARNING
+    message: >-
+      `except Exception` around an import or attribute access hides WHY it
+      failed. bhavcopy_store.load_symbol() does not exist — the real API is
+      get() — but the broad except swallowed the ImportError, so every Indian
+      name reported "not in cache" while the data was present. A missing
+      function and missing data looked identical. Catch the specific exception,
+      or log the type before continuing.
+    patterns:
+      - pattern: |
+          try:
+            from $MOD import $NAME
+            ...
+          except Exception:
+            ...
+      - pattern-not: |
+          try:
+            from $MOD import $NAME
+            ...
+          except Exception as $E:
+            ...
+
+  # ── 6. hardcoded home paths ─────────────────────────────────────────────────
+  - id: hardcoded-downloads-path
+    languages: [python]
+    severity: ERROR
+    message: >-
+      A path under ~/Downloads is unreadable to launchd — macOS TCC denies
+      scheduled jobs all access there. market_data_cache.py hardcoded it while
+      every sibling honoured $MARKET_CACHE, and the nightly US scan died with
+      PermissionError mid-download, leaving a 3.9-day-old workbook that was then
+      shipped in the brief. Resolve through data_registry, or
+      os.environ.get("MARKET_CACHE", ...).
+    patterns:
+      - pattern-either:
+          - pattern: Path.home() / "Downloads" / ...
+          - pattern: '"/Users/$USER/Downloads/..."'
+      - pattern-not-inside: |
+          os.environ.get("MARKET_CACHE", ...)
+      - pattern-not-inside: |
+          os.environ.get("BHAV_CACHE", ...)
+
+  # ── 7. credentials in source ────────────────────────────────────────────────
+  - id: hardcoded-credential
+    languages: [python, yaml, bash]
+    severity: ERROR
+    message: >-
+      A literal credential in tracked source. A live Gmail app password was
+      committed here on 2026-06-30 and reached six branches of a PUBLIC repo
+      before anyone noticed; untracking stopped future leakage but the exposure
+      is permanent and needed revocation. Read secrets via env_loader, never a
+      literal.
+    pattern-regex: >-
+      (?i)(password|passwd|secret|api[_-]?key|token)\s*[:=]\s*["'][^"'\s]{8,}["']
+
+  # ── 8. success inferred from absence of an error ────────────────────────────
+  - id: success-from-absent-error-string
+    languages: [python, bash]
+    severity: WARNING
+    message: >-
+      Treating "no ABORT/ERROR in the output" as success. trickle_collect.sh
+      logged `ok` for a batch that fetched NOTHING against an active block: the
+      collector's circuit breaker needs 40 consecutive failures, so a 15-ticker
+      batch cannot trip it and prints nothing. A batch below the breaker
+      threshold is structurally incapable of reporting its own failure. Measure
+      the RESULT (rows gained, records written), not the absence of a string.
+    pattern-regex: >-
+      (?i)(grep\s+-q\s+["']?(ABORT|ERROR|FAIL)|if\s+not\s+.*(ABORT|ERROR)\s+in\s+)

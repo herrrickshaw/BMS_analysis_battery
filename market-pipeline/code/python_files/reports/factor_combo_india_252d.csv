@@ -1,0 +1,11 @@
+combo,n,n_years,mean,edge,t,years_positive,testable
+ALL (baseline),442,8.0,12.081008114163469,0.0,0.912074580855207,4.0,True
+piotroski,50,8.0,17.23666388420236,5.1556557700388925,0.8450904476769374,4.0,True
+roce_plus,50,7.0,14.364322118391545,2.2833140042280764,0.8651240090269205,4.0,True
+piotroski + roce_plus,14,,,,,,False
+debt_reduction,205,8.0,16.37316149519893,4.29215338103546,1.0467627448338477,4.0,True
+piotroski + debt_reduction,44,8.0,20.51004727147654,8.429039157313072,1.0496941790383696,4.0,True
+roce_plus + debt_reduction,30,,,,,,False
+piotroski + roce_plus + debt_reduction,13,,,,,,False
+not_distress (control),0,,,,,,False
+low_asset_growth (control),0,,,,,,False

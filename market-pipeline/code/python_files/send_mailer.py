@@ -19,6 +19,8 @@
 from __future__ import annotations
 
 import os
+
+import env_loader as _env
 import smtplib
 import sys
 from email.mime.multipart import MIMEMultipart
@@ -29,9 +31,9 @@ from build_mailer import build
 
 
 def send(subject: str, text: str, html: str) -> bool:
-    user = os.environ.get("GMAIL_USER")
-    pw = os.environ.get("GMAIL_APP_PASSWORD")
-    to = os.environ.get("MAIL_TO", user)
+    user = _env.get("GMAIL_USER")
+    pw = _env.get("GMAIL_APP_PASSWORD")
+    to = (_env.get("MAIL_TO") or user)
     if not (user and pw) or len(pw) < 16 or "PUT-YOUR" in pw:
         Path("brief_today.html").write_text(html)
         print("  no valid GMAIL_APP_PASSWORD set — saved brief_today.html instead of sending")

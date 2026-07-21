@@ -37,6 +37,8 @@ from __future__ import annotations
 
 import io
 import json
+import os
+import sys
 import time
 import urllib.parse
 import urllib.request
@@ -47,11 +49,24 @@ from typing import Dict, Optional
 
 import env_loader as _env
 
+# Cache root. The fallback must NOT hardcode ~/Downloads: macOS TCC denies
+# launchd all access there, so a scheduled run would fail with PermissionError
+# at first write — which is exactly how the nightly US scan died on 2026-07-20,
+# and how this line was originally written hours after that was diagnosed.
+# $MARKET_CACHE is the same variable data_registry reads, so the fallback lands
+# in the same place rather than somewhere unreachable.
 try:
     import data_registry as R
     _CACHE_ROOT = R.MARKET_CACHE / "dart"
-except Exception:
-    _CACHE_ROOT = Path.home() / "Downloads" / "market_cache" / "dart"
+except ImportError as e:
+    # Narrow: only a genuinely absent module falls back. A registry that raises
+    # for any OTHER reason (bad env var, unreadable path) must surface — the
+    # broad `except Exception` here would have swallowed that and quietly used
+    # a different cache directory, so Korea would look empty with no error.
+    print(f"dart_fundamentals: data_registry unavailable ({e}) — "
+          "falling back to $MARKET_CACHE", file=sys.stderr)
+    _CACHE_ROOT = Path(
+        os.environ.get("MARKET_CACHE", Path.home() / "market_cache")) / "dart"
 
 _CACHE_ROOT.mkdir(parents=True, exist_ok=True)
 _CORP_MAP = _CACHE_ROOT / "corp_map.json"

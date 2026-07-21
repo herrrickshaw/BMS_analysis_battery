@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import datetime as _dt
 import os
+
+import env_loader as _env
 import smtplib
 import sys
 from email.mime.text import MIMEText
@@ -21,9 +23,9 @@ from email.mime.text import MIMEText
 def send_alert(failed_steps: list) -> bool:
     if not failed_steps:
         return True
-    user = os.environ.get("GMAIL_USER")
-    pw = os.environ.get("GMAIL_APP_PASSWORD")
-    to = os.environ.get("MAIL_TO", user)
+    user = _env.get("GMAIL_USER")
+    pw = _env.get("GMAIL_APP_PASSWORD")
+    to = (_env.get("MAIL_TO") or user)
     today = _dt.date.today().strftime("%d %b %Y")
     log_name = f"daily_pipeline_{_dt.date.today().strftime('%Y%m%d')}.log"
     subject = f"⚠️ Daily Market Brief — {len(failed_steps)} step(s) failed ({today})"

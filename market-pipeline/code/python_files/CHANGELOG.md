@@ -18,6 +18,95 @@ mistakes were made, and the mistakes here have repeated.
 
 ---
 
+## 2026-07-21 (evening, post-close run)
+
+### `technical` now capped at 5 per market — wiring it everywhere broke the watchlist
+
+Direct consequence of wiring `breakout_quality` into all five scanners. The
+post-close mailer returned **2,110** technical passes (US 1,044, JP 766, EU 185,
+KR 110) and pushed the watchlist from 775 rows to **2,703** — a list nobody can
+act on.
+
+**The filter is not broken.** 2,110 of ~15,000 names is a ~14% hit rate, which
+is what a grade-A/B breakout screen should return. It was never a shortlist; it
+only looked like one while Korea was the sole market emitting `Quality_Grade`.
+
+**Decision: rank and cap per market, not globally.** Grade alone is too weak a
+bar (grade A is still 595 names/day, and daily intake compounds). A *global*
+top-N would hand the list to whichever market scanned the most names — the Korea
+skew again, pointed the other way. So: grade A, ranked by quality score, top 5
+per market. 2,110 → 20, scores 90–100, evenly split across EU/JP/KR/US.
+
+The ledger still records **every** pass (2,369 entries) — nothing is lost for
+analysis. Only watchlist intake is bounded. Watchlist went +14 instead of +1,928.
+
+⚠️ India contributed no technical signals: its scan step `[1/9]` failed again
+this run, so `harvest_technical` had no India workbook to read.
+
+### Do not run the screener.in collector alongside the mailer
+
+The post-close brief failed validation with 3 of 8 sample stocks skipped on
+`http 429`. Cause: a screener.in collection session was running concurrently,
+and the mailer validates prices against the same host. Self-inflicted rate limit.
+
+The collection also produced **zero rows** in five minutes (store mtime
+unchanged) — so it contributed nothing while still degrading the brief. Worst of
+both. Sequence these two against screener.in; never overlap them.
+
+---
+
+## 2026-07-21 (evening)
+
+### 🔴 The India F-score is out of EIGHT, not nine — `f6_curratio_up` never fires
+
+`f6_curratio_up` evaluates on **0.0%** of panel rows. `f_tested` maxes at 8.
+Every "Piotroski score" in the India panel is therefore out of 8, and an `F≥7`
+filter here does not mean what `F≥7` means in the literature.
+
+This is **structural, not a bug to fix in the mapping.** screener.in's Data
+Sheet balance sheet is `Equity Capital / Reserves / Borrowings / Other
+Liabilities / Total` against `Net Block / CWIP / Investments / Other Assets /
+Total` — there is no current-vs-non-current split, so the current ratio has no
+input path. Confirmed: neither `screener_history_collector.py` nor
+`screener_in_auth.py` references `current_assets` or `current_liabilities`
+anywhere.
+
+Two consequences for any factor result quoted from this panel:
+- Cross-study comparisons must say "8-test F-score", or they overstate
+  strictness (7/8 is a higher bar than 7/9).
+- `f8_margin_up` also only evaluates on 55.2% of rows, so the effective test
+  count varies by firm-year. `f_tested` is already stored per row — use it as a
+  denominator rather than assuming 9.
+
+**Not fixed.** Getting F6 would mean sourcing the current-asset split from a
+second provider per ticker, and the store shows why that is not free: see below.
+
+### The two fundamental sources never overlap per ticker
+
+`cache_seed/fundamentals_history/IN.parquet` holds 1,846 tickers / 8,429 rows,
+but the factor panel builds from only ~108. Not a gate that is too strict — the
+sources are complementary in aggregate and disjoint per name:
+
+| source | rows | cfo | borrowings | total_assets |
+|---|---|---|---|---|
+| `screener_in` | 2,808 | 99.3% | 0.0% | 0.0% |
+| `yfinance` | 3,769 | 2.9% | 0.0% | 98.9% |
+| `None` (current collector) | 1,848 | 94.7% | 88.3% | 53.5% |
+
+Tickers carrying **both** `screener_in` and `yfinance` rows: **0**. So the
+281 screener-only names have cash-flow but no balance sheet, and the 1,443
+yfinance-only names have the reverse; neither group can pass the panel gate.
+Only the current collector's path produces rows complete enough to use — 193
+tickers, median 10 fiscal years, of which 94 have ≥5 fully-populated years.
+
+**Decision: expand by re-running the current collector, not by repairing old
+rows.** A merge across the two legacy sources would need per-ticker fiscal-year
+alignment between two providers with different restatement policies, and would
+silently mix vintages inside one firm-year. Re-collecting produces one
+provider's view per row, which is the thing a point-in-time panel requires.
+
+---
+
 ## 2026-07-21 (later still)
 
 ### `breakout_quality` wired into all five scanners

@@ -135,6 +135,41 @@ WATCHLIST = HERE / "watchlist.csv"
 # tracks all of them regardless, so nothing is lost by being selective here.
 WATCHLIST_FILTERS = {"triple", "piotroski+debt", "piotroski+roce", "technical"}
 
+# `technical` needs a HARD CAP that the fundamental filters do not.
+#
+# It fired 110 times on 2026-07-21 while only the Korea scanner emitted
+# Quality_Grade. Once breakout_quality was wired into the other four scanners
+# the same filter returned 2,110 passes in one run and pushed the watchlist from
+# 775 rows to 2,703 — a "watchlist" nobody can act on. The filter is not broken:
+# 2,110 of ~15,000 names is a ~14% hit rate, which is what a grade-A/B breakout
+# screen should return. It is simply not a shortlist.
+#
+# Grade alone is not enough of a bar — grade A is still 595 names/day, and any
+# daily intake compounds. So: rank by quality score and take the best few PER
+# MARKET. Per-market, not global, because a global top-N would hand the whole
+# list to whichever market happened to scan the most names — the Korea skew
+# again, pointed the other way (US alone was 1,044 of the 2,110).
+#
+# The ledger still records every pass, so nothing is lost for analysis; this
+# bounds only what earns a tracked watchlist slot.
+TECHNICAL_MIN_GRADE = {"grade A"}     # detail string as harvest_technical writes it
+TECHNICAL_TOP_PER_MARKET = 5
+
+
+def _cap_technical(new: pd.DataFrame) -> pd.DataFrame:
+    """Keep only the strongest few `technical` passes per market."""
+    if new.empty or "filter" not in new.columns:
+        return new
+    tech = new[new["filter"] == "technical"]
+    rest = new[new["filter"] != "technical"]
+    if tech.empty:
+        return new
+    keep = (tech[tech["detail"].isin(TECHNICAL_MIN_GRADE)]
+            .sort_values("score", ascending=False)
+            .groupby("market", group_keys=False)
+            .head(TECHNICAL_TOP_PER_MARKET))
+    return pd.concat([rest, keep], ignore_index=True)
+
 
 def sync_watchlist(new: pd.DataFrame) -> int:
     """Add today's strongest passes to watchlist.csv as the `signal` tier.
@@ -150,6 +185,7 @@ def sync_watchlist(new: pd.DataFrame) -> int:
             for _, r in wl.iterrows()}
     rows = [list(r) for r in wl.itertuples(index=False, name=None)]
     added = 0
+    new = _cap_technical(new)
     for _, r in new[new["filter"].isin(WATCHLIST_FILTERS)].iterrows():
         k = (r["symbol"], r["market"])
         if k in have:

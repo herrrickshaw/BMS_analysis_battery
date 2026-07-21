@@ -66,6 +66,14 @@ section_start "mailer"
       $PY send_mailer.py --draft || FAILURES+=("mailer: draft save")
   fi
 
+  # ── record today's filter passes ────────────────────────────────────────────
+  # AFTER the send, deliberately. This is a diary of what the filters said today,
+  # measured against what happens next — the only evidence here free of the
+  # survivorship and lookahead that flatter every backtest in this repo. It must
+  # never be able to block or delay the brief, so it runs last and is guarded.
+  run "[10/10] record filter passes to signal ledger" \
+      $PY signal_tracker.py --record
+
   section_end
 } >> "$LOG" 2>&1
 

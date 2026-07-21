@@ -1,0 +1,675 @@
+symbol,market,status,note
+A,US,held,nan
+AAPL,US,held,nan
+ABT,US,held,nan
+AIA,US,held,nan
+AMD,US,held,nan
+AMGN,US,held,nan
+AMZN,US,held,nan
+ASML,US,held,nan
+AVGO,US,held,nan
+BABA,US,held,nan
+BAC,US,held,nan
+BATRK,US,held,nan
+BKR,US,held,nan
+BRK.B,US,held,nan
+CL,US,held,nan
+CLH,US,held,nan
+CME,US,held,nan
+COP,US,held,nan
+CORN,US,held,nan
+COST,US,held,nan
+CTRA,US,held,nan
+CVX,US,held,nan
+CWK,US,held,nan
+CWT,US,held,nan
+DELL,US,held,nan
+DHR,US,held,nan
+DIS,US,held,nan
+DXC,US,held,nan
+ECL,US,held,nan
+EEM,US,held,nan
+EMR,US,held,nan
+EQH,US,held,nan
+ES,US,held,nan
+EWJ,US,held,nan
+EWT,US,held,nan
+EWY,US,held,nan
+FDP,US,held,nan
+FDX,US,held,nan
+FL,US,held,nan
+FLS,US,held,nan
+FSLR,US,held,nan
+GFI,US,held,nan
+GLNG,US,held,nan
+GLW,US,held,nan
+GNK,US,held,nan
+GOOG,US,held,nan
+GTLB,US,held,nan
+HD,US,held,nan
+HSBC,US,held,nan
+IBM,US,held,nan
+INFY,US,held,nan
+INTC,US,held,nan
+IR,US,held,nan
+IWM,US,held,nan
+IZRL,US,held,nan
+JCI,US,held,nan
+JHML,US,held,nan
+JNJ,US,held,nan
+KHC,US,held,nan
+KO,US,held,nan
+KR,US,held,nan
+KSA,US,held,nan
+LNG,US,held,nan
+LYB,US,held,nan
+MARA,US,held,nan
+MCO,US,held,nan
+MELI,US,held,nan
+MET,US,held,nan
+META,US,held,nan
+MLAB,US,held,nan
+MNDY,US,held,nan
+MNKD,US,held,nan
+MSCI,US,held,nan
+MT,US,held,nan
+MTCH,US,held,nan
+MTD,US,held,nan
+NEXT,US,held,nan
+NTGR,US,held,nan
+NVDA,US,held,nan
+NVO,US,held,nan
+OXY,US,held,nan
+PEGA,US,held,nan
+PG,US,held,nan
+RIO,US,held,nan
+RKLB,US,held,nan
+RWR,US,held,nan
+SAP,US,held,nan
+SE,US,held,nan
+SHEL,US,held,nan
+SOXL,US,held,nan
+SPGI,US,held,nan
+SU,US,held,nan
+SWK,US,held,nan
+SYK,US,held,nan
+T,US,held,nan
+TFLO,US,held,nan
+TMO,US,held,nan
+TMUS,US,held,nan
+TSLA,US,held,nan
+TSM,US,held,nan
+TTE,US,held,nan
+TXN,US,held,nan
+UBS,US,held,nan
+UGI,US,held,nan
+V,US,held,nan
+VLO,US,held,nan
+VVV,US,held,nan
+VZ,US,held,nan
+WIT,US,held,nan
+WM,US,held,nan
+WMT,US,held,nan
+XOM,US,held,nan
+ADM,US,sold,nan
+AMC,US,sold,nan
+ARM,US,sold,nan
+BCE,US,sold,nan
+BLNK,US,sold,nan
+BMBL,US,sold,nan
+CAT,US,sold,nan
+CGBSW,US,sold,nan
+CRSP,US,sold,nan
+CSAN,US,sold,nan
+DNUT,US,sold,nan
+ENPH,US,sold,nan
+EW,US,sold,nan
+F,US,sold,nan
+FRSH,US,sold,nan
+GFS,US,sold,nan
+HES,US,sold,nan
+HUM,US,sold,nan
+IART,US,sold,nan
+K,US,sold,nan
+KE,US,sold,nan
+KLG,US,sold,nan
+LIT,US,sold,nan
+MANU,US,sold,nan
+MDB,US,sold,nan
+MED,US,sold,nan
+MRNA,US,sold,nan
+MU,US,sold,nan
+NKE,US,sold,nan
+ON,US,sold,nan
+PFE,US,sold,nan
+PZZA,US,sold,nan
+QCLN,US,sold,nan
+SSL,US,sold,nan
+WBD,US,sold,nan
+WKHS,US,sold,nan
+AARTISURF,IN,held,Aarti Surfactants
+SPLPETRO,IN,held,Supreme Petrochem
+TNPETRO,IN,held,Tamilnadu Petroproducts
+CASTROLIND,IN,held,Castrol India
+TNPL,IN,held,TN Newsprint & Papers
+SUZLON,IN,held,Suzlon Energy
+CEWATER,IN,held,Concord Enviro Systems
+SENORES,IN,held,Senores Pharmaceuticals
+CARRARO,IN,held,Carraro India
+VENTIVE,IN,held,Ventive Hospitality
+UNIMECH,IN,held,Unimech Aerospace
+INDOFARM,IN,held,Indo Farm Equipment
+NIFTYBEES,IN,held,Nippon Nifty BEES ETF
+PSUBNKBEES,IN,held,Nippon PSU Bank BEES ETF
+ADANIPORTS,IN,sold,nan
+ANURAS,IN,sold,nan
+APOLLO,IN,sold,nan
+ASMTEC,IN,sold,nan
+AWHCL,IN,sold,nan
+AWL,IN,sold,nan
+BANDHANBNK,IN,sold,nan
+BCPL,IN,sold,nan
+BEL,IN,sold,nan
+BHEL,IN,sold,nan
+BIHSPONG,IN,sold,nan
+CAPLIPOINT,IN,sold,nan
+CDSL,IN,sold,nan
+CGPOWER,IN,sold,nan
+COCHINSHIP,IN,sold,nan
+CREDITACC,IN,sold,nan
+CRISIL,IN,sold,nan
+CROMPTON,IN,sold,nan
+CUPID,IN,sold,nan
+DHAMPURSUG,IN,sold,nan
+DLF,IN,sold,nan
+DLINKINDIA,IN,sold,nan
+EASEMYTRIP,IN,sold,nan
+FEDFINA,IN,sold,nan
+FORTIS,IN,sold,nan
+GALAXYSURF,IN,sold,nan
+GICRE,IN,sold,nan
+GODAVARIB,IN,sold,nan
+GOLDBEES,IN,sold,nan
+HCLTECH,IN,sold,nan
+HDFCLIFE,IN,sold,nan
+HMVL,IN,sold,nan
+HYUNDAI,IN,sold,nan
+INDSUCR,IN,sold,nan
+INDUSINDBK,IN,sold,nan
+IOC,IN,sold,nan
+IRFC,IN,sold,nan
+ITI,IN,sold,nan
+J&KBANK,IN,sold,nan
+JUBLFOOD,IN,sold,nan
+KLRFM,IN,sold,nan
+KOTAKBANK,IN,sold,nan
+LAFFANSQ,IN,sold,nan
+M&M,IN,sold,nan
+MAHLIFE,IN,sold,nan
+MASTEK,IN,sold,nan
+NBCC,IN,sold,nan
+NDTV,IN,sold,nan
+NETWORK18,IN,sold,nan
+NH,IN,sold,nan
+NHPC,IN,sold,nan
+NIACL,IN,sold,nan
+NMDC,IN,sold,nan
+NTPC,IN,sold,nan
+PATANJALI,IN,sold,nan
+PNB,IN,sold,nan
+PROZONER,IN,sold,nan
+RCF,IN,sold,nan
+RENUKA,IN,sold,nan
+RRKABEL,IN,sold,nan
+SAIL,IN,sold,nan
+STCINDIA,IN,sold,nan
+STYLEBAAZA,IN,sold,nan
+SUMICHEM,IN,sold,nan
+SUNTV,IN,sold,nan
+SYNGENE,IN,sold,nan
+SYRMA,IN,sold,nan
+TATAELXSI,IN,sold,nan
+TITAGARH,IN,sold,nan
+TRACXN,IN,sold,nan
+TRITURBINE,IN,sold,nan
+UJJIVANSFB,IN,sold,nan
+VINYLINDIA,IN,sold,nan
+WELSPLSOL,IN,sold,nan
+WELSPUNLIV,IN,sold,nan
+ZEEMEDIA,IN,sold,nan
+ABFRL,IN,watch,nan
+ADANIGREEN,IN,watch,nan
+ADANIPOWER,IN,watch,nan
+AGARIND,IN,watch,nan
+AJANTSOY,IN,watch,nan
+AKUMS,IN,watch,nan
+AKZOINDIA,IN,watch,nan
+AMARAJABAT,IN,watch,nan
+ANANTRAJ,IN,watch,nan
+ANTONY,IN,watch,nan
+ARIHANTSUP,IN,watch,nan
+ASAHIINDIA,IN,watch,nan
+ATFL,IN,watch,nan
+AVANTIFEED,IN,watch,nan
+AXISBANK,IN,watch,nan
+AXITA,IN,watch,nan
+AZAD,IN,watch,nan
+BAAZARSTYLE,IN,watch,nan
+BAJFINANCE,IN,watch,nan
+BANARISUG,IN,watch,nan
+BANKINDIA,IN,watch,nan
+BANNARIAMM,IN,watch,nan
+BATLIBOI,IN,watch,nan
+BCCL,IN,watch,nan
+BEARDSELL,IN,watch,nan
+BECTORFOOD,IN,watch,nan
+BHARTIARTL,IN,watch,nan
+BIHARSPNG,IN,watch,nan
+BINDALAGRO,IN,watch,nan
+BIOCON,IN,watch,nan
+BLS,IN,watch,nan
+BLSE,IN,watch,nan
+BPCL,IN,watch,nan
+BRITANNIA,IN,watch,nan
+CANBK,IN,watch,nan
+CEATLTD,IN,watch,nan
+CENTURYTEX,IN,watch,nan
+CESC,IN,watch,nan
+CHAMBLFERT,IN,watch,nan
+CHENNPETRO,IN,watch,nan
+CIPLA,IN,watch,nan
+COALINDIA,IN,watch,nan
+COASTCORP,IN,watch,nan
+COFFEEDAY,IN,watch,nan
+COLPAL,IN,watch,nan
+COMBAG,IN,watch,nan
+CONCORDENV,IN,watch,nan
+COROMANDEL,IN,watch,nan
+CUMMINSIND,IN,watch,nan
+DAVANAGERE,IN,watch,nan
+DECANGOLD,IN,watch,nan
+DEEPAKFERT,IN,watch,nan
+DEEPAKNTR,IN,watch,nan
+DEEPINDS,IN,watch,nan
+DELHIVERY,IN,watch,nan
+DONEAR,IN,watch,nan
+EDELWEISS,IN,watch,nan
+EICHERMOT,IN,watch,nan
+EKI,IN,watch,nan
+EMAMIPAP,IN,watch,nan
+EMBASSY,IN,watch,nan
+ENDURANCE,IN,watch,nan
+ENGINERSIN,IN,watch,nan
+ESCORTS,IN,watch,nan
+EXIDEIND,IN,watch,nan
+FINPIPE,IN,watch,nan
+GAIL,IN,watch,nan
+GANDHAR,IN,watch,nan
+GANGAFORG,IN,watch,nan
+GATEWAY,IN,watch,nan
+GEPIL,IN,watch,nan
+GET&D,IN,watch,nan
+GMBREW,IN,watch,nan
+GMDC,IN,watch,nan
+GMRINFRA,IN,watch,nan
+GODREJAGRO,IN,watch,nan
+GOLDIAM,IN,watch,nan
+GOLKALUM,IN,watch,nan
+GREAVESCOT,IN,watch,nan
+GSAUTO,IN,watch,nan
+GSPL,IN,watch,nan
+GUJGASLTD,IN,watch,nan
+GUJTEX,IN,watch,nan
+HAL,IN,watch,nan
+HARRMALAYA,IN,watch,nan
+HATHWAY,IN,watch,nan
+HATSUN,IN,watch,nan
+HAVELLS,IN,watch,nan
+HDFC,IN,watch,nan
+HDFCBANK,IN,watch,nan
+HERANBA,IN,watch,nan
+HIINFRA,IN,watch,nan
+HINDALCO,IN,watch,nan
+HINDPETRO,IN,watch,nan
+HITECH,IN,watch,nan
+HONASA,IN,watch,nan
+ICICIBANK,IN,watch,nan
+IDBI,IN,watch,nan
+IDEA,IN,watch,nan
+IDFCFIRSTB,IN,watch,nan
+IIFL,IN,watch,nan
+INDIACEM,IN,watch,nan
+INDIAGLYCO,IN,watch,nan
+INDIGOPNTS,IN,watch,nan
+INDOTECH,IN,watch,nan
+INDSUC,IN,watch,nan
+INDSWFTLAB,IN,watch,nan
+INFY,IN,watch,nan
+INOXWIND,IN,watch,nan
+IOLCP,IN,watch,nan
+IRCTC,IN,watch,nan
+ITC,IN,watch,nan
+ITDC,IN,watch,nan
+IXIGO,IN,watch,nan
+JINDALDRLL,IN,watch,nan
+JINDALSAW,IN,watch,nan
+JKLAKSHMI,IN,watch,nan
+JKPAPER,IN,watch,nan
+JKTYRE,IN,watch,nan
+JKUMAR,IN,watch,nan
+JSWENERGY,IN,watch,nan
+KALLAMTEX,IN,watch,nan
+KECL,IN,watch,nan
+KHADIM,IN,watch,nan
+KRBL,IN,watch,nan
+KRIDHANINF,IN,watch,nan
+KVB,IN,watch,nan
+LAFFANS,IN,watch,nan
+LATENTVIEW,IN,watch,nan
+LIBERTSHOE,IN,watch,nan
+LOYALTEX,IN,watch,nan
+M&MFIN,IN,watch,nan
+MADRASFERT,IN,watch,nan
+MAHINDCIE,IN,watch,nan
+MANGCHEFER,IN,watch,nan
+MAPMYINDIA,IN,watch,nan
+MARICO,IN,watch,nan
+MARINE,IN,watch,nan
+MARUTI,IN,watch,nan
+MATRIMONY,IN,watch,nan
+MAZDOCK,IN,watch,nan
+MGL,IN,watch,nan
+MHRIL,IN,watch,nan
+MINDTREE,IN,watch,nan
+MKPROT,IN,watch,nan
+MORARJEE,IN,watch,nan
+MOTHERSON,IN,watch,nan
+MPSLTD,IN,watch,nan
+MRPL,IN,watch,nan
+MRSBECTORS,IN,watch,nan
+MTARTECH,IN,watch,nan
+NATCOPHARM,IN,watch,nan
+NATIONALUM,IN,watch,nan
+NAUKRI,IN,watch,nan
+NAZARA,IN,watch,nan
+NLCINDIA,IN,watch,nan
+NSDL,IN,watch,nan
+NYKAA,IN,watch,nan
+OFSS,IN,watch,nan
+OIL,IN,watch,nan
+OLAELECTRIC,IN,watch,nan
+OMAXE,IN,watch,nan
+ONGC,IN,watch,nan
+PADAMCOT,IN,watch,nan
+PARAGMILK,IN,watch,nan
+PATELINT,IN,watch,nan
+PETRONET,IN,watch,nan
+PFC,IN,watch,nan
+PIDILITIND,IN,watch,nan
+PNBHOUSING,IN,watch,nan
+POKARNA,IN,watch,nan
+PRAJIND,IN,watch,nan
+PREMIERENE,IN,watch,nan
+PROTEAN,IN,watch,nan
+PROZONE,IN,watch,nan
+PUNJABCHEM,IN,watch,nan
+PVR,IN,watch,nan
+RAILTEL,IN,watch,nan
+RAIN,IN,watch,nan
+RANEENGINE,IN,watch,nan
+RAYMOND,IN,watch,nan
+RAYMONDREL,IN,watch,nan
+RECLTD,IN,watch,nan
+REDINGTON,IN,watch,nan
+RELIANCE,IN,watch,nan
+RHFL,IN,watch,nan
+RPOWER,IN,watch,nan
+RSIL,IN,watch,nan
+RVNL,IN,watch,nan
+SAGILITY,IN,watch,nan
+SANDUMA,IN,watch,nan
+SAPPHIRE,IN,watch,nan
+SBILIFE,IN,watch,nan
+SBIN,IN,watch,nan
+SCHNEIDER,IN,watch,nan
+SCI,IN,watch,nan
+SHAKTIPUMP,IN,watch,nan
+SIEMENS,IN,watch,nan
+SIMBHALS,IN,watch,nan
+SKFINDIA,IN,watch,nan
+SOUTHBANK,IN,watch,nan
+SPCENET,IN,watch,nan
+STALLION,IN,watch,nan
+STC,IN,watch,nan
+STOVEKRAFT,IN,watch,nan
+SUNPHARMA,IN,watch,nan
+SUPREMEPETRO,IN,watch,nan
+SWIGGY,IN,watch,nan
+TARAPUR,IN,watch,nan
+TARTRIND,IN,watch,nan
+TATACONSUM,IN,watch,nan
+TATAMOTORS,IN,watch,nan
+TATAPOWER,IN,watch,nan
+TATASTEEL,IN,watch,nan
+TCI,IN,watch,nan
+TCPLPACK,IN,watch,nan
+TEJASNET,IN,watch,nan
+THERMAX,IN,watch,nan
+TIRUMALCHM,IN,watch,nan
+TITAN,IN,watch,nan
+TRIVENI,IN,watch,nan
+TRIVENTINE,IN,watch,nan
+TTML,IN,watch,nan
+TVSMOTOR,IN,watch,nan
+UCOBANK,IN,watch,nan
+UGROCAP,IN,watch,nan
+UNIONBANK,IN,watch,nan
+UNITEDTEA,IN,watch,nan
+VADILALIND,IN,watch,nan
+VALORE,IN,watch,nan
+VBL,IN,watch,nan
+VEDL,IN,watch,nan
+VIJAYA,IN,watch,nan
+VIKRAMSOLR,IN,watch,nan
+VJLAXMIE,IN,watch,nan
+VMART,IN,watch,nan
+VOLTAS,IN,watch,nan
+WAAREEENER,IN,watch,nan
+WABAG,IN,watch,nan
+WELSPUNSPEC,IN,watch,nan
+WIPRO,IN,watch,nan
+WSTCSTPAPR,IN,watch,nan
+YESBANK,IN,watch,nan
+YUVRAAJ,IN,watch,nan
+ZEEL,IN,watch,nan
+ZODIAC,IN,watch,nan
+ZOMATO,IN,watch,nan
+5360,KR,signal,technical 2026-07-21
+94800,KR,signal,technical 2026-07-21
+15020,KR,signal,technical 2026-07-21
+69460,KR,signal,technical 2026-07-21
+380540,KR,signal,technical 2026-07-21
+9310,KR,signal,technical 2026-07-21
+3680,KR,signal,technical 2026-07-21
+ASIANHOTNR,IN,signal,piotroski+debt 2026-07-21
+ATUL,IN,signal,piotroski+debt 2026-07-21
+AARNAV,IN,signal,piotroski+debt 2026-07-21
+AYMSYNTEX,IN,signal,piotroski+debt 2026-07-21
+AARON,IN,signal,piotroski+debt 2026-07-21
+AMANTA,IN,signal,piotroski+debt 2026-07-21
+AGI,IN,signal,piotroski+debt 2026-07-21
+ANTELOPUS,IN,signal,piotroski+debt 2026-07-21
+AJANTPHARM,IN,signal,piotroski+debt 2026-07-21
+ANUP,IN,signal,piotroski+debt 2026-07-21
+INDOSTAR,IN,signal,golden_cross 2026-07-13 (backfilled)
+KONNDOR,IN,signal,golden_cross 2026-07-13 (backfilled)
+VAIBHAVGBL,IN,signal,golden_cross 2026-07-13 (backfilled)
+NARPROP,IN,signal,golden_cross 2026-07-13 (backfilled)
+BDH,IN,signal,golden_cross 2026-07-13 (backfilled)
+RUDRAGAS,IN,signal,golden_cross 2026-07-13 (backfilled)
+MAHESHWARI,IN,signal,golden_cross 2026-07-13 (backfilled)
+PANCHSHEEL,IN,signal,golden_cross 2026-07-13 (backfilled)
+CORDSCABLE,IN,signal,golden_cross 2026-07-13 (backfilled)
+SUPRATRE,IN,signal,golden_cross 2026-07-13 (backfilled)
+UNICHEMLAB,IN,signal,golden_cross 2026-07-13 (backfilled)
+SVARTCORP,IN,signal,golden_cross 2026-07-13 (backfilled)
+LMFA,US,signal,golden_cross 2026-07-13 (backfilled)
+GREE,US,signal,golden_cross 2026-07-13 (backfilled)
+RTB,US,signal,golden_cross 2026-07-13 (backfilled)
+ASBP,US,signal,golden_cross 2026-07-13 (backfilled)
+PML,US,signal,golden_cross 2026-07-13 (backfilled)
+IPHA,US,signal,golden_cross 2026-07-13 (backfilled)
+DLY,US,signal,golden_cross 2026-07-13 (backfilled)
+THRM,US,signal,golden_cross 2026-07-13 (backfilled)
+RRR,US,signal,golden_cross 2026-07-13 (backfilled)
+HRL,US,signal,golden_cross 2026-07-13 (backfilled)
+MNPR,US,signal,golden_cross 2026-07-13 (backfilled)
+EVEXIA,IN,signal,golden_cross 2026-07-13 (backfilled)
+UPBD,US,signal,golden_cross 2026-07-13 (backfilled)
+NAMSW,US,signal,golden_cross 2026-07-14 (backfilled)
+ARL,US,signal,golden_cross 2026-07-14 (backfilled)
+CCK,US,signal,golden_cross 2026-07-14 (backfilled)
+BN,US,signal,golden_cross 2026-07-14 (backfilled)
+CNH,US,signal,golden_cross 2026-07-14 (backfilled)
+BAX,US,signal,golden_cross 2026-07-14 (backfilled)
+IGI,US,signal,golden_cross 2026-07-14 (backfilled)
+FORR,US,signal,golden_cross 2026-07-14 (backfilled)
+DORM,US,signal,golden_cross 2026-07-14 (backfilled)
+USA,US,signal,golden_cross 2026-07-14 (backfilled)
+GEN,US,signal,golden_cross 2026-07-14 (backfilled)
+DBX,US,signal,golden_cross 2026-07-14 (backfilled)
+VRNS,US,signal,golden_cross 2026-07-14 (backfilled)
+ICUI,US,signal,golden_cross 2026-07-14 (backfilled)
+DFP,US,signal,golden_cross 2026-07-14 (backfilled)
+JYNT,US,signal,golden_cross 2026-07-14 (backfilled)
+TTWO,US,signal,golden_cross 2026-07-15 (backfilled)
+AGIO,US,signal,golden_cross 2026-07-15 (backfilled)
+RPAY,US,signal,golden_cross 2026-07-15 (backfilled)
+OTLK,US,signal,golden_cross 2026-07-15 (backfilled)
+MSW,US,signal,golden_cross 2026-07-15 (backfilled)
+9202,JP,signal,golden_cross 2026-07-15 (backfilled)
+9082,JP,signal,golden_cross 2026-07-15 (backfilled)
+4221,JP,signal,golden_cross 2026-07-15 (backfilled)
+2882,JP,signal,golden_cross 2026-07-15 (backfilled)
+3076,JP,signal,golden_cross 2026-07-15 (backfilled)
+3632,JP,signal,golden_cross 2026-07-15 (backfilled)
+9997,JP,signal,golden_cross 2026-07-15 (backfilled)
+4728,JP,signal,golden_cross 2026-07-15 (backfilled)
+9686,JP,signal,golden_cross 2026-07-15 (backfilled)
+PNDORA.CO,EU,signal,golden_cross 2026-07-15 (backfilled)
+OTOEL.AT,EU,signal,golden_cross 2026-07-15 (backfilled)
+LRE.L,EU,signal,golden_cross 2026-07-15 (backfilled)
+FSG.L,EU,signal,golden_cross 2026-07-15 (backfilled)
+ZAL.F,EU,signal,golden_cross 2026-07-15 (backfilled)
+EXFY,US,signal,golden_cross 2026-07-15 (backfilled)
+LINK,US,signal,golden_cross 2026-07-15 (backfilled)
+PMA,US,signal,golden_cross 2026-07-15 (backfilled)
+IFBD,US,signal,golden_cross 2026-07-15 (backfilled)
+38880,KR,signal,golden_cross 2026-07-15 (backfilled)
+54940,KR,signal,golden_cross 2026-07-15 (backfilled)
+AUSTENG,IN,signal,golden_cross 2026-07-15 (backfilled)
+KRISHIVAL,IN,signal,golden_cross 2026-07-15 (backfilled)
+TOTEM,IN,signal,golden_cross 2026-07-15 (backfilled)
+360ONE,IN,signal,golden_cross 2026-07-15 (backfilled)
+GANESHHOU,IN,signal,golden_cross 2026-07-15 (backfilled)
+RESPONIND,IN,signal,golden_cross 2026-07-15 (backfilled)
+NDRAUTO,IN,signal,golden_cross 2026-07-15 (backfilled)
+GALXBRG,IN,signal,golden_cross 2026-07-15 (backfilled)
+TRABI,IN,signal,golden_cross 2026-07-15 (backfilled)
+DATAMATICS,IN,signal,golden_cross 2026-07-15 (backfilled)
+GKCONS,IN,signal,golden_cross 2026-07-15 (backfilled)
+AJAXENGG,IN,signal,golden_cross 2026-07-15 (backfilled)
+GARFIBRES,IN,signal,golden_cross 2026-07-15 (backfilled)
+HOMEFIRST,IN,signal,golden_cross 2026-07-15 (backfilled)
+GREENLAM,IN,signal,golden_cross 2026-07-15 (backfilled)
+IGARASHI,IN,signal,golden_cross 2026-07-15 (backfilled)
+20MICRONS,IN,signal,golden_cross 2026-07-15 (backfilled)
+JD.L,EU,signal,golden_cross 2026-07-16 (backfilled)
+HEN3.F,EU,signal,golden_cross 2026-07-16 (backfilled)
+NCC.L,EU,signal,golden_cross 2026-07-16 (backfilled)
+CLDN.L,EU,signal,golden_cross 2026-07-17 (backfilled)
+BRSC.L,EU,signal,golden_cross 2026-07-17 (backfilled)
+BBOX.L,EU,signal,golden_cross 2026-07-17 (backfilled)
+4443,JP,signal,golden_cross 2026-07-17 (backfilled)
+7033,JP,signal,golden_cross 2026-07-17 (backfilled)
+3475,JP,signal,golden_cross 2026-07-17 (backfilled)
+BLUEJET,IN,signal,golden_cross 2026-07-17 (backfilled)
+HARIOMPIPE,IN,signal,golden_cross 2026-07-17 (backfilled)
+RAMCOIND,IN,signal,golden_cross 2026-07-17 (backfilled)
+2820,JP,signal,golden_cross 2026-07-17 (backfilled)
+CHOLAFIN,IN,signal,golden_cross 2026-07-17 (backfilled)
+PPL,IN,signal,golden_cross 2026-07-17 (backfilled)
+FOSECOIND,IN,signal,golden_cross 2026-07-17 (backfilled)
+PRICOLLTD,IN,signal,golden_cross 2026-07-17 (backfilled)
+WINDLAS,IN,signal,golden_cross 2026-07-17 (backfilled)
+APTUS,IN,signal,golden_cross 2026-07-17 (backfilled)
+PICCADIL,IN,signal,golden_cross 2026-07-17 (backfilled)
+JINDWORLD,IN,signal,golden_cross 2026-07-17 (backfilled)
+FDC,IN,signal,golden_cross 2026-07-17 (backfilled)
+ONMOBILE,IN,signal,golden_cross 2026-07-17 (backfilled)
+ROTO,IN,signal,golden_cross 2026-07-17 (backfilled)
+6333,JP,signal,golden_cross 2026-07-17 (backfilled)
+8923,JP,signal,golden_cross 2026-07-17 (backfilled)
+3420,JP,signal,golden_cross 2026-07-17 (backfilled)
+3753,JP,signal,golden_cross 2026-07-17 (backfilled)
+6276,JP,signal,golden_cross 2026-07-20 (backfilled)
+5269,JP,signal,golden_cross 2026-07-20 (backfilled)
+4543,JP,signal,golden_cross 2026-07-20 (backfilled)
+8147,JP,signal,golden_cross 2026-07-20 (backfilled)
+8075,JP,signal,golden_cross 2026-07-20 (backfilled)
+6915,JP,signal,golden_cross 2026-07-20 (backfilled)
+5938,JP,signal,golden_cross 2026-07-20 (backfilled)
+8424,JP,signal,golden_cross 2026-07-20 (backfilled)
+6325,JP,signal,golden_cross 2026-07-20 (backfilled)
+2818,JP,signal,golden_cross 2026-07-20 (backfilled)
+1787,JP,signal,golden_cross 2026-07-20 (backfilled)
+7060,JP,signal,golden_cross 2026-07-20 (backfilled)
+5909,JP,signal,golden_cross 2026-07-20 (backfilled)
+5108,JP,signal,golden_cross 2026-07-20 (backfilled)
+3020,JP,signal,golden_cross 2026-07-20 (backfilled)
+JLHL,IN,signal,golden_cross 2026-07-20 (backfilled)
+TCBX,US,signal,golden_cross 2026-07-20 (backfilled)
+SBCF,US,signal,golden_cross 2026-07-20 (backfilled)
+HQY,US,signal,golden_cross 2026-07-20 (backfilled)
+IOTR,US,signal,golden_cross 2026-07-20 (backfilled)
+RCL,US,signal,golden_cross 2026-07-20 (backfilled)
+ITW,US,signal,golden_cross 2026-07-20 (backfilled)
+SHC,US,signal,golden_cross 2026-07-20 (backfilled)
+ATRA,US,signal,golden_cross 2026-07-20 (backfilled)
+KMB,US,signal,golden_cross 2026-07-20 (backfilled)
+PRPL,US,signal,golden_cross 2026-07-20 (backfilled)
+APM,US,signal,golden_cross 2026-07-20 (backfilled)
+NMIH,US,signal,golden_cross 2026-07-20 (backfilled)
+INDP,US,signal,golden_cross 2026-07-20 (backfilled)
+CRNX,US,signal,golden_cross 2026-07-20 (backfilled)
+DT,US,signal,golden_cross 2026-07-20 (backfilled)
+FWONA,US,signal,golden_cross 2026-07-20 (backfilled)
+ONCH,US,signal,golden_cross 2026-07-20 (backfilled)
+MS-PQ,US,signal,golden_cross 2026-07-20 (backfilled)
+ESNT,US,signal,golden_cross 2026-07-20 (backfilled)
+VINCOFE,IN,signal,golden_cross 2026-07-20 (backfilled)
+INDHOTEL,IN,signal,golden_cross 2026-07-20 (backfilled)
+IKIO,IN,signal,golden_cross 2026-07-20 (backfilled)
+MKS.L,EU,signal,golden_cross 2026-07-20 (backfilled)
+DBK.F,EU,signal,golden_cross 2026-07-20 (backfilled)
+FME.F,EU,signal,golden_cross 2026-07-20 (backfilled)
+RED.MC,EU,signal,golden_cross 2026-07-20 (backfilled)
+NAVKARCORP,IN,signal,golden_cross 2026-07-20 (backfilled)
+EIMCOELECO,IN,signal,golden_cross 2026-07-20 (backfilled)
+MAITHANALL,IN,signal,golden_cross 2026-07-20 (backfilled)
+KMEW,IN,signal,golden_cross 2026-07-20 (backfilled)
+UDS,IN,signal,golden_cross 2026-07-20 (backfilled)
+PRINCEPIPE,IN,signal,golden_cross 2026-07-20 (backfilled)
+PPLPHARMA,IN,signal,golden_cross 2026-07-20 (backfilled)
+FWONK,US,signal,golden_cross 2026-07-20 (backfilled)
+WBX,US,signal,golden_cross 2026-07-20 (backfilled)
+TARIL,IN,signal,golden_cross 2026-07-20 (backfilled)
+NAAS,US,signal,golden_cross 2026-07-20 (backfilled)
+3536,JP,signal,golden_cross 2026-07-21 (backfilled)
+4680,JP,signal,golden_cross 2026-07-21 (backfilled)
+4206,JP,signal,golden_cross 2026-07-21 (backfilled)
+4053,JP,signal,golden_cross 2026-07-21 (backfilled)
+3769,JP,signal,golden_cross 2026-07-21 (backfilled)
+8281,JP,signal,golden_cross 2026-07-21 (backfilled)
+6995,JP,signal,golden_cross 2026-07-21 (backfilled)
+2533,JP,signal,golden_cross 2026-07-21 (backfilled)

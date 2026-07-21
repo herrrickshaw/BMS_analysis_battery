@@ -117,14 +117,21 @@ def _deadline(seconds: int = NET_TIMEOUT_S, label: str = "source"):
         if el > seconds * 0.5:
             print(f"  ⏱  {label}: {el:.0f}s (deadline {seconds}s)")
 
-# MARKET_CACHE mirrors the existing BHAV_CACHE idiom so the whole tree can live
-# outside ~/Downloads. That matters for more than tidiness: macOS TCC denies
-# launchd ALL access to ~/Downloads, so anything rooted there is unreadable to the
-# scheduled 00:30 run unless /bin/bash is granted Full Disk Access. Keeping the
-# default pointed at the old location means nothing breaks for interactive use.
+# MARKET_CACHE resolves through data_registry. "Keeping the default pointed at
+# the old location means nothing breaks for interactive use" was the original
+# reasoning and it was wrong: it did not keep one tree working, it created two.
+# The 15:19 mailer on 2026-07-21 wrote 21,902 symbols to
+# ~/Downloads/market_cache/symbol_master.parquet while every other step of the
+# same run read the live tree, because mailer.sh does not export MARKET_CACHE —
+# only the plists do.
+#
+# 🔴 This line is also why .semgrep.yml rule 6 did not catch it: that rule
+# exempts anything inside os.environ.get("MARKET_CACHE", ...), on the assumption
+# that reading the env var makes a line safe. It does not — the DEFAULT is the
+# hazard, and the exemption hides precisely the case that matters.
 import os as _os
-MASTER = Path(_os.environ.get(
-    "MARKET_CACHE", Path.home() / "Downloads" / "market_cache")) / "symbol_master.parquet"
+import data_registry as _R
+MASTER = Path(_os.environ.get("MARKET_CACHE", _R.MARKET_CACHE)) / "symbol_master.parquet"
 MASTER.parent.mkdir(parents=True, exist_ok=True)
 STALE_HOURS = 24
 

@@ -18,6 +18,74 @@ mistakes were made, and the mistakes here have repeated.
 
 ---
 
+## 2026-07-21 (later)
+
+### `technical` filter can only ever fire for Korea
+
+The 15:19 mailer recorded 110 `technical` passes, all Korean, and pushed +101
+names into the watchlist — taking KR from 3 signal names to 110, the largest
+block in the book. This is **not** a signal about Korea.
+
+`harvest_technical()` skips any market whose scan lacks a `Quality_Grade`
+column, and only the Korea scanner emits it:
+
+| market | latest scan | `Quality_Grade` |
+|---|---|---|
+| IN | `indian_full_scan_20260721_1336` | no — skipped |
+| US | `us_full_scan_20260721_1513` | no — skipped |
+| **KR** | `korea_market_scan_20260721_1518` | **yes** |
+| JP | `japan_market_scan_20260721_1517` | no — skipped |
+| EU | `european_market_scan_broad_20260721_1515` | no — skipped |
+
+**Decision: recorded, not silently accepted.** The filter's conjunction
+(grade A/B ∧ above EMA-50 ∧ EMA-50 rising ∧ recomputed `BREAKOUT_BUY`) admits
+4.3% of Korean names, which is a sane hit rate — the defect is coverage, not
+threshold. Until `breakout_quality` is wired into the other four scanners, any
+cross-market comparison of `technical` is measuring instrumentation, not
+markets. **Not yet fixed.**
+
+### `symbol_master` wrote 21,902 rows to the stale tree — during a live run
+
+`symbol_master.py` used `os.environ.get("MARKET_CACHE", ~/Downloads/...)`.
+`mailer.sh` does not export `MARKET_CACHE` (only the plists do), so the 15:19
+mailer wrote the symbol master to `~/Downloads/market_cache` while every other
+step of the same run read the live tree.
+
+### Semgrep rule 6 exemption removed — it was hiding the bugs it existed to find
+
+The rule exempted anything inside `os.environ.get("MARKET_CACHE"/"BHAV_CACHE",
+...)`, on the assumption that reading the env var made a line safe. Backwards:
+the **default** is the hazard. Removing the exemption immediately surfaced 10
+further real findings, including `market_data_cache.py` — the file whose
+hardcoded path caused the original nightly US-scan `PermissionError` that
+started this work — plus `liquidity.py` and `ohlcv_cache.py`.
+
+**Decision:** a filter that excludes the cases a rule exists to find is worse
+than no rule, because it reports zero findings and reads as a clean bill of
+health. Blocking count went 0 → 10; that is the rule working, not a regression.
+
+### Re-running the mailer for past dates: rejected as unsound
+
+Asked to re-run the mailer for the days when data was stale. **Not done, by
+decision.** No scanner accepts an as-of date; they read the latest bar, and for
+US/JP/KR/EU they fetch live from yfinance rather than reading persisted history.
+Generating a "17 July brief" from data through 20 July would use bars that did
+not exist on the 17th — lookahead, producing picks that cannot be falsified.
+
+The ledger also shows there is nothing to recover: every date from 13–20 Jul
+holds *only* `golden_cross_hist` signals. Piotroski, debt-reduction, ROCE and
+technical did not exist then. A backdated piotroski signal would need
+point-in-time fundamentals as of that date, which no backfill can synthesise.
+
+What the re-run *did* fix: `mailer.sh` never exported `MARKET_CACHE`, so the
+13:52 manual run read the stale tree. The 15:19 run was the first manual run on
+live stores. Both runs ended in a suppressed send — 13:52 because screener.in
+was serving live intraday quotes, 15:19 because HDFCBANK drifted 2.18% against
+screener.in with 11 minutes left in the session. **A sendable brief requires a
+post-close run.**
+
+---
+
 ## 2026-07-21
 
 ### Cache roots resolve from the repo, not `~/Downloads`

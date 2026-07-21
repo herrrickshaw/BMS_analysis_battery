@@ -135,14 +135,21 @@ rules:
       PermissionError mid-download, leaving a 3.9-day-old workbook that was then
       shipped in the brief. Resolve through data_registry, or
       os.environ.get("MARKET_CACHE", ...).
+    # 🔴 This rule USED TO exempt anything inside os.environ.get("MARKET_CACHE",
+    # ...) / ("BHAV_CACHE", ...), reasoning that a line which reads the env var
+    # is already doing the right thing. That exemption was backwards: the
+    # DEFAULT is the hazard, and env-var-with-a-Downloads-default is the exact
+    # shape of the bug. It hid three real instances — data_registry itself,
+    # bhavcopy_history/bhavcopy_store, and symbol_master.py, which on
+    # 2026-07-21 wrote 21,902 rows to the stale tree during a live mailer run
+    # because mailer.sh does not export MARKET_CACHE.
+    #
+    # A filter that excludes the cases the rule exists to find is worse than no
+    # rule: it reports zero findings and reads as a clean bill of health.
     patterns:
       - pattern-either:
           - pattern: Path.home() / "Downloads" / ...
           - pattern: '"/Users/$USER/Downloads/..."'
-      - pattern-not-inside: |
-          os.environ.get("MARKET_CACHE", ...)
-      - pattern-not-inside: |
-          os.environ.get("BHAV_CACHE", ...)
 
   # ── 7. credentials in source ────────────────────────────────────────────────
   - id: hardcoded-credential

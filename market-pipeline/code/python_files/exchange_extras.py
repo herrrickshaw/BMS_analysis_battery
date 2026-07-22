@@ -129,6 +129,46 @@ def fetch_corp_actions(_: _dt.date) -> pd.DataFrame:
     return d
 
 
+def backfill_corp_actions(quarters: int) -> None:
+    """Historical corporate actions, walked in exact calendar-quarter windows.
+
+    THE gap this closes: the price warehouse holds RAW closes, and splits/bonuses
+    fake returns through every event (+12.2% measured on one backtest). The CA
+    API serves history by date window (probed: Q1-2020 alone returned 466
+    actions) — but, like the results API, behaves oddly on ragged windows, so
+    exact quarters only. Ex-dates + subjects ("Face Value Split ... From Rs 10
+    To Re 1") are what an adjuster needs.
+    """
+    out = ROOT / "corp_actions_history.parquet"
+    old = pd.read_parquet(out) if out.exists() else pd.DataFrame()
+    frames = [old] if not old.empty else []
+    today = _dt.date.today()
+    qsm = 3 * ((today.month - 1) // 3) + 1
+    start, end = _dt.date(today.year, qsm, 1), today
+    for _ in range(quarters):
+        u = ("https://www.nseindia.com/api/corporates-corporateActions?index=equities"
+             f"&from_date={start:%d-%m-%Y}&to_date={end:%d-%m-%Y}")
+        try:
+            r = _get(u, referer="https://www.nseindia.com/")
+            r.raise_for_status()
+            d = pd.DataFrame(r.json())
+            print(f"  CA window {start}..{end}: {len(d)} actions")
+            if not d.empty:
+                frames.append(d)
+        except Exception as e:
+            print(f"  CA window {start}..{end}: FAILED {type(e).__name__}")
+        end = start - _dt.timedelta(days=1)
+        start = _dt.date(end.year, 3 * ((end.month - 1) // 3) + 1, 1)
+        time.sleep(1.5)
+    if not frames:
+        return
+    allf = pd.concat(frames, ignore_index=True).drop_duplicates()
+    ROOT.mkdir(parents=True, exist_ok=True)
+    tmp = out.with_suffix(".parquet.tmp")
+    allf.to_parquet(tmp, index=False); tmp.replace(out)
+    print(f"  CA history: {len(allf)} actions -> {out.name}")
+
+
 def fetch_fo_oi(d: _dt.date) -> pd.DataFrame:
     u = f"https://archives.nseindia.com/content/nsccl/fao_participant_oi_{d:%d%m%Y}.csv"
     r = _get(u)
@@ -227,12 +267,18 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="NSE/BSE bulk extras collector")
     ap.add_argument("--date", help="trade date DDMMYYYY (default: yesterday)")
     ap.add_argument("--backfill", type=int, default=0, help="also fetch N prior days")
+    ap.add_argument("--ca-quarters", type=int, default=0,
+                    help="backfill corporate-actions history N quarters")
     a = ap.parse_args()
 
     if a.date:
         d0 = _dt.datetime.strptime(a.date, "%d%m%Y").date()
     else:
         d0 = _dt.date.today() - _dt.timedelta(days=1)
+
+    if a.ca_quarters:
+        backfill_corp_actions(a.ca_quarters)
+        return 0
 
     days = [d0 - _dt.timedelta(days=i) for i in range(a.backfill + 1)]
     summary = {"ok": 0, "skip": 0, "fail": 0}

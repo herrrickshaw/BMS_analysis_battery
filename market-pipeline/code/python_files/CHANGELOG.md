@@ -95,6 +95,42 @@ policy convergence). No pipeline decisions recovered.
 
 ---
 
+## 2026-07-22 (CA history + filings-based metrics, site-validated)
+
+### Corporate-actions history: 23,480 actions back to 2015
+
+The top correctness gap closed: the CA API serves history by exact
+calendar-quarter windows (same trap as the results API — ragged windows return
+almost nothing). `exchange_extras.py --ca-quarters 44` harvested every ex-date
+(dividends, splits, bonuses) matching the price warehouse's depth. This is the
+data needed to adjust the raw-close warehouse — the +12.2% split artifact is now
+fixable rather than merely known.
+
+### `metrics_from_filings.py` — metrics with provenance, checked against the sites
+
+Computes net margin, OPM-proxy, EPS, YoY growth and interest cover from the
+XBRL filings (every figure traces to a filing with a date), then validates
+against screener.in's quarterly table — filings vs the site, per quarter, per
+consolidation basis.
+
+**Validation run: 6 OK · 0 DIFF.** Three initial mismatches, each diagnosed to
+a distinct cause and each a lesson encoded in the harness:
+
+- **SHYAMMETL 3,612cr vs 1,559cr** — consolidated filing compared against the
+  standalone page. Basis is now matched PER FILING, not per symbol.
+- **WEALTH 20 vs 21cr** — whole-crore rounding is 5%% of a Rs20cr quarter; the
+  tolerance now has an absolute floor (1cr) alongside the 2%% relative.
+- **RADICO 3,715cr vs 925cr with PAT 65 == 65 exactly** — not an error: liquor
+  companies file revenue GROSS of excise, the sites net it out, and the filing
+  carries no excise element to reconcile with. Classified `DEFN`
+  (definitional), a category distinct from DIFF, because forcing agreement
+  would hide a real convention difference.
+
+The harness rule: DIFF against one site -> suspect our parse; DIFF against all
+sites -> the filing was restated and the divergence IS the finding.
+
+---
+
 ## 2026-07-22 (warehouse — partitioned parquet + DuckDB)
 
 ### The LFS problem was duplication and monoliths, not file format

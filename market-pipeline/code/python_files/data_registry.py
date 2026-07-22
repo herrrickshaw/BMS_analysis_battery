@@ -152,6 +152,16 @@ DATASETS: List[Dataset] = [
     # shows in data_index alongside everything else, instead of the brief
     # silently screening on old financials — the exact stale-data failure this
     # registry exists to surface.
+    Dataset("extras.index_closes", MARKET_CACHE / "exchange_extras" / "index_closes.parquet",
+            "exchange_extras.py", "ingest", DAILY, 3.0,
+            "162 NSE indices/day with P/E, P/B, div yield — the REAL Nifty 50 "
+            "benchmark (NIFTYBEES was filtered out of the equity panel as an ETF) "
+            "plus an index-valuation regime series",
+            ["signal_tracker.py", "watchlist_pnl.py"]),
+    Dataset("extras.delivery", MARKET_CACHE / "exchange_extras" / "delivery.parquet",
+            "exchange_extras.py", "ingest", DAILY, 3.0,
+            "per-stock delivery % — conviction signal (positions taken home vs "
+            "intraday churn); never collected before 2026-07-22"),
     Dataset("fundamentals.in_annual", MARKET_CACHE / "fundamentals" / "IN_current.parquet",
             "fundamentals_offhours.py", "ingest", "weeknights 21:30 + weekends 08:00/14:00", 10.0,
             "annual statements for the HIGH-LIQUIDITY India universe (>=Rs1cr/day); "

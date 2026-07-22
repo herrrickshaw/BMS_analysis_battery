@@ -34,6 +34,12 @@ section_start "ingest"
   run "[3/7] FX rates for liquidity gate" \
       $PY -c "import liquidity, json; r = liquidity.scan_fx(); liquidity._fx_write_cache(r); print(f'  fx: {len(r)} currencies cached')"
 
+  # NSE/BSE bulk extras: index closes (real benchmarks + index P/E), delivery %,
+  # bulk/block deals, corporate actions (the split-adjustment data), F&O OI,
+  # BSE results calendar. All cookie-free archive files; idempotent per day.
+  run "[3b/7] NSE/BSE extras (indices, delivery, deals, corp actions)" \
+      $PY exchange_extras.py
+
   # Cross-market symbol normalisation.
   run "[4/7] symbol master refresh" $PY symbol_master.py
 

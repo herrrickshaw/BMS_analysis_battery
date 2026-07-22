@@ -95,6 +95,41 @@ policy convergence). No pipeline decisions recovered.
 
 ---
 
+## 2026-07-22 (NSE/BSE bulk extras — six new datasets)
+
+Probed the exchanges' public endpoints directly: seven bulk files are cookie-free
+(archives.nseindia.com + two JSON APIs answered plain curl; only NSE's website
+APIs need the cookie dance). `exchange_extras.py` now collects daily, idempotent
+per (kind, date), raw files kept verbatim + one consolidated parquet per kind.
+Wired into ingest as step 3b; index_closes and delivery registered in
+data_registry (3d tolerance).
+
+What each fills:
+
+| dataset | gap it closes |
+|---|---|
+| **index_closes** (162 indices/day, with P/E·P/B·yield) | the BENCHMARK gap — NIFTYBEES was ISIN-filtered out of the equity panel, so signal tracking used a panel-median stand-in; this is the real Nifty 50. Index P/E is also a regime series the pipeline never had |
+| **delivery** (per-stock DELIV_PER) | conviction signal — positions taken home vs intraday churn; never collected |
+| **bulk_deals / block_deals** (full history, client names) | smart-money prints; never collected |
+| **corp_actions** (ex-dates: dividends, splits, bonuses) | the SPLIT-ADJUSTMENT gap — deep panels carry raw closes, and splits faked a +12.2% illiquid premium in a measured backtest; this is the data to adjust or at least flag |
+| **fo_oi** (FII/DII/pro/client OI) | futures positioning; context for put_call_parity |
+| **bse_results_cal** | earnings calendar without scraping |
+
+Verified with an 8-day backfill: 966 index rows, 19,571 delivery rows, deals,
+20 corp actions, 642 calendar entries — 0 failures (weekend 404s recorded as
+skips, not errors; a holiday is a fact, not a failure).
+
+**Deliberate choices:** raw files are never deleted (a parsing bug must not
+destroy source data); each kind fails independently (index closes must not
+depend on bulk-deals parsing); the CA endpoint raises loudly if NSE later
+fences it, rather than storing a block page as data.
+
+**Consumers not yet wired** (data first, consumers next): signal_tracker /
+watchlist_pnl still benchmark against the panel median — switching them to the
+real Nifty 50 series is the immediate follow-on.
+
+---
+
 ## 2026-07-22 (liquidity framing + staleness guard)
 
 ### The brief now says what its universe IS: high-liquidity picks

@@ -45,9 +45,13 @@ HERE = Path(__file__).resolve().parent
 WATCHLIST = HERE / "watchlist.csv"
 LEDGER = HERE / "cache_seed" / "signal_ledger.parquet"
 FA_SHEET = Path("/Users/umashankar/Downloads/Sheet for tax filing US stocks.xlsx")
+# Warehouse dirs (year-partitioned parquet) — pd.read_parquet reads a directory
+# natively. Replaces the monolithic ltm panels and the per-market folklore of
+# which repo held the good copy (the other US.parquet is the broken
+# alphabetical collection).
 PANELS = {
-    "IN": Path("/Users/umashankar/repos/global-market-data/cache_seed/ltm/IN.parquet"),
-    "US": Path("/Users/umashankar/repos/global-stock-screener/cache_seed/ltm/US.parquet"),
+    "IN": Path("/Users/umashankar/repos/global-market-data/warehouse/ohlcv/IN"),
+    "US": Path("/Users/umashankar/repos/global-market-data/warehouse/ohlcv/US"),
 }
 BENCH = {"IN": "NIFTYBEES", "US": "SPY"}
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")

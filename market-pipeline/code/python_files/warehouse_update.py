@@ -52,9 +52,15 @@ from typing import Optional
 import pandas as pd
 
 HERE = Path(__file__).resolve().parent
+# The WAREHOUSE replaces the monolithic ltm panels (2026-07-22). Year-partitioned
+# zstd parquet: a daily update rewrites ONLY the current-year file (~8MB for IN)
+# instead of a 68-184MB monolith, so each push uploads one small LFS object
+# rather than re-uploading append-only history in full. Measured before the
+# change: partitioning costs +7% on disk and cuts daily LFS growth ~10x.
+WAREHOUSE = Path("/Users/umashankar/repos/global-market-data/warehouse/ohlcv")
 PANELS = {
-    "IN": Path("/Users/umashankar/repos/global-market-data/cache_seed/ltm/IN.parquet"),
-    "US": Path("/Users/umashankar/repos/global-stock-screener/cache_seed/ltm/US.parquet"),
+    "IN": WAREHOUSE / "IN",
+    "US": WAREHOUSE / "US",
 }
 COLS = ["Date", "Symbol", "Open", "High", "Low", "Close", "Volume"]
 
@@ -112,8 +118,8 @@ FRESH = {"US": _fresh_us, "IN": _fresh_in}
 
 def update(market: str, dry: bool) -> int:
     panel = PANELS.get(market)
-    if not panel or not panel.exists():
-        print(f"  {market}: no panel at {panel}"); return 1
+    if not panel or not panel.exists() or not any(panel.glob("year=*.parquet")):
+        print(f"  {market}: no warehouse partitions at {panel}"); return 1
 
     old = pd.read_parquet(panel)
     old["Date"] = pd.to_datetime(old["Date"])
@@ -168,12 +174,20 @@ def update(market: str, dry: bool) -> int:
     if dry:
         print(f"  {market}: dry-run, not written"); return 0
 
-    bak = panel.with_suffix(".parquet.bak")
-    shutil.copy2(panel, bak)
-    tmp = panel.with_suffix(".parquet.tmp")
-    merged.to_parquet(tmp, index=False)
-    tmp.replace(panel)          # atomic; a crash cannot leave a partial panel
-    print(f"  ✅ {market}: written ({len(merged):,} rows)  backup -> {bak.name}")
+    # Write ONLY the partitions that changed — in practice the current year.
+    # Closed years never change under the strictly-newer-dates rule, so a daily
+    # run touches one ~8MB file, which is the entire point of partitioning.
+    changed_years = sorted(pd.to_datetime(new["Date"]).dt.year.unique())
+    for y in changed_years:
+        g = merged[pd.to_datetime(merged["Date"]).dt.year == y]
+        part = panel / f"year={y}.parquet"
+        bak = part.with_suffix(".parquet.bak")
+        if part.exists():
+            shutil.copy2(part, bak)
+        tmp = part.with_suffix(".parquet.tmp")
+        g.to_parquet(tmp, compression="zstd", index=False)
+        tmp.replace(part)
+        print(f"  ✅ {market}: year={y} written ({len(g):,} rows)")
     return 0
 
 

@@ -95,6 +95,43 @@ policy convergence). No pipeline decisions recovered.
 
 ---
 
+## 2026-07-22 (warehouse — partitioned parquet + DuckDB)
+
+### The LFS problem was duplication and monoliths, not file format
+
+Asked to cut LFS space "by using parquets": the panels already WERE parquet, and
+measured re-compression gains nothing (68.9 vs 68MB — already compressed). The
+real waste:
+
+- **~900MB where ~450MB exists** — the same market panels tracked in BOTH data
+  repos, diverging, with the canonical copy differing per market (this folklore
+  is now written down once, in `warehouse_build.py`: IN from global-market-data's
+  deep panel; US from global-stock-screener — the other US is the broken
+  alphabetical collection).
+- **Monoliths defeat LFS** — every daily update rewrote a 68-184MB file and each
+  push uploaded a complete new LFS object. Append-only history, re-uploaded in
+  full, forever, server-side.
+
+### The fix: `warehouse/ohlcv/<MKT>/year=YYYY.parquet` + DuckDB views
+
+43.5M rows, 6 markets, 2016-2026, row parity verified 6/6. Partitioning costs
++7% on disk and cuts the daily push from a 68MB monolith to the ~8MB
+current-year file — **~10x less LFS growth per push**. `warehouse.duckdb` is
+268KB of VIEWS (no data copied): SQL over every market with zero load step,
+committable for free.
+
+Consumers rewired and verified: `warehouse_update` writes only changed year
+partitions (closed years never change under the strictly-newer rule);
+`signal_tracker` / `watchlist_pnl` read the warehouse dirs (pandas reads a
+partition directory natively — the swap was one path).
+
+Monoliths untracked in both repos (local files stay as caches; README pointers
+left). ⚠️ GitHub keeps already-pushed LFS objects — this stops FUTURE growth
+and removes the duplication; reclaiming historical remote objects needs a
+support request or repo surgery, deliberately not attempted.
+
+---
+
 ## 2026-07-22 (NSE XBRL — the point-in-time prize)
 
 ### `nse_xbrl_results.py` — filing-dated quarterly fundamentals, 10+ years

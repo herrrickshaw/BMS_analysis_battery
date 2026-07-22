@@ -54,7 +54,12 @@ HOME = Path("/Users/umashankar")
 # The pipeline migrated out of ~/Downloads on 2026-07-16; honor an env override.
 PF = Path(os.environ.get("MARKET_PIPELINE_DIR",
                          str(HOME / "market-pipeline" / "code" / "python_files")))
-SYMBOL_MASTER = HOME / "Downloads" / "market_cache" / "symbol_master.parquet"
+# Live tree, NOT ~/Downloads: launchd is TCC-denied all of ~/Downloads (the
+# pipeline's founding failure mode) — the 2026-07-23 00:30 run tracebacked
+# right here reading the Downloads copy. symbol_master.py writes to
+# MARKET_CACHE; read the same tree it writes.
+SYMBOL_MASTER = Path(os.environ.get(
+    "MARKET_CACHE", str(HOME / "market-pipeline" / "market_cache"))) / "symbol_master.parquet"
 DSN = "dbname=market_data host=/tmp user=umashankar"
 SCHEMA = "market_daily"
 

@@ -152,6 +152,35 @@ import:workflow` DEACTIVATES on import — follow with `n8n update:workflow
 `DbxBkpMonitor001` (needed a Dropbox OAuth2 credential that was never attached)
 is superseded by the credential-free rclone GATE and left inactive.
 
+## 2026-07-23 (early morning: runtime ledger; two corrections it caught)
+
+### New: morning_runtimes.py — per-run duration ledger across all three surfaces
+
+Appends every finished run (pipeline log sections, n8n trigger executions for
+the 07:00 chain and 09:00 backup) to reports/morning_runtimes.csv — append-only,
+idempotent, in-flight runs picked up by the next sweep. Prints a recent trend +
+per-surface median/max. Exists because drift only ever got found by hand-diffing
+artifact mtimes (the Korea 3→28min case). First sweep: 8 runs back to Jul 17.
+
+### Correction: I broke my own backup lock
+
+The first sweep exposed the 00:30 Jul-23 run stuck in step [16] for ~4h: TWO
+rclone syncs interleaving on the same tree. Cause: my queued re-run command
+carried an unconditional `rmdir` of the lock — written to clear my own stale
+lock, but by execution time the lock belonged to the pipeline's LIVE step-16
+instance. Lesson encoded here: never clear a lock without checking the holder
+is dead (`rmdir` only after `pgrep` shows no cloud_backup.sh). Competitor
+killed; the pipeline's own sync left to finish alone.
+
+### Correction: readers reintroduced the ~/Downloads TCC trap
+
+market_ingest.py and financial_ratios.py (both written 2026-07-22) hardcoded
+`~/Downloads/market_cache/symbol_master.parquet` — the launchd-TCC-denied tree,
+and the exact two-trees trap symbol_master.py's own comment warns about (its
+WRITER already targets MARKET_CACHE). The 00:30 run tracebacked on it in step
+[15]. Both readers now resolve `$MARKET_CACHE/symbol_master.parquet` (env, then
+live-tree default). The Downloads copy remains only as a stale git snapshot.
+
 ## 2026-07-23 (post-midnight: backup concurrency + restore hardening)
 
 ### Correction: the first pg dump was destroyed by a /tmp filename collision

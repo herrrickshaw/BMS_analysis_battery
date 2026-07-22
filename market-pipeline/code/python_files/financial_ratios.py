@@ -8,7 +8,7 @@ INPUTS (all local, no network):
   * market_cache/fundamentals/US_current.parquet  (USD, SEC EDGAR store)
   * data/bhavcopy_cache/cleaned_long.parquet      (India closes, NSE precedence)
   * data/bhavcopy_cache/ohlcv_US.parquet          (US closes)
-  * Downloads/market_cache/symbol_master.parquet  (names)
+  * market_cache/symbol_master.parquet            (names — live tree, never ~/Downloads)
 
 RATIOS, per ticker, latest fiscal year vs latest close:
   market_cap, pe, pb, roe, roa, roce, debt_to_equity, current_ratio,
@@ -35,6 +35,7 @@ NB: run with /usr/bin/python3 — duckdb lives there, not in the venv.
 from __future__ import annotations
 
 import argparse
+import os
 import datetime as dt
 import sys
 from pathlib import Path
@@ -53,7 +54,10 @@ except Exception:
     PG_DSN = "dbname=market_data host=/tmp user=umashankar"
 
 BHAV = Path("/Users/umashankar/market-pipeline/data/bhavcopy_cache")
-SYMBOL_MASTER = Path("/Users/umashankar/Downloads/market_cache/symbol_master.parquet")
+# Live tree, NOT ~/Downloads (TCC-denied under launchd — see symbol_master.py's
+# two-trees warning; the 2026-07-23 00:30 run failed on the Downloads path).
+SYMBOL_MASTER = Path(os.environ.get(
+    "MARKET_CACHE", "/Users/umashankar/market-pipeline/market_cache")) / "symbol_master.parquet"
 OUT_PARQUET = FUND_DIR / "ratios_latest.parquet"
 OUT_CSV = HERE / "reports" / "financial_ratios.csv"
 

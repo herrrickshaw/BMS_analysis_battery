@@ -549,6 +549,10 @@ def fundamental_scan(symbol: str, yf_suffix: str = ".NS", price: float = None) -
                 # Magic Formula run from the store too. Without a price they get
                 # (0, {}) and abstain, exactly as in Phase 1.
                 mcap, info = _fsr.mcap_and_info(symbol, price)
+                # Phase 3: quarterly income statement for Bull Cartel, from the
+                # quarterly store. None (fewer than 5 quarters) -> Bull Cartel
+                # abstains, exactly as before.
+                inc_q = _fsr.quarterly_statements(symbol)
         except Exception:
             inc = bal = cf = None
             _store_hit = False

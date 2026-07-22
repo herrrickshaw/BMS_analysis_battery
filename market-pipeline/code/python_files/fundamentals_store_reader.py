@@ -38,8 +38,10 @@ HERE = Path(__file__).resolve().parent
 try:
     import data_registry as _R
     STORE = _R.FUND_DIR / "IN_current.parquet"
+    QSTORE = _R.FUND_DIR / "IN_quarterly.parquet"
 except Exception:
     STORE = HERE / "cache_seed" / "fundamentals_current" / "IN_current.parquet"
+    QSTORE = HERE / "cache_seed" / "fundamentals_current" / "IN_quarterly.parquet"
 
 # Our field -> (statement, yfinance row-label the scan queries). The label must
 # be EXACTLY what stock_utils.row() looks up; the scan tries some aliases, and
@@ -146,6 +148,42 @@ def mcap_and_info(symbol: str, price: float) -> tuple:
     if equity is not None and shares:
         info["bookValue"] = equity / shares      # per-share, as yfinance reports
     return mcap, info
+
+
+_QCACHE = {"mtime": None, "by_ticker": {}}
+
+
+def quarterly_statements(symbol: str) -> Optional[pd.DataFrame]:
+    """Bull Cartel's quarterly income statement, yfinance-shaped, or None.
+
+    Rows "Total Revenue" and "Net Income"; columns are quarter-ends DESCENDING,
+    so col 0 is the latest quarter and col 4 the year-ago quarter — exactly what
+    the scan reads for YoY growth. Returns None if fewer than 5 quarters, matching
+    the scan's own `len(inc_q.columns) >= 5` guard so Bull Cartel abstains rather
+    than dividing by a missing quarter.
+    """
+    if not QSTORE.exists():
+        return None
+    m = QSTORE.stat().st_mtime
+    if _QCACHE["mtime"] != m:
+        d = pd.read_parquet(QSTORE)
+        _QCACHE.update(mtime=m,
+                       by_ticker={t: g for t, g in d.groupby(d["ticker"].astype(str).str.upper())})
+    g = _QCACHE["by_ticker"].get(str(symbol).upper())
+    if g is None or g.empty:
+        return None
+    g = g.sort_values("quarter_end", ascending=False)
+    if len(g) < 5:
+        return None
+    cols = list(g["quarter_end"])
+    rows = {}
+    for field, label in (("revenue", "Total Revenue"), ("net_income", "Net Income")):
+        vals = pd.to_numeric(g[field], errors="coerce").tolist()
+        if not all(v != v for v in vals):
+            rows[label] = vals
+    if "Total Revenue" not in rows or "Net Income" not in rows:
+        return None
+    return pd.DataFrame(rows, index=cols).T
 
 
 def has(symbol: str) -> bool:

@@ -68,8 +68,10 @@ HERE = Path(__file__).resolve().parent
 try:
     import data_registry as _R
     STORE = _R.FUND_DIR / "IN_current.parquet"
+    QSTORE = _R.FUND_DIR / "IN_quarterly.parquet"          # Phase 3, Bull Cartel
 except Exception:
     STORE = HERE / "cache_seed" / "fundamentals_current" / "IN_current.parquet"
+    QSTORE = HERE / "cache_seed" / "fundamentals_current" / "IN_quarterly.parquet"
 
 UNIVERSE_PARQUET = Path(
     "/Users/umashankar/repos/global-stock-screener/cache_seed/ltm/IN.parquet")
@@ -215,12 +217,55 @@ def _pick(df: "pd.DataFrame", labels) -> Optional["pd.Series"]:
     return None
 
 
-def from_yfinance(ticker: str) -> list:
+def _quarterly_rows(ticker: str, t) -> list:
+    """Per-QUARTER (ticker, quarter_end, revenue, net_income) rows for Bull Cartel.
+
+    Phase 3. Bull Cartel reads quarterly Total Revenue and Net Income at col 0
+    (latest quarter) and col 4 (year-ago quarter) for YoY growth, needing >=5
+    quarters. Collected from the SAME Ticker as the annual data, so one off-hours
+    fetch fills both. Stored separately (different granularity) in
+    IN_quarterly.parquet.
+    """
+    try:
+        q = t.quarterly_income_stmt
+        if q is None or q.empty:
+            q = t.quarterly_financials
+    except Exception:
+        return []
+    if q is None or q.empty:
+        return []
+    rev = _pick(q, ["Total Revenue", "Operating Revenue"])
+    ni = _pick(q, ["Net Income", "Net Income Common Stockholders"])
+    if rev is None and ni is None:
+        return []
+    quarters = set()
+    for s in (rev, ni):
+        if s is not None:
+            quarters |= {pd.Timestamp(c) for c in s.index}
+    out = []
+    for qd in sorted(quarters, reverse=True):     # latest quarter first
+        def _v(s):
+            if s is None:
+                return None
+            m = {pd.Timestamp(c): c for c in s.index}
+            if qd not in m:
+                return None
+            raw = s[m[qd]]
+            return float(raw) if pd.notna(raw) else None
+        out.append({"ticker": ticker, "quarter_end": qd.date().isoformat(),
+                    "revenue": _v(rev), "net_income": _v(ni), "source": "yfinance"})
+    return out
+
+
+def from_yfinance(ticker: str, quarterly_sink: list = None) -> list:
     """Per-fiscal-year rows for one NSE symbol, or [] on any failure.
 
     Never raises: a source that throws on one name must not stop the run. A
     missing field is left as NaN, never zero — a zero-filled fundamental reads as
     a real figure and silently changes a screen's verdict.
+
+    If quarterly_sink is given, quarterly rows for Bull Cartel are appended to it
+    (collected from the same Ticker — no extra fetch).
     """
     import yfinance as yf
     t = yf.Ticker(f"{ticker}.NS")
@@ -230,6 +275,9 @@ def from_yfinance(ticker: str) -> list:
         return []
     if all(x is None or x.empty for x in (bs, is_, cf)):
         return []
+
+    if quarterly_sink is not None:
+        quarterly_sink.extend(_quarterly_rows(ticker, t))
 
     src_of = {"bs": bs, "is": is_, "cf": cf}
     series = {}
@@ -295,6 +343,23 @@ def write_store(store: "pd.DataFrame", new_rows: list, collected_at: str) -> "pd
     merged.to_parquet(tmp, index=False)
     tmp.replace(STORE)
     return merged
+
+
+def _write_quarterly(new_rows: list, collected_at: str) -> None:
+    """Merge quarterly rows into IN_quarterly.parquet, atomically, per-ticker."""
+    if not new_rows:
+        return
+    nd = pd.DataFrame(new_rows)
+    nd["collected_at"] = collected_at
+    old = pd.read_parquet(QSTORE) if QSTORE.exists() else pd.DataFrame()
+    if not old.empty:
+        old = old[~old["ticker"].astype(str).str.upper().isin(
+            nd["ticker"].astype(str).str.upper())]
+    merged = pd.concat([old, nd], ignore_index=True)
+    QSTORE.parent.mkdir(parents=True, exist_ok=True)
+    tmp = QSTORE.with_suffix(".parquet.tmp")
+    merged.to_parquet(tmp, index=False)
+    tmp.replace(QSTORE)
 
 
 # ── coverage report ───────────────────────────────────────────────────────────
@@ -363,6 +428,16 @@ def main() -> int:
     uni = universe()
     store = load_store()
     fresh = _fresh_set(store, a.max_age_days)
+    # A ticker counts as fresh only if it ALSO has quarterly rows — otherwise a
+    # name whose annual is recent would be skipped forever and its quarterly
+    # (Bull Cartel) never collected. Same "presence, not just recency" logic the
+    # bhavcopy fast-path got wrong.
+    if QSTORE.exists():
+        have_q = set(pd.read_parquet(QSTORE, columns=["ticker"])["ticker"]
+                     .astype(str).str.upper())
+        fresh = {t for t in fresh if t in have_q}
+    else:
+        fresh = set()
     todo = [s for s in uni if s not in fresh]
     if a.limit:
         todo = todo[: a.limit]
@@ -373,9 +448,9 @@ def main() -> int:
         print("  nothing to collect — store is current"); coverage(store); return 0
 
     collected_at = datetime.now(timezone.utc).isoformat()
-    batch, got, empty, consecutive_empty = [], 0, 0, 0
+    batch, qbatch, got, empty, consecutive_empty = [], [], 0, 0, 0
     for i, sym in enumerate(todo, 1):
-        rows = from_yfinance(sym)
+        rows = from_yfinance(sym, quarterly_sink=qbatch)   # quarterly from same fetch
         if rows:
             batch.extend(rows); got += 1; consecutive_empty = 0
         else:
@@ -386,16 +461,20 @@ def main() -> int:
             print(f"  ⚠️  {consecutive_empty} consecutive empties — likely throttled, "
                   "checkpointing and stopping")
             store = write_store(store, batch, collected_at); batch = []
+            _write_quarterly(qbatch, collected_at); qbatch = []
             break
         if len(batch) >= CHECKPOINT_EVERY:
             store = write_store(store, batch, collected_at); batch = []
+            _write_quarterly(qbatch, collected_at); qbatch = []
             print(f"  [{i}/{len(todo)}] checkpoint · {got} collected, {empty} empty")
         time.sleep(a.rate)
 
     store = write_store(store, batch, collected_at)
+    _write_quarterly(qbatch, collected_at)
     print(f"\n  done: {got} collected, {empty} empty this run")
     coverage(store)
     print(f"  → {STORE}")
+    print(f"  → {QSTORE}  (quarterly, for Bull Cartel)")
     return 0
 
 

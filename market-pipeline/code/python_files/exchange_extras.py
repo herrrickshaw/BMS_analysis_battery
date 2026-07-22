@@ -280,6 +280,14 @@ def main() -> int:
         backfill_corp_actions(a.ca_quarters)
         return 0
 
+    # Keep the CA HISTORY fresh, not just the forward snapshot: refresh the
+    # current quarter every daily run (idempotent — dedup on all columns), so
+    # new ex-dates flow into the adjuster without anyone remembering to backfill.
+    try:
+        backfill_corp_actions(1)
+    except Exception as e:
+        print(f"  CA current-quarter refresh failed: {type(e).__name__}")
+
     days = [d0 - _dt.timedelta(days=i) for i in range(a.backfill + 1)]
     summary = {"ok": 0, "skip": 0, "fail": 0}
     for d in days:

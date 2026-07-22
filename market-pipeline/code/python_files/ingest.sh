@@ -60,6 +60,12 @@ section_start "ingest"
   run "[7/7] fold fresh bars into the deep price panels" \
       $PY warehouse_update.py
 
+  # Rebuild split/bonus-adjusted partitions from the freshly-folded warehouse +
+  # the CA history refreshed above. Validated 7/7 against yfinance's independent
+  # adjustment; raw closes fake -90% "crashes" through every split without this.
+  run "[7b/7] split/bonus-adjust the India warehouse" \
+      $PY price_adjuster.py
+
   # Close the section by reporting what actually landed. This is the artifact the
   # mailer's gate reads, so printing it here makes a blocked mailer explainable
   # from the ingest log alone.

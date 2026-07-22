@@ -158,6 +158,16 @@ DATASETS: List[Dataset] = [
             "(visible_from = filingDate, not a +90d proxy); 110,942 filings "
             "indexed back to 2015; fills over ~8 weeks of off-hours sessions",
             ["build_india_factor_panel.py"]),
+    Dataset("warehouse.ohlcv_adj_in", Path("/Users/umashankar/repos/global-market-data/warehouse/ohlcv_adj/IN"),
+            "price_adjuster.py", "ingest", DAILY, 3.0,
+            "split/bonus-ADJUSTED India prices — use for ANY multi-month return; "
+            "raw closes fake -90% crashes through splits (789 events applied, "
+            "validated 7/7 vs yfinance's independent adjustment)",
+            ["backtests", "signal_tracker.py"]),
+    Dataset("extras.corp_actions_history", MARKET_CACHE / "exchange_extras" / "corp_actions_history.parquet",
+            "exchange_extras.py", "ingest", DAILY, 5.0,
+            "ex-dated corporate actions to 2015; feeds the adjuster; current "
+            "quarter refreshed daily"),
     Dataset("extras.index_closes", MARKET_CACHE / "exchange_extras" / "index_closes.parquet",
             "exchange_extras.py", "ingest", DAILY, 3.0,
             "162 NSE indices/day with P/E, P/B, div yield — the REAL Nifty 50 "

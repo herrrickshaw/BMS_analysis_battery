@@ -95,6 +95,44 @@ policy convergence). No pipeline decisions recovered.
 
 ---
 
+## 2026-07-22 (adjusted prices — the data is fixed, and stays fixed)
+
+### `price_adjuster.py` — split/bonus-adjusted India warehouse, validated 7/7
+
+789 events parsed from the CA history (377 splits, 412 bonuses; the subject
+strings are perfectly regular), factors compounded backward, 546,802 bars
+re-scaled across 577 symbols → `warehouse/ohlcv_adj/IN/`.
+
+**Validated against yfinance's INDEPENDENT adjustment, across each ex-date:
+7 OK · 0 DIFF.** The same table shows what was being fixed — through recent
+events the RAW series claims −93.8%, −92.1%, −88.4% "crashes" where the true
+returns are −69%, −20.8%, +16.2%. This is the measured +12.2%-fake-premium
+artifact, now removed at the source.
+
+One harness lesson: the first run showed 5–9pp of fake DIFF because the two
+series' return windows started/ended on different trading days. Returns over
+different endpoints are different returns — both series are now cut to their
+common dates spanning the ex-date. (Same family as the zero-day-holding bug:
+comparisons must share their frame.)
+
+Deliberately NOT adjusted: dividends (a total-return series is a different,
+later artifact). Splits and bonuses are the return-corrupting events.
+
+### Freshness is wired, not assumed
+
+- Daily extras run refreshes the CURRENT quarter of CA history (idempotent), so
+  new ex-dates flow to the adjuster automatically.
+- `ingest.sh` step 7b rebuilds the adjusted partitions right after the daily
+  warehouse fold.
+- Both registered (`warehouse.ohlcv_adj_in`, `extras.corp_actions_history`) —
+  staleness shows in data_index and gates like everything else.
+
+⚠️ Consumers: use `ohlcv_adj/IN` for ANY multi-month return computation. The
+raw `ohlcv/IN` remains for point-in-time price checks (what did it close at
+that day) where raw is correct.
+
+---
+
 ## 2026-07-22 (CA history + filings-based metrics, site-validated)
 
 ### Corporate-actions history: 23,480 actions back to 2015

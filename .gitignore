@@ -94,3 +94,11 @@ mempalace.yaml
 entities.json
 com.umashankar.*.plist
 *.plist.bak
+decision_log/
+decision_log_*.log
+
+# Claude message provenance log -- DB + summary contain transcript content (may include echoed secrets); keep local
+claude-provenance/provenance.db
+claude-provenance/PROVENANCE_SUMMARY.md
+claude-provenance/claude-ai-export/
+.claude.json.backup

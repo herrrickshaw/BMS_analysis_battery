@@ -95,6 +95,40 @@ policy convergence). No pipeline decisions recovered.
 
 ---
 
+## 2026-07-22 (fundamentals — all four screeners store-served)
+
+Phases 2-3 completing Phase 1. All four fundamental screeners now run from the
+off-hours store with zero yfinance calls per store hit, so none throttle-truncate
+alphabetically. Final coverage: 1,287 usable tickers, 26 first-letters, ~10%
+A-share — the market's real distribution, replacing the 89-96% A the screeners
+showed.
+
+- **Piotroski** — bit-identical store-vs-live (8/8).
+- **Coffee Can / Magic Formula** — never worse than live; MORE complete on 5 of
+  13 tested. Needed 6 extra fields (equity, EBIT, FCF, capex, total debt, cash)
+  and market cap computed from stored shares x the scan's price.
+- **Bull Cartel** — bit-identical YoY quarterly growth (4/4); quarterly income
+  statement collected alongside annual in the same fetch, stored in
+  IN_quarterly.parquet.
+
+**🔴 Finding: the live Stage-4 path was DEGRADED, not just truncated.** Chasing a
+CoffeeCan mismatch (store 6/6 vs live 5/6 for EICHERMOT) proved the integrated
+per-ticker fetch (statements + quarterly + info + fast_info, in a thread pool)
+silently drops individual rows under load — e.g. a near-zero Long Term Debt —
+so it scored tickers it DID process slightly wrong, on top of dropping later
+tickers entirely. The store fixes both.
+
+**Three bugs caught by verifying before shipping:** substring field-matching
+(grabbed "Total Current Assets" 218B for "Current Assets" 56B); stale
+statement-routing (new fields silently empty — now an explicit map + assert);
+and the fresh-skip being annual-only (would never collect quarterly for an
+annually-fresh name — now requires quarterly presence).
+
+Fallback to the live path is intact throughout: a store miss is byte-identical
+to before, so every change can only ADD coverage.
+
+---
+
 ## 2026-07-22 (fundamentals coverage)
 
 ### 🔴 The A-bias was TWO bugs, not one — and the live scan was the bigger

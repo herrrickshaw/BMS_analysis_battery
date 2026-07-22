@@ -96,7 +96,32 @@ YF_MAP = {
     "current_liabilities": ["Current Liabilities", "Total Current Liabilities"],
     "gross_profit":        ["Gross Profit"],
     "shares":              ["Share Issued", "Ordinary Shares Number", "Common Stock"],
+    # Phase 2 — Coffee Can & Magic Formula. Verified present on real NSE tickers
+    # (ZYDUSLIFE, TATASTEEL) with these exact labels.
+    "stockholders_equity": ["Stockholders Equity", "Total Stockholder Equity",
+                            "Total Equity Gross Minority Interest"],
+    "ebit":                ["EBIT", "Operating Income"],
+    "free_cash_flow":      ["Free Cash Flow"],
+    "capex":               ["Capital Expenditure", "Capital Expenditures"],
+    "total_debt":          ["Total Debt"],
+    "cash":                ["Cash And Cash Equivalents",
+                            "Cash Cash Equivalents And Short Term Investments"],
 }
+
+# Which statement each field lives in. Explicit, so adding a field to YF_MAP
+# without classifying it here is a KeyError at collection time — loud — rather
+# than the silent mis-route that left stockholders_equity/total_debt/cash/
+# free_cash_flow/capex empty because a hardcoded list was never updated.
+STATEMENT = {
+    "net_income": "is", "revenue": "is", "gross_profit": "is", "ebit": "is",
+    "total_assets": "bs", "long_term_debt": "bs", "current_assets": "bs",
+    "current_liabilities": "bs", "stockholders_equity": "bs", "shares": "bs",
+    "total_debt": "bs", "cash": "bs",
+    "cfo": "cf", "free_cash_flow": "cf", "capex": "cf",
+}
+assert set(STATEMENT) == set(YF_MAP), (
+    "every YF_MAP field must be classified in STATEMENT: "
+    f"missing {set(YF_MAP) - set(STATEMENT)}")
 
 
 # ── universe ──────────────────────────────────────────────────────────────────
@@ -206,12 +231,10 @@ def from_yfinance(ticker: str) -> list:
     if all(x is None or x.empty for x in (bs, is_, cf)):
         return []
 
+    src_of = {"bs": bs, "is": is_, "cf": cf}
     series = {}
     for field, labels in YF_MAP.items():
-        src = bs if field in ("total_assets", "long_term_debt", "current_assets",
-                              "current_liabilities", "shares") else (
-              cf if field == "cfo" else is_)
-        series[field] = _pick(src, labels)
+        series[field] = _pick(src_of[STATEMENT[field]], labels)
 
     # Fiscal years present across any statement.
     years = set()

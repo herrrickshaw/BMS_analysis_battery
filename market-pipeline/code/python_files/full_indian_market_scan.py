@@ -504,7 +504,7 @@ def compute_golden_crossover(df: pd.DataFrame) -> dict:
 from stock_utils import first_df as _first_df, row as _row
 
 
-def fundamental_scan(symbol: str, yf_suffix: str = ".NS") -> dict:
+def fundamental_scan(symbol: str, yf_suffix: str = ".NS", price: float = None) -> dict:
     """
     Run ALL 5 fundamental screeners for one symbol in a single Ticker() call.
 
@@ -542,13 +542,20 @@ def fundamental_scan(symbol: str, yf_suffix: str = ".NS") -> dict:
             import fundamentals_store_reader as _fsr
             inc, bal, cf = _fsr.statements(symbol)
             _store_hit = inc is not None and bal is not None
+            if _store_hit:
+                # Phase 2: market cap = stored shares x the scan's own current
+                # price (no yfinance call), and info (totalDebt/totalCash/
+                # bookValue) from the stored balance sheet — so Coffee Can and
+                # Magic Formula run from the store too. Without a price they get
+                # (0, {}) and abstain, exactly as in Phase 1.
+                mcap, info = _fsr.mcap_and_info(symbol, price)
         except Exception:
             inc = bal = cf = None
             _store_hit = False
 
     if _store_hit:
-        # inc_q stays None (no quarterly in the store) -> Bull Cartel abstains;
-        # mcap stays 0 -> Coffee Can / Magic Formula abstain. Deliberate.
+        # inc_q stays None (no quarterly in the store) -> Bull Cartel abstains.
+        # Piotroski + Coffee Can + Magic Formula now all run from the store.
         out = {"symbol": symbol, "error": "", "_source": "store"}
     else:
       try:
@@ -955,7 +962,11 @@ def main(nse_only: bool = False, top: int = 0, run_scans: bool = True, workers: 
         done = 0
         with ThreadPoolExecutor(max_workers=workers) as pool:
             futures = {
-                pool.submit(fundamental_scan, sym, suffix): (sym, suffix)
+                # Pass the current price so store-sourced tickers can compute
+                # market cap (shares x price) for Coffee Can / Magic Formula
+                # without a yfinance call.
+                pool.submit(fundamental_scan, sym, suffix,
+                            (ohlc_row_map.get(sym) or {}).get("LTP")): (sym, suffix)
                 for sym, suffix in all_fund_symbols
             }
             for future in as_completed(futures):

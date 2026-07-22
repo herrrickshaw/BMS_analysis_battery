@@ -152,6 +152,33 @@ import:workflow` DEACTIVATES on import — follow with `n8n update:workflow
 `DbxBkpMonitor001` (needed a Dropbox OAuth2 credential that was never attached)
 is superseded by the credential-free rclone GATE and left inactive.
 
+## 2026-07-23 (post-midnight: backup concurrency + restore hardening)
+
+### Correction: the first pg dump was destroyed by a /tmp filename collision
+
+Two concurrent cloud_backup.sh invocations shared /tmp/market_data_<date>.dump.
+Instance A uploaded it, printed ok, and rm'd the file while instance B's rclone
+was mid-transfer of the SAME path → hash mismatch → rclone deleted the
+"corrupted" REMOTE copy too. Net: a dump that had landed was destroyed by the
+retry of its twin. Three fixes in cloud_backup.sh: (1) mkdir-based
+single-instance lock keyed by remote (a second invocation exits 0 with a log
+line — the 00:30 pipeline hitting the lock during a manual run is normal, not
+a failure); (2) $$ in the LOCAL dump path so even an aborted instance can't
+collide with a later one (remote name stays dated); (3) the dump-prune used
+`head -n -8`, which macOS head rejects — every prune since inception was a
+silent no-op; now `sort -r | tail -n +9`.
+
+### Restore verified against a live user restore; webhook retry flags
+
+A full-tree restore during the triple-concurrent window (two backups + 1.6GB
+dump upload) surfaced ~20 `invalid character '<'` errors — Dropbox API
+throttling returning HTML where JSON belongs, NOT corruption: sampled files
+byte-exact on the remote, and a re-download SHA-256-matched the local
+original. The n8n restore webhook now bakes in
+`--retries 5 --low-level-retries 20 --timeout 10m`; interactive restores
+should carry the same flags. The instance lock also closes the worst
+contention window.
+
 ## 2026-07-22 (night: justified mailer — evidence-first brief)
 
 ### New: justified_mailer.py — only screens that earned their place

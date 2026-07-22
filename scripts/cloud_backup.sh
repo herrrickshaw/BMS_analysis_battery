@@ -34,6 +34,18 @@ LOG="$HOME/market-pipeline/code/python_files/cloud_backup.log"
 RCLONE=/opt/homebrew/bin/rclone
 FAILS=0
 
+# Single-instance lock. On 2026-07-22 two concurrent invocations (pipeline
+# step 16 + a manual --with-pg) shared /tmp/market_data_<date>.dump: instance A
+# finished and rm'd the file while B's rclone was mid-transfer -> hash mismatch
+# -> rclone deleted the "corrupted" REMOTE copy too. The sync trees survive
+# concurrency (rclone per-file), but the dump lifecycle does not.
+LOCK="/tmp/cloud_backup.$(echo "$REMOTE" | tr ':/' '__').lock"
+if ! mkdir "$LOCK" 2>/dev/null; then
+  echo "cloud_backup: another instance holds $LOCK — exiting (not an error)" >> "$LOG"
+  exit 0
+fi
+trap 'rmdir "$LOCK" 2>/dev/null' EXIT
+
 # name -> local path. lmdb dirs and tmp/bak files are excluded below: lmdb is a
 # live-updated memory-mapped store (copying mid-write gives a corrupt snapshot,
 # and it is rebuilt from the parquets anyway); .tmp/.bak are churn.
@@ -67,15 +79,17 @@ TREES=(
   # selective restore (pg_restore -t). The warehouse IS rebuildable from the
   # caches, but a direct dump makes retrieval one step instead of a pipeline.
   if [ "$(date +%u)" = "1" ] || [ "${1:-}" = "--with-pg" ]; then
-    DUMP="/tmp/market_data_$(date +%Y%m%d).dump"
+    # $$ in the LOCAL name: even with the lock, a unique path means an aborted
+    # instance can never collide with a later one. The REMOTE name stays dated.
+    DUMP="/tmp/market_data_$(date +%Y%m%d).$$.dump"
     if /opt/homebrew/bin/pg_dump -d market_data -Fc -f "$DUMP" 2>/dev/null \
        || pg_dump -d market_data -Fc -f "$DUMP"; then
-      "$RCLONE" copyto "$DUMP" "$REMOTE/pg/$(basename "$DUMP")" --stats-one-line --stats 0 \
+      "$RCLONE" copyto "$DUMP" "$REMOTE/pg/market_data_$(date +%Y%m%d).dump" --stats-one-line --stats 0 \
         && echo "  ok pg dump $(du -h "$DUMP" | cut -f1)" \
         || { echo "  ! pg dump upload FAILED"; FAILS=$((FAILS+1)); }
       rm -f "$DUMP"
-      # keep the last 8 weekly dumps
-      "$RCLONE" lsf "$REMOTE/pg/" 2>/dev/null | sort | head -n -8 | while read -r old; do
+      # keep the last 8 weekly dumps (sort -r|tail +9: macOS head has no -n -8)
+      "$RCLONE" lsf "$REMOTE/pg/" 2>/dev/null | sort -r | tail -n +9 | while read -r old; do
         [ -n "$old" ] && "$RCLONE" deletefile "$REMOTE/pg/$old" \
           && echo "  pruned pg/$old"
       done

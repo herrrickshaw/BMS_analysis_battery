@@ -135,6 +135,96 @@ date=YYYY-MM-DD to pull a prior version from history/). Bulk bytes stay on
 rclone; the Dropbox MCP connector (same account — verified by a marker-file
 round-trip between rclone and the connector) is the browse/verify surface.
 
+Imported + ACTIVATED as `dropboxbackup001` after two upgrades matching the
+marketpipeline001 conventions: (1) the bare `rclone size` verify was replaced
+with `~/scripts/cloud_backup_verify.sh` — an independent per-tree GATE
+(remote-vs-local bytes with the backup's own excludes, 10% churn tolerance,
+pg-dump recency <8d) because a whole-mirror byte count passes a half-synced
+tree; (2) an ALERT node (send_alert.py) wired to the error outputs of both the
+backup and the gate — without it a failed backup only dies quietly in the
+executions list, the exact silent-staleness mode this whole day was about.
+Webhook tested live: `list` returns the mirror inventory; invalid
+tree/dest/date inputs throw in the Code node BEFORE any shell runs (verified:
+error execution, no side effects — fail-closed). `history` errors until the
+first re-sync creates history/ — expected, not a defect. 🔑 `n8n
+import:workflow` DEACTIVATES on import — follow with `n8n update:workflow
+--active=true` + `launchctl kickstart -k gui/501/com.umashankar.n8n`.
+`DbxBkpMonitor001` (needed a Dropbox OAuth2 credential that was never attached)
+is superseded by the credential-free rclone GATE and left inactive.
+
+## 2026-07-22 (night: justified mailer — evidence-first brief)
+
+### New: justified_mailer.py — only screens that earned their place
+
+Inverts the daily brief: starts from the repo's measured evidence and shows ONE
+backtest-best screen per market, with the result, sample and test window printed
+above the picks. India = near_high + momentum (the two screens with positive
+India edge: +1.33/+1.18pp, 21d fwd, 2016→2026 PIT — run as SEPARATE lists,
+matching how the backtest tested them; intersecting them left 1 name). US/KR/JP
+= RSI-14 oversold (+1.85/+2.04/+0.93pp, win 0.463/0.481/0.513). Fundamental
+overlay table = factor_combo CSVs verbatim (n, span, edge, t, years-positive)
+with the honest caveats attached in-mail: t<1, US PIT EDGAR found high-F
+INVERTED, and the Piotroski edge is an illiquidity premium (~$100k yes, $10M
+no). "Excluded by evidence" box lists Golden Cross (worst everywhere), Europe
+(untested), india_factor_panel (biased sampler), momentum outside India.
+
+Three defects caught by inspecting the first drafts — each now guarded in code:
+1. **India momentum list was ALL ETFs** (PHARMABEES/HEALTHIETF/MOMNC) — the
+   LIQUIDSBI failure mode again; fixed with the ISIN allowlist (INE + SctySrs
+   EQ from nse_raw), the documented instrument-type key.
+2. **US oversold surfaced RSI≈0 zombies** (SKHYV 0.0) — thin listings falling
+   14 straight days; now >=100 bars + $2 floor + RSI>2 sanity band.
+3. **ohlcv_NSE holds ~126 bars — exactly too short for 126-day momentum**
+   (2 non-NaN momenta in 2,069 symbols); India source switched to
+   cleaned_long (273 trading days), re-gated to the workbook's ₹1cr-floor
+   universe (ungated cleaned_long put VIJIFIN @ ₹9 on top).
+
+First edition sent 2026-07-22 late night: 40 picks (10/market).
+
+**Scheduled same night (user call):** node "Justified brief (send + sync)" in
+the 07:00 weekday n8n chain — gate → recurring movers → justified brief →
+digest — so the brief emails daily and its picks land in watchlist.csv
+(`justified` tier, note = "<screen metric> @ <date>") BEFORE the digest builds.
+The digest renders `justified` as a SEPARATE table (own heading/columns, screen
+column instead of free-note), never mixed into held/watch/sold — they are
+mailer output, not portfolio state. Existing watchlist rows are never touched.
+First sync: +39 rows. Import gotcha hit twice tonight: `n8n export` emits a
+LIST, a patched re-dump emits a DICT — a `[0]` on the re-read KeyErrors and the
+stale file imports silently; the live-DB command was verified after the fix
+(the node also initially lacked the `cd` prefix every other node carries —
+executeCommand cwd is n8n's, not the repo's).
+
+## 2026-07-22 (night: recurring movers — the self-updating shortlist watchlist)
+
+### New: recurring_movers.py — mailer picks that keep recurring AND are moving
+
+The distilled daily watchlist the signal ledger was building toward: names with
+**>= 2 distinct signal dates** in the last 30d whose price is **>= +2% since the
+FIRST flag** (entry = the ledger's own price_at_signal — the number the brief
+actually quoted). Recurrence × movement, not either alone: one strong day is
+one strong day; re-passing while the market agrees is the signal. Rules kept
+few and printed in the output. Source hygiene: `india_factor_panel` rows are
+EXCLUDED (documented alphabetical sampler — recurrence from a biased sampler
+measures the bias); T5_MOST_ILLIQUID dropped. Current prices come from the
+day's scan workbooks (KR codes zero-pad-normalised — ledger holds '400', the
+workbook '000400').
+
+Outputs: `reports/recurring_movers.csv` (full ranked list, rebuilt each run) +
+top-25 promoted into `watchlist.csv` as `signal` tier — capped because a young
+ledger qualifies 100+ names at 2 appearances and flooding buries the curated
+tiers; existing rows are never touched (same contract as signal_tracker).
+
+**Daily update wiring: inside the 07:00 watchlist-digest n8n workflow**
+(gate → refresh movers → build digest), NOT a new schedule — the digest is the
+consumer, so refreshing immediately before it means the 07:00 email always
+carries today's movers, and `onError: continue` ensures a movers failure can't
+block the digest. (Also deliberately not appended to daily_pipeline.sh
+tonight: that script was mid-execution, and bash re-reads running scripts —
+editing it live corrupts the run.) First run: 130 qualifiers, +14 promoted
+(rest were already on the watchlist). watchlist_digest.py learned a `signal`
+tier (own sort rank, count, and amber tag) — previously those rows rendered
+untagged and uncounted, masquerading as holdings.
+
 ## 2026-07-22 (warehouse ingest repaired + per-ticker freshness ledger)
 
 ### Warehouse ingest had been silently stale for 8 days — root cause: the migration left it behind

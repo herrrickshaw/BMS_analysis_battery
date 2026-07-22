@@ -7,9 +7,8 @@
         "rule": {
           "interval": [
             {
-              "field": "days",
-              "triggerAtHour": 9,
-              "triggerAtMinute": 0
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
             }
           ]
         }
@@ -18,7 +17,10 @@
       "name": "Daily 09:00 (catch-up)",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [-460, -160],
+      "position": [
+        -460,
+        -160
+      ],
       "notes": "Safety net AFTER the 00:30 pipeline: cloud_backup.sh is idempotent (rclone sync moves only changed files), so if the pipeline ran, this is a no-op costing seconds. If the Mac slept through the wake window — the recurring failure mode — this is the run that actually happens."
     },
     {
@@ -30,7 +32,10 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "onError": "continueErrorOutput",
-      "position": [-200, -160],
+      "position": [
+        -200,
+        -160
+      ],
       "notes": "Syncs market_cache, bhavcopy_cache, cache_seed, gmd cache_seed and ~/data (duckdb) to dropbox:market-data-archive/current with dated history/ versioning; weekly Monday pg_dump. Exits non-zero on any tree failure, which fails this execution loudly. Detail log: ~/market-pipeline/code/python_files/cloud_backup.log"
     },
     {
@@ -42,7 +47,10 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "onError": "continueErrorOutput",
-      "position": [60, -160],
+      "position": [
+        60,
+        -160
+      ],
       "notes": "INDEPENDENT per-tree check: rclone size of each current/<tree> vs local du with the same excludes (10% tolerance for legitimate churn between backup and verify), plus pg-dump recency (<8d). Replaces a whole-mirror byte count, which a half-synced tree passes. Gates measure the world, not the process — same principle as marketpipeline001's ingest gate."
     },
     {
@@ -54,7 +62,10 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "onError": "continueRegularOutput",
-      "position": [60, 20],
+      "position": [
+        60,
+        20
+      ],
       "notes": "Reuses send_alert.py so n8n alerts and shell-run alerts look identical in the inbox. Without this, a failed backup only dies quietly in the executions list — the exact silent-staleness failure mode the whole 2026-07-22 repair cycle was about."
     },
     {
@@ -68,7 +79,10 @@
       "name": "Webhook: restore/list",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [-460, 160],
+      "position": [
+        -460,
+        160
+      ],
       "webhookId": "dropbox-restore",
       "notes": "POST http://localhost:5678/webhook/dropbox-restore\nBody: {\"action\":\"list\"} | {\"action\":\"history\"} | {\"action\":\"restore\",\"tree\":\"bhavcopy_cache\",\"dest\":\"/Users/umashankar/restore/bhavcopy_cache\"}\n(dest optional — defaults to ~/restore/<tree>)"
     },
@@ -80,7 +94,10 @@
       "name": "Validate + build rclone cmd",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [-200, 160]
+      "position": [
+        -200,
+        160
+      ]
     },
     {
       "parameters": {
@@ -90,7 +107,10 @@
       "name": "Withdrawal: run rclone",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [60, 160]
+      "position": [
+        60,
+        160
+      ]
     },
     {
       "parameters": {
@@ -101,7 +121,10 @@
       "name": "Respond",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [320, 160]
+      "position": [
+        320,
+        160
+      ]
     }
   ],
   "connections": {

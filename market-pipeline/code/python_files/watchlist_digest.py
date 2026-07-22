@@ -136,9 +136,11 @@ def build_rows(watchlist: pd.DataFrame) -> list:
                      "last": last_date, "note": _text(w.get("note")),
                      "status": (_text(w.get("status")) or "held").lower(),
                      "missing": False})
-    # Held first, then watchlist, then exited; each block by move size. Owning
-    # something is the reason to look at it first.
-    tier = {"held": 0, "watch": 1, "sold": 2}
+    # Held first, then watchlist, then fresh signals, then exited; each block by
+    # move size. Owning something is the reason to look at it first. `signal` =
+    # auto-promoted (signal_tracker / recurring_movers) — candidates, not
+    # positions, so they sort behind the curated tiers but ahead of exits.
+    tier = {"held": 0, "watch": 1, "signal": 2, "justified": 4, "sold": 3}
     rows.sort(key=lambda r: (tier.get(r.get("status", "held"), 0),
                              r["d1"] is None, -(r["d1"] or 0)))
     return rows
@@ -154,6 +156,12 @@ def render(rows: list, as_of: str) -> str:
     live = [r for r in rows if r.get("status", "held") == "held"]
     exited = [r for r in rows if r.get("status", "held") == "sold"]
     watch = [r for r in rows if r.get("status", "held") == "watch"]
+    signals = [r for r in rows if r.get("status", "held") == "signal"]
+    # `justified` rows get their OWN table below the main one — they are picks
+    # from the evidence-first mailer, not portfolio state, and mixing them into
+    # the main table would bury both.
+    justified = [r for r in rows if r.get("status", "held") == "justified"]
+    rows = [r for r in rows if r.get("status", "held") != "justified"]
     up = sum(1 for r in live if r["mark"] == "🟢")
     dn = sum(1 for r in live if r["mark"] == "🔴")
     flat = sum(1 for r in live if r["mark"] == "⚪")
@@ -166,6 +174,8 @@ def render(rows: list, as_of: str) -> str:
         f'<b>{len(live)} held</b> — {up} up · {dn} down · {flat} flat (±{FLAT_BAND_PCT}%)'
         + (f' · {len(exited)} exited' if exited else '')
         + (f' · {len(watch)} watchlist' if watch else '')
+        + (f' · {len(signals)} signals' if signals else '')
+        + (f' · {len(justified)} justified' if justified else '')
         + (f' · <b style="color:#b00">{miss} not in cache</b>' if miss else '')
         + '</p>',
         '<table style="border-collapse:collapse;width:100%;font-size:14px">',
@@ -178,7 +188,8 @@ def render(rows: list, as_of: str) -> str:
         muted = st in ("sold", "watch")
         colour = "#999" if muted else {"🟢": "#0a0", "🔴": "#c00"}.get(r["mark"], "#666")
         tag = {"sold": '<span style="color:#aaa;font-size:10px"> exited</span>',
-               "watch": '<span style="color:#7a9;font-size:10px"> watch</span>'}.get(st, "")
+               "watch": '<span style="color:#7a9;font-size:10px"> watch</span>',
+               "signal": '<span style="color:#c80;font-size:10px"> signal</span>'}.get(st, "")
         if r["missing"]:
             body.append(
                 f'<tr style="border-bottom:1px solid #f0f0f0;color:#b00">'
@@ -195,12 +206,44 @@ def render(rows: list, as_of: str) -> str:
             f'<td>{r["close"]:,.2f}</td>'
             f'<td style="color:#999;font-size:12px">{r["last"] or "?"}</td>'
             f'<td style="color:#666;font-size:12px">{r["note"]}</td></tr>')
-    body += [
-        '</table>',
+    body.append('</table>')
+
+    if justified:
+        body.append(
+            '<h3 style="margin:18px 0 4px">🧪 Justified picks '
+            '<span style="font-weight:400;color:#777;font-size:12px">'
+            '(evidence-backed screens — see the Justified Brief for the backtest '
+            'behind each)</span></h3>'
+            '<table style="border-collapse:collapse;width:100%;font-size:13px">'
+            '<tr style="text-align:left;border-bottom:2px solid #ddd">'
+            '<th style="padding:5px 4px">Symbol</th><th>1d</th><th>5d</th>'
+            '<th>Close</th><th>As of</th><th>Screen</th></tr>')
+        for r in justified:
+            if r["missing"]:
+                body.append(
+                    f'<tr style="border-bottom:1px solid #f0f0f0;color:#b58900">'
+                    f'<td style="padding:5px 4px">❔ <b>{r["symbol"]}</b>'
+                    f'<span style="color:#999;font-size:11px"> {r["market"]}</span></td>'
+                    f'<td colspan="4" style="font-size:12px">not in local cache</td>'
+                    f'<td style="color:#666;font-size:12px">{r["note"]}</td></tr>')
+                continue
+            colour = {"🟢": "#0a0", "🔴": "#c00"}.get(r["mark"], "#666")
+            body.append(
+                f'<tr style="border-bottom:1px solid #f0f0f0">'
+                f'<td style="padding:5px 4px">{r["mark"]} <b>{r["symbol"]}</b>'
+                f'<span style="color:#999;font-size:11px"> {r["market"]}</span></td>'
+                f'<td style="color:{colour};font-weight:600">{_fmt(r["d1"])}</td>'
+                f'<td style="color:#666">{_fmt(r["d5"])}</td>'
+                f'<td>{r["close"]:,.2f}</td>'
+                f'<td style="color:#999;font-size:12px">{r["last"] or "?"}</td>'
+                f'<td style="color:#666;font-size:12px">{r["note"]}</td></tr>')
+        body.append('</table>')
+
+    body.append(
         '<p style="color:#999;font-size:11px;margin-top:14px">'
         'Prices from the local cache refreshed by ingest.sh — no external API. '
         '"As of" is the last bar actually held, so a stale row is visible rather '
-        'than silently shown as current. Not investment advice.</p></div>']
+        'than silently shown as current. Not investment advice.</p></div>')
     return "\n".join(body)
 
 

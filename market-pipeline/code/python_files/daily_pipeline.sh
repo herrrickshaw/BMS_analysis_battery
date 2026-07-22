@@ -23,7 +23,13 @@
 #   ./daily_pipeline.sh --draft    # refresh + screen (5 markets) + save brief_today.html
 set -uo pipefail
 cd "$(dirname "$0")"
-PY=python3
+# Resolve our own venv — never inherit `python3` from the caller's PATH. A
+# manual run from a plain shell resolved python3 to homebrew 3.14 on
+# 2026-07-22 19:00: step [0] flagged missing deps, every scan died, and the
+# validation gate suppressed the send. Same split documented in
+# run_fundamentals_offhours.sh; launchd was never affected (plist sets PATH).
+PY="$(dirname "$0")/.venv/bin/python3"
+[ -x "$PY" ] || PY=python3
 LOG="daily_pipeline_$(date +%Y%m%d).log"
 mkdir -p correlation_scan
 # ── step timing ───────────────────────────────────────────────────────────────

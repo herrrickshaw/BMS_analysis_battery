@@ -18,6 +18,163 @@ mistakes were made, and the mistakes here have repeated.
 
 ---
 
+## 2026-07-22 (evening: US fundamentals store, ratio table, Dropbox replaces LFS)
+
+### cleaned_ohlcv 17,571-row surplus reconciled; loads now split append vs regenerated
+
+Closes the "known remainder" below. Root cause confirmed: `cleaned_long.parquet`
+is fully REGENERATED each run (pivot + clean_ohlcv can drop or alter historical
+rows) and `assembled_long.parquet` is rewritten with dedup keep="last" (old-date
+rows can be replaced or backfilled), yet `bhavcopy_to_db.py --incremental` only
+ever appended rows with `trade_date > max` — so cleaned-away rows accumulated as
+a permanent +17,571 surplus in DuckDB and its Postgres mirror, and `--verify`
+FAILed every night as a false failure in daily_pipeline step [15].
+**Decision: classify each source by write semantics, not one load strategy for
+all.** New `REGENERATED = {bhavcopy_ohlcv, cleaned_ohlcv}` set: incremental
+DuckDB load re-creates these from source; Postgres mirror rebuilds them on
+row-count divergence via DELETE+INSERT — **not DROP** (rejected: the
+`market_daily.ticker_freshness` view depends on `bhavcopy.cleaned_ohlcv`, DROP
+would need CASCADE and destroy it; caught live on first run). `nse_raw`/`bse_raw`
+keep true append-only loads (bhavcopy_raw_archive.py only ever appends days
+newer than max TradDt), `nse_deep_ohlcv` too (static archive, no live writer).
+Reconciled: pg cleaned_ohlcv 1,257,133→1,239,562, `--verify` exits 0 across all
+five tables, ticker_freshness view intact (21,263 tickers).
+
+### Raw 34-col bhavcopy archives have a writer again (nse.parquet/bse.parquet)
+
+The 2026-07-21 "known remainder" is closed. The original builder of the raw
+archives was an ad-hoc script that was never committed and vanished with the
+~/Downloads tree — confirmed by searching every repo's full git history: the
+only file that ever referenced `nse.parquet` is `bhavcopy_to_db.py`, a
+*consumer*. `bhavcopy_raw_archive.py` recreates it: appends day-CSVs newer than
+each parquet's max TradDt, full `--rebuild` available. **Decision: schema is
+PINNED in code** (TradDt/BizDt date32, prices double, ids int64, empty UDiFF
+cols string) rather than inferred per-run — inference from a day-CSV would type
+all-NaN string columns as float and silently drift the arrow schema, breaking
+bhavcopy_to_db's incremental date comparison downstream. Verified before
+writing: the frozen archives are a plain per-day concat (row counts match
+CSV-for-CSV, 34/34 cols, no filtering beyond what bhavcopy_history applies when
+writing the day-CSVs), and post-append the pre-existing rows are byte-identical.
+Wired into daily_pipeline step [15] *before* bhavcopy_to_db so the raw layer
+rides the same schedule as everything else; registered in data_registry
+(bhavcopy.nse_raw/bse_raw, max_age 1d) so going stale is now observable.
+Backfill ran: pg.bhavcopy.nse_raw 620,332→632,987, bse_raw 1,284,825→1,312,525,
+both current through 2026-07-21.
+
+Known remainder, found during the same run: `pg.bhavcopy.cleaned_ohlcv` (and
+its DuckDB twin) hold 17,571 MORE rows than today's `cleaned_long.parquet` —
+the incremental load only appends by date, so rows the daily-regenerated
+cleaned parquet later dropped are never reconciled. Max dates match; the
+`--verify` FAIL is this, not the raw-archive fix.
+
+### US fundamentals now collected from SEC EDGAR into the store (US_current.parquet)
+
+`us_fundamentals_edgar.py` — the US analog of the India off-hours collector, but
+sourced from data.sec.gov companyfacts: official, filing-dated, and rate-limited
+at a documented 10 req/s instead of an opaque throttle. **Decision: EDGAR over
+yfinance for the US** — yfinance is only in the India collector because India has
+no official filings API; the US does, and yfinance's alphabetical throttle-bias
+is the exact disease the store exists to cure. Store shape = `IN_current.parquet`
+verbatim (same columns, capex stored negative to match the yfinance convention)
+so every India-store consumer reads it unchanged. Restatement rule: comparative
+prior-year figures in a newer 10-K overwrite the original (latest `filed` wins);
+quarterly rows inside 10-Ks are excluded by a 330–380-day span filter — both
+covered by `--self-test`. Wired into `run_fundamentals_offhours.sh` (1,500
+names/session ≈ full ~7k universe in 5 of the 9 weekly slots, then staleness-driven).
+
+### Correction: future-dated debt maturities minted phantom fiscal years (EDGAR)
+
+First bulk run (1,500 names, 0 fetch failures, A-share 10.2%) surfaced it:
+PMTV's 10-K reports LongTermDebt *repayments due 2026-2029* as instant facts
+with future `end` dates, and the parser treated every instant end as a fiscal
+year — the ratio table's "newest US FY" read 2029-12-31. Rule now: a fiscal
+year that hasn't ended cannot have been filed; ends > today are dropped
+(self-tested), and the 4 phantom rows were purged from the store. One ticker
+this time, but the bug class is any company tagging maturity schedules with
+bare debt tags.
+
+### New: financial_ratios.py — one India+US ratio table
+
+PE/PB/ROE/ROA/ROCE/D-E/current ratio/margins/FCF yield/CFO-to-NI/asset turnover/
+revenue growth, per ticker, latest FY vs latest close (India closes from
+`cleaned_long.parquet` — NSE precedence; US from `ohlcv_US.parquet`). Currencies
+never mixed: every ratio is a pure number; `mcap_local` is in the market's own
+currency by design. Outputs: `market_cache/fundamentals/ratios_latest.parquet`,
+Postgres `fundamentals.ratios` (full replace — derived data, stores are truth),
+`reports/financial_ratios.csv`. Validated against prior screener.in checks:
+RELIANCE ROE 8.9% / ROCE 11.3%, TCS ROCE 56.3%. Re-priced daily in pipeline step
+[15/15]; recomputed after each off-hours collection too.
+
+### Decision: Dropbox (rclone) replaces GitHub LFS as the off-machine data store
+
+`~/scripts/cloud_backup.sh`, pipeline step [16/16]. The LFS account budget is
+exhausted, every rewritten parquet became a new permanent blob (no delta
+compression), and only repo deletion ever frees space — the delete/edit churn
+this replaces. Drive side: `market-data-archive/current/<tree>` exact mirror +
+`history/<YYYY-MM-DD>/` where changed/deleted files are MOVED (never destroyed),
+60-day history retention, weekly Monday `pg_dump -Fc` of market_data (last 8
+kept). Trees: market_cache, bhavcopy_cache, cache_seed, global-market-data
+cache_seed, ~/data (duckdb). lmdb dirs excluded — live memory-mapped stores
+snapshot corrupt and rebuild from parquet anyway. **Remote: `dropbox:`
+(1.6 TiB free) — user's call after an initial googledrive setup; also sidesteps
+rclone's shared Google client_id retiring during 2026. `gdrive1` was ruled out
+either way (institutional IIT content — deactivation risk for an archive).**
+Rejected: GCS (needs billing setup for no capacity we lack). Runs as step [16] rather than its
+own schedule — a separate schedule off the wake window is how market_ingest
+drifted 8 days. (The Google client_id retirement note only matters if the archive ever moves
+back to a Drive remote: rclone.org/drive/#making-your-own-client-id.)
+
+Orchestration layer: `n8n_dropbox_workflow.json` (import into the local n8n at
+:5678). Two flows: a **09:00 daily catch-up backup** — deliberately AFTER the
+00:30 pipeline, because cloud_backup.sh is idempotent so it costs seconds when
+step [16] already ran, and it is the run that actually happens when the Mac
+slept through the wake window (the launchd lesson, third time) — and a
+**restore/list webhook** (`POST /webhook/dropbox-restore`,
+action=list|history|restore, tree allowlisted, dest sanitized, optional
+date=YYYY-MM-DD to pull a prior version from history/). Bulk bytes stay on
+rclone; the Dropbox MCP connector (same account — verified by a marker-file
+round-trip between rclone and the connector) is the browse/verify surface.
+
+## 2026-07-22 (warehouse ingest repaired + per-ticker freshness ledger)
+
+### Warehouse ingest had been silently stale for 8 days — root cause: the migration left it behind
+
+`scripts/market_ingest.py` and `scripts/bhavcopy_to_db.py` still pointed at the
+abandoned `~/Downloads/code/python_files` / `~/Downloads/data/bhavcopy_cache`
+tree after the 2026-07-16 migration to `~/market-pipeline`. Both kept "running
+fine" against dead directories: snapshots froze at 2026-07-16, Postgres bhavcopy
+at 2026-07-14, and nothing alerted. Fixed by repointing both (with
+`BHAV_CACHE`/`MARKET_PIPELINE_DIR` env overrides) and backfilling: +33,105
+bhavcopy rows (Jul 15–21), and every missed workbook date per market — the
+ingester now loads ALL dates absent from the table, not just the newest file, so
+an ingest gap no longer loses the intervening days.
+
+**Decision — the ingest is now step [15/15] of `daily_pipeline.sh`**, not a
+separate schedule. Rejected: its own launchd/cron job (that is exactly the
+arrangement that let it drift — a second schedule with no coupling to the data
+it records, off the wake window). Running it in-pipeline ties it to the same
+wake, the same log, and the `[ALERT]` failure email. It calls `/usr/bin/python3`
+explicitly because duckdb lives there and not in the venv (the same split
+documented on 2026-07-15).
+
+### New: per-ticker freshness ledger (ticker, name, market, last update)
+
+`market_daily.ticker_freshness` (Postgres view) + `market_ingest.py --tickers`
+/ `--csv` — one row per ticker with name, market, and date of last real data:
+21,279 tickers across 5 markets. India rows come from bhavcopy trade dates (the
+true series, ~7.9k symbols), not the gated scan snapshot; names come from the
+workbook `Name` column where it exists (EU/JP/KR) and from
+`market_daily.symbol_names` (refreshed each run from `symbol_master.parquet`,
+NSE preferred on symbol collisions) otherwise. India name coverage is 4,308/7,858
+— the unnamed remainder are BSE-only/delisted symbols outside symbol_master,
+left NULL rather than guessed. Snapshot workbooks now also persist `name`.
+Exported daily to `reports/ticker_freshness.csv` for downstream extraction.
+
+Known remainder: `nse_raw`/`bse_raw` (the 34-col raw archives) still have no
+writer since 2026-07-13 — `nse.parquet`/`bse.parquet` in the new cache are not
+being rebuilt by anything. The OHLCV series everything reads is current; the raw
+archive is the stale layer.
+
 ## 2026-07-21 (night, sampling)
 
 ### 🔴 EVERY India factor result so far is an ALPHABETICAL sample

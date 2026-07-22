@@ -128,6 +128,17 @@ DATASETS: List[Dataset] = [
             "🔴 load India from HERE, not assembled — NSE/BSE share bare symbols "
             "and 2534 collide; the cleaned pivot resolves the exchange",
             ["scan_bhavcopy.py", "factor_zscore_panel.py"]),
+    Dataset("bhavcopy.nse_raw", BHAV_CACHE / "nse.parquet",
+            "bhavcopy_raw_archive.py", "ingest", DAILY, 1.0,
+            "lossless 34-col UDiFF archive of the nse/ day-CSVs; feeds "
+            "pg.bhavcopy.nse_raw. Went stale 2026-07-13→22 when its original "
+            "(uncommitted) builder was lost — hence this entry",
+            ["bhavcopy_to_db.py"]),
+    Dataset("bhavcopy.bse_raw", BHAV_CACHE / "bse.parquet",
+            "bhavcopy_raw_archive.py", "ingest", DAILY, 1.0,
+            "lossless 34-col UDiFF archive of the bse/ day-CSVs; feeds "
+            "pg.bhavcopy.bse_raw",
+            ["bhavcopy_to_db.py"]),
     Dataset("bhavcopy.lmdb", BHAV_CACHE / "ohlcv.lmdb",
             "bhavcopy_history.py", "ingest", DAILY, 1.0,
             "per-symbol OHLCV store, ~7.8k symbols; needs lmdb",

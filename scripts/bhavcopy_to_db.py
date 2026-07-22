@@ -8,12 +8,15 @@ an LFS rule in .gitattributes (`*.parquet`, `**/data/**/*.csv`) while being
 regenerated on each run, so a single `git add -A` would push ~120 MB of churn into
 LFS *permanently* (parquet is binary — no delta compression, a new blob every run).
 
-DESIGN — "only new data moves":
+DESIGN — "only new data moves" (for append-only sources):
   * DuckDB is the local analytical store. Gitignored: it is a full-file rewrite,
     which is the worst possible shape for LFS.
-  * Postgres is the durable store. Rows are UPSERTed by (trade_date, symbol), so a
-    daily run appends ~5k new rows instead of rewriting a 100 MB blob.
-  * Only genuinely new trading days are loaded (`--since`, or auto from max date).
+  * Postgres is the durable store. Append-only sources (nse_raw/bse_raw, and the
+    static nse_deep_ohlcv) load only rows newer than the mirror's max date.
+  * REGENERATED sources (see the set below) are instead re-created from source:
+    bhavcopy_history.py rewrites them daily and may drop/replace historical rows,
+    which appends can never reconcile (caused a permanent --verify FAIL by
+    2026-07-22: cleaned_ohlcv carried a +17,571-row surplus of cleaned-away rows).
 
 Verified before use (2026-07-15): nse.parquet/bse.parquet reproduce the raw CSVs
 losslessly — 34/34 cols and 269/269 dates each — so the day-CSVs are redundant.
@@ -27,13 +30,17 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
 import duckdb
 
 HOME = Path("/Users/umashankar")
-CACHE = Path.home() / "Downloads" / "data" / "bhavcopy_cache"
+# The pipeline (and its cache) migrated out of ~/Downloads on 2026-07-16; the
+# launchd plist exports BHAV_CACHE pointing at the live location — honor it.
+CACHE = Path(os.environ.get("BHAV_CACHE",
+                            str(HOME / "market-pipeline" / "data" / "bhavcopy_cache")))
 DB = HOME / "data" / "bhavcopy.duckdb"
 
 # table -> (source parquet, date column, select body)
@@ -70,6 +77,16 @@ TABLES = {
 # Sorting by (symbol, date) lets DuckDB's run-length/delta encoders do real work.
 SORTED = {"bhavcopy_ohlcv", "cleaned_ohlcv", "nse_deep_ohlcv"}
 
+# Sources that bhavcopy_history.py REWRITES on every run, where historical rows
+# can be dropped (clean_ohlcv filters) or replaced/backfilled (assembled dedup
+# keep="last"). An append-only `WHERE date > max` load can never reconcile those,
+# so --incremental drifted +17,571 rows on cleaned_ohlcv by 2026-07-22 and
+# --verify FAILed permanently. These tables are re-created from source instead.
+#   * nse_raw/bse_raw stay append-only: bhavcopy_raw_archive.py only ever
+#     concatenates day-CSVs newer than the parquet's max TradDt.
+#   * nse_deep_ohlcv stays append-only: static archive, no live writer.
+REGENERATED = {"bhavcopy_ohlcv", "cleaned_ohlcv"}
+
 
 def build(db_path: Path, incremental: bool) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -85,7 +102,7 @@ def build(db_path: Path, incremental: bool) -> None:
         exists = con.execute(
             "SELECT count(*) FROM information_schema.tables WHERE table_name=?", [tbl]
         ).fetchone()[0]
-        if incremental and exists:
+        if incremental and exists and tbl not in REGENERATED:
             mx = con.execute(f'SELECT max("{datecol}") FROM "{tbl}"').fetchone()[0]
             n0 = con.execute(f'SELECT count(*) FROM "{tbl}"').fetchone()[0]
             con.execute(
@@ -96,7 +113,8 @@ def build(db_path: Path, incremental: bool) -> None:
         else:
             con.execute(f'CREATE OR REPLACE TABLE "{tbl}" AS {sel}')
             n = con.execute(f'SELECT count(*) FROM "{tbl}"').fetchone()[0]
-            print(f"  {tbl:16s} {n:>9,} rows")
+            note = " (replaced: regenerated source)" if incremental and exists else ""
+            print(f"  {tbl:16s} {n:>9,} rows{note}")
     con.close()
 
 
@@ -126,7 +144,8 @@ def verify(db_path: Path) -> int:
 
 
 def to_postgres(db_path: Path, dsn: str, schema: str = "bhavcopy") -> None:
-    """Mirror into Postgres, appending only new dates.
+    """Mirror into Postgres: append new dates (append-only sources) or rebuild
+    on row-count divergence (REGENERATED sources).
 
     Targets a DEDICATED schema (default `bhavcopy`), never `public`. The
     market_data DB already carries a populated, normalized schema from the
@@ -150,8 +169,18 @@ def to_postgres(db_path: Path, dsn: str, schema: str = "bhavcopy") -> None:
         tgt = f'pg."{schema}"."{tbl}"'
         con.execute(f'CREATE TABLE IF NOT EXISTS {tgt} AS SELECT * FROM "{tbl}" LIMIT 0')
         before = con.execute(f"SELECT count(*) FROM {tgt}").fetchone()[0]
+        local_n = con.execute(f'SELECT count(*) FROM "{tbl}"').fetchone()[0]
         if before == 0:
             con.execute(f'INSERT INTO {tgt} SELECT * FROM "{tbl}"')
+        elif tbl in REGENERATED:
+            # regenerated sources drop/replace historical rows — an append can
+            # never reconcile that, so rebuild whenever the mirror disagrees.
+            # DELETE+INSERT, not DROP: market_daily.ticker_freshness (a view
+            # built by market_ingest.py) depends on cleaned_ohlcv, and DROP
+            # would require CASCADE-ing it away.
+            if before != local_n:
+                con.execute(f"DELETE FROM {tgt}")
+                con.execute(f'INSERT INTO {tgt} SELECT * FROM "{tbl}"')
         else:
             # append only rows newer than what Postgres already has
             dc = TABLES[tbl][1]
@@ -160,7 +189,8 @@ def to_postgres(db_path: Path, dsn: str, schema: str = "bhavcopy") -> None:
                 f'INSERT INTO {tgt} SELECT * FROM "{tbl}" WHERE "{dc}" > ?', [mx]
             )
         after = con.execute(f"SELECT count(*) FROM {tgt}").fetchone()[0]
-        print(f"  pg.{schema}.{tbl:16s} {before:>9,} -> {after:>9,} rows (+{after-before:,})")
+        note = " (rebuilt)" if tbl in REGENERATED and before not in (0, after) else ""
+        print(f"  pg.{schema}.{tbl:16s} {before:>9,} -> {after:>9,} rows (+{after-before:,}){note}")
     con.close()
 
 

@@ -323,7 +323,19 @@ def build() -> pd.DataFrame:
         i0 = idx.searchsorted(reb)
         if i0 >= len(idx):
             continue
-        for hz, label in ((252, "xret_T+252d"), (126, "xret_T+126d")):
+        # SHORT HORIZONS ADDED 2026-07-21. Only 252d and 126d existed, so the
+        # question "does this edge show up in a week, a month, a quarter — or
+        # only over a year?" had no data behind it at all, while the pipeline
+        # gave the impression it had been tested. 5/21/63 are one trading week,
+        # one month and one quarter.
+        #
+        # A short horizon is NOT a smaller version of a long one: transaction
+        # costs are unchanged while the return shrinks, so a 5d edge of +1% is
+        # roughly break-even after the spread and impact measured in
+        # cost_vs_edge.py. Read the term structure for SHAPE (does the edge
+        # accrue early or late), not as a menu to pick the best number from.
+        for hz, label in ((252, "xret_T+252d"), (126, "xret_T+126d"),
+                          (63, "xret_T+63d"), (21, "xret_T+21d"), (5, "xret_T+5d")):
             i1 = min(i0 + hz, len(idx) - 1)
             if i1 <= i0:
                 elig[label] = np.nan

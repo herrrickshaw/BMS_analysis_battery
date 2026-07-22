@@ -36,7 +36,11 @@ MARKET_SRC = {  # market -> price partition (IN uses adjusted)
 
 def main():
     con = duckdb.connect()
-    sig = pd.read_parquet(LEDGER).reset_index(drop=True)
+    sig = pd.read_parquet(LEDGER)
+    backfill = os.path.join(BASE, "cache_seed", "signal_ledger_backfill.parquet")
+    if os.path.exists(backfill):
+        sig = pd.concat([sig, pd.read_parquet(backfill)], ignore_index=True)
+    sig = sig.reset_index(drop=True)
     sig["signal_id"] = sig.index
     sig["signal_date"] = pd.to_datetime(sig["signal_date"])
 
@@ -138,7 +142,7 @@ def main():
         frames.append(df)
 
     out = pd.concat(frames, ignore_index=True)
-    meta = sig[["signal_id", "market", "filter", "score", "source"]] \
+    meta = sig[["signal_id", "market", "filter", "detail", "score", "source"]] \
         .drop_duplicates("signal_id")
     out = meta.merge(out.drop(columns=["market"]), on="signal_id", how="left")
     out["excess_ret"] = out["fwd_ret"] - out["mkt_median"]
@@ -171,11 +175,15 @@ def main():
         lines += ["", "## Outcomes by market × filter × horizon", "",
                   "| market | filter | h | n | hit% | median ret | median excess |",
                   "|---|---|---|---|---|---|---|"]
-        g = scored.groupby(["market", "filter", "h"])
-        for (m, f, h), grp in g:
-            hit = (grp.fwd_ret > 0).mean()
+        scored = scored.copy()
+        scored["direction"] = scored["detail"].astype(str).str.contains("SELL") \
+            .map({True: "SELL", False: "BUY/long"})
+        g = scored.groupby(["market", "filter", "direction", "h"])
+        for (m, f, d, h), grp in g:
+            # a SELL signal "hits" when the price FALLS
+            hit = ((grp.fwd_ret < 0) if d == "SELL" else (grp.fwd_ret > 0)).mean()
             lines.append(
-                f"| {m} | {f} | {h}d | {len(grp)} | {hit:.0%} "
+                f"| {m} | {f} {d} | {h}d | {len(grp)} | {hit:.0%} "
                 f"| {grp.fwd_ret.median():+.2%} | {grp.excess_ret.median():+.2%} |")
     with open(OUT_MD, "w") as fh:
         fh.write("\n".join(lines) + "\n")

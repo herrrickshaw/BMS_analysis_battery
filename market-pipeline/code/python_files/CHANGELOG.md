@@ -95,6 +95,38 @@ policy convergence). No pipeline decisions recovered.
 
 ---
 
+## 2026-07-22 (liquidity framing + staleness guard)
+
+### The brief now says what its universe IS: high-liquidity picks
+
+The fundamental screeners run on ~1,350 of ~7,800 listed Indian equities. The
+missing ~4,500 are not a gap — they are removed by a deliberate ₹1cr/day
+median-turnover floor applied BEFORE any fundamental test (measured funnel:
+7,842 equities → 5,203 with enough history → ~1,400 clear the floor). The brief
+previously implied this; it now states it outright: **liquidity is a screening
+criterion alongside Piotroski and the rest**, and lower-liquidity names are
+deliberately out of scope until their collection is reliable — at which point
+they arrive as a separately-tagged tier, not mixed in.
+
+Floor sensitivities, for when that day comes: ₹1cr → 1,480 names · ₹10L → 2,253
+· ₹1L → 3,665. The cost/capacity work says the illiquid edge is real at retail
+size, so ₹10L is the plausible next tier.
+
+### Fundamentals staleness is now monitored, not assumed
+
+"Collect regularly and avoid stale data" needs machinery, not intent:
+
+- Both stores registered in `data_registry` (`fundamentals.in_annual`,
+  `fundamentals.in_quarterly`, writer `fundamentals_offhours.py`, tolerance
+  10d) — so `data_index` and the ingest gate report them like every other
+  dataset. 10 days means the SCHEDULE broke, not that quarterly filings moved.
+- The brief's coverage note shows the store's **median** age — median, not
+  newest, so one fresh ticker cannot make 1,300 stale ones look current (the
+  max-mtime bug, third appearance) — and switches to a bold STALE warning past
+  10 days.
+
+---
+
 ## 2026-07-22 (fundamentals — all four screeners store-served)
 
 Phases 2-3 completing Phase 1. All four fundamental screeners now run from the

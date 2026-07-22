@@ -144,6 +144,23 @@ DATASETS: List[Dataset] = [
     Dataset("cache.symbol_master", MARKET_CACHE / "symbol_master.parquet",
             "symbol_master.py", "ingest", DAILY, 2.0,
             "cross-market symbol normalisation"),
+    # India fundamentals store — feeds all four fundamental screeners
+    # (Piotroski/CoffeeCan/MagicFormula from the annual file, BullCartel from
+    # the quarterly). 10 days tolerance: fundamentals are quarterly filings, but
+    # the collector runs weeknights+weekends, so >10d means the SCHEDULE broke,
+    # not that the data went meaningfully wrong. Registered here so staleness
+    # shows in data_index alongside everything else, instead of the brief
+    # silently screening on old financials — the exact stale-data failure this
+    # registry exists to surface.
+    Dataset("fundamentals.in_annual", MARKET_CACHE / "fundamentals" / "IN_current.parquet",
+            "fundamentals_offhours.py", "ingest", "weeknights 21:30 + weekends 08:00/14:00", 10.0,
+            "annual statements for the HIGH-LIQUIDITY India universe (>=Rs1cr/day); "
+            "lower-liquidity names deliberately not collected yet",
+            ["fundamentals_store_reader.py", "scan_bhavcopy.py", "full_indian_market_scan.py"]),
+    Dataset("fundamentals.in_quarterly", MARKET_CACHE / "fundamentals" / "IN_quarterly.parquet",
+            "fundamentals_offhours.py", "ingest", "weeknights 21:30 + weekends 08:00/14:00", 10.0,
+            "quarterly Total Revenue + Net Income for Bull Cartel (same universe)",
+            ["fundamentals_store_reader.py", "scan_bhavcopy.py"]),
     Dataset("fx.usd", BHAV_CACHE / "fx_usd.json",
             "liquidity.py", "ingest", DAILY, 7.0,
             "USD rates for the liquidity gate; refuses to serve >7d old, which is "

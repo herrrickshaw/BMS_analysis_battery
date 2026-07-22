@@ -77,21 +77,32 @@ def _fund_coverage_note() -> str:
     try:
         import data_registry as _R
         d = pd.read_parquet(_R.FUND_DIR / "IN_current.parquet")
-        n = d.dropna(subset=["cfo", "total_assets"])["ticker"].nunique()
-        letters = d.dropna(subset=["cfo", "total_assets"])["ticker"].astype(str).str[0].nunique()
+        u = d.dropna(subset=["cfo", "total_assets"])
+        n = u["ticker"].nunique()
+        letters = u["ticker"].astype(str).str[0].nunique()
+        # MEDIAN age of the store, never the newest row — one fresh ticker must
+        # not make 1,300 stale ones look current (the max-mtime bug, again).
+        ca = pd.to_datetime(d["collected_at"], errors="coerce", utc=True)
+        age_d = float((pd.Timestamp.now(tz="UTC") - ca).dt.days.median())
     except Exception:
-        n, letters = 0, 0
+        n, letters, age_d = 0, 0, None
     if n < 50:
         return ("<p class='mut' style='font-size:11px;margin:2px 0'>⚠ Fundamentals "
-                "coverage is still filling from the off-hours collector. Piotroski "
-                "picks may be alphabet-skewed until it completes; Coffee Can / Bull "
-                "Cartel / Magic Formula remain live-fetched and A-skewed pending "
-                "Phase 2.</p>")
-    return (f"<p class='mut' style='font-size:11px;margin:2px 0'>Piotroski now spans "
-            f"the universe ({n} names, {letters} first-letters, off-hours store). "
-            f"Coffee Can / Bull Cartel / Magic Formula are still live-fetched and "
-            f"remain A-skewed until Phase 2 — read those three by conviction, not "
-            f"alphabet.</p>")
+                "coverage is still filling from the off-hours collector; picks may "
+                "be alphabet-skewed until it completes.</p>")
+    age_txt = "age unknown" if age_d is None else f"median {age_d:.0f}d old"
+    # 10 days matches the registry tolerance for fundamentals.in_annual: beyond
+    # it the off-hours SCHEDULE has broken, and screening on old financials while
+    # presenting them as current is the stale-data failure this brief keeps
+    # having to guard against.
+    warn = ("" if age_d is None or age_d <= 10 else
+            " <b>⚠ STALE — the off-hours collector has not refreshed in over 10 "
+            "days; these fundamentals may predate recent results.</b>")
+    return (f"<p class='mut' style='font-size:11px;margin:2px 0'>All four fundamental "
+            f"screeners (Piotroski · Coffee Can · Magic Formula · Bull Cartel) run on "
+            f"the <b>high-liquidity universe only</b> — liquidity is a criterion "
+            f"applied before them. Data: off-hours store, {n} names, {letters} "
+            f"first-letters, {age_txt}.{warn}</p>")
 
 
 def _table(headers, rows):
@@ -715,7 +726,7 @@ h3{{font-size:14px;margin:14px 0 6px;color:#333}}
 <h1 style="font-size:21px;margin:0 0 2px">📈 Daily Market Brief — {today}</h1>
 <p class="sub" style="color:#666;font-size:13px;margin:0 0 10px">One block per market — screener, fundamentals, news and breakouts together · then global context</p>
 {as_of_html}
-<p class="liq" style="font-size:11px;color:#555;margin:0 0 14px;background:#f6f8fc;border-left:3px solid #1a73e8;padding:6px 9px">Every pick clears a liquidity floor (~₹1cr/day in India, ~$120k elsewhere) — untradable microcaps, ETFs and bonds are excluded. <b>Tier</b>: T1 mega ≥$12M/day · T2 large ≥$3M · T3 mid ≥$600k · T4 small ≥$120k.</p>
+<p class="liq" style="font-size:11px;color:#555;margin:0 0 14px;background:#f6f8fc;border-left:3px solid #1a73e8;padding:6px 9px"><b>These are HIGH-LIQUIDITY picks.</b> Liquidity is a screening criterion applied alongside Piotroski, Coffee Can and the other filters — every name below clears a median-turnover floor (~₹1cr/day in India, ~$120k elsewhere) <i>before</i> any fundamental test runs. In India that floor admits ~1,350 of ~7,800 listed equities; the ~4,500 lower-liquidity names are deliberately out of scope for now (harder to trade, data collected less regularly) and will be added as a separately-tagged tier once their collection is reliable. Untradable microcaps, ETFs and bonds are excluded. <b>Tier</b>: T1 mega ≥$12M/day · T2 large ≥$3M · T3 mid ≥$600k · T4 small ≥$120k.</p>
 <h2 style="font-size:16px;border-bottom:2px solid #1a73e8;padding-bottom:3px">🌍 Market Snapshot</h2>
 {snapshot_html}
 

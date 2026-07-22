@@ -44,7 +44,8 @@ warnings.filterwarnings("ignore")
 
 from stock_utils import parallel_map
 
-CACHE_DIR = Path.home() / "Downloads" / "market_cache" / "ohlc"
+import data_registry as _R
+CACHE_DIR = _R.OHLC_DIR
 REF_DIR   = Path.home() / "nse_screener_reference" / "ohlc_cache"
 OUT_DIR   = Path("./sentiment_link_results"); OUT_DIR.mkdir(exist_ok=True)
 MONITOR_LOG = OUT_DIR / "forward_sentiment_log.json"

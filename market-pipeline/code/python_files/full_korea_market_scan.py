@@ -65,6 +65,18 @@ except Exception:                                    # pragma: no cover
     def _gc_fields(df):
         return {}
 
+try:
+    from breakout_quality import row_fields as _bq_fields
+except ImportError:                                  # pragma: no cover
+    # Return the KEYS with None values, never {}. signal_tracker.harvest_technical()
+    # SKIPS any market whose scan lacks a Quality_Grade column, so an empty dict
+    # would silently drop this market from the technical filter entirely.
+    def _bq_fields(df, price_round=2):
+        return {k: None for k in
+                ("EMA50", "Above_EMA50", "EMA50_Rising", "Quality_Score",
+                 "Quality_Grade", "Rel_Volume", "Compression_Ratio", "Body_Pct",
+                 "Actionable", "Recomputed_Signal")}
+
 
 # Liquidity gate (shared, currency-aware). Lazy so the scan still runs if the
 # module is unavailable; _LiqStub then tags everything UNKNOWN rather than
@@ -275,12 +287,40 @@ def fetch_krx_ohlc(universe: list[dict], months: int = 3) -> dict[str, pd.DataFr
 def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
     if df is None or df.empty or len(df) < confirm + 5:
         return {"signal": "INSUFFICIENT_DATA", "box_top": None, "box_bottom": None}
+    # Drop trailing bars with no close BEFORE anything else. pykrx/yfinance
+    # append a row for the current session as soon as the date exists, so a scan
+    # run before the market prints sees a NaN final bar. The correct "current
+    # price" is then the last SETTLED close, not a null and certainly not zero.
+    try:
+        _c = pd.to_numeric(df["Close"], errors="coerce")
+        _last = _c.last_valid_index()
+        if _last is None:
+            return {"signal": "NO_DATA", "box_top": None, "box_bottom": None,
+                    "current_price": None}
+        df = df.loc[:_last]
+    except Exception:
+        pass
+    # 🔴 Trailing NaN bars must be DROPPED, never zero-filled.
+    # .fillna(0) turned a missing final close into current=0, and 0 is below
+    # every box bottom — so the whole universe reported BREAKDOWN_SELL. Korea
+    # 2026-07-21: 2,472 of 2,480 rows, with Position_in_Box% reading -1990.9
+    # ((0-2190)/110*100) instead of the true 59.1. The zero also never reached
+    # LTP, which is computed with .dropna(), so the sheet showed a real price
+    # beside a signal derived from zero — self-contradictory and hard to spot.
+    # Zero is a PRICE here, not a null; coercing missing data to a valid-looking
+    # value is what made this silent.
 
-    highs  = pd.to_numeric(df["High"],  errors="coerce").fillna(0).tolist()
-    lows   = pd.to_numeric(df["Low"],   errors="coerce").fillna(0).tolist()
-    closes = pd.to_numeric(df["Close"], errors="coerce").fillna(0).tolist()
+    highs  = pd.to_numeric(df["High"],  errors="coerce").tolist()
+    lows   = pd.to_numeric(df["Low"],   errors="coerce").tolist()
+    closes = pd.to_numeric(df["Close"], errors="coerce").tolist()
 
     current = closes[-1]
+    if current is None or current != current or current <= 0:
+        # Explicit: a missing final bar is NO_DATA. Falling through would make
+        # every comparison False and silently report IN_BOX — a different wrong
+        # answer, not a right one.
+        return {"signal": "NO_DATA", "box_top": None, "box_bottom": None,
+                "current_price": None}
     h = highs[:-1]   # exclude current bar from box formation
     l = lows[:-1]
     n = len(h)
@@ -370,16 +410,46 @@ def _series(df, *names):
 # ── Fundamental scan (yfinance, .KS / .KQ) ───────────────────────────────────
 
 def fundamental_scan(code: str, yf_suffix: str) -> dict:
-    """Piotroski F-Score + Korea-adapted Coffee Can via yfinance."""
+    """Piotroski F-Score + Korea-adapted Coffee Can.
+
+    DART first, yfinance as fallback.
+
+    WHY DART IS PRIMARY (2026-07-21): yfinance's KRX statement coverage is thin
+    and inconsistent — the 07-21 run produced 8 Fundamentals rows for a
+    2,496-name universe, so Korea's Piotroski block was effectively absent while
+    still reporting a number. DART is the FSS's own filing database and maps
+    2,496/2,496 of that universe. Measured, not assumed.
+    yfinance is kept as the fallback for the Coffee Can block below, which needs
+    multi-year revenue/FCF series DART's annual endpoint does not return in one
+    call.
+    """
     yf_ticker = f"{code}{yf_suffix}"
     result = {"code": code, "yf_ticker": yf_ticker, "f_score": None,
               "cc_qualifies": "FAIL", "error": None}
+
+    dart_score = None
+    try:
+        import dart_fundamentals as _dart
+        _d = _dart.piotroski_inputs(code)
+        dart_score = _dart.f_score(_d) if _d else None
+    except Exception:
+        dart_score = None          # never let the new path break the scan
+
     try:
         ticker = yf.Ticker(yf_ticker)
         inc = _first_df(ticker, "income_stmt", "financials")
         bal = _first_df(ticker, "balance_sheet")
         cf  = _first_df(ticker, "cash_flow", "cashflow")
         if inc is None:
+            if dart_score:
+                # DART has the filing even though yfinance does not — report the
+                # F-score rather than discarding it. Coffee Can needs multi-year
+                # yfinance series, so it stays unscored here and says so.
+                result["f_score"] = dart_score["f_score"]
+                result["f_strong"] = dart_score["f_score"] >= PIOTROSKI_STRONG
+                result["source"] = "dart"
+                result["cc_score"] = "n/a (no yfinance statements)"
+                return result
             result["error"] = "no_financial_data"
             return result
     except Exception as e:
@@ -419,6 +489,14 @@ def fundamental_scan(code: str, yf_suffix: str) -> dict:
         f9 = 1 if (rev0 and a0 and rev1 and a1 and (rev0 / a0) > (rev1 / a1)) else 0
 
         f_score = f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9
+        if dart_score:
+            # Both sources present: prefer DART. It is the regulator's filing of
+            # record; yfinance is a re-derivation of it and drifts on KRX.
+            f_score = dart_score["f_score"]
+            result["source"] = "dart"
+            result["yf_f_score"] = f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9
+        else:
+            result["source"] = "yfinance"
         result["f_score"]  = f_score
         result["f_strong"] = f_score >= PIOTROSKI_STRONG
     except Exception:
@@ -581,6 +659,11 @@ def main():
             continue
 
         darv    = compute_darvas_box(df)
+        # EMA-50 trend filter + breakout quality, derived from THIS df in
+        # THIS iteration. Deliberately not a post-pass join: Darvas_Signal
+        # drifted out of alignment with its own Box_Top/Box_Bottom that way
+        # (2,461 contradictory rows on 2026-07-21), and a join is exactly
+        # how that happens.
         closes  = pd.to_numeric(df["Close"], errors="coerce").dropna()
         ltp     = round(float(closes.iloc[-1]), 0)  if not closes.empty  else None
         prev    = round(float(closes.iloc[-2]), 0)  if len(closes) >= 2  else None
@@ -610,6 +693,15 @@ def main():
             "Change%":            chg_pct,
             "Turnover_USD":       round(tv_usd),
             "Liquidity_Tier":     liq_tier,
+            # Migrated to the shared helper so all five markets emit these
+            # columns from ONE implementation. The old inline block guarded with
+            # `if qual.get("rel_volume")`, which is falsy for a genuine 0.0 and
+            # turned a real zero into None — 15 of 353 sampled rows. Verified
+            # before migrating: the signal-bearing fields (Quality_Grade,
+            # Above_EMA50, EMA50_Rising, Recomputed_Signal, Actionable) are
+            # byte-identical; only Rel_Volume and Body_Pct change, and only
+            # where the true value was zero.
+            **_bq_fields(df, price_round=0),
             "200_Day_MA":         ma200,
             **_gc_fields(df),
             "Distance_to_200MA%": dist_ma,

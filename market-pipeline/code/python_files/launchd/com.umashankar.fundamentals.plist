@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.umashankar.fundamentals</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/umashankar/market-pipeline/code/python_files/run_fundamentals_offhours.sh</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/umashankar/market-pipeline/code/python_files</string>
+
+  <!-- OFF-HOURS ONLY. India trades 09:15-15:30 IST; these slots are all well
+       clear of it. Weekends get two passes (full catch-up); weeknights get one
+       late top-up. The collector skips names fresher than 30 days, so a nightly
+       run only fetches what has gone stale. -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <!-- Saturday + Sunday: 08:00 and 14:00 IST, big catch-up windows -->
+    <dict><key>Weekday</key><integer>6</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Weekday</key><integer>6</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+    <!-- Weeknights 21:30 IST (after India close, before US ramp) -->
+    <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>30</integer></dict>
+  </array>
+
+  <key>StandardOutPath</key><string>/Users/umashankar/market-pipeline/code/python_files/fundamentals_offhours.log</string>
+  <key>StandardErrorPath</key><string>/Users/umashankar/market-pipeline/code/python_files/fundamentals_offhours.err</string>
+  <key>RunAtLoad</key><false/>
+</dict></plist>

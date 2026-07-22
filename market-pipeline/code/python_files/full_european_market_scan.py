@@ -80,6 +80,20 @@ try:
 except ImportError:
     OPENPYXL_OK = False
 
+
+try:
+    from breakout_quality import row_fields as _bq_fields
+except ImportError:                                  # pragma: no cover
+    # Return the KEYS with None values, never {}. signal_tracker.harvest_technical()
+    # SKIPS any market whose scan lacks a Quality_Grade column, so an empty dict
+    # would silently drop this market from the technical filter entirely — the
+    # exact failure this wiring exists to fix (only Korea emitted these columns on
+    # 2026-07-21, so all 110 technical signals were Korean).
+    def _bq_fields(df, price_round=2):
+        return {k: None for k in
+                ("EMA50", "Above_EMA50", "EMA50_Rising", "Quality_Score",
+                 "Quality_Grade", "Rel_Volume", "Compression_Ratio", "Body_Pct",
+                 "Actionable", "Recomputed_Signal")}
 # ── Configuration & Constants ────────────────────────────────────────────────
 DOWNLOAD_DIR = Path("./european_scan")
 DOWNLOAD_DIR.mkdir(exist_ok=True)
@@ -217,6 +231,19 @@ def _first_df(ticker, *attrs):
 def _row(df, *row_names, col: int = 0):
     if df is None or df.empty:
         return None
+    # Drop trailing bars with no close BEFORE anything else. pykrx/yfinance
+    # append a row for the current session as soon as the date exists, so a scan
+    # run before the market prints sees a NaN final bar. The correct "current
+    # price" is then the last SETTLED close, not a null and certainly not zero.
+    try:
+        _c = pd.to_numeric(df["Close"], errors="coerce")
+        _last = _c.last_valid_index()
+        if _last is None:
+            return {"signal": "NO_DATA", "box_top": None, "box_bottom": None,
+                    "current_price": None}
+        df = df.loc[:_last]
+    except Exception:
+        pass
     for name in row_names:
         if name in df.index:
             try:
@@ -239,12 +266,27 @@ def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
     """Detect Darvas Box from historical Close/High/Low series."""
     if df is None or df.empty or len(df) < confirm + 5:
         return {"signal": "INSUFFICIENT_DATA", "box_top": None, "box_bottom": None}
+    # 🔴 Trailing NaN bars must be DROPPED, never zero-filled.
+    # .fillna(0) turned a missing final close into current=0, and 0 is below
+    # every box bottom — so the whole universe reported BREAKDOWN_SELL. Korea
+    # 2026-07-21: 2,472 of 2,480 rows, with Position_in_Box% reading -1990.9
+    # ((0-2190)/110*100) instead of the true 59.1. The zero also never reached
+    # LTP, which is computed with .dropna(), so the sheet showed a real price
+    # beside a signal derived from zero — self-contradictory and hard to spot.
+    # Zero is a PRICE here, not a null; coercing missing data to a valid-looking
+    # value is what made this silent.
 
-    highs  = pd.to_numeric(df["High"],  errors="coerce").fillna(0).tolist()
-    lows   = pd.to_numeric(df["Low"],   errors="coerce").fillna(0).tolist()
-    closes = pd.to_numeric(df["Close"], errors="coerce").fillna(0).tolist()
+    highs  = pd.to_numeric(df["High"],  errors="coerce").tolist()
+    lows   = pd.to_numeric(df["Low"],   errors="coerce").tolist()
+    closes = pd.to_numeric(df["Close"], errors="coerce").tolist()
 
     current = closes[-1]
+    if current is None or current != current or current <= 0:
+        # Explicit: a missing final bar is NO_DATA. Falling through would make
+        # every comparison False and silently report IN_BOX — a different wrong
+        # answer, not a right one.
+        return {"signal": "NO_DATA", "box_top": None, "box_bottom": None,
+                "current_price": None}
     highs_h = highs[:-1]  # Exclude current bar to avoid lookahead contamination
     lows_h  = lows[:-1]
     n       = len(highs_h)
@@ -580,6 +622,9 @@ def main():
                 "Change%":            chg_pct,
                 "Turnover_USD":       round(tv_usd),
                 "Liquidity_Tier":     liq_tier,
+                # Computed from THIS df in THIS iteration, not joined afterwards.
+                # Without these columns signal_tracker skips Europe entirely.
+                **_bq_fields(df, price_round=2),
                 "200_Day_MA":         ma_200,
                 **_gc_fields(df),
                 "Distance_to_200MA%": dist_ma,

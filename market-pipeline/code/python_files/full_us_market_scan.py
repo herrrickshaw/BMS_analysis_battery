@@ -108,6 +108,20 @@ try:
 except ImportError:
     _NCDS_AVAILABLE = False
 
+
+try:
+    from breakout_quality import row_fields as _bq_fields
+except ImportError:                                  # pragma: no cover
+    # Return the KEYS with None values, never {}. signal_tracker.harvest_technical()
+    # SKIPS any market whose scan lacks a Quality_Grade column, so an empty dict
+    # would silently drop this market from the technical filter entirely — the
+    # exact failure this wiring exists to fix (only Korea emitted these columns on
+    # 2026-07-21, so all 110 technical signals were Korean).
+    def _bq_fields(df, price_round=2):
+        return {k: None for k in
+                ("EMA50", "Above_EMA50", "EMA50_Rising", "Quality_Score",
+                 "Quality_Grade", "Rel_Volume", "Compression_Ratio", "Body_Pct",
+                 "Actionable", "Recomputed_Signal")}
 _NCDS_CREDS_PATH = Path.home() / ".nasdaq" / "ncds_auth.json"
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -441,10 +455,19 @@ def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
 
     if not all([h_col, l_col, c_col]) or len(df) < confirm + 5:
         return {"signal": "INSUFFICIENT_DATA", "box_top": None, "box_bottom": None}
+    # 🔴 Trailing NaN bars must be DROPPED, never zero-filled.
+    # .fillna(0) turned a missing final close into current=0, and 0 is below
+    # every box bottom — so the whole universe reported BREAKDOWN_SELL. Korea
+    # 2026-07-21: 2,472 of 2,480 rows, with Position_in_Box% reading -1990.9
+    # ((0-2190)/110*100) instead of the true 59.1. The zero also never reached
+    # LTP, which is computed with .dropna(), so the sheet showed a real price
+    # beside a signal derived from zero — self-contradictory and hard to spot.
+    # Zero is a PRICE here, not a null; coercing missing data to a valid-looking
+    # value is what made this silent.
 
-    all_highs  = pd.to_numeric(df[h_col], errors="coerce").fillna(0).tolist()
-    all_lows   = pd.to_numeric(df[l_col], errors="coerce").fillna(0).tolist()
-    all_closes = pd.to_numeric(df[c_col], errors="coerce").fillna(0).tolist()
+    all_highs  = pd.to_numeric(df[h_col], errors="coerce").tolist()
+    all_lows   = pd.to_numeric(df[l_col], errors="coerce").tolist()
+    all_closes = pd.to_numeric(df[c_col], errors="coerce").tolist()
 
     current = all_closes[-1]
     highs   = all_highs[:-1]
@@ -829,6 +852,10 @@ def main(nasdaq_only: bool = False, top: int = 0, run_scans: bool = True,
             "Change%":          chg_pct,
             "Turnover_USD":     round(tv_usd),
             "Liquidity_Tier":   liq_tier,
+            # Computed from THIS df in THIS iteration — never a post-pass join,
+            # which is how Darvas_Signal drifted out of alignment with its own
+            # box. Without these columns signal_tracker skips the US entirely.
+            **_bq_fields(df, price_round=2),
             "Darvas_Signal":    darvas.get("signal"),
             "Box_Top":          darvas.get("box_top"),
             "Box_Bottom":       darvas.get("box_bottom"),

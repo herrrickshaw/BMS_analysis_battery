@@ -1,0 +1,31 @@
+symbol,market,filter,filter_score,news_n,news_score,verdict,why,headline
+ADANIPORTS,IN,piotroski,7.0,6,0.4698833333333334,CONVERGENT,positive coverage,Adani Energy Solutions among 4 large-caps that hit 52-week highs &amp; rallied up to 16% in a month
+AARNAV,IN,piotroski,7.0,1,0.3612,CONVERGENT,positive coverage,Arvind Fashions Q1 Results: Net profit rises 11% to Rs 27.61 cr
+ANUP,IN,piotroski,7.0,1,0.296,CONVERGENT,positive coverage,Triveni Engineering demerger: Last day to buy stock to get Triveni Power Transmission shares. Check details
+ABFRL,IN,debt_reduction,6.0,1,0.3612,CONVERGENT,positive coverage,Aditya Birla Sun Life AMC Q1 profit rises 12% to ₹309.5 crore
+ARVINDFASN,IN,debt_reduction,6.0,1,0.3612,CONVERGENT,positive coverage,Arvind Fashions Q1 Results: Net profit rises 11% to Rs 27.61 cr
+ADANIGREEN,IN,debt_reduction,6.0,10,0.39651000000000003,CONVERGENT,positive coverage,"Juniper Green Energy, Tata Power sign PPA for 85 MW hybrid project in Maharashtra"
+ALIVUS,IN,debt_reduction,6.0,4,0.303,CONVERGENT,positive coverage,ICICI Prudential Life Insurance to focus on growing absolute VNB amid slump in FY24
+AJANTPHARM,IN,piotroski,7.0,2,-0.0928,NEUTRAL,routine coverage,"Stocks in news: CDSL, Adani Energy, L&amp;T, Adani Total Gas, Emcure Pharma"
+AGROPHOS,IN,debt_reduction,6.0,1,0.0,NEUTRAL,routine coverage,"Hatsun Agro Standalone March 2024 Net Sales at Rs 2,046.87 crore, up 14.38% Y-o-Y"
+AIIL,IN,debt_reduction,6.0,1,0.0,NEUTRAL,routine coverage,"PVV Infra Standalone March 2024 Net Sales at Rs 12.15 crore, down 39.77% Y-o-Y"
+AARON,IN,piotroski,8.0,0,,NO_NEWS,no company-specific coverage,
+AKSHARCHEM,IN,piotroski,7.0,0,,NO_NEWS,no company-specific coverage,
+AMBICAAGAR,IN,piotroski,7.0,0,,NO_NEWS,no company-specific coverage,
+ANTELOPUS,IN,piotroski,7.0,0,,NO_NEWS,no company-specific coverage,
+ATUL,IN,piotroski,7.0,0,,NO_NEWS,no company-specific coverage,
+AMANTA,IN,piotroski,7.0,0,,NO_NEWS,no company-specific coverage,
+AARTISURF,IN,piotroski,7.0,0,,NO_NEWS,no company-specific coverage,
+AYMSYNTEX,IN,piotroski,7.0,0,,NO_NEWS,no company-specific coverage,
+ASIANHOTNR,IN,piotroski,7.0,0,,NO_NEWS,no company-specific coverage,
+AGI,IN,piotroski,7.0,0,,NO_NEWS,no company-specific coverage,
+AMBIKCO,IN,debt_reduction,6.0,0,,NO_NEWS,no company-specific coverage,
+APEX,IN,debt_reduction,6.0,0,,NO_NEWS,no company-specific coverage,
+ACUTAAS,IN,debt_reduction,6.0,0,,NO_NEWS,no company-specific coverage,
+5PAISA,IN,debt_reduction,6.0,0,,NO_NEWS,no company-specific coverage,
+AMBALALSA,IN,debt_reduction,6.0,0,,NO_NEWS,no company-specific coverage,
+AETHER,IN,debt_reduction,6.0,0,,NO_NEWS,no company-specific coverage,
+ALKEM,IN,roce_plus,6.0,0,,NO_NEWS,no company-specific coverage,
+ALGOQUANT,IN,debt_reduction,6.0,0,,NO_NEWS,no company-specific coverage,
+3BBLACKBIO,IN,debt_reduction,6.0,0,,NO_NEWS,no company-specific coverage,
+ARCHIES,IN,debt_reduction,6.0,0,,NO_NEWS,no company-specific coverage,

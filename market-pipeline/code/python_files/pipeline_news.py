@@ -42,7 +42,8 @@ from stock_utils import pct_change
 
 OUT_DIR     = Path("./news_pipeline_results"); OUT_DIR.mkdir(exist_ok=True)
 MONITOR_LOG = OUT_DIR / "news_sentiment_log.json"
-CACHE_DIR   = Path.home() / "Downloads" / "market_cache" / "ohlc"
+import data_registry as _R
+CACHE_DIR   = _R.OHLC_DIR
 
 HORIZONS = {"1d": 1, "1wk": 5, "1mo": 21, "3mo": 63}
 

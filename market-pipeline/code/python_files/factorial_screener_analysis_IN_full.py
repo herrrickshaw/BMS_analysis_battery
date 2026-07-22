@@ -36,7 +36,7 @@ SCREENERS = [
     # technical (7)
     "golden_cross", "darvas", "new_highs", "below_200dma",
     "reversal_weekly", "reversal_monthly", "low_beta",
-    # fundamental (27)
+    # fundamental (27, as of the original build)
     "piotroski", "coffee_can", "magic_formula", "bull_cartel",
     "roce_plus", "sloan_quality", "not_distress",
     "capacity_expansion", "growth_stocks", "graham_10y", "small_cap_growth",
@@ -45,6 +45,9 @@ SCREENERS = [
     "ev_ebitda_value", "peg_value", "fcf_yield",
     "eps_growth", "roic_value", "fcf_margin", "net_debt_ebitda", "ev_sales",
     "low_asset_growth", "buyback_yield",
+    # added 2026-07-18/19 (Bucket B + this analysis's own request)
+    "pe_value", "quick_ratio",
+    "operating_profit_growth", "debt_reduction_and_opgrowth",
 ]
 CONTROLS = fsa.CONTROLS
 HORIZON_LABELS = ["T+63d", "T+252d"]

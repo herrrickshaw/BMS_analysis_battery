@@ -80,7 +80,16 @@ except ImportError:
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
-CACHE_ROOT   = Path.home() / "Downloads" / "market_cache"
+# MARKET_CACHE mirrors the symbol_master.py / sentiment_pipeline.py idiom so the
+# whole tree can live outside ~/Downloads. macOS TCC denies launchd ALL access to
+# ~/Downloads, so a hardcoded root here is unwritable to the scheduled 00:30 run:
+# on 2026-07-20 this module was the ONLY MARKET_CACHE consumer still hardcoding it,
+# and _save_meta() died with PermissionError partway through the US bulk download,
+# taking the whole US scan with it. Default stays on the old path so nothing
+# changes for interactive use.
+import os as _os
+CACHE_ROOT   = Path(_os.environ.get(
+    "MARKET_CACHE", Path.home() / "Downloads" / "market_cache"))
 OHLC_DIR     = CACHE_ROOT / "ohlc"
 FUND_DIR     = CACHE_ROOT / "fundamentals"
 INDEX_DIR    = CACHE_ROOT / "index"

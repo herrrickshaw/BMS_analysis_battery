@@ -6,18 +6,29 @@ Replaces the (wiped) build_email.py. Loads the latest combined_IN / combined_US
 JSONs produced by daily_combined_report.py, adds a market-snapshot banner and a
 lightweight Darvas-breakouts section extracted directly from the freshest scan
 xlsx (replacing the wiped darvas_breakouts.py), and emits:
-  * ~/Downloads/daily_market_report_<date>.html      (email body)
-  * ~/Downloads/daily_market_report_artifact.html    (artifact page)
-Both are also copied to the scratchpad so they survive a Downloads-tree wipe.
+  * <repo>/reports/daily_market_report_<date>.html   (email body)
+  * <repo>/reports/daily_market_report_artifact.html (artifact page)
 """
 import glob, json, os, sys
 from datetime import datetime
 from pathlib import Path
 
-PF = Path.home() / "Downloads" / "code" / "python_files"
-SCRATCH = Path("/private/tmp/claude-501/-Users-umashankar/"
-               "77e79041-e575-4344-824f-9fb4e475f707/scratchpad")
-DOWNLOADS = Path.home() / "Downloads"
+import data_registry as _R
+
+# PF is this script's OWN directory. It used to be ~/Downloads/code/python_files
+# — a stale pre-migration copy of this same repo — so the "latest" scan it found
+# was combined_US_20260714 while the live tree had 20260721. Seven days out, no
+# error, because both trees exist and both look plausible. Deriving from
+# __file__ makes reading someone else's copy impossible rather than merely
+# unlikely.
+PF = Path(__file__).resolve().parent
+
+# Outputs go to the repo, not ~/Downloads: macOS TCC denies launchd all access
+# there, so a scheduled run would fail at write time. The old scratchpad mirror
+# pointed at a session UUID that no longer exists — a dead path that silently
+# wrote nowhere useful — so it is gone; the repo copy is the durable one.
+OUT_DIR = _R.REPO / "reports"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 DATE = datetime.now().strftime("%Y-%m-%d")
 DATE_H = datetime.now().strftime("%d %b %Y")
 NOW = datetime.now().strftime("%d %b %Y %H:%M")
@@ -364,13 +375,16 @@ def main():
     snap = market_snapshot()
     html = build(reports, snap, " ".join(degraded))
 
-    email_path = DOWNLOADS / f"daily_market_report_{DATE}.html"
-    art_path = DOWNLOADS / "daily_market_report_artifact.html"
-    for p in (email_path, art_path, SCRATCH / f"daily_market_report_{DATE}.html",
-              SCRATCH / "daily_market_report_artifact.html"):
+    email_path = OUT_DIR / f"daily_market_report_{DATE}.html"
+    art_path = OUT_DIR / "daily_market_report_artifact.html"
+    for p in (email_path, art_path):
         try:
             p.write_text(html)
-        except Exception as e:
+        except OSError as e:
+            # Narrow: a write failure here is a real filesystem problem
+            # (permissions, full disk) and must be visible. The previous broad
+            # except also swallowed the dead-scratchpad writes, which is why
+            # nobody noticed two of the four targets never existed.
             print(f"  write {p} failed: {e}")
     print(f"EMAIL_HTML={email_path}")
     print(f"ARTIFACT_HTML={art_path}")

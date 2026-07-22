@@ -1,0 +1,281 @@
+
+[IN] building feature panel (full universe, cap=None)...
+[IN] 4389151 symbol-days, 3435 symbols
+
+[IN] DONE:
+{
+  "market": "IN",
+  "n_symbols": 3435,
+  "n_total": 4389151,
+  "n_train": 3098996,
+  "n_test": 1290155,
+  "state_distribution": {
+    "IN_BOX": 0.6189,
+    "BREAKOUT": 0.2659,
+    "BREAKDOWN": 0.1152
+  },
+  "kappa_mean_reversion": {
+    "coef": -0.000261,
+    "se": 9.7e-05,
+    "tstat": -2.69,
+    "n_train": 1924934
+  },
+  "phi_momentum": {
+    "phi0": {
+      "coef": 0.000355,
+      "se": 4.2e-05,
+      "tstat": 8.38
+    },
+    "phi_r_t": {
+      "coef": 0.045119,
+      "se": 0.000774,
+      "tstat": 58.27
+    },
+    "phi_r_tm1": {
+      "coef": 0.009535,
+      "se": 0.00089,
+      "tstat": 10.72
+    },
+    "phi_r_tm2": {
+      "coef": 3.1e-05,
+      "se": 0.000937,
+      "tstat": 0.03
+    },
+    "phi_magnitude": {
+      "coef": -0.002014,
+      "se": 0.000215,
+      "tstat": -9.39
+    }
+  },
+  "n_train_momentum": 1174062,
+  "test_consolidation": {
+    "n": 791480,
+    "dir_acc": 0.4716,
+    "skill_vs_naive_pct": -0.002
+  },
+  "test_momentum": {
+    "n": 498675,
+    "dir_acc": 0.4922,
+    "skill_vs_naive_pct": -0.096
+  },
+  "circuit_bound_pct": 20.0
+}
+
+[US] building feature panel (full universe, cap=None)...
+[US] 8922692 symbol-days, 4924 symbols
+
+[US] DONE:
+{
+  "market": "US",
+  "n_symbols": 4924,
+  "n_total": 8922692,
+  "n_train": 6158132,
+  "n_test": 2764560,
+  "state_distribution": {
+    "IN_BOX": 0.6058,
+    "BREAKOUT": 0.294,
+    "BREAKDOWN": 0.1002
+  },
+  "kappa_mean_reversion": {
+    "coef": 0.012273,
+    "se": 0.000127,
+    "tstat": 96.36,
+    "n_train": 3719245
+  },
+  "phi_momentum": {
+    "phi0": {
+      "coef": -0.000644,
+      "se": 4.3e-05,
+      "tstat": -14.84
+    },
+    "phi_r_t": {
+      "coef": -0.123692,
+      "se": 0.00048,
+      "tstat": -257.89
+    },
+    "phi_r_tm1": {
+      "coef": -0.050292,
+      "se": 0.000568,
+      "tstat": -88.5
+    },
+    "phi_r_tm2": {
+      "coef": -0.035691,
+      "se": 0.000588,
+      "tstat": -60.68
+    },
+    "phi_magnitude": {
+      "coef": 1.2e-05,
+      "se": 1e-06,
+      "tstat": 15.57
+    }
+  },
+  "n_train_momentum": 2438887,
+  "test_consolidation": {
+    "n": 1686072,
+    "dir_acc": 0.4198,
+    "skill_vs_naive_pct": 0.127
+  },
+  "test_momentum": {
+    "n": 1078488,
+    "dir_acc": 0.4546,
+    "skill_vs_naive_pct": 1.141
+  },
+  "circuit_bound_pct": 100.0
+}
+
+[JP] building feature panel (full universe, cap=None)...
+[JP] 7569770 symbol-days, 3060 symbols
+
+[JP] DONE:
+{
+  "market": "JP",
+  "n_symbols": 3060,
+  "n_total": 7569770,
+  "n_train": 5692794,
+  "n_test": 1876976,
+  "state_distribution": {
+    "IN_BOX": 0.5708,
+    "BREAKOUT": 0.3182,
+    "BREAKDOWN": 0.1109
+  },
+  "kappa_mean_reversion": {
+    "coef": 0.000241,
+    "se": 4.7e-05,
+    "tstat": 5.19,
+    "n_train": 3253881
+  },
+  "phi_momentum": {
+    "phi0": {
+      "coef": 0.000149,
+      "se": 1.7e-05,
+      "tstat": 8.93
+    },
+    "phi_r_t": {
+      "coef": 0.003843,
+      "se": 0.000552,
+      "tstat": 6.96
+    },
+    "phi_r_tm1": {
+      "coef": -0.005385,
+      "se": 0.000609,
+      "tstat": -8.84
+    },
+    "phi_r_tm2": {
+      "coef": -0.027617,
+      "se": 0.000634,
+      "tstat": -43.54
+    },
+    "phi_magnitude": {
+      "coef": -0.0,
+      "se": 0.0,
+      "tstat": -2.37
+    }
+  },
+  "n_train_momentum": 2438913,
+  "test_consolidation": {
+    "n": 1067223,
+    "dir_acc": 0.4809,
+    "skill_vs_naive_pct": 0.025
+  },
+  "test_momentum": {
+    "n": 809753,
+    "dir_acc": 0.4815,
+    "skill_vs_naive_pct": 0.04
+  },
+  "circuit_bound_pct": 50.0
+}
+
+[KR] building feature panel (full universe, cap=None)...
+[KR] 5423664 symbol-days, 2589 symbols
+
+[KR] DONE:
+{
+  "market": "KR",
+  "n_symbols": 2589,
+  "n_total": 5423664,
+  "n_train": 3888955,
+  "n_test": 1534709,
+  "state_distribution": {
+    "IN_BOX": 0.6333,
+    "BREAKOUT": 0.2501,
+    "BREAKDOWN": 0.1166
+  },
+  "kappa_mean_reversion": {
+    "coef": -0.001944,
+    "se": 7.1e-05,
+    "tstat": -27.45,
+    "n_train": 2457916
+  },
+  "phi_momentum": {
+    "phi0": {
+      "coef": 0.000118,
+      "se": 3.2e-05,
+      "tstat": 3.66
+    },
+    "phi_r_t": {
+      "coef": 0.011649,
+      "se": 0.000691,
+      "tstat": 16.86
+    },
+    "phi_r_tm1": {
+      "coef": -0.003162,
+      "se": 0.000761,
+      "tstat": -4.15
+    },
+    "phi_r_tm2": {
+      "coef": -0.002656,
+      "se": 0.000792,
+      "tstat": -3.35
+    },
+    "phi_magnitude": {
+      "coef": -0.004013,
+      "se": 0.000148,
+      "tstat": -27.13
+    }
+  },
+  "n_train_momentum": 1431039,
+  "test_consolidation": {
+    "n": 976876,
+    "dir_acc": 0.4691,
+    "skill_vs_naive_pct": 0.011
+  },
+  "test_momentum": {
+    "n": 557833,
+    "dir_acc": 0.4683,
+    "skill_vs_naive_pct": -1.208
+  },
+  "circuit_bound_pct": 30.0
+}
+
+
+==============================================================================
+CROSS-MARKET SUMMARY
+==============================================================================
+
+IN  (3435 symbols, 4389151 symbol-days)
+  state mix: {'IN_BOX': 0.6189, 'BREAKOUT': 0.2659, 'BREAKDOWN': 0.1152}
+  kappa (consolidation mean-reversion): -0.000261  (se=0.000097, t=-2.69)
+  phi_r_t (momentum, 1-day-lag persistence): +0.045119  (se=0.000774, t=+58.27)
+  OOS consolidation: dir_acc=0.472  skill=-0.002%
+  OOS momentum: dir_acc=0.492  skill=-0.096%
+
+US  (4924 symbols, 8922692 symbol-days)
+  state mix: {'IN_BOX': 0.6058, 'BREAKOUT': 0.294, 'BREAKDOWN': 0.1002}
+  kappa (consolidation mean-reversion): +0.012273  (se=0.000127, t=+96.36)
+  phi_r_t (momentum, 1-day-lag persistence): -0.123692  (se=0.000480, t=-257.89)
+  OOS consolidation: dir_acc=0.420  skill=+0.127%
+  OOS momentum: dir_acc=0.455  skill=+1.141%
+
+JP  (3060 symbols, 7569770 symbol-days)
+  state mix: {'IN_BOX': 0.5708, 'BREAKOUT': 0.3182, 'BREAKDOWN': 0.1109}
+  kappa (consolidation mean-reversion): +0.000241  (se=0.000047, t=+5.19)
+  phi_r_t (momentum, 1-day-lag persistence): +0.003843  (se=0.000552, t=+6.96)
+  OOS consolidation: dir_acc=0.481  skill=+0.025%
+  OOS momentum: dir_acc=0.481  skill=+0.040%
+
+KR  (2589 symbols, 5423664 symbol-days)
+  state mix: {'IN_BOX': 0.6333, 'BREAKOUT': 0.2501, 'BREAKDOWN': 0.1166}
+  kappa (consolidation mean-reversion): -0.001944  (se=0.000071, t=-27.45)
+  phi_r_t (momentum, 1-day-lag persistence): +0.011649  (se=0.000691, t=+16.86)
+  OOS consolidation: dir_acc=0.469  skill=+0.011%
+  OOS momentum: dir_acc=0.468  skill=-1.208%

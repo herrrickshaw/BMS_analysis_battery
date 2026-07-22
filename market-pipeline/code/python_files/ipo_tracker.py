@@ -111,7 +111,8 @@ def discover_new_listings(lookback_days: int = LOOKBACK_DAYS,
     """
     try:
         from nse import NSE
-        cache_dir = Path.home() / "Downloads" / "market_cache"
+        import data_registry as _R
+        cache_dir = _R.MARKET_CACHE
     except ImportError:
         print("  ⚠️  nse library not available — pip install 'nse[local]'")
         return []

@@ -23,7 +23,13 @@
 #   ./daily_pipeline.sh --draft    # refresh + screen (5 markets) + save brief_today.html
 set -uo pipefail
 cd "$(dirname "$0")"
-PY=python3
+# Resolve our own venv — never inherit `python3` from the caller's PATH. A
+# manual run from a plain shell resolved python3 to homebrew 3.14 on
+# 2026-07-22 19:00: step [0] flagged missing deps, every scan died, and the
+# validation gate suppressed the send. Same split documented in
+# run_fundamentals_offhours.sh; launchd was never affected (plist sets PATH).
+PY="$(dirname "$0")/.venv/bin/python3"
+[ -x "$PY" ] || PY=python3
 LOG="daily_pipeline_$(date +%Y%m%d).log"
 mkdir -p correlation_scan
 # ── step timing ───────────────────────────────────────────────────────────────
@@ -135,6 +141,47 @@ FAILURES=()
       FAILURES+=("mailer: NOT SENT — brief failed screener.in validation (see above)")
       $PY send_mailer.py --draft || { echo "  draft save failed"; FAILURES+=("mailer: draft save"); }
   fi
+
+  # [15] Warehouse ingest + per-ticker freshness ledger — appends today's scan
+  # snapshots (and India's bhavcopy high-water mark) to Postgres market_daily.*
+  # and refreshes the ticker/name/market/last-update ledger. This went 8 days
+  # stale in July 2026 because it lived outside the pipeline and silently kept
+  # reading the abandoned ~/Downloads tree after the migration; running it here
+  # ties it to the same schedule as the data it records. NB: /usr/bin/python3,
+  # not $PY — duckdb lives there, not in the venv.
+  step "[15/15] warehouse ingest + ticker freshness ledger"
+  # Rebuild the raw 34-col archives (nse.parquet/bse.parquet) from today's
+  # day-CSVs FIRST — bhavcopy_to_db.py reads them for pg.bhavcopy.nse_raw/
+  # bse_raw. Their original builder was never committed and vanished with the
+  # ~/Downloads tree, freezing the raw layer at 2026-07-13 while everything
+  # else stayed current (found 2026-07-22).
+  $PY bhavcopy_raw_archive.py \
+    || FAILURES+=("ingest: raw bhavcopy archive refresh")
+  /usr/bin/python3 /Users/umashankar/scripts/bhavcopy_to_db.py --incremental \
+    || FAILURES+=("ingest: bhavcopy incremental")
+  /usr/bin/python3 /Users/umashankar/scripts/bhavcopy_to_db.py --to-postgres "dbname=market_data host=/tmp user=umashankar" \
+    || FAILURES+=("ingest: bhavcopy -> postgres")
+  /usr/bin/python3 /Users/umashankar/scripts/market_ingest.py \
+    || FAILURES+=("ingest: market snapshots")
+  mkdir -p reports
+  /usr/bin/python3 /Users/umashankar/scripts/market_ingest.py --csv "$PWD/reports/ticker_freshness.csv" \
+    || FAILURES+=("ingest: ticker_freshness.csv export")
+  # Financial ratios (India + US): recompute PE/PB/ROE/ROCE/margins against
+  # TODAY's closes from the off-hours fundamentals stores. Collection happens in
+  # run_fundamentals_offhours.sh (its own launchd job); this step only re-prices.
+  /usr/bin/python3 financial_ratios.py \
+    || FAILURES+=("ratios: financial_ratios rebuild")
+
+  # [16] Cloud copy — rclone-sync the data trees (market_cache, bhavcopy_cache,
+  # cache_seed, gmd cache_seed, warehouse duckdb) to Google Drive with dated
+  # history, replacing GitHub LFS as the off-machine store (LFS budget is
+  # exhausted account-wide and rewritten parquets each became a permanent
+  # blob there). Changed/deleted files move to history/<date>/, never lost.
+  # Riding this run keeps it inside the 00:10 wake window — a separate schedule
+  # would fire while the Mac sleeps (the market_ingest lesson, again).
+  step "[16/16] cloud backup (rclone -> Google Drive)"
+  /Users/umashankar/scripts/cloud_backup.sh \
+    || FAILURES+=("cloud: rclone backup (see cloud_backup.log)")
 
   if [[ ${#FAILURES[@]} -gt 0 ]]; then
     echo "[ALERT] ${#FAILURES[@]} step(s) failed: ${FAILURES[*]}"

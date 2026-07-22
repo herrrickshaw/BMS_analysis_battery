@@ -1,0 +1,211 @@
+{
+  "updatedAt": "2026-07-22T15:14:15.000Z",
+  "createdAt": "2026-07-20T15:07:51.388Z",
+  "id": "watchlistdigest001",
+  "name": "Watchlist Digest — daily 07:00",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "wd-trigger",
+      "name": "Weekdays 07:00 IST",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -420,
+        0
+      ],
+      "notes": "07:00 IST — after the 00:30 brief, before the 09:15 NSE open. Requires GENERIC_TIMEZONE=Asia/Kolkata on the n8n service; the n8n default is America/New_York, which would fire this mid-afternoon IST and drift twice a year with US daylight saving."
+    },
+    {
+      "parameters": {
+        "command": "cd /Users/umashankar/market-pipeline/code/python_files && ./.venv/bin/python3 data_index.py --require ingest"
+      },
+      "id": "wd-gate",
+      "name": "Gate: is the cache fresh?",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        0
+      ],
+      "onError": "continueErrorOutput",
+      "notes": "The article has no equivalent, because it re-fetches from a paid API every run and so cannot serve stale data. Reading a local cache is faster and free but CAN serve stale data silently — this gate is the price of that trade. Without it a market holiday or a failed ingest would produce a confident digest of Friday's prices labelled as today's."
+    },
+    {
+      "parameters": {
+        "command": "cd /Users/umashankar/market-pipeline/code/python_files && ./.venv/bin/python3 watchlist_digest.py --watchlist watchlist.csv --send"
+      },
+      "id": "wd-digest",
+      "name": "Build + send digest",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -80
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 60000,
+      "notes": "Reads watchlist.csv, prices from market_cache + bhavcopy LMDB, classifies 🟢/🔴/⚪, emails via the pipeline's existing SMTP env. Retry is safe up to the send: generation is pure, and a failed SMTP login fails before any mail leaves."
+    },
+    {
+      "parameters": {
+        "command": "=cd /Users/umashankar/market-pipeline/code/python_files && ./.venv/bin/python3 send_alert.py \"watchlist digest blocked: {{ $json.stderr || 'cache stale — ingest.sh did not produce fresh data' }}\""
+      },
+      "id": "wd-alert",
+      "name": "ALERT (stale cache)",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        80,
+        140
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Fires only on the gate's error branch. A silently-missing digest is indistinguishable from a quiet market; an alert is not."
+    },
+    {
+      "parameters": {
+        "command": "cd /Users/umashankar/market-pipeline/code/python_files && ./.venv/bin/python3 recurring_movers.py"
+      },
+      "id": "n-recurring-movers",
+      "name": "Refresh recurring movers",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "onError": "continueRegularOutput",
+      "position": [
+        440,
+        -80
+      ],
+      "notes": "Rebuilds reports/recurring_movers.csv from the signal ledger (>=2 distinct signal dates AND >=+2% since first flagged; india_factor_panel excluded as a biased sampler) and promotes the top 25 new names into watchlist.csv as `signal` tier — existing rows never touched. Runs BEFORE the digest so today's recurring movers appear in the 07:00 email. onError continues: a movers failure must not block the digest itself."
+    },
+    {
+      "parameters": {
+        "command": "cd /Users/umashankar/market-pipeline/code/python_files && ./.venv/bin/python3 justified_mailer.py --send --sync-watchlist"
+      },
+      "id": "n-justified-mailer",
+      "name": "Justified brief (send + sync)",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "onError": "continueRegularOutput",
+      "position": [
+        660,
+        -80
+      ],
+      "notes": "Builds + emails the evidence-first Justified Brief (backtest-best screen per market, evidence printed above each list) and adds today's picks to watchlist.csv as `justified` tier — rendered as its own table in the digest that follows. Runs AFTER recurring movers, BEFORE the digest, so the 07:00 digest always carries today's justified picks. onError continues: this mailer failing must not block the digest."
+    }
+  ],
+  "connections": {
+    "Weekdays 07:00 IST": {
+      "main": [
+        [
+          {
+            "node": "Gate: is the cache fresh?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gate: is the cache fresh?": {
+      "main": [
+        [
+          {
+            "node": "Refresh recurring movers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ALERT (stale cache)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Refresh recurring movers": {
+      "main": [
+        [
+          {
+            "node": "Justified brief (send + sync)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Justified brief (send + sync)": {
+      "main": [
+        [
+          {
+            "node": "Build + send digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "executionTimeout": 900
+  },
+  "staticData": {
+    "node:Weekdays 07:00 IST": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "b5a21dd6-ab9c-4f2e-895e-8092af00a971",
+  "activeVersionId": "b5a21dd6-ab9c-4f2e-895e-8092af00a971",
+  "versionCounter": 2,
+  "triggerCount": 1,
+  "sourceWorkflowId": null,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-20T15:07:51.390Z",
+      "createdAt": "2026-07-20T15:07:51.390Z",
+      "role": "workflow:owner",
+      "workflowId": "watchlistdigest001",
+      "projectId": "SuPusz5aBkGJzsoA",
+      "project": {
+        "updatedAt": "2026-07-22T13:02:59.589Z",
+        "createdAt": "2026-07-20T14:41:17.182Z",
+        "id": "SuPusz5aBkGJzsoA",
+        "name": "Umashankar TD <tdrickshaw@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "customTelemetryTags": [],
+        "creatorId": "35f985fd-a471-4bfd-aca1-20589238d3d4"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

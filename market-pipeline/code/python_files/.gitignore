@@ -1,0 +1,31 @@
+# Run logs -- stdout redirected to a file during a collector/analysis run.
+# Ephemeral by nature (rerun regenerates them); the real durable outputs are
+# the *.parquet/*.csv files those runs produce, which stay tracked.
+cache_seed/*_log.txt
+cache_seed/*_log2.txt
+cache_seed/*_log3.txt
+cache_seed/*_log4.txt
+cache_seed/*_log5.txt
+cache_seed/*_log6.txt
+cache_seed/*_log7.txt
+cache_seed/*_full_log.txt
+cache_seed/*_full_log2.txt
+cache_seed/*_sequencer_log.txt
+cache_seed/*_sequencer_log2.txt
+
+# Smoke-test artifacts -- small-sample dry runs to verify a pipeline works,
+# not the real collection. See factorial_screener_test_IN_full.py's own
+# module docstring for this convention (SMOKE_OUT_PATH vs OUT_PATH).
+cache_seed/*smoketest*.parquet
+cache_seed/*SMOKETEST*.parquet
+
+# Daily-generated mailer brief drafts -- regenerated fresh each run, same
+# "same-day cache, not durable data" convention CLAUDE.md documents for
+# us_list.csv/japan_list.csv/etc. brief_today.html (no draft/action suffix)
+# is the one committed, versioned template.
+action_brief_today.html
+brief_today_draft*.html
+
+# Raw third-party downloads cached locally before being parsed into a
+# tracked cache_seed/*.parquet -- same daily-refreshed-cache convention.
+docs_cache/

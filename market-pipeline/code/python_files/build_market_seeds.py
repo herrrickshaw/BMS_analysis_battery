@@ -28,7 +28,11 @@ try:
 except ImportError:
     clean_ohlcv = None
 
-OHLC_DIR = Path.home() / "Downloads" / "data" / "market_cache" / "market_cache" / "ohlc"
+# Was ~/Downloads/data/market_cache/market_cache/ohlc — note the doubled
+# component. That path has never existed, so line 51 raised FileNotFoundError
+# and this script could not run at all. Resolve through the registry.
+import data_registry as _R
+OHLC_DIR = _R.OHLC_DIR
 SEED_DIR = Path(__file__).parent / "cache_seed"
 
 # suffix → market code (None key = no suffix)

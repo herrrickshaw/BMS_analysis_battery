@@ -1,0 +1,155 @@
+{
+  "id": "marketpipeline001",
+  "name": "Market Pipeline — full ownership",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "cronExpression", "expression": "15 0 * * 1-5" }
+          ]
+        }
+      },
+      "id": "trg-weekday",
+      "name": "Weekdays 00:15",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-460, 0],
+      "notes": "Replaces com.umashankar.ingest.plist. NOTE: cannot fire on a sleeping Mac — `sudo pmset repeat wakeorpoweron MTWRF 00:10:00` is still required and is NOT redundant with this trigger."
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "cronExpression", "expression": "0 2 * * 6" }
+          ]
+        }
+      },
+      "id": "trg-weekend",
+      "name": "Saturday 02:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-460, 420],
+      "notes": "Research cadence. Nothing here feeds the brief."
+    },
+
+    {
+      "parameters": {
+        "command": "cd /Users/umashankar/market-pipeline/code/python_files && ./ingest.sh"
+      },
+      "id": "n-ingest",
+      "name": "1 · ingest",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [-200, 0],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 120000,
+      "notes": "~14m today, but 98% of that is symbol_master blocking on un-timeout'd FinanceDataReader/akshare calls. Retry x2 is safe: every step is incremental and idempotent."
+    },
+    {
+      "parameters": {
+        "command": "cd /Users/umashankar/market-pipeline/code/python_files && ./.venv/bin/python3 data_index.py --require ingest"
+      },
+      "id": "n-gate",
+      "name": "2 · GATE: ingest fresh?",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [40, 0],
+      "onError": "continueErrorOutput",
+      "notes": "THE hard gate. Non-zero exit = ingest data is stale/missing. On 2026-07-20 the US scan crashed, left a 3.9-day-old workbook, and the brief was built and SENT from it because every check asked 'does the file exist' not 'is it current'. Error output routes to the alert, NOT to the scans."
+    },
+
+    {
+      "parameters": {
+        "command": "cd /Users/umashankar/market-pipeline/code/python_files && ./mailer.sh"
+      },
+      "id": "n-mailer",
+      "name": "3 · mailer (scans → validate → send)",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [300, -100],
+      "retryOnFail": false,
+      "notes": "NO RETRY, deliberately. mailer.sh ends by SENDING email. A retry on a partial failure risks a second brief in the inbox. mailer.sh already suppresses the send and falls back to --draft when validate_brief.py disagrees with screener.in."
+    },
+
+    {
+      "parameters": {
+        "command": "cd /Users/umashankar/market-pipeline/code/python_files && ./modelling.sh"
+      },
+      "id": "n-modelling",
+      "name": "4 · modelling",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [-200, 420],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 300000,
+      "notes": "Correlation ×5, factor panel, PPO walk-forward, walk-forward backtest. Hours. Nothing here feeds the brief."
+    },
+    {
+      "parameters": {
+        "command": "cd /Users/umashankar/market-pipeline/code/python_files && ./factor_tests.sh"
+      },
+      "id": "n-tests",
+      "name": "5 · factor_tests",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [40, 420],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 300000,
+      "notes": "Runs AFTER modelling — reads the factor panel modelling produces. The connection is the barrier."
+    },
+
+    {
+      "parameters": {
+        "command": "cd /Users/umashankar/market-pipeline/code/python_files && ./.venv/bin/python3 run_monitor.py --history 1 2>&1 | tail -40"
+      },
+      "id": "n-monitor",
+      "name": "6 · runtime report",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [560, -100],
+      "onError": "continueRegularOutput",
+      "notes": "Per-step durations. Surfaces creep — totals ran 26m → 64m → 92m across three nights before the split."
+    },
+
+    {
+      "parameters": {
+        "command": "=cd /Users/umashankar/market-pipeline/code/python_files && ./.venv/bin/python3 send_alert.py \"n8n: {{ $json.error || 'pipeline step failed' }}\""
+      },
+      "id": "n-alert",
+      "name": "ALERT",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [300, 140],
+      "onError": "continueRegularOutput",
+      "notes": "Reuses send_alert.py so n8n alerts and shell-run alerts look identical in the inbox."
+    }
+  ],
+
+  "connections": {
+    "Weekdays 00:15":  { "main": [[{ "node": "1 · ingest", "type": "main", "index": 0 }]] },
+    "1 · ingest":      { "main": [[{ "node": "2 · GATE: ingest fresh?", "type": "main", "index": 0 }]] },
+    "2 · GATE: ingest fresh?": {
+      "main": [
+        [{ "node": "3 · mailer (scans → validate → send)", "type": "main", "index": 0 }],
+        [{ "node": "ALERT", "type": "main", "index": 0 }]
+      ]
+    },
+    "3 · mailer (scans → validate → send)": { "main": [[{ "node": "6 · runtime report", "type": "main", "index": 0 }]] },
+
+    "Saturday 02:00": { "main": [[{ "node": "4 · modelling", "type": "main", "index": 0 }]] },
+    "4 · modelling":  { "main": [[{ "node": "5 · factor_tests", "type": "main", "index": 0 }]] }
+  },
+
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "executionTimeout": 21600
+  },
+  "pinData": {}
+}

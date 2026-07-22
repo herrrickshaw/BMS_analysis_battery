@@ -119,6 +119,20 @@ except Exception as _e:  # pragma: no cover
     _BHAV_OK = False
     print(f"  ⚠️  bhavcopy_fetcher unavailable ({_e}); OHLC falls back to yfinance")
 
+
+try:
+    from breakout_quality import row_fields as _bq_fields
+except ImportError:                                  # pragma: no cover
+    # Return the KEYS with None values, never {}. signal_tracker.harvest_technical()
+    # SKIPS any market whose scan lacks a Quality_Grade column, so an empty dict
+    # would silently drop this market from the technical filter entirely — the
+    # exact failure this wiring exists to fix (only Korea emitted these columns on
+    # 2026-07-21, so all 110 technical signals were Korean).
+    def _bq_fields(df, price_round=2):
+        return {k: None for k in
+                ("EMA50", "Above_EMA50", "EMA50_Rising", "Quality_Score",
+                 "Quality_Grade", "Rel_Volume", "Compression_Ratio", "Body_Pct",
+                 "Actionable", "Recomputed_Signal")}
 # ── Constants ──────────────────────────────────────────────────────────────────
 DOWNLOAD_DIR = Path("./indian_full_scan")
 DOWNLOAD_DIR.mkdir(exist_ok=True)
@@ -384,9 +398,9 @@ def compute_darvas_box(df: pd.DataFrame, confirm: int = DARVAS_CONFIRM) -> dict:
     if not all([h_col, l_col, c_col]) or len(df) < confirm + 5:
         return {"signal": "INSUFFICIENT_DATA", "box_top": None, "box_bottom": None}
 
-    all_highs = pd.to_numeric(df[h_col], errors="coerce").fillna(0).tolist()
-    all_lows = pd.to_numeric(df[l_col], errors="coerce").fillna(0).tolist()
-    all_closes = pd.to_numeric(df[c_col], errors="coerce").fillna(0).tolist()
+    all_highs = pd.to_numeric(df[h_col], errors="coerce").tolist()
+    all_lows = pd.to_numeric(df[l_col], errors="coerce").tolist()
+    all_closes = pd.to_numeric(df[c_col], errors="coerce").tolist()
 
     current = all_closes[-1]
     highs = all_highs[:-1]
@@ -490,7 +504,7 @@ def compute_golden_crossover(df: pd.DataFrame) -> dict:
 from stock_utils import first_df as _first_df, row as _row
 
 
-def fundamental_scan(symbol: str, yf_suffix: str = ".NS") -> dict:
+def fundamental_scan(symbol: str, yf_suffix: str = ".NS", price: float = None) -> dict:
     """
     Run ALL 5 fundamental screeners for one symbol in a single Ticker() call.
 
@@ -503,7 +517,52 @@ def fundamental_scan(symbol: str, yf_suffix: str = ".NS") -> dict:
     One yfinance Ticker() → one set of HTTP calls → four screener results.
     This is the core efficiency mechanism for running all screeners on the full universe.
     """
-    try:
+    # STORE-FIRST (Phase 1: Piotroski). The off-hours collector fills
+    # IN_current.parquet across the whole alphabet; the live per-ticker yfinance
+    # fetch below throttles under ThreadPoolExecutor after ~250 names and
+    # truncates ALPHABETICALLY (its Fundamentals sheet stopped at BAJAJELEC on
+    # 2026-07-22), which is why the brief's fundamental picks were 94% A-names.
+    #
+    # A store hit costs ZERO yfinance calls, so it never contends for the rate
+    # limit. The store serves ANNUAL statements only, and reproduces yfinance's
+    # values bit-identically (verified AADHARHFC/AARTIPHARM/ABFRL), so the
+    # Piotroski block below computes an identical score. Coffee Can, Magic
+    # Formula and Bull Cartel need market cap / EBIT / equity / quarterly data
+    # the store does not yet hold, so they simply do not fire on a store hit —
+    # the SAME outcome those names already had while throttled, not a
+    # regression. Phases 2-3 add those fields and quarterly data.
+    #
+    # A store MISS falls through to the exact live path, byte-identical to
+    # before: this change can only ADD Piotroski coverage, never remove any.
+    inc = bal = cf = inc_q = None
+    mcap, info = 0, {}
+    _store_hit = False
+    if yf_suffix == ".NS":
+        try:
+            import fundamentals_store_reader as _fsr
+            inc, bal, cf = _fsr.statements(symbol)
+            _store_hit = inc is not None and bal is not None
+            if _store_hit:
+                # Phase 2: market cap = stored shares x the scan's own current
+                # price (no yfinance call), and info (totalDebt/totalCash/
+                # bookValue) from the stored balance sheet — so Coffee Can and
+                # Magic Formula run from the store too. Without a price they get
+                # (0, {}) and abstain, exactly as in Phase 1.
+                mcap, info = _fsr.mcap_and_info(symbol, price)
+                # Phase 3: quarterly income statement for Bull Cartel, from the
+                # quarterly store. None (fewer than 5 quarters) -> Bull Cartel
+                # abstains, exactly as before.
+                inc_q = _fsr.quarterly_statements(symbol)
+        except Exception:
+            inc = bal = cf = None
+            _store_hit = False
+
+    if _store_hit:
+        # inc_q stays None (no quarterly in the store) -> Bull Cartel abstains.
+        # Piotroski + Coffee Can + Magic Formula now all run from the store.
+        out = {"symbol": symbol, "error": "", "_source": "store"}
+    else:
+      try:
         ticker = yf.Ticker(f"{symbol}{yf_suffix}")
         inc = _first_df(ticker, "income_stmt", "financials")
         bal = _first_df(ticker, "balance_sheet")
@@ -517,7 +576,7 @@ def fundamental_scan(symbol: str, yf_suffix: str = ".NS") -> dict:
             info = ticker.info or {}
         except Exception:
             info = {}
-    except Exception as e:
+      except Exception as e:
         return {
             "symbol": symbol,
             "error": str(e),
@@ -533,7 +592,10 @@ def fundamental_scan(symbol: str, yf_suffix: str = ".NS") -> dict:
             "Profit_Growth_YoY_%": None,
         }
 
-    out = {"symbol": symbol, "error": ""}
+    # Preserve which source served this row — "store" (no yfinance call) vs
+    # "live" (fallback). Lets a run report store-vs-live coverage instead of
+    # guessing from timing.
+    out = {"symbol": symbol, "error": "", "_source": "store" if _store_hit else "live"}
 
     # ─────────────────────────────────────────────────────────────────────────
     # SCREENER 1 + 2: Piotroski F-Score & Coffee Can (annual statements)
@@ -852,6 +914,12 @@ def main(nse_only: bool = False, top: int = 0, run_scans: bool = True, workers: 
             "LTP": ltp,
             "Prev_Close": prev,
             "Change%": chg,
+            # Breakout quality + EMA-50 trend, computed from THIS df in THIS
+            # iteration — never a post-pass join, which is how Darvas_Signal
+            # drifted out of alignment with its own box (2,461 contradictory
+            # rows, 2026-07-21). Without these columns signal_tracker skips
+            # India entirely.
+            **_bq_fields(df, price_round=2),
             # Darvas
             "Darvas_Signal": darvas.get("signal"),
             "Box_Top": darvas.get("box_top"),
@@ -901,7 +969,11 @@ def main(nse_only: bool = False, top: int = 0, run_scans: bool = True, workers: 
         done = 0
         with ThreadPoolExecutor(max_workers=workers) as pool:
             futures = {
-                pool.submit(fundamental_scan, sym, suffix): (sym, suffix)
+                # Pass the current price so store-sourced tickers can compute
+                # market cap (shares x price) for Coffee Can / Magic Formula
+                # without a yfinance call.
+                pool.submit(fundamental_scan, sym, suffix,
+                            (ohlc_row_map.get(sym) or {}).get("LTP")): (sym, suffix)
                 for sym, suffix in all_fund_symbols
             }
             for future in as_completed(futures):

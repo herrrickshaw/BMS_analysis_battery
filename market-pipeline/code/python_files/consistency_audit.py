@@ -49,7 +49,57 @@ from datetime import datetime
 
 import pandas as pd
 
-FLOOR_USD = 120_000
+from safe_prices import Money, UnsafePrice
+
+# ── per-market liquidity floors ──────────────────────────────────────────────
+# WAS a single FLOOR_USD = 120_000 applied to all five markets. That is India's
+# POLICY floor (Rs 1 crore/day), and using it everywhere broke the check twice:
+#
+#  1. Non-India markets were judged against a floor nobody chose for them. The
+#     scans gate on adaptive_liquidity.scan_floor(), which is the STRUCTURAL
+#     floor ($10k/day) unless a policy floor was actually set — and one was set
+#     only for India. So every US/JP/KR/EU name between $10k and $120k was
+#     reported "below the floor" while being correctly admitted by the gate.
+#     That is the 872/858/652/82 warnings on 2026-07-20: all false positives.
+#  2. India's Median_Turnover column is in RUPEES, not USD. Comparing it to a
+#     USD constant is a unit error that silently PASSED — rupee turnover is ~87x
+#     the USD figure, so everything cleared 120_000 regardless of liquidity.
+#     India's real gate is Rs 1 crore, and it must be checked in rupees.
+#
+# Floors are therefore stated per market in the SAME currency as that market's
+# turnover column, and sourced from the modules the scans themselves gate on so
+# the audit cannot drift from the gate again.
+def _floors() -> dict:
+    struct, india = 10_000.0, 10_000_000.0
+    try:
+        import adaptive_liquidity as _AL
+        struct = float(_AL.scan_floor(""))          # structural, no policy floor
+    except Exception:
+        pass
+    try:
+        import scan_bhavcopy as _SB
+        india = float(_SB.LIQ_FLOOR)                # Rs 1 crore/day, native INR
+    except Exception:
+        pass
+    # Floors are Money, not (float, str). The string version was CORRECT and
+    # still unenforced — nothing stopped a caller pairing India's rupee floor
+    # with a USD column, which is exactly the bug this block documents. Money
+    # makes that pairing a TypeError at the comparison instead of a comment
+    # someone has to read.
+    return {"India":  Money(india,  "INR"),
+            "US":     Money(struct, "USD"),
+            "Europe": Money(struct, "USD"),
+            "Japan":  Money(struct, "USD"),
+            "Korea":  Money(struct, "USD")}
+
+
+# The currency each market's turnover COLUMN is denominated in. Declared next to
+# the floors so the two can be checked against each other; previously this fact
+# lived only in a comment, and a comment cannot fail.
+COLUMN_CURRENCY = {"India": "INR", "US": "USD", "Europe": "USD",
+                   "Japan": "USD", "Korea": "USD"}
+
+FLOORS = _floors()
 MIN_BARS_FOR_200DMA = 200
 
 MARKETS = [
@@ -100,12 +150,36 @@ def audit_market(name, pat, sym, ltp, tcol) -> dict:
         elif unknown > len(d) * 0.05:
             r["issues"].append(("WARN", f"{unknown:,} rows UNKNOWN ({unknown/len(d)*100:.0f}%)"))
     if tcol in d.columns:
-        below = int((pd.to_numeric(d[tcol], errors="coerce") < FLOOR_USD).sum())
+        floor = FLOORS.get(name)
+        col_ccy = COLUMN_CURRENCY.get(name)
+        if floor is None or col_ccy is None:
+            r["issues"].append(("WARN", f"no floor configured for {name}"))
+            return r
+        # THE GUARD. Comparing a Money floor to a Money sample raises when the
+        # currencies differ, so a rupee column judged against a USD floor fails
+        # HERE — loudly, at the comparison — instead of passing silently because
+        # rupee turnover is ~87x the dollar figure and clears any USD bar.
+        sample = pd.to_numeric(d[tcol], errors="coerce").dropna()
+        if not sample.empty:
+            try:
+                _ = Money(float(sample.iloc[0]), col_ccy) < floor
+            except TypeError as e:
+                r["issues"].append(("ERROR", f"currency mismatch: {e}"))
+                return r
+            except UnsafePrice as e:
+                r["issues"].append(("WARN", f"unusable turnover sample: {e}"))
+                return r
+        # Currencies agree, so the bulk comparison is safe to vectorise. Money
+        # guards the boundary; numpy does the 5,800 rows.
+        below = int((pd.to_numeric(d[tcol], errors="coerce") < floor.amount).sum())
         r["below_floor"] = below
+        r["floor"] = f"{floor.amount:,.0f} {floor.currency}"
         if below and below == len(d):
-            r["issues"].append(("ERROR", f"every row below the liquidity floor — gate not applied"))
+            r["issues"].append(("ERROR", "every row below the liquidity floor — gate not applied"))
         elif below:
-            r["issues"].append(("WARN", f"{below:,} rows below the floor"))
+            r["issues"].append(("WARN",
+                                f"{below:,} rows below the {floor.amount:,.0f} "
+                                f"{floor.currency} floor"))
     else:
         r["issues"].append(("WARN", f"no turnover column ({tcol})"))
 

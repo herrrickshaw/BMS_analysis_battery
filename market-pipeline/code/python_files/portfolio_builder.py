@@ -41,8 +41,10 @@ warnings.filterwarnings("ignore")
 
 from scipy.optimize import minimize
 
-CACHE_DIR  = Path.home() / "Downloads" / "market_cache" / "ohlc"
-INDEX_DIR  = Path.home() / "Downloads" / "market_cache" / "index"
+import os as _os
+_MC = Path(_os.environ.get("MARKET_CACHE", Path.home() / "Downloads" / "market_cache"))
+CACHE_DIR  = _MC / "ohlc"
+INDEX_DIR  = _MC / "index"
 REF_DIR    = Path.home() / "nse_screener_reference" / "ohlc_cache"
 OUT_DIR    = Path("./portfolio_results"); OUT_DIR.mkdir(exist_ok=True)
 

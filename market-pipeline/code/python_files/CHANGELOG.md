@@ -95,6 +95,46 @@ policy convergence). No pipeline decisions recovered.
 
 ---
 
+## 2026-07-22 (NSE XBRL — the point-in-time prize)
+
+### `nse_xbrl_results.py` — filing-dated quarterly fundamentals, 10+ years
+
+The user pointed at NSE's corporate-filings XBRL page; behind it sits an API
+that answers plain curl. This closes the last big gap: every India fundamentals
+source so far failed point-in-time (yfinance has no filing dates, so backtests
+guess a +90d lag; screener.in's rate limit made every panel an A-prefix sample).
+
+**Index harvested in full: 110,942 filings · 2,495 symbols · back to 2015**,
+each with `filingDate` (when the market learned the numbers), fiscal period,
+audited/consolidated flags, and the XBRL file link. Backtests can now use
+`visible_from = filingDate` — the real date, removing the biggest honesty
+caveat on the factor work.
+
+Files (~20KB each, full P&L in the in-bse-fin taxonomy) trickle in hash order,
+~2,000 per off-hours session piggybacked on the fundamentals runner — full
+history in ~8 weeks, representative at every stage.
+
+**Three parser findings, each verified before shipping:**
+- The API silently misbehaves on windows longer than a quarter (a 4.7-month
+  window returned 8 filings where its quarters held thousands) — exact
+  calendar-quarter windows only.
+- NSE's "WEB"-format files reference `contextRef="OneD"` **without defining
+  it** — invalid XBRL, but consistent; the period is synthesized from the
+  index record. This alone was 172 of the first 299 "failures".
+- Element names drift across taxonomy years (only
+  `ProfitLossForPeriodFromContinuingOperations` in 2018 files; banks use
+  `InterestEarned`) — alias lists per field.
+
+Parse rate 42% → **95%**. Periods verified: all rows bind to true 89-91-day
+quarters (zero YTD contamination — the first parse of TRIDENT took the H1 YTD
+context, ₹3,291cr instead of ₹1,797cr; the period-bound parser fixed it and the
+corrected figures match the company's published Q2FY24).
+
+Registered as `xbrl.pit_quarterly`. Consumer wiring (factor panel using
+filingDate as visible_from) is the follow-on once coverage accumulates.
+
+---
+
 ## 2026-07-22 (NSE/BSE bulk extras — six new datasets)
 
 Probed the exchanges' public endpoints directly: seven bulk files are cookie-free

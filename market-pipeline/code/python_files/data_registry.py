@@ -152,6 +152,12 @@ DATASETS: List[Dataset] = [
     # shows in data_index alongside everything else, instead of the brief
     # silently screening on old financials — the exact stale-data failure this
     # registry exists to surface.
+    Dataset("xbrl.pit_quarterly", MARKET_CACHE / "nse_xbrl" / "pit_quarterly.parquet",
+            "nse_xbrl_results.py", "ingest", "off-hours trickle (with fundamentals)", 10.0,
+            "POINT-IN-TIME quarterly P&L from NSE XBRL filings — filing-dated "
+            "(visible_from = filingDate, not a +90d proxy); 110,942 filings "
+            "indexed back to 2015; fills over ~8 weeks of off-hours sessions",
+            ["build_india_factor_panel.py"]),
     Dataset("extras.index_closes", MARKET_CACHE / "exchange_extras" / "index_closes.parquet",
             "exchange_extras.py", "ingest", DAILY, 3.0,
             "162 NSE indices/day with P/E, P/B, div yield — the REAL Nifty 50 "

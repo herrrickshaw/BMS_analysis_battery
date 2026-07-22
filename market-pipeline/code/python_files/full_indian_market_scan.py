@@ -592,7 +592,10 @@ def fundamental_scan(symbol: str, yf_suffix: str = ".NS", price: float = None) -
             "Profit_Growth_YoY_%": None,
         }
 
-    out = {"symbol": symbol, "error": ""}
+    # Preserve which source served this row — "store" (no yfinance call) vs
+    # "live" (fallback). Lets a run report store-vs-live coverage instead of
+    # guessing from timing.
+    out = {"symbol": symbol, "error": "", "_source": "store" if _store_hit else "live"}
 
     # ─────────────────────────────────────────────────────────────────────────
     # SCREENER 1 + 2: Piotroski F-Score & Coffee Can (annual statements)

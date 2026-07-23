@@ -18,7 +18,41 @@ mistakes were made, and the mistakes here have repeated.
 
 ---
 
-## 2026-07-22 (evening: US fundamentals store, ratio table, Dropbox replaces LFS)
+## 2026-07-23 (adjusted-price propagation — and a premise correction)
+
+### CORRECTION: JP/KR/CN/US panels were never raw Close
+
+The account-wide "raw Close — splits fake returns" flag (claims.yaml, memory)
+was overbroad. Verified in-panel: NTT trades ¥147 *before* its 25:1, Samsung
+₩41k *before* its 50:1, NVDA $120 through its 10:1 — fractional closes and
+back-scaled volume throughout. The non-India panels are yfinance-adjusted as of
+their last assembly. The raw-Close defect (and the +12.2% fake illiquidity
+premium it manufactured) was **India bhavcopy only**, already fixed 2026-07-21.
+
+### What actually needed fixing: post-assembly residual breaks
+
+Splits occurring after a panel's last full re-download appear as raw jumps
+(7946.T ¥3,673→¥733 5:1, 8227.T 3:1, KR cluster 2024-26). New
+`price_adjuster_global.py`: integer-ratio (≥2:1) + calm-day-band + per-market
+TURNOVER gates → 86 candidates; each must be confirmed against the yfinance
+split calendar before it may adjust → 8 confirmed (JP 2, KR 3, US 3; CN/EU 0).
+Sparse overlays written to gmd `warehouse/ohlcv_adj/{JP,KR,US}/
+corrected_symbols.parquet` — overlay-first read rule, no 700MB duplication.
+
+**Rejected along the way (each caught by validation):** sub-2 ratios (3:2, 5:4
+matched ordinary -20/-33% days — 3,002 false positives); share-count liquidity
+gate (killed thin-but-real ¥13M/day 7946.T); snapping corrections to the yf
+calendar date (panel rebases days before the official ex-date — scaling at the
+calendar date corrupted 3 already-rebased rows; scale at the OBSERVED break).
+
+**New yfinance bug (memorialised):** `history(auto_adjust=True)` serves
+UNADJUSTED prices across recent JP/KR splits even when `.splits` knows the
+event. Validate corrections by series continuity + calendar, never by comparing
+windowed returns to yf's "adjusted" history (US is fine: 3/3 exact).
+
+**Standing rule:** every panel re-assembly resets the residual set — re-run
+`price_adjuster_global.py` after any full re-download (staleness trigger in
+claims.yaml).
 
 ### cleaned_ohlcv 17,571-row surplus reconciled; loads now split append vs regenerated
 

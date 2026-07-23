@@ -637,6 +637,7 @@ def maintain(wl: pd.DataFrame) -> tuple:
 # human-readable remark so the email answers "why am I looking at this?"
 # without a trip back to signal_tracker's ledger.
 _FILTER_DESC = {
+    "value_rerating": "cheap vs sector + expanding PE (backtested)",
     "technical": "grade-A breakout (breakout_quality)",
     "triple": "triple screener confluence",
     "piotroski+debt": "Piotroski F-score + debt reduction",
@@ -778,6 +779,7 @@ def _fmt(p: Optional[float]) -> str:
 # product, not a portfolio tracker.
 CATEGORIES = (
     ("thematic",  "🎯 Thematic — leading sectors"),
+    ("vrr",       "💎 Value re-rating picks"),
     ("breakout",  "🚀 Breakout picks (grade-A quality)"),
     ("dma",       "📈 DMA crossover picks"),
     ("proce",     "🏆 Piotroski + ROCE picks"),
@@ -799,6 +801,8 @@ def pick_category(r: dict) -> str:
     if r.get("status") == "watch":
         return "watch"
     n = (r.get("note") or "").lower()
+    if "value_rerating" in n:
+        return "vrr"
     if n.startswith("technical") or "breakout" in n:
         return "breakout"
     if "golden_cross" in n or "dma" in n:
@@ -882,8 +886,8 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
     priced = [r for r in rows if not r["missing"]]
     miss_rows = [r for r in rows if r["missing"]]
 
-    cap = 10 ** 6 if full else 5
-    scap = 10 ** 6 if full else 5
+    cap = 10 ** 6 if full else 4
+    scap = 10 ** 6 if full else 4
 
     def _img(key, alt):
         src = (images or {}).get(key)
@@ -1099,7 +1103,8 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
                              f"buy-zone names in today's strongest sectors: {theme_names}",
                              thematic, sector_col=True))
     SUBTITLE = {
-        "breakout": "breakout_quality grade-A across all five market scans",
+        "vrr": "cheap vs own sector + expanding 12M PE — backtested +5.3% Q1−Q5/6M",
+    "breakout": "breakout_quality grade-A across all five market scans",
         "dma": "golden-cross / moving-average alignment screens",
         "proce": "canonical 9-pt Piotroski F + 3-pt ROCE block",
         "pdebt": "Piotroski F + year-on-year debt reduction",

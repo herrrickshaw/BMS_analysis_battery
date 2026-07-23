@@ -71,6 +71,17 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### value_rerating — the screen the backtests earned
+
+screen_value_rerating.py, pipeline step [13z/14] (runs BEFORE the mailer so
+today's picks are in today's email): cheap vs own sector (within-industry PE
+percentile ≤ 0.20) ∩ re-rating (12M ΔlnPE > 0), ₹1cr/day liquidity-gated at
+source, top-15 rank-blend promoted to watchlist.csv as `signal` rows with
+entry stamps. First run: 18 passers, 11 new — a PSU-bank re-rating cluster
+(CANBK, UNIONBANK, KTKBANK, BANKINDIA), industrials, healthcare. Digest grew
+a 💎 Value re-rating category (chip, section, why-parser). Body re-trimmed to
+100 KB (card cap 5→4).
+
 ### PE anomaly backtests (India, 2017-2026) — both user hypotheses tested
 
 backtest_pe_anomalies.py + reports/pe_anomaly_backtest.md. 1,458 NSE names,

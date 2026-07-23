@@ -129,6 +129,15 @@ FAILURES=()
   # with NO liquidity gate when the FX fetch failed; India momentum-only) was
   # invisible in its own scan and obvious side by side. Non-fatal: it registers a
   # FAILURE so the alert fires, without blocking a brief that is mostly sound.
+  # [13z] Value re-rating screen (India) — the combined signal the PE
+  # backtests earned (2026-07-23): cheap vs own sector ∩ expanding 12M PE,
+  # ₹1cr/day liquidity-gated at source, top-15 promoted to watchlist.csv as
+  # `signal` rows BEFORE the mailer builds, so today's picks are in today's
+  # email. Reads only local parquets (screener history + adjusted panel).
+  step "[13z/14] value re-rating screen (India)"
+  $PY screen_value_rerating.py \
+    || FAILURES+=("screen: value re-rating (India)")
+
   step "[13a/14] cross-market consistency audit"
   $PY consistency_audit.py || FAILURES+=("consistency: cross-market anomaly (see audit above)")
 

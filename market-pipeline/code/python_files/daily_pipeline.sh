@@ -183,6 +183,19 @@ FAILURES=()
   /Users/umashankar/scripts/cloud_backup.sh \
     || FAILURES+=("cloud: rclone backup (see cloud_backup.log)")
 
+  # [17] IUDX flood-sensor archive — pulls latest readings for the 77-sensor
+  # EnvFlood fleet (Pune/Chennai/Kalyan-Dombivli) into ~/iudx-flood-collector/
+  # flood.duckdb. Until the 3 provider access requests (PENDING since
+  # 2026-07-23) are approved this collects 0 rows but doubles as the daily
+  # approval-checker: the run after an approval starts archiving automatically.
+  # IUDX serves live snapshots only, so the accumulated history IS the asset
+  # (bhavcopy thesis). /usr/bin/python3, not $PY — duckdb, same as step [15].
+  # Riding this run for the same reason as [16]: a separate schedule would
+  # fire while the Mac sleeps.
+  step "[17/17] IUDX flood-sensor collect"
+  /usr/bin/python3 /Users/umashankar/iudx-flood-collector/collector.py \
+    || FAILURES+=("iudx: flood collector (see access_log in flood.duckdb)")
+
   if [[ ${#FAILURES[@]} -gt 0 ]]; then
     echo "[ALERT] ${#FAILURES[@]} step(s) failed: ${FAILURES[*]}"
     $PY send_alert.py "${FAILURES[@]}" || echo "  alert email itself failed to send"

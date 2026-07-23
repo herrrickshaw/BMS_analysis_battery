@@ -2,6 +2,19 @@
 
 Decisions and material changes to the pipeline, newest first.
 
+## 2026-07-23 — IUDX flood-sensor collector rides the pipeline as [17/17]
+
+- **`~/iudx-flood-collector/collector.py` appended as step [17/17]** — archives
+  India's 77-sensor urban flood fleet (Pune 46 / Chennai 27+3 / Kalyan-Dombivli 1)
+  from IUDX into `flood.duckdb`. DECISION: ride `daily_pipeline.sh` instead of
+  its own launchd job — a separate schedule would fire while the Mac sleeps
+  (the market_ingest lesson; same reasoning as [16]). DECISION: keep it in the
+  run even though it archives 0 rows today — all 3 provider access requests are
+  PENDING (filed 2026-07-23 via ACL-APD), and the daily run doubles as the
+  approval-checker: first run after approval starts archiving with no config
+  change. Rejected alternative: wait for approval before scheduling — that
+  turns "approved" into a fact someone must notice manually.
+
 ## 2026-07-23 — Korea fundamentals from DART; J-Quants V2 validator; EC2 gap-fill
 
 - **Korea joins financial_ratios via official DART filings** (`dart_kr_store.py`

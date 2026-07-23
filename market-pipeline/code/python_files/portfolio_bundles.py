@@ -185,10 +185,36 @@ def maybe_build(rows: List[dict], frames: dict) -> dict:
     return store
 
 
+def _bench_since(rows: List[dict], frames: dict, mkt: str, since: str) -> Optional[float]:
+    """Equal-weight market benchmark return (%) from `since` to the last bar.
+
+    The active-vs-index question (Weiner 2022, user-supplied): a bundle is an
+    active mini-fund, so its since-formation return is only meaningful NET of
+    what simply owning the market's pick universe returned over the same
+    window. Alpha, not absolute return, is the bundle's report card.
+    """
+    rets = []
+    t0 = pd.Timestamp(since)
+    for r in rows:
+        if r["market"] != mkt or r.get("missing"):
+            continue
+        s = _closes(frames, r)
+        if s is None:
+            continue
+        # anchor at the last close AT OR BEFORE formation — the same bar the
+        # members' px_formation used, so bundle and benchmark share a window
+        # (day 0: alpha = 0 by construction, not n/a)
+        past = s[s.index <= t0]
+        if len(past):
+            rets.append(float((s.iloc[-1] / past.iloc[-1] - 1) * 100))
+    return float(np.mean(rets)) if len(rets) >= 10 else None
+
+
 def value(store: dict, rows: List[dict], frames: dict) -> List[dict]:
     """Daily valuation of the standing bundles from current frames."""
     out = []
     by_key = {(r["market"], r["symbol"]): r for r in rows}
+    bench_cache: Dict[tuple, Optional[float]] = {}
     for b in store.get("bundles", []):
         vals = []
         for m in b["members"]:
@@ -207,13 +233,20 @@ def value(store: dict, rows: List[dict], frames: dict) -> List[dict]:
             continue
         tot = sum(v["cur_val"] for v in vals) or 1
         drift = max(abs(v["cur_val"] / tot - v["m"]["weight"]) for v in vals)
+        since = sum(v["since"] * v["m"]["weight"] for v in vals)
+        bk = (b["market"], b["formed"])
+        if bk not in bench_cache:
+            bench_cache[bk] = _bench_since(rows, frames, b["market"], b["formed"])
+        bench = bench_cache[bk]
         out.append({
             "bundle": b,
             "d1": sum(v["d1"] * v["m"]["weight"] for v in vals),
-            "since": sum(v["since"] * v["m"]["weight"] for v in vals),
+            "since": since,
+            "alpha": (since - bench) if bench is not None else None,
             "drift": drift * 100,
             "members": vals,
             "sell_now": sum(1 for v in vals if v["zone_now"] == "SELL"),
         })
-    out.sort(key=lambda x: -x["since"])
+    # rank by alpha where measurable — beating the market is the point
+    out.sort(key=lambda x: -(x["alpha"] if x["alpha"] is not None else x["since"]))
     return out

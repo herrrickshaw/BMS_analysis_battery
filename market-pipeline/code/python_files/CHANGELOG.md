@@ -71,6 +71,16 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Bundles report ALPHA, not absolute return
+
+Takeaway adopted from the user-supplied active-vs-index literature (Weiner
+2022): a bundle is an active mini-fund, so its since-formation return is only
+meaningful NET of what simply owning the market's pick universe returned over
+the same window. value() now computes each bundle's alpha vs an equal-weight
+benchmark of ALL its market's picks, anchored to the same last-bar-≤-formation
+close the members use (day 0 → α = 0 by construction, never n/a); bundles are
+RANKED by alpha and the card prints "α +x.x% vs market".
+
 ### Model portfolios — the watchlist as a bundling tool
 
 portfolio_bundles.py (user, 2026-07-23): single-stock picks are now bundled

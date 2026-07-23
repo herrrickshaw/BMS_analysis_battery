@@ -1074,6 +1074,11 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
                 f'{v["d1"]:+.2f}% today</span> '
                 f'<span style="font-size:12px;color:{sic}">{v["since"]:+.1f}% since '
                 f'formation</span> '
+                + (f'<span style="font-size:12px;font-weight:600;color:'
+                   f'{"#0c6b58" if v["alpha"] >= 0 else "#ca3433"}">'
+                   f'α {v["alpha"]:+.1f}% vs market</span> '
+                   if v.get("alpha") is not None else "")
+                + 
                 f'<span style="font-size:11px;color:#8aa0ae">drift {v["drift"]:.1f}pp</span>'
                 f'<table cellspacing="0" cellpadding="0" style="border-collapse:'
                 f'collapse;margin:3px 0"><tr>{cells}</tr></table>'

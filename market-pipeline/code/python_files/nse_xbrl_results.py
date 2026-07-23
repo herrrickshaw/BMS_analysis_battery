@@ -77,6 +77,12 @@ UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
       "Referer": "https://www.nseindia.com/companies-listing/corporate-filings-financial-results"}
 API = ("https://www.nseindia.com/api/corporates-financial-results"
        "?index=equities&period=Quarterly&from_date={f}&to_date={t}")
+# SEBI's integrated-filing framework moved mainstream results here from the
+# Dec-2024 quarter: the legacy API keeps only stragglers after early 2025
+# (Oct-Dec 2025 window: legacy 59 rows vs integrated totalCount 7,349 —
+# found 2026-07-23). Paginated: size up to 5000 + page.
+API_IF = ("https://www.nseindia.com/api/integrated-filing-results"
+          "?index=equities&from_date={f}&to_date={t}&size={size}&page={page}")
 RATE = 0.8
 BREAKER = 40          # consecutive file failures = a block, stop
 
@@ -150,6 +156,71 @@ def fetch_index(quarters: int) -> pd.DataFrame:
     tmp = INDEX_PQ.with_suffix(".parquet.tmp")
     allf.to_parquet(tmp, index=False); tmp.replace(INDEX_PQ)
     print(f"  index: {len(allf)} filings, {allf['symbol'].nunique()} symbols -> {INDEX_PQ.name}")
+    return allf
+
+
+def fetch_index_integrated(quarters: int) -> pd.DataFrame:
+    """Integrated-filing index (results after ~Dec-2024), mapped onto the
+    legacy schema and merged into the same parquet. seq ids are prefixed
+    'IF' — the two APIs' id spaces are unrelated. A quarter present in BOTH
+    APIs double-lists some filings; downstream studies dedup on
+    (symbol, toDate) keep-first-broadcast, so this is harmless there."""
+    old = pd.read_parquet(INDEX_PQ) if INDEX_PQ.exists() else pd.DataFrame()
+    frames = [old] if not old.empty else []
+    s = requests.Session(); s.headers.update(UA)
+    s.get("https://www.nseindia.com/companies-listing/"
+          "corporate-filings-financial-results", timeout=45)
+    for f, t in _windows(quarters):
+        page, got, total = 1, 0, None
+        while True:
+            u = API_IF.format(f=f.strftime("%d-%m-%Y"),
+                              t=t.strftime("%d-%m-%Y"), size=5000, page=page)
+            try:
+                r = s.get(u, timeout=60)
+                r.raise_for_status()
+                j = r.json()
+            except Exception as e:
+                print(f"  IF window {f}..{t} p{page}: FAILED "
+                      f"{type(e).__name__}: {str(e)[:60]}")
+                break
+            d = pd.DataFrame(j.get("data", []))
+            total = j.get("totalCount")
+            if d.empty:
+                break
+            qe = pd.to_datetime(d["qe_Date"], format="%d-%b-%Y",
+                                errors="coerce")
+            mapped = pd.DataFrame({
+                "symbol": d["symbol"],
+                "companyName": d["cmName"],
+                "broadCastDate": d["broadcast_Date"],
+                "filingDate": d["creation_Date"],
+                "toDate": qe.dt.strftime("%d-%b-%Y"),
+                "fromDate": (qe - pd.offsets.QuarterBegin(startingMonth=1))
+                            .dt.strftime("%d-%b-%Y"),
+                "xbrl": d["xbrl"],
+                "consolidated": d["consolidated"],
+                "audited": d["audited"],
+                "period": "Quarterly",
+                "relatingTo": d["type_Sub"],
+                "seqNumber": "IF" + d["seq_Id"].astype(str),
+            })
+            frames.append(mapped)
+            got += len(d)
+            if got >= (total or 0) or len(d) < 5000:
+                break
+            page += 1
+            time.sleep(RATE)
+        print(f"  IF window {f}..{t}: {got} filings (total {total})")
+        time.sleep(2)
+    if not frames:
+        return old
+    allf = pd.concat(frames, ignore_index=True)
+    allf = allf.drop_duplicates(subset=["seqNumber"], keep="first")
+    ROOT.mkdir(parents=True, exist_ok=True)
+    tmp = INDEX_PQ.with_suffix(".parquet.tmp")
+    allf.to_parquet(tmp, index=False); tmp.replace(INDEX_PQ)
+    print(f"  index: {len(allf)} filings, {allf['symbol'].nunique()} symbols "
+          f"-> {INDEX_PQ.name}")
     return allf
 
 
@@ -334,6 +405,8 @@ def main() -> int:
     a = ap.parse_args()
     if a.index:
         fetch_index(a.quarters)
+        # integrated-filing API carries the mainstream post-2024 results
+        fetch_index_integrated(a.quarters)
     if a.files:
         fetch_files(a.limit)
     if a.parse:

@@ -18,6 +18,35 @@ mistakes were made, and the mistakes here have repeated.
 
 ---
 
+## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
+
+### The XBRL × CA × bhavcopy join is live (pit_event_studies.py)
+
+Three fully point-in-time India studies on adjusted prices, abnormal vs daily
+market median, broadcast-timestamp anchored (after-15:30 -> next trading day):
+1. PEAD on 64,263 filing-dated events, announcement-return quintiles within
+   quarter: Q5−Q1 CAR63 spread only +1.09% — announcement-sorted PEAD is WEAK
+   in India. 🔴 levels are biased (+13% all quintiles: filing universe vs
+   microcap-median benchmark + within-window survivorship) — spreads only.
+2. Surprise-sorted PEAD: n=83 (parse coverage) — noise until queue drains.
+3. Post-CA (722 splits/bonuses, 10y): +14.4%/+9.9% abnormal RUN-UP in the 20d
+   before ex-date, ~0% after (47% hit) — the anticipation trade exists, the
+   post-event trade does not. Follow-on: anchor on caBroadcastDate
+   (announcement) instead of ex-date to see how much of the run-up is
+   tradeable.
+
+### DISCOVERY: NSE moved mainstream results to the integrated-filing API
+
+The "2025 is thin" gap in results_index was not a collection failure: under
+SEBI's integrated-filing framework (Dec-2024 quarter onward), mainstream
+quarterly results stopped flowing to api/corporates-financial-results — the
+legacy endpoint now returns only stragglers (59 rows for Oct-Dec-2025 where
+7,349 exist). New endpoint found and wired in permanently
+(api/integrated-filing-results, paginated size<=5000, schema mapped onto the
+legacy one, seq ids prefixed IF): index now 151,928 filings / 2,794 symbols,
+2025-26 at full ~7,300/quarter volume. Any NSE-results consumer that still
+reads only the legacy API is silently losing post-2024 coverage.
+
 ## 2026-07-23 (later: regime conditioning; JP/KR scoring was silently broken)
 
 ### CORRECTION: JP/KR signals never scored — join bug, not stale panels

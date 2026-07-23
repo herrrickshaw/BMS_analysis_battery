@@ -183,6 +183,26 @@ FAILURES=()
   /Users/umashankar/scripts/cloud_backup.sh \
     || FAILURES+=("cloud: rclone backup (see cloud_backup.log)")
 
+  # [16b] Monthly snapshot of the purged-watchlist archive to Dropbox (user,
+  # 2026-07-23). Rides the pipeline instead of owning a monthly schedule: the
+  # pmset 00:25 wake guarantees THIS job fires, while a standalone monthly
+  # cron on a sleeping Mac is silently skipped and runs a month late. The
+  # marker file makes it exactly-once per calendar month — the first pipeline
+  # run of a new month uploads the cumulative CSV as watchlist_purged_YYYY-MM.csv.
+  PURGE_MARK="$HOME/.local/state/watchlist_purged_last_archive"
+  THIS_MONTH="$(date +%Y-%m)"
+  if [[ -f watchlist_purged.csv && "$(cat "$PURGE_MARK" 2>/dev/null)" != "$THIS_MONTH" ]]; then
+    step "[16b] monthly purged-watchlist snapshot -> Dropbox"
+    if /opt/homebrew/bin/rclone copyto watchlist_purged.csv \
+         "dropbox:market-data-archive/watchlist_purged/watchlist_purged_${THIS_MONTH}.csv" \
+         --retries 3; then
+      mkdir -p "$(dirname "$PURGE_MARK")" && printf '%s' "$THIS_MONTH" > "$PURGE_MARK"
+      echo "  archived watchlist_purged.csv -> Dropbox (${THIS_MONTH})"
+    else
+      FAILURES+=("archive: purged watchlist -> Dropbox")
+    fi
+  fi
+
   # [17] IUDX flood-sensor archive — pulls latest readings for the 77-sensor
   # EnvFlood fleet (Pune/Chennai/Kalyan-Dombivli) into ~/iudx-flood-collector/
   # flood.duckdb. Until the 3 provider access requests (PENDING since

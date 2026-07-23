@@ -57,6 +57,17 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Monthly Dropbox snapshot of the purged-watchlist archive
+
+daily_pipeline.sh [16b]: on the first pipeline run of each calendar month,
+watchlist_purged.csv is rclone-copied to
+dropbox:market-data-archive/watchlist_purged/watchlist_purged_YYYY-MM.csv.
+Exactly-once via a marker file (~/.local/state/watchlist_purged_last_archive);
+rides the pipeline rather than owning a monthly cron because the pmset 00:25
+wake guarantees the pipeline fires while a standalone monthly schedule on a
+sleeping Mac is silently skipped. First snapshot (2026-07, 7.3 KB) uploaded
+and verified on Dropbox at setup.
+
 ### Full digest rides as an .html attachment
 
 render() grew a `full=True` mode (same rows, no caps: every zone row, all

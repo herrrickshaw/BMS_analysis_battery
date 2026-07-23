@@ -2,6 +2,20 @@
 
 Decisions and material changes to the pipeline, newest first.
 
+## 2026-07-23 — Annual IMD rainfall refresh as [18/18] (self-guarded no-op)
+
+- **`~/iudx-flood-collector/annual_refresh.py` appended as [18/18]** — each
+  Jan/Feb, once (marker file), re-pulls the two newest IMD 0.25° grids
+  (prior year revised + finalized year), rewrites the 12-city daily series,
+  recomputes metrics/charts, mails the summary, pushes kalki_flooding.
+  DECISION: guard lives inside the script, pipeline calls it daily — a
+  standalone January launchd date would fire while the Mac sleeps (the
+  market_ingest lesson, third time). DECISION: refresh re-pulls TWO years —
+  IMD revises its real-time product after the fact, so last year's
+  "final" numbers change; single-year refresh would freeze the revision.
+  E2E-tested 2026-07-23 with --force --no-mail (dup-free rewrite verified,
+  test marker removed so Jan-2026 still fires).
+
 ## 2026-07-23 — IUDX flood-sensor collector rides the pipeline as [17/17]
 
 - **`~/iudx-flood-collector/collector.py` appended as step [17/17]** — archives
@@ -56,6 +70,20 @@ mistakes were made, and the mistakes here have repeated.
 ---
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
+
+### Sell-zone audit (user query) — data verified sound; held-row clock fixed
+
+User challenged green rows in the Sell zone (CME +5.28% showing "43d/6").
+Audit findings: (1) NOT a bug — the dot is the 1-day move, the zone is trend
+position; CME closed 249.90 vs EMA50 254.18, GFI 33.15 vs 36.64 — green
+bounces inside 2-month downtrends, exactly what the table exists to catch.
+(2) KR "grade-A breakout" names with −20% 5d: warehouse series verified clean
+(no dup dates / splits / scale breaks) — KOSDAQ names genuinely crashed
+together on 07-16 and 07-20, and breakout_quality graded them A on 07-21 on
+patterns the crash had invalidated; the sell-streak clock is correctly
+cleaning up after the scanner. (3) Real bug fixed: held rows showed the
+eviction countdown ("43d/6") though held names are never auto-evicted — now a
+plain grey "43d"; sell-zone subtitle states both rules.
 
 ### Monthly Dropbox snapshot of the purged-watchlist archive
 

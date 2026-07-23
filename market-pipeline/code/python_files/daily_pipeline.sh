@@ -216,6 +216,17 @@ FAILURES=()
   /usr/bin/python3 /Users/umashankar/iudx-flood-collector/collector.py \
     || FAILURES+=("iudx: flood collector (see access_log in flood.duckdb)")
 
+  # [18] Annual IMD rainfall refresh — self-guarded: no-ops except in Jan/Feb
+  # and only once per year (marker analysis/data/.refresh_done_<Y>). When IMD
+  # finalizes last year it re-pulls the revised grids, rewrites the 12-city
+  # series, recomputes metrics, mails the summary, and pushes kalki_flooding.
+  # Riding this run for the usual reason: a standalone January schedule would
+  # fire while the Mac sleeps and silently never happen. $PY (venv), not
+  # /usr/bin/python3 — imdlib's numpy/xarray chain lives there + ./pkgs.
+  step "[18/18] annual IMD rainfall refresh (Jan/Feb no-op guard)"
+  $PY /Users/umashankar/iudx-flood-collector/annual_refresh.py \
+    || FAILURES+=("rain: annual IMD refresh (see kalki_flooding)")
+
   # NOTE: the watchlist digest no longer has its own step. It rides INSIDE
   # send_mailer.py at [14/14] — brief + digest are ONE email (user,
   # 2026-07-23) — and that call also runs watchlist hygiene (entry backfill,

@@ -1,860 +1,884 @@
-symbol,market,status,note
-A,US,held,
-AAPL,US,held,
-ABT,US,held,
-AIA,US,held,
-AMD,US,held,
-AMGN,US,held,
-AMZN,US,held,
-ASML,US,held,
-AVGO,US,held,
-BABA,US,held,
-BAC,US,held,
-BATRK,US,held,
-BKR,US,held,
-BRK.B,US,held,
-CL,US,held,
-CLH,US,held,
-CME,US,held,
-COP,US,held,
-CORN,US,held,
-COST,US,held,
-CTRA,US,held,
-CVX,US,held,
-CWK,US,held,
-CWT,US,held,
-DELL,US,held,
-DHR,US,held,
-DIS,US,held,
-DXC,US,held,
-ECL,US,held,
-EEM,US,held,
-EMR,US,held,
-EQH,US,held,
-ES,US,held,
-EWJ,US,held,
-EWT,US,held,
-EWY,US,held,
-FDP,US,held,
-FDX,US,held,
-FL,US,held,
-FLS,US,held,
-FSLR,US,held,
-GFI,US,held,
-GLNG,US,held,
-GLW,US,held,
-GNK,US,held,
-GOOG,US,held,
-GTLB,US,held,
-HD,US,held,
-HSBC,US,held,
-IBM,US,held,
-INFY,US,held,
-INTC,US,held,
-IR,US,held,
-IWM,US,held,
-IZRL,US,held,
-JCI,US,held,
-JHML,US,held,
-JNJ,US,held,
-KHC,US,held,
-KO,US,held,
-KR,US,held,
-KSA,US,held,
-LNG,US,held,
-LYB,US,held,
-MARA,US,held,
-MCO,US,held,
-MELI,US,held,
-MET,US,held,
-META,US,held,
-MLAB,US,held,
-MNDY,US,held,
-MNKD,US,held,
-MSCI,US,held,
-MT,US,held,
-MTCH,US,held,
-MTD,US,held,
-NEXT,US,held,
-NTGR,US,held,
-NVDA,US,held,
-NVO,US,held,
-OXY,US,held,
-PEGA,US,held,
-PG,US,held,
-RIO,US,held,
-RKLB,US,held,
-RWR,US,held,
-SAP,US,held,
-SE,US,held,
-SHEL,US,held,
-SOXL,US,held,
-SPGI,US,held,
-SU,US,held,
-SWK,US,held,
-SYK,US,held,
-T,US,held,
-TFLO,US,held,
-TMO,US,held,
-TMUS,US,held,
-TSLA,US,held,
-TSM,US,held,
-TTE,US,held,
-TXN,US,held,
-UBS,US,held,
-UGI,US,held,
-V,US,held,
-VLO,US,held,
-VVV,US,held,
-VZ,US,held,
-WIT,US,held,
-WM,US,held,
-WMT,US,held,
-XOM,US,held,
-ADM,US,sold,
-AMC,US,sold,
-ARM,US,sold,
-BCE,US,sold,
-BLNK,US,sold,
-BMBL,US,sold,
-CAT,US,sold,
-CGBSW,US,sold,
-CRSP,US,sold,
-CSAN,US,sold,
-DNUT,US,sold,
-ENPH,US,sold,
-EW,US,sold,
-F,US,sold,
-FRSH,US,sold,
-GFS,US,sold,
-HES,US,sold,
-HUM,US,sold,
-IART,US,sold,
-K,US,sold,
-KE,US,sold,
-KLG,US,sold,
-LIT,US,sold,
-MANU,US,sold,
-MDB,US,sold,
-MED,US,sold,
-MRNA,US,sold,
-MU,US,sold,
-NKE,US,sold,
-ON,US,sold,
-PFE,US,sold,
-PZZA,US,sold,
-QCLN,US,sold,
-SSL,US,sold,
-WBD,US,sold,
-WKHS,US,sold,
-AARTISURF,IN,held,Aarti Surfactants
-SPLPETRO,IN,held,Supreme Petrochem
-TNPETRO,IN,held,Tamilnadu Petroproducts
-CASTROLIND,IN,held,Castrol India
-TNPL,IN,held,TN Newsprint & Papers
-SUZLON,IN,held,Suzlon Energy
-CEWATER,IN,held,Concord Enviro Systems
-SENORES,IN,held,Senores Pharmaceuticals
-CARRARO,IN,held,Carraro India
-VENTIVE,IN,held,Ventive Hospitality
-UNIMECH,IN,held,Unimech Aerospace
-INDOFARM,IN,held,Indo Farm Equipment
-NIFTYBEES,IN,held,Nippon Nifty BEES ETF
-PSUBNKBEES,IN,held,Nippon PSU Bank BEES ETF
-ADANIPORTS,IN,sold,
-ANURAS,IN,sold,
-APOLLO,IN,sold,
-ASMTEC,IN,sold,
-AWHCL,IN,sold,
-AWL,IN,sold,
-BANDHANBNK,IN,sold,
-BCPL,IN,sold,
-BEL,IN,sold,
-BHEL,IN,sold,
-BIHSPONG,IN,sold,
-CAPLIPOINT,IN,sold,
-CDSL,IN,sold,
-CGPOWER,IN,sold,
-COCHINSHIP,IN,sold,
-CREDITACC,IN,sold,
-CRISIL,IN,sold,
-CROMPTON,IN,sold,
-CUPID,IN,sold,
-DHAMPURSUG,IN,sold,
-DLF,IN,sold,
-DLINKINDIA,IN,sold,
-EASEMYTRIP,IN,sold,
-FEDFINA,IN,sold,
-FORTIS,IN,sold,
-GALAXYSURF,IN,sold,
-GICRE,IN,sold,
-GODAVARIB,IN,sold,
-GOLDBEES,IN,sold,
-HCLTECH,IN,sold,
-HDFCLIFE,IN,sold,
-HMVL,IN,sold,
-HYUNDAI,IN,sold,
-INDSUCR,IN,sold,
-INDUSINDBK,IN,sold,
-IOC,IN,sold,
-IRFC,IN,sold,
-ITI,IN,sold,
-J&KBANK,IN,sold,
-JUBLFOOD,IN,sold,
-KLRFM,IN,sold,
-KOTAKBANK,IN,sold,
-LAFFANSQ,IN,sold,
-M&M,IN,sold,
-MAHLIFE,IN,sold,
-MASTEK,IN,sold,
-NBCC,IN,sold,
-NDTV,IN,sold,
-NETWORK18,IN,sold,
-NH,IN,sold,
-NHPC,IN,sold,
-NIACL,IN,sold,
-NMDC,IN,sold,
-NTPC,IN,sold,
-PATANJALI,IN,sold,
-PNB,IN,sold,
-PROZONER,IN,sold,
-RCF,IN,sold,
-RENUKA,IN,sold,
-RRKABEL,IN,sold,
-SAIL,IN,sold,
-STCINDIA,IN,sold,
-STYLEBAAZA,IN,sold,
-SUMICHEM,IN,sold,
-SUNTV,IN,sold,
-SYNGENE,IN,sold,
-SYRMA,IN,sold,
-TATAELXSI,IN,sold,
-TITAGARH,IN,sold,
-TRACXN,IN,sold,
-TRITURBINE,IN,sold,
-UJJIVANSFB,IN,sold,
-VINYLINDIA,IN,sold,
-WELSPLSOL,IN,sold,
-WELSPUNLIV,IN,sold,
-ZEEMEDIA,IN,sold,
-ABFRL,IN,watch,
-ADANIGREEN,IN,watch,
-ADANIPOWER,IN,watch,
-AGARIND,IN,watch,
-AJANTSOY,IN,watch,
-AKUMS,IN,watch,
-AKZOINDIA,IN,watch,
-AMARAJABAT,IN,watch,
-ANANTRAJ,IN,watch,
-ANTONY,IN,watch,
-ARIHANTSUP,IN,watch,
-ASAHIINDIA,IN,watch,
-ATFL,IN,watch,
-AVANTIFEED,IN,watch,
-AXISBANK,IN,watch,
-AXITA,IN,watch,
-AZAD,IN,watch,
-BAAZARSTYLE,IN,watch,
-BAJFINANCE,IN,watch,
-BANARISUG,IN,watch,
-BANKINDIA,IN,watch,
-BANNARIAMM,IN,watch,
-BATLIBOI,IN,watch,
-BCCL,IN,watch,
-BEARDSELL,IN,watch,
-BECTORFOOD,IN,watch,
-BHARTIARTL,IN,watch,
-BIHARSPNG,IN,watch,
-BINDALAGRO,IN,watch,
-BIOCON,IN,watch,
-BLS,IN,watch,
-BLSE,IN,watch,
-BPCL,IN,watch,
-BRITANNIA,IN,watch,
-CANBK,IN,watch,
-CEATLTD,IN,watch,
-CENTURYTEX,IN,watch,
-CESC,IN,watch,
-CHAMBLFERT,IN,watch,
-CHENNPETRO,IN,watch,
-CIPLA,IN,watch,
-COALINDIA,IN,watch,
-COASTCORP,IN,watch,
-COFFEEDAY,IN,watch,
-COLPAL,IN,watch,
-COMBAG,IN,watch,
-CONCORDENV,IN,watch,
-COROMANDEL,IN,watch,
-CUMMINSIND,IN,watch,
-DAVANAGERE,IN,watch,
-DECANGOLD,IN,watch,
-DEEPAKFERT,IN,watch,
-DEEPAKNTR,IN,watch,
-DEEPINDS,IN,watch,
-DELHIVERY,IN,watch,
-DONEAR,IN,watch,
-EDELWEISS,IN,watch,
-EICHERMOT,IN,watch,
-EKI,IN,watch,
-EMAMIPAP,IN,watch,
-EMBASSY,IN,watch,
-ENDURANCE,IN,watch,
-ENGINERSIN,IN,watch,
-ESCORTS,IN,watch,
-EXIDEIND,IN,watch,
-FINPIPE,IN,watch,
-GAIL,IN,watch,
-GANDHAR,IN,watch,
-GANGAFORG,IN,watch,
-GATEWAY,IN,watch,
-GEPIL,IN,watch,
-GET&D,IN,watch,
-GMBREW,IN,watch,
-GMDC,IN,watch,
-GMRINFRA,IN,watch,
-GODREJAGRO,IN,watch,
-GOLDIAM,IN,watch,
-GOLKALUM,IN,watch,
-GREAVESCOT,IN,watch,
-GSAUTO,IN,watch,
-GSPL,IN,watch,
-GUJGASLTD,IN,watch,
-GUJTEX,IN,watch,
-HAL,IN,watch,
-HARRMALAYA,IN,watch,
-HATHWAY,IN,watch,
-HATSUN,IN,watch,
-HAVELLS,IN,watch,
-HDFC,IN,watch,
-HDFCBANK,IN,watch,
-HERANBA,IN,watch,
-HIINFRA,IN,watch,
-HINDALCO,IN,watch,
-HINDPETRO,IN,watch,
-HITECH,IN,watch,
-HONASA,IN,watch,
-ICICIBANK,IN,watch,
-IDBI,IN,watch,
-IDEA,IN,watch,
-IDFCFIRSTB,IN,watch,
-IIFL,IN,watch,
-INDIACEM,IN,watch,
-INDIAGLYCO,IN,watch,
-INDIGOPNTS,IN,watch,
-INDOTECH,IN,watch,
-INDSUC,IN,watch,
-INDSWFTLAB,IN,watch,
-INFY,IN,watch,
-INOXWIND,IN,watch,
-IOLCP,IN,watch,
-IRCTC,IN,watch,
-ITC,IN,watch,
-ITDC,IN,watch,
-IXIGO,IN,watch,
-JINDALDRLL,IN,watch,
-JINDALSAW,IN,watch,
-JKLAKSHMI,IN,watch,
-JKPAPER,IN,watch,
-JKTYRE,IN,watch,
-JKUMAR,IN,watch,
-JSWENERGY,IN,watch,
-KALLAMTEX,IN,watch,
-KECL,IN,watch,
-KHADIM,IN,watch,
-KRBL,IN,watch,
-KRIDHANINF,IN,watch,
-KVB,IN,watch,
-LAFFANS,IN,watch,
-LATENTVIEW,IN,watch,
-LIBERTSHOE,IN,watch,
-LOYALTEX,IN,watch,
-M&MFIN,IN,watch,
-MADRASFERT,IN,watch,
-MAHINDCIE,IN,watch,
-MANGCHEFER,IN,watch,
-MAPMYINDIA,IN,watch,
-MARICO,IN,watch,
-MARINE,IN,watch,
-MARUTI,IN,watch,
-MATRIMONY,IN,watch,
-MAZDOCK,IN,watch,
-MGL,IN,watch,
-MHRIL,IN,watch,
-MINDTREE,IN,watch,
-MKPROT,IN,watch,
-MORARJEE,IN,watch,
-MOTHERSON,IN,watch,
-MPSLTD,IN,watch,
-MRPL,IN,watch,
-MRSBECTORS,IN,watch,
-MTARTECH,IN,watch,
-NATCOPHARM,IN,watch,
-NATIONALUM,IN,watch,
-NAUKRI,IN,watch,
-NAZARA,IN,watch,
-NLCINDIA,IN,watch,
-NSDL,IN,watch,
-NYKAA,IN,watch,
-OFSS,IN,watch,
-OIL,IN,watch,
-OLAELECTRIC,IN,watch,
-OMAXE,IN,watch,
-ONGC,IN,watch,
-PADAMCOT,IN,watch,
-PARAGMILK,IN,watch,
-PATELINT,IN,watch,
-PETRONET,IN,watch,
-PFC,IN,watch,
-PIDILITIND,IN,watch,
-PNBHOUSING,IN,watch,
-POKARNA,IN,watch,
-PRAJIND,IN,watch,
-PREMIERENE,IN,watch,
-PROTEAN,IN,watch,
-PROZONE,IN,watch,
-PUNJABCHEM,IN,watch,
-PVR,IN,watch,
-RAILTEL,IN,watch,
-RAIN,IN,watch,
-RANEENGINE,IN,watch,
-RAYMOND,IN,watch,
-RAYMONDREL,IN,watch,
-RECLTD,IN,watch,
-REDINGTON,IN,watch,
-RELIANCE,IN,watch,
-RHFL,IN,watch,
-RPOWER,IN,watch,
-RSIL,IN,watch,
-RVNL,IN,watch,
-SAGILITY,IN,watch,
-SANDUMA,IN,watch,
-SAPPHIRE,IN,watch,
-SBILIFE,IN,watch,
-SBIN,IN,watch,
-SCHNEIDER,IN,watch,
-SCI,IN,watch,
-SHAKTIPUMP,IN,watch,
-SIEMENS,IN,watch,
-SIMBHALS,IN,watch,
-SKFINDIA,IN,watch,
-SOUTHBANK,IN,watch,
-SPCENET,IN,watch,
-STALLION,IN,watch,
-STC,IN,watch,
-STOVEKRAFT,IN,watch,
-SUNPHARMA,IN,watch,
-SUPREMEPETRO,IN,watch,
-SWIGGY,IN,watch,
-TARAPUR,IN,watch,
-TARTRIND,IN,watch,
-TATACONSUM,IN,watch,
-TATAMOTORS,IN,watch,
-TATAPOWER,IN,watch,
-TATASTEEL,IN,watch,
-TCI,IN,watch,
-TCPLPACK,IN,watch,
-TEJASNET,IN,watch,
-THERMAX,IN,watch,
-TIRUMALCHM,IN,watch,
-TITAN,IN,watch,
-TRIVENI,IN,watch,
-TRIVENTINE,IN,watch,
-TTML,IN,watch,
-TVSMOTOR,IN,watch,
-UCOBANK,IN,watch,
-UGROCAP,IN,watch,
-UNIONBANK,IN,watch,
-UNITEDTEA,IN,watch,
-VADILALIND,IN,watch,
-VALORE,IN,watch,
-VBL,IN,watch,
-VEDL,IN,watch,
-VIJAYA,IN,watch,
-VIKRAMSOLR,IN,watch,
-VJLAXMIE,IN,watch,
-VMART,IN,watch,
-VOLTAS,IN,watch,
-WAAREEENER,IN,watch,
-WABAG,IN,watch,
-WELSPUNSPEC,IN,watch,
-WIPRO,IN,watch,
-WSTCSTPAPR,IN,watch,
-YESBANK,IN,watch,
-YUVRAAJ,IN,watch,
-ZEEL,IN,watch,
-ZODIAC,IN,watch,
-ZOMATO,IN,watch,
-5360,KR,signal,technical 2026-07-21
-94800,KR,signal,technical 2026-07-21
-15020,KR,signal,technical 2026-07-21
-69460,KR,signal,technical 2026-07-21
-380540,KR,signal,technical 2026-07-21
-9310,KR,signal,technical 2026-07-21
-3680,KR,signal,technical 2026-07-21
-ASIANHOTNR,IN,signal,piotroski+debt 2026-07-21
-ATUL,IN,signal,piotroski+debt 2026-07-21
-AARNAV,IN,signal,piotroski+debt 2026-07-21
-AYMSYNTEX,IN,signal,piotroski+debt 2026-07-21
-AARON,IN,signal,piotroski+debt 2026-07-21
-AMANTA,IN,signal,piotroski+debt 2026-07-21
-AGI,IN,signal,piotroski+debt 2026-07-21
-ANTELOPUS,IN,signal,piotroski+debt 2026-07-21
-AJANTPHARM,IN,signal,piotroski+debt 2026-07-21
-ANUP,IN,signal,piotroski+debt 2026-07-21
-INDOSTAR,IN,signal,golden_cross 2026-07-13 (backfilled)
-KONNDOR,IN,signal,golden_cross 2026-07-13 (backfilled)
-VAIBHAVGBL,IN,signal,golden_cross 2026-07-13 (backfilled)
-NARPROP,IN,signal,golden_cross 2026-07-13 (backfilled)
-BDH,IN,signal,golden_cross 2026-07-13 (backfilled)
-RUDRAGAS,IN,signal,golden_cross 2026-07-13 (backfilled)
-MAHESHWARI,IN,signal,golden_cross 2026-07-13 (backfilled)
-PANCHSHEEL,IN,signal,golden_cross 2026-07-13 (backfilled)
-CORDSCABLE,IN,signal,golden_cross 2026-07-13 (backfilled)
-SUPRATRE,IN,signal,golden_cross 2026-07-13 (backfilled)
-UNICHEMLAB,IN,signal,golden_cross 2026-07-13 (backfilled)
-SVARTCORP,IN,signal,golden_cross 2026-07-13 (backfilled)
-LMFA,US,signal,golden_cross 2026-07-13 (backfilled)
-GREE,US,signal,golden_cross 2026-07-13 (backfilled)
-RTB,US,signal,golden_cross 2026-07-13 (backfilled)
-ASBP,US,signal,golden_cross 2026-07-13 (backfilled)
-PML,US,signal,golden_cross 2026-07-13 (backfilled)
-IPHA,US,signal,golden_cross 2026-07-13 (backfilled)
-DLY,US,signal,golden_cross 2026-07-13 (backfilled)
-THRM,US,signal,golden_cross 2026-07-13 (backfilled)
-RRR,US,signal,golden_cross 2026-07-13 (backfilled)
-HRL,US,signal,golden_cross 2026-07-13 (backfilled)
-MNPR,US,signal,golden_cross 2026-07-13 (backfilled)
-EVEXIA,IN,signal,golden_cross 2026-07-13 (backfilled)
-UPBD,US,signal,golden_cross 2026-07-13 (backfilled)
-NAMSW,US,signal,golden_cross 2026-07-14 (backfilled)
-ARL,US,signal,golden_cross 2026-07-14 (backfilled)
-CCK,US,signal,golden_cross 2026-07-14 (backfilled)
-BN,US,signal,golden_cross 2026-07-14 (backfilled)
-CNH,US,signal,golden_cross 2026-07-14 (backfilled)
-BAX,US,signal,golden_cross 2026-07-14 (backfilled)
-IGI,US,signal,golden_cross 2026-07-14 (backfilled)
-FORR,US,signal,golden_cross 2026-07-14 (backfilled)
-DORM,US,signal,golden_cross 2026-07-14 (backfilled)
-USA,US,signal,golden_cross 2026-07-14 (backfilled)
-GEN,US,signal,golden_cross 2026-07-14 (backfilled)
-DBX,US,signal,golden_cross 2026-07-14 (backfilled)
-VRNS,US,signal,golden_cross 2026-07-14 (backfilled)
-ICUI,US,signal,golden_cross 2026-07-14 (backfilled)
-DFP,US,signal,golden_cross 2026-07-14 (backfilled)
-JYNT,US,signal,golden_cross 2026-07-14 (backfilled)
-TTWO,US,signal,golden_cross 2026-07-15 (backfilled)
-AGIO,US,signal,golden_cross 2026-07-15 (backfilled)
-RPAY,US,signal,golden_cross 2026-07-15 (backfilled)
-OTLK,US,signal,golden_cross 2026-07-15 (backfilled)
-MSW,US,signal,golden_cross 2026-07-15 (backfilled)
-9202,JP,signal,golden_cross 2026-07-15 (backfilled)
-9082,JP,signal,golden_cross 2026-07-15 (backfilled)
-4221,JP,signal,golden_cross 2026-07-15 (backfilled)
-2882,JP,signal,golden_cross 2026-07-15 (backfilled)
-3076,JP,signal,golden_cross 2026-07-15 (backfilled)
-3632,JP,signal,golden_cross 2026-07-15 (backfilled)
-9997,JP,signal,golden_cross 2026-07-15 (backfilled)
-4728,JP,signal,golden_cross 2026-07-15 (backfilled)
-9686,JP,signal,golden_cross 2026-07-15 (backfilled)
-PNDORA.CO,EU,signal,golden_cross 2026-07-15 (backfilled)
-OTOEL.AT,EU,signal,golden_cross 2026-07-15 (backfilled)
-LRE.L,EU,signal,golden_cross 2026-07-15 (backfilled)
-FSG.L,EU,signal,golden_cross 2026-07-15 (backfilled)
-ZAL.F,EU,signal,golden_cross 2026-07-15 (backfilled)
-EXFY,US,signal,golden_cross 2026-07-15 (backfilled)
-LINK,US,signal,golden_cross 2026-07-15 (backfilled)
-PMA,US,signal,golden_cross 2026-07-15 (backfilled)
-IFBD,US,signal,golden_cross 2026-07-15 (backfilled)
-38880,KR,signal,golden_cross 2026-07-15 (backfilled)
-54940,KR,signal,golden_cross 2026-07-15 (backfilled)
-AUSTENG,IN,signal,golden_cross 2026-07-15 (backfilled)
-KRISHIVAL,IN,signal,golden_cross 2026-07-15 (backfilled)
-TOTEM,IN,signal,golden_cross 2026-07-15 (backfilled)
-360ONE,IN,signal,golden_cross 2026-07-15 (backfilled)
-GANESHHOU,IN,signal,golden_cross 2026-07-15 (backfilled)
-RESPONIND,IN,signal,golden_cross 2026-07-15 (backfilled)
-NDRAUTO,IN,signal,golden_cross 2026-07-15 (backfilled)
-GALXBRG,IN,signal,golden_cross 2026-07-15 (backfilled)
-TRABI,IN,signal,golden_cross 2026-07-15 (backfilled)
-DATAMATICS,IN,signal,golden_cross 2026-07-15 (backfilled)
-GKCONS,IN,signal,golden_cross 2026-07-15 (backfilled)
-AJAXENGG,IN,signal,golden_cross 2026-07-15 (backfilled)
-GARFIBRES,IN,signal,golden_cross 2026-07-15 (backfilled)
-HOMEFIRST,IN,signal,golden_cross 2026-07-15 (backfilled)
-GREENLAM,IN,signal,golden_cross 2026-07-15 (backfilled)
-IGARASHI,IN,signal,golden_cross 2026-07-15 (backfilled)
-20MICRONS,IN,signal,golden_cross 2026-07-15 (backfilled)
-JD.L,EU,signal,golden_cross 2026-07-16 (backfilled)
-HEN3.F,EU,signal,golden_cross 2026-07-16 (backfilled)
-NCC.L,EU,signal,golden_cross 2026-07-16 (backfilled)
-CLDN.L,EU,signal,golden_cross 2026-07-17 (backfilled)
-BRSC.L,EU,signal,golden_cross 2026-07-17 (backfilled)
-BBOX.L,EU,signal,golden_cross 2026-07-17 (backfilled)
-4443,JP,signal,golden_cross 2026-07-17 (backfilled)
-7033,JP,signal,golden_cross 2026-07-17 (backfilled)
-3475,JP,signal,golden_cross 2026-07-17 (backfilled)
-BLUEJET,IN,signal,golden_cross 2026-07-17 (backfilled)
-HARIOMPIPE,IN,signal,golden_cross 2026-07-17 (backfilled)
-RAMCOIND,IN,signal,golden_cross 2026-07-17 (backfilled)
-2820,JP,signal,golden_cross 2026-07-17 (backfilled)
-CHOLAFIN,IN,signal,golden_cross 2026-07-17 (backfilled)
-PPL,IN,signal,golden_cross 2026-07-17 (backfilled)
-FOSECOIND,IN,signal,golden_cross 2026-07-17 (backfilled)
-PRICOLLTD,IN,signal,golden_cross 2026-07-17 (backfilled)
-WINDLAS,IN,signal,golden_cross 2026-07-17 (backfilled)
-APTUS,IN,signal,golden_cross 2026-07-17 (backfilled)
-PICCADIL,IN,signal,golden_cross 2026-07-17 (backfilled)
-JINDWORLD,IN,signal,golden_cross 2026-07-17 (backfilled)
-FDC,IN,signal,golden_cross 2026-07-17 (backfilled)
-ONMOBILE,IN,signal,golden_cross 2026-07-17 (backfilled)
-ROTO,IN,signal,golden_cross 2026-07-17 (backfilled)
-6333,JP,signal,golden_cross 2026-07-17 (backfilled)
-8923,JP,signal,golden_cross 2026-07-17 (backfilled)
-3420,JP,signal,golden_cross 2026-07-17 (backfilled)
-3753,JP,signal,golden_cross 2026-07-17 (backfilled)
-6276,JP,signal,golden_cross 2026-07-20 (backfilled)
-5269,JP,signal,golden_cross 2026-07-20 (backfilled)
-4543,JP,signal,golden_cross 2026-07-20 (backfilled)
-8147,JP,signal,golden_cross 2026-07-20 (backfilled)
-8075,JP,signal,golden_cross 2026-07-20 (backfilled)
-6915,JP,signal,golden_cross 2026-07-20 (backfilled)
-5938,JP,signal,golden_cross 2026-07-20 (backfilled)
-8424,JP,signal,golden_cross 2026-07-20 (backfilled)
-6325,JP,signal,golden_cross 2026-07-20 (backfilled)
-2818,JP,signal,golden_cross 2026-07-20 (backfilled)
-1787,JP,signal,golden_cross 2026-07-20 (backfilled)
-7060,JP,signal,golden_cross 2026-07-20 (backfilled)
-5909,JP,signal,golden_cross 2026-07-20 (backfilled)
-5108,JP,signal,golden_cross 2026-07-20 (backfilled)
-3020,JP,signal,golden_cross 2026-07-20 (backfilled)
-JLHL,IN,signal,golden_cross 2026-07-20 (backfilled)
-TCBX,US,signal,golden_cross 2026-07-20 (backfilled)
-SBCF,US,signal,golden_cross 2026-07-20 (backfilled)
-HQY,US,signal,golden_cross 2026-07-20 (backfilled)
-IOTR,US,signal,golden_cross 2026-07-20 (backfilled)
-RCL,US,signal,golden_cross 2026-07-20 (backfilled)
-ITW,US,signal,golden_cross 2026-07-20 (backfilled)
-SHC,US,signal,golden_cross 2026-07-20 (backfilled)
-ATRA,US,signal,golden_cross 2026-07-20 (backfilled)
-KMB,US,signal,golden_cross 2026-07-20 (backfilled)
-PRPL,US,signal,golden_cross 2026-07-20 (backfilled)
-APM,US,signal,golden_cross 2026-07-20 (backfilled)
-NMIH,US,signal,golden_cross 2026-07-20 (backfilled)
-INDP,US,signal,golden_cross 2026-07-20 (backfilled)
-CRNX,US,signal,golden_cross 2026-07-20 (backfilled)
-DT,US,signal,golden_cross 2026-07-20 (backfilled)
-FWONA,US,signal,golden_cross 2026-07-20 (backfilled)
-ONCH,US,signal,golden_cross 2026-07-20 (backfilled)
-MS-PQ,US,signal,golden_cross 2026-07-20 (backfilled)
-ESNT,US,signal,golden_cross 2026-07-20 (backfilled)
-VINCOFE,IN,signal,golden_cross 2026-07-20 (backfilled)
-INDHOTEL,IN,signal,golden_cross 2026-07-20 (backfilled)
-IKIO,IN,signal,golden_cross 2026-07-20 (backfilled)
-MKS.L,EU,signal,golden_cross 2026-07-20 (backfilled)
-DBK.F,EU,signal,golden_cross 2026-07-20 (backfilled)
-FME.F,EU,signal,golden_cross 2026-07-20 (backfilled)
-RED.MC,EU,signal,golden_cross 2026-07-20 (backfilled)
-NAVKARCORP,IN,signal,golden_cross 2026-07-20 (backfilled)
-EIMCOELECO,IN,signal,golden_cross 2026-07-20 (backfilled)
-MAITHANALL,IN,signal,golden_cross 2026-07-20 (backfilled)
-KMEW,IN,signal,golden_cross 2026-07-20 (backfilled)
-UDS,IN,signal,golden_cross 2026-07-20 (backfilled)
-PRINCEPIPE,IN,signal,golden_cross 2026-07-20 (backfilled)
-PPLPHARMA,IN,signal,golden_cross 2026-07-20 (backfilled)
-FWONK,US,signal,golden_cross 2026-07-20 (backfilled)
-WBX,US,signal,golden_cross 2026-07-20 (backfilled)
-TARIL,IN,signal,golden_cross 2026-07-20 (backfilled)
-NAAS,US,signal,golden_cross 2026-07-20 (backfilled)
-3536,JP,signal,golden_cross 2026-07-21 (backfilled)
-4680,JP,signal,golden_cross 2026-07-21 (backfilled)
-4206,JP,signal,golden_cross 2026-07-21 (backfilled)
-4053,JP,signal,golden_cross 2026-07-21 (backfilled)
-3769,JP,signal,golden_cross 2026-07-21 (backfilled)
-8281,JP,signal,golden_cross 2026-07-21 (backfilled)
-6995,JP,signal,golden_cross 2026-07-21 (backfilled)
-2533,JP,signal,golden_cross 2026-07-21 (backfilled)
-457600,KR,signal,technical 2026-07-21
-54410,KR,signal,technical 2026-07-21
-400,KR,signal,technical 2026-07-21
-101160,KR,signal,technical 2026-07-21
-44340,KR,signal,technical 2026-07-21
-5430,KR,signal,technical 2026-07-21
-446540,KR,signal,technical 2026-07-21
-31980,KR,signal,technical 2026-07-21
-127120,KR,signal,technical 2026-07-21
-227610,KR,signal,technical 2026-07-21
-6370,KR,signal,technical 2026-07-21
-30720,KR,signal,technical 2026-07-21
-212560,KR,signal,technical 2026-07-21
-219130,KR,signal,technical 2026-07-21
-26910,KR,signal,technical 2026-07-21
-475150,KR,signal,technical 2026-07-21
-94840,KR,signal,technical 2026-07-21
-61090,KR,signal,technical 2026-07-21
-214260,KR,signal,technical 2026-07-21
-36930,KR,signal,technical 2026-07-21
-33560,KR,signal,technical 2026-07-21
-66590,KR,signal,technical 2026-07-21
-212710,KR,signal,technical 2026-07-21
-144960,KR,signal,technical 2026-07-21
-119850,KR,signal,technical 2026-07-21
-310200,KR,signal,technical 2026-07-21
-270520,KR,signal,technical 2026-07-21
-263800,KR,signal,technical 2026-07-21
-91970,KR,signal,technical 2026-07-21
-348030,KR,signal,technical 2026-07-21
-399720,KR,signal,technical 2026-07-21
-79940,KR,signal,technical 2026-07-21
-1540,KR,signal,technical 2026-07-21
-53350,KR,signal,technical 2026-07-21
-236200,KR,signal,technical 2026-07-21
-71200,KR,signal,technical 2026-07-21
-57540,KR,signal,technical 2026-07-21
-104040,KR,signal,technical 2026-07-21
-35610,KR,signal,technical 2026-07-21
-94860,KR,signal,technical 2026-07-21
-6120,KR,signal,technical 2026-07-21
-20120,KR,signal,technical 2026-07-21
-17890,KR,signal,technical 2026-07-21
-6340,KR,signal,technical 2026-07-21
-33130,KR,signal,technical 2026-07-21
-42420,KR,signal,technical 2026-07-21
-93380,KR,signal,technical 2026-07-21
-52330,KR,signal,technical 2026-07-21
-192390,KR,signal,technical 2026-07-21
-91440,KR,signal,technical 2026-07-21
-8490,KR,signal,technical 2026-07-21
-26890,KR,signal,technical 2026-07-21
-120240,KR,signal,technical 2026-07-21
-175330,KR,signal,technical 2026-07-21
-244920,KR,signal,technical 2026-07-21
-131290,KR,signal,technical 2026-07-21
-38390,KR,signal,technical 2026-07-21
-348350,KR,signal,technical 2026-07-21
-361670,KR,signal,technical 2026-07-21
-5670,KR,signal,technical 2026-07-21
-90850,KR,signal,technical 2026-07-21
-82210,KR,signal,technical 2026-07-21
-270870,KR,signal,technical 2026-07-21
-105560,KR,signal,technical 2026-07-21
-185490,KR,signal,technical 2026-07-21
-70590,KR,signal,technical 2026-07-21
-318010,KR,signal,technical 2026-07-21
-332370,KR,signal,technical 2026-07-21
-73240,KR,signal,technical 2026-07-21
-3690,KR,signal,technical 2026-07-21
-55550,KR,signal,technical 2026-07-21
-58630,KR,signal,technical 2026-07-21
-71950,KR,signal,technical 2026-07-21
-80010,KR,signal,technical 2026-07-21
-453340,KR,signal,technical 2026-07-21
-14100,KR,signal,technical 2026-07-21
-7070,KR,signal,technical 2026-07-21
-45060,KR,signal,technical 2026-07-21
-21650,KR,signal,technical 2026-07-21
-2820,KR,signal,technical 2026-07-21
-79650,KR,signal,technical 2026-07-21
-14710,KR,signal,technical 2026-07-21
-136490,KR,signal,technical 2026-07-21
-145210,KR,signal,technical 2026-07-21
-89970,KR,signal,technical 2026-07-21
-86060,KR,signal,technical 2026-07-21
-6090,KR,signal,technical 2026-07-21
-9240,KR,signal,technical 2026-07-21
-4430,KR,signal,technical 2026-07-21
-66620,KR,signal,technical 2026-07-21
-16920,KR,signal,technical 2026-07-21
-95610,KR,signal,technical 2026-07-21
-319660,KR,signal,technical 2026-07-21
-481070,KR,signal,technical 2026-07-21
-290690,KR,signal,technical 2026-07-21
-17650,KR,signal,technical 2026-07-21
-237750,KR,signal,technical 2026-07-21
-89860,KR,signal,technical 2026-07-21
-222040,KR,signal,technical 2026-07-21
-85810,KR,signal,technical 2026-07-21
-43590,KR,signal,technical 2026-07-21
-8410,JP,signal,technical 2026-07-21
-4197,JP,signal,technical 2026-07-21
-8101,JP,signal,technical 2026-07-21
-7867,JP,signal,technical 2026-07-21
-4441,JP,signal,technical 2026-07-21
-GREEL,US,signal,technical 2026-07-21
-GRN,US,signal,technical 2026-07-21
-EPR-PC,US,signal,technical 2026-07-21
-ACP,US,signal,technical 2026-07-21
-CRAC,US,signal,technical 2026-07-21
-PANNERGY.BD,EU,signal,technical 2026-07-21
-FCH.L,EU,signal,technical 2026-07-21
-PUM.F,EU,signal,technical 2026-07-21
-SZG.F,EU,signal,technical 2026-07-21
-2175,JP,signal,technical 2026-07-21
-7175,JP,signal,technical 2026-07-22
-3946,JP,signal,technical 2026-07-22
-65690,KR,signal,technical 2026-07-22
-AGM-PD,US,signal,technical 2026-07-22
-VOYA-PB,US,signal,technical 2026-07-22
-12690,KR,signal,technical 2026-07-22
-SDF.F,EU,signal,technical 2026-07-22
-362320,KR,signal,technical 2026-07-22
-1811,JP,signal,technical 2026-07-22
-SMJF,US,signal,technical 2026-07-22
-HVII,US,signal,technical 2026-07-22
-KCHV,US,signal,technical 2026-07-22
-FACT,US,signal,technical 2026-07-22
-6138,JP,signal,technical 2026-07-22
-ANSC,US,signal,technical 2026-07-22
-4249,JP,signal,technical 2026-07-22
-HELP,US,signal,recurring x2 +13.9% since 2026-07-21
-IOVA,US,signal,recurring x2 +9.2% since 2026-07-21
-XNCR,US,signal,recurring x2 +8.7% since 2026-07-21
-FET,US,signal,recurring x2 +8.4% since 2026-07-21
-TPC,US,signal,recurring x2 +7.7% since 2026-07-21
-ACVA,US,signal,recurring x2 +7.0% since 2026-07-21
-FTK,US,signal,recurring x2 +6.5% since 2026-07-21
-BWEN,US,signal,recurring x2 +6.3% since 2026-07-21
-FBIO,US,signal,recurring x2 +6.0% since 2026-07-21
-BULL,US,signal,recurring x2 +6.0% since 2026-07-21
-VOC,US,signal,recurring x2 +5.6% since 2026-07-21
-RGP,US,signal,recurring x2 +5.4% since 2026-07-21
-ZBIO,US,signal,recurring x2 +5.4% since 2026-07-21
-ETON,US,signal,recurring x2 +5.2% since 2026-07-21
-HFCL,IN,justified,96.4% of 52w-hi @ 2026-07-22
-KPL,IN,justified,95.8% of 52w-hi @ 2026-07-22
-YASHO,IN,justified,100.0% of 52w-hi @ 2026-07-22
-SPORTKING,IN,justified,100.0% of 52w-hi @ 2026-07-22
-STLTECH,IN,justified,495.1% 6m mom @ 2026-07-22
-DEEDEV,IN,justified,209.9% 6m mom @ 2026-07-22
-BLISSGVS,IN,justified,175.8% 6m mom @ 2026-07-22
-GVPIL,IN,justified,164.4% 6m mom @ 2026-07-22
-CPPLUS,IN,justified,142.7% 6m mom @ 2026-07-22
-CLBK,US,justified,21.5 RSI @ 2026-07-22
-KKRT,US,justified,22.9 RSI @ 2026-07-22
-IONS,US,justified,24.3 RSI @ 2026-07-22
-SNEX,US,justified,24.7 RSI @ 2026-07-22
-SSTK,US,justified,25.0 RSI @ 2026-07-22
-SJT,US,justified,25.1 RSI @ 2026-07-22
-PNR,US,justified,25.9 RSI @ 2026-07-22
-AA,US,justified,26.1 RSI @ 2026-07-22
-LAC,US,justified,26.2 RSI @ 2026-07-22
-PRTS,US,justified,26.7 RSI @ 2026-07-22
-210980.KS,KR,justified,7.3 RSI @ 2026-07-22
-051360.KQ,KR,justified,14.2 RSI @ 2026-07-22
-084680.KS,KR,justified,18.1 RSI @ 2026-07-22
-246690.KQ,KR,justified,19.8 RSI @ 2026-07-22
-106190.KQ,KR,justified,20.4 RSI @ 2026-07-22
-179900.KQ,KR,justified,20.9 RSI @ 2026-07-22
-006490.KS,KR,justified,20.9 RSI @ 2026-07-22
-476040.KQ,KR,justified,21.5 RSI @ 2026-07-22
-043100.KQ,KR,justified,21.9 RSI @ 2026-07-22
-365340.KQ,KR,justified,22.2 RSI @ 2026-07-22
-6928.T,JP,justified,25.6 RSI @ 2026-07-22
-5393.T,JP,justified,28.2 RSI @ 2026-07-22
-4109.T,JP,justified,28.3 RSI @ 2026-07-22
-4222.T,JP,justified,28.6 RSI @ 2026-07-22
-6047.T,JP,justified,28.6 RSI @ 2026-07-22
-6619.T,JP,justified,28.7 RSI @ 2026-07-22
-7564.T,JP,justified,28.9 RSI @ 2026-07-22
-6616.T,JP,justified,29.0 RSI @ 2026-07-22
-6908.T,JP,justified,29.3 RSI @ 2026-07-22
-9412.T,JP,justified,29.4 RSI @ 2026-07-22
+symbol,market,status,note,entry_date,entry_price
+A,US,held,,,
+AAPL,US,held,,,
+ABT,US,held,,,
+AIA,US,held,,,
+AMD,US,held,,,
+AMGN,US,held,,,
+AMZN,US,held,,,
+ASML,US,held,,,
+AVGO,US,held,,,
+BABA,US,held,,,
+BAC,US,held,,,
+BATRK,US,held,,,
+BKR,US,held,,,
+BRK.B,US,held,,,
+CL,US,held,,,
+CLH,US,held,,,
+CME,US,held,,,
+COP,US,held,,,
+CORN,US,held,,,
+COST,US,held,,,
+CTRA,US,held,,,
+CVX,US,held,,,
+CWK,US,held,,,
+CWT,US,held,,,
+DELL,US,held,,,
+DHR,US,held,,,
+DIS,US,held,,,
+DXC,US,held,,,
+ECL,US,held,,,
+EEM,US,held,,,
+EMR,US,held,,,
+EQH,US,held,,,
+ES,US,held,,,
+EWJ,US,held,,,
+EWT,US,held,,,
+EWY,US,held,,,
+FDP,US,held,,,
+FDX,US,held,,,
+FL,US,held,,,
+FLS,US,held,,,
+FSLR,US,held,,,
+GFI,US,held,,,
+GLNG,US,held,,,
+GLW,US,held,,,
+GNK,US,held,,,
+GOOG,US,held,,,
+GTLB,US,held,,,
+HD,US,held,,,
+HSBC,US,held,,,
+IBM,US,held,,,
+INFY,US,held,,,
+INTC,US,held,,,
+IR,US,held,,,
+IWM,US,held,,,
+IZRL,US,held,,,
+JCI,US,held,,,
+JHML,US,held,,,
+JNJ,US,held,,,
+KHC,US,held,,,
+KO,US,held,,,
+KR,US,held,,,
+KSA,US,held,,,
+LNG,US,held,,,
+LYB,US,held,,,
+MARA,US,held,,,
+MCO,US,held,,,
+MELI,US,held,,,
+MET,US,held,,,
+META,US,held,,,
+MLAB,US,held,,,
+MNDY,US,held,,,
+MNKD,US,held,,,
+MSCI,US,held,,,
+MT,US,held,,,
+MTCH,US,held,,,
+MTD,US,held,,,
+NEXT,US,held,,,
+NTGR,US,held,,,
+NVDA,US,held,,,
+NVO,US,held,,,
+OXY,US,held,,,
+PEGA,US,held,,,
+PG,US,held,,,
+RIO,US,held,,,
+RKLB,US,held,,,
+RWR,US,held,,,
+SAP,US,held,,,
+SE,US,held,,,
+SHEL,US,held,,,
+SOXL,US,held,,,
+SPGI,US,held,,,
+SU,US,held,,,
+SWK,US,held,,,
+SYK,US,held,,,
+T,US,held,,,
+TFLO,US,held,,,
+TMO,US,held,,,
+TMUS,US,held,,,
+TSLA,US,held,,,
+TSM,US,held,,,
+TTE,US,held,,,
+TXN,US,held,,,
+UBS,US,held,,,
+UGI,US,held,,,
+V,US,held,,,
+VLO,US,held,,,
+VVV,US,held,,,
+VZ,US,held,,,
+WIT,US,held,,,
+WM,US,held,,,
+WMT,US,held,,,
+XOM,US,held,,,
+ADM,US,sold,,,
+AMC,US,sold,,,
+ARM,US,sold,,,
+BCE,US,sold,,,
+BLNK,US,sold,,,
+BMBL,US,sold,,,
+CAT,US,sold,,,
+CGBSW,US,sold,,,
+CRSP,US,sold,,,
+CSAN,US,sold,,,
+DNUT,US,sold,,,
+ENPH,US,sold,,,
+EW,US,sold,,,
+F,US,sold,,,
+FRSH,US,sold,,,
+GFS,US,sold,,,
+HES,US,sold,,,
+HUM,US,sold,,,
+IART,US,sold,,,
+K,US,sold,,,
+KE,US,sold,,,
+KLG,US,sold,,,
+LIT,US,sold,,,
+MANU,US,sold,,,
+MDB,US,sold,,,
+MED,US,sold,,,
+MRNA,US,sold,,,
+MU,US,sold,,,
+NKE,US,sold,,,
+ON,US,sold,,,
+PFE,US,sold,,,
+PZZA,US,sold,,,
+QCLN,US,sold,,,
+SSL,US,sold,,,
+WBD,US,sold,,,
+WKHS,US,sold,,,
+AARTISURF,IN,held,Aarti Surfactants,,
+SPLPETRO,IN,held,Supreme Petrochem,,
+TNPETRO,IN,held,Tamilnadu Petroproducts,,
+CASTROLIND,IN,held,Castrol India,,
+TNPL,IN,held,TN Newsprint & Papers,,
+SUZLON,IN,held,Suzlon Energy,,
+CEWATER,IN,held,Concord Enviro Systems,,
+SENORES,IN,held,Senores Pharmaceuticals,,
+CARRARO,IN,held,Carraro India,,
+VENTIVE,IN,held,Ventive Hospitality,,
+UNIMECH,IN,held,Unimech Aerospace,,
+INDOFARM,IN,held,Indo Farm Equipment,,
+NIFTYBEES,IN,held,Nippon Nifty BEES ETF,,
+PSUBNKBEES,IN,held,Nippon PSU Bank BEES ETF,,
+ADANIPORTS,IN,sold,,,
+ANURAS,IN,sold,,,
+APOLLO,IN,sold,,,
+ASMTEC,IN,sold,,,
+AWHCL,IN,sold,,,
+AWL,IN,sold,,,
+BANDHANBNK,IN,sold,,,
+BCPL,IN,sold,,,
+BEL,IN,sold,,,
+BHEL,IN,sold,,,
+BIHSPONG,IN,sold,,,
+CAPLIPOINT,IN,sold,,,
+CDSL,IN,sold,,,
+CGPOWER,IN,sold,,,
+COCHINSHIP,IN,sold,,,
+CREDITACC,IN,sold,,,
+CRISIL,IN,sold,,,
+CROMPTON,IN,sold,,,
+CUPID,IN,sold,,,
+DHAMPURSUG,IN,sold,,,
+DLF,IN,sold,,,
+DLINKINDIA,IN,sold,,,
+EASEMYTRIP,IN,sold,,,
+FEDFINA,IN,sold,,,
+FORTIS,IN,sold,,,
+GALAXYSURF,IN,sold,,,
+GICRE,IN,sold,,,
+GODAVARIB,IN,sold,,,
+GOLDBEES,IN,sold,,,
+HCLTECH,IN,sold,,,
+HDFCLIFE,IN,sold,,,
+HMVL,IN,sold,,,
+HYUNDAI,IN,sold,,,
+INDSUCR,IN,sold,,,
+INDUSINDBK,IN,sold,,,
+IOC,IN,sold,,,
+IRFC,IN,sold,,,
+ITI,IN,sold,,,
+J&KBANK,IN,sold,,,
+JUBLFOOD,IN,sold,,,
+KLRFM,IN,sold,,,
+KOTAKBANK,IN,sold,,,
+LAFFANSQ,IN,sold,,,
+M&M,IN,sold,,,
+MAHLIFE,IN,sold,,,
+MASTEK,IN,sold,,,
+NBCC,IN,sold,,,
+NDTV,IN,sold,,,
+NETWORK18,IN,sold,,,
+NH,IN,sold,,,
+NHPC,IN,sold,,,
+NIACL,IN,sold,,,
+NMDC,IN,sold,,,
+NTPC,IN,sold,,,
+PATANJALI,IN,sold,,,
+PNB,IN,sold,,,
+PROZONER,IN,sold,,,
+RCF,IN,sold,,,
+RENUKA,IN,sold,,,
+RRKABEL,IN,sold,,,
+SAIL,IN,sold,,,
+STCINDIA,IN,sold,,,
+STYLEBAAZA,IN,sold,,,
+SUMICHEM,IN,sold,,,
+SUNTV,IN,sold,,,
+SYNGENE,IN,sold,,,
+SYRMA,IN,sold,,,
+TATAELXSI,IN,sold,,,
+TITAGARH,IN,sold,,,
+TRACXN,IN,sold,,,
+TRITURBINE,IN,sold,,,
+UJJIVANSFB,IN,sold,,,
+VINYLINDIA,IN,sold,,,
+WELSPLSOL,IN,sold,,,
+WELSPUNLIV,IN,sold,,,
+ZEEMEDIA,IN,sold,,,
+ABFRL,IN,evicted,evicted 2026-07-23 after 12 sessions in sell zone,,
+ADANIGREEN,IN,watch,,,
+ADANIPOWER,IN,watch,,,
+AGARIND,IN,watch,,,
+AJANTSOY,IN,evicted,evicted 2026-07-23 after 47 sessions in sell zone,,
+AKUMS,IN,watch,,,
+AKZOINDIA,IN,watch,,,
+AMARAJABAT,IN,watch,,,
+ANANTRAJ,IN,watch,,,
+ANTONY,IN,watch,,,
+ARIHANTSUP,IN,watch,,,
+ASAHIINDIA,IN,watch,,,
+ATFL,IN,watch,,,
+AVANTIFEED,IN,evicted,evicted 2026-07-23 after 39 sessions in sell zone,,
+AXISBANK,IN,watch,,,
+AXITA,IN,evicted,evicted 2026-07-23 after 106 sessions in sell zone,,
+AZAD,IN,watch,,,
+BAAZARSTYLE,IN,watch,,,
+BAJFINANCE,IN,watch,,,
+BANARISUG,IN,evicted,evicted 2026-07-23 after 26 sessions in sell zone,,
+BANKINDIA,IN,watch,,,
+BANNARIAMM,IN,watch,,,
+BATLIBOI,IN,watch,,,
+BCCL,IN,evicted,evicted 2026-07-23 after 107 sessions in sell zone,,
+BEARDSELL,IN,watch,,,
+BECTORFOOD,IN,watch,,,
+BHARTIARTL,IN,watch,,,
+BIHARSPNG,IN,watch,,,
+BINDALAGRO,IN,watch,,,
+BIOCON,IN,watch,,,
+BLS,IN,evicted,evicted 2026-07-23 after 50 sessions in sell zone,,
+BLSE,IN,watch,,,
+BPCL,IN,watch,,,
+BRITANNIA,IN,watch,,,
+CANBK,IN,evicted,evicted 2026-07-23 after 21 sessions in sell zone,,
+CEATLTD,IN,watch,,,
+CENTURYTEX,IN,watch,,,
+CESC,IN,evicted,evicted 2026-07-23 after 21 sessions in sell zone,,
+CHAMBLFERT,IN,evicted,evicted 2026-07-23 after 12 sessions in sell zone,,
+CHENNPETRO,IN,watch,,,
+CIPLA,IN,watch,,,
+COALINDIA,IN,evicted,evicted 2026-07-23 after 30 sessions in sell zone,,
+COASTCORP,IN,watch,,,
+COFFEEDAY,IN,watch,,,
+COLPAL,IN,watch,,,
+COMBAG,IN,watch,,,
+CONCORDENV,IN,watch,,,
+COROMANDEL,IN,watch,,,
+CUMMINSIND,IN,watch,,,
+DAVANAGERE,IN,watch,,,
+DECANGOLD,IN,watch,,,
+DEEPAKFERT,IN,watch,,,
+DEEPAKNTR,IN,watch,,,
+DEEPINDS,IN,watch,,,
+DELHIVERY,IN,watch,,,
+DONEAR,IN,evicted,evicted 2026-07-23 after 19 sessions in sell zone,,
+EDELWEISS,IN,watch,,,
+EICHERMOT,IN,watch,,,
+EKI,IN,evicted,evicted 2026-07-23 after 8 sessions in sell zone,,
+EMAMIPAP,IN,watch,,,
+EMBASSY,IN,watch,,,
+ENDURANCE,IN,watch,,,
+ENGINERSIN,IN,evicted,evicted 2026-07-23 after 8 sessions in sell zone,,
+ESCORTS,IN,watch,,,
+EXIDEIND,IN,watch,,,
+FINPIPE,IN,evicted,evicted 2026-07-23 after 13 sessions in sell zone,,
+GAIL,IN,watch,,,
+GANDHAR,IN,watch,,,
+GANGAFORG,IN,watch,,,
+GATEWAY,IN,watch,,,
+GEPIL,IN,watch,,,
+GET&D,IN,watch,,,
+GMBREW,IN,evicted,evicted 2026-07-23 after 9 sessions in sell zone,,
+GMDC,IN,watch,,,
+GMRINFRA,IN,watch,,,
+GODREJAGRO,IN,watch,,,
+GOLDIAM,IN,evicted,evicted 2026-07-23 after 11 sessions in sell zone,,
+GOLKALUM,IN,watch,,,
+GREAVESCOT,IN,watch,,,
+GSAUTO,IN,evicted,evicted 2026-07-23 after 45 sessions in sell zone,,
+GSPL,IN,watch,,,
+GUJGASLTD,IN,evicted,evicted 2026-07-23 after 6 sessions in sell zone,,
+GUJTEX,IN,watch,,,
+HAL,IN,watch,,,
+HARRMALAYA,IN,watch,,,
+HATHWAY,IN,watch,,,
+HATSUN,IN,watch,,,
+HAVELLS,IN,watch,,,
+HDFC,IN,watch,,,
+HDFCBANK,IN,watch,,,
+HERANBA,IN,evicted,evicted 2026-07-23 after 48 sessions in sell zone,,
+HIINFRA,IN,watch,,,
+HINDALCO,IN,evicted,evicted 2026-07-23 after 30 sessions in sell zone,,
+HINDPETRO,IN,watch,,,
+HITECH,IN,evicted,evicted 2026-07-23 after 7 sessions in sell zone,,
+HONASA,IN,watch,,,
+ICICIBANK,IN,watch,,,
+IDBI,IN,watch,,,
+IDEA,IN,watch,,,
+IDFCFIRSTB,IN,watch,,,
+IIFL,IN,watch,,,
+INDIACEM,IN,watch,,,
+INDIAGLYCO,IN,watch,,,
+INDIGOPNTS,IN,watch,,,
+INDOTECH,IN,watch,,,
+INDSUC,IN,watch,,,
+INDSWFTLAB,IN,watch,,,
+INFY,IN,evicted,evicted 2026-07-23 after 35 sessions in sell zone,,
+INOXWIND,IN,evicted,evicted 2026-07-23 after 21 sessions in sell zone,,
+IOLCP,IN,watch,,,
+IRCTC,IN,evicted,evicted 2026-07-23 after 51 sessions in sell zone,,
+ITC,IN,evicted,evicted 2026-07-23 after 44 sessions in sell zone,,
+ITDC,IN,watch,,,
+IXIGO,IN,watch,,,
+JINDALDRLL,IN,watch,,,
+JINDALSAW,IN,watch,,,
+JKLAKSHMI,IN,evicted,evicted 2026-07-23 after 47 sessions in sell zone,,
+JKPAPER,IN,watch,,,
+JKTYRE,IN,watch,,,
+JKUMAR,IN,watch,,,
+JSWENERGY,IN,watch,,,
+KALLAMTEX,IN,watch,,,
+KECL,IN,watch,,,
+KHADIM,IN,evicted,evicted 2026-07-23 after 11 sessions in sell zone,,
+KRBL,IN,evicted,evicted 2026-07-23 after 7 sessions in sell zone,,
+KRIDHANINF,IN,evicted,evicted 2026-07-23 after 21 sessions in sell zone,,
+KVB,IN,watch,,,
+LAFFANS,IN,watch,,,
+LATENTVIEW,IN,watch,,,
+LIBERTSHOE,IN,watch,,,
+LOYALTEX,IN,evicted,evicted 2026-07-23 after 13 sessions in sell zone,,
+M&MFIN,IN,watch,,,
+MADRASFERT,IN,watch,,,
+MAHINDCIE,IN,watch,,,
+MANGCHEFER,IN,evicted,evicted 2026-07-23 after 14 sessions in sell zone,,
+MAPMYINDIA,IN,watch,,,
+MARICO,IN,watch,,,
+MARINE,IN,watch,,,
+MARUTI,IN,watch,,,
+MATRIMONY,IN,watch,,,
+MAZDOCK,IN,evicted,evicted 2026-07-23 after 11 sessions in sell zone,,
+MGL,IN,evicted,evicted 2026-07-23 after 6 sessions in sell zone,,
+MHRIL,IN,evicted,evicted 2026-07-23 after 16 sessions in sell zone,,
+MINDTREE,IN,watch,,,
+MKPROT,IN,watch,,,
+MORARJEE,IN,watch,,,
+MOTHERSON,IN,watch,,,
+MPSLTD,IN,watch,,,
+MRPL,IN,watch,,,
+MRSBECTORS,IN,watch,,,
+MTARTECH,IN,evicted,evicted 2026-07-23 after 8 sessions in sell zone,,
+NATCOPHARM,IN,evicted,evicted 2026-07-23 after 6 sessions in sell zone,,
+NATIONALUM,IN,evicted,evicted 2026-07-23 after 33 sessions in sell zone,,
+NAUKRI,IN,watch,,,
+NAZARA,IN,watch,,,
+NLCINDIA,IN,evicted,evicted 2026-07-23 after 16 sessions in sell zone,,
+NSDL,IN,evicted,evicted 2026-07-23 after 18 sessions in sell zone,,
+NYKAA,IN,watch,,,
+OFSS,IN,watch,,,
+OIL,IN,watch,,,
+OLAELECTRIC,IN,watch,,,
+OMAXE,IN,watch,,,
+ONGC,IN,evicted,evicted 2026-07-23 after 39 sessions in sell zone,,
+PADAMCOT,IN,watch,,,
+PARAGMILK,IN,evicted,evicted 2026-07-23 after 7 sessions in sell zone,,
+PATELINT,IN,watch,,,
+PETRONET,IN,watch,,,
+PFC,IN,evicted,evicted 2026-07-23 after 18 sessions in sell zone,,
+PIDILITIND,IN,watch,,,
+PNBHOUSING,IN,watch,,,
+POKARNA,IN,watch,,,
+PRAJIND,IN,watch,,,
+PREMIERENE,IN,watch,,,
+PROTEAN,IN,watch,,,
+PROZONE,IN,watch,,,
+PUNJABCHEM,IN,watch,,,
+PVR,IN,watch,,,
+RAILTEL,IN,evicted,evicted 2026-07-23 after 14 sessions in sell zone,,
+RAIN,IN,watch,,,
+RANEENGINE,IN,watch,,,
+RAYMOND,IN,watch,,,
+RAYMONDREL,IN,watch,,,
+RECLTD,IN,watch,,,
+REDINGTON,IN,watch,,,
+RELIANCE,IN,watch,,,
+RHFL,IN,evicted,evicted 2026-07-23 after 62 sessions in sell zone,,
+RPOWER,IN,evicted,evicted 2026-07-23 after 15 sessions in sell zone,,
+RSIL,IN,watch,,,
+RVNL,IN,evicted,evicted 2026-07-23 after 50 sessions in sell zone,,
+SAGILITY,IN,watch,,,
+SANDUMA,IN,evicted,evicted 2026-07-23 after 30 sessions in sell zone,,
+SAPPHIRE,IN,watch,,,
+SBILIFE,IN,watch,,,
+SBIN,IN,watch,,,
+SCHNEIDER,IN,watch,,,
+SCI,IN,evicted,evicted 2026-07-23 after 13 sessions in sell zone,,
+SHAKTIPUMP,IN,watch,,,
+SIEMENS,IN,watch,,,
+SIMBHALS,IN,evicted,evicted 2026-07-23 after 39 sessions in sell zone,,
+SKFINDIA,IN,evicted,evicted 2026-07-23 after 14 sessions in sell zone,,
+SOUTHBANK,IN,watch,,,
+SPCENET,IN,watch,,,
+STALLION,IN,watch,,,
+STC,IN,watch,,,
+STOVEKRAFT,IN,watch,,,
+SUNPHARMA,IN,watch,,,
+SUPREMEPETRO,IN,watch,,,
+SWIGGY,IN,watch,,,
+TARAPUR,IN,evicted,evicted 2026-07-23 after 65 sessions in sell zone,,
+TARTRIND,IN,watch,,,
+TATACONSUM,IN,evicted,evicted 2026-07-23 after 37 sessions in sell zone,,
+TATAMOTORS,IN,evicted,evicted 2026-07-23 after 10 sessions in sell zone,,
+TATAPOWER,IN,evicted,evicted 2026-07-23 after 35 sessions in sell zone,,
+TATASTEEL,IN,evicted,evicted 2026-07-23 after 33 sessions in sell zone,,
+TCI,IN,evicted,evicted 2026-07-23 after 11 sessions in sell zone,,
+TCPLPACK,IN,watch,,,
+TEJASNET,IN,watch,,,
+THERMAX,IN,watch,,,
+TIRUMALCHM,IN,evicted,evicted 2026-07-23 after 37 sessions in sell zone,,
+TITAN,IN,watch,,,
+TRIVENI,IN,watch,,,
+TRIVENTINE,IN,watch,,,
+TTML,IN,evicted,evicted 2026-07-23 after 15 sessions in sell zone,,
+TVSMOTOR,IN,watch,,,
+UCOBANK,IN,watch,,,
+UGROCAP,IN,evicted,evicted 2026-07-23 after 52 sessions in sell zone,,
+UNIONBANK,IN,watch,,,
+UNITEDTEA,IN,evicted,evicted 2026-07-23 after 35 sessions in sell zone,,
+VADILALIND,IN,watch,,,
+VALORE,IN,watch,,,
+VBL,IN,evicted,evicted 2026-07-23 after 13 sessions in sell zone,,
+VEDL,IN,evicted,evicted 2026-07-23 after 57 sessions in sell zone,,
+VIJAYA,IN,watch,,,
+VIKRAMSOLR,IN,evicted,evicted 2026-07-23 after 8 sessions in sell zone,,
+VJLAXMIE,IN,watch,,,
+VMART,IN,watch,,,
+VOLTAS,IN,watch,,,
+WAAREEENER,IN,evicted,evicted 2026-07-23 after 22 sessions in sell zone,,
+WABAG,IN,watch,,,
+WELSPUNSPEC,IN,watch,,,
+WIPRO,IN,evicted,evicted 2026-07-23 after 33 sessions in sell zone,,
+WSTCSTPAPR,IN,watch,,,
+YESBANK,IN,watch,,,
+YUVRAAJ,IN,watch,,,
+ZEEL,IN,watch,,,
+ZODIAC,IN,evicted,evicted 2026-07-23 after 37 sessions in sell zone,,
+ZOMATO,IN,watch,,,
+5360,KR,signal,technical 2026-07-21,2026-07-21,2615.0
+94800,KR,signal,technical 2026-07-21,2026-07-21,6300.0
+15020,KR,signal,technical 2026-07-21,2026-07-21,928.0
+69460,KR,signal,technical 2026-07-21,2026-07-21,2660.0
+380540,KR,signal,technical 2026-07-21,2026-07-21,8450.0
+9310,KR,signal,technical 2026-07-21,2026-07-21,5325.0
+3680,KR,signal,technical 2026-07-21,2026-07-21,8600.0
+ASIANHOTNR,IN,signal,piotroski+debt 2026-07-21,2026-07-21,294.55
+ATUL,IN,evicted,piotroski+debt 2026-07-21 | evicted 2026-07-23 after 18 sessions in sell zone,2026-07-21,6191.5
+AARNAV,IN,signal,piotroski+debt 2026-07-21,2026-07-21,30.73
+AYMSYNTEX,IN,signal,piotroski+debt 2026-07-21,2026-07-21,234.37
+AARON,IN,evicted,piotroski+debt 2026-07-21 | evicted 2026-07-23 after 222 sessions in sell zone,2026-07-21,119.95
+AMANTA,IN,signal,piotroski+debt 2026-07-21,2026-07-21,168.45
+AGI,IN,signal,piotroski+debt 2026-07-21,2026-07-21,686.4
+ANTELOPUS,IN,signal,piotroski+debt 2026-07-21,2026-07-21,868.45
+AJANTPHARM,IN,signal,piotroski+debt 2026-07-21,2026-07-21,3575.3
+ANUP,IN,signal,piotroski+debt 2026-07-21,2026-07-21,2139.3999
+INDOSTAR,IN,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,269.35
+KONNDOR,IN,evicted,golden_cross 2026-07-13 (backfilled) | evicted 2026-07-23 after 10 sessions in sell zone,2026-07-13,15.8
+VAIBHAVGBL,IN,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,255.88
+NARPROP,IN,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,39.27
+BDH,IN,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,559.95
+RUDRAGAS,IN,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,73.8
+MAHESHWARI,IN,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,
+PANCHSHEEL,IN,evicted,golden_cross 2026-07-13 (backfilled) | evicted 2026-07-23 after 6 sessions in sell zone,2026-07-13,118.35
+CORDSCABLE,IN,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,204.1
+SUPRATRE,IN,evicted,golden_cross 2026-07-13 (backfilled) | evicted 2026-07-23 after 15 sessions in sell zone,2026-07-13,14.0
+UNICHEMLAB,IN,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,596.95
+SVARTCORP,IN,evicted,golden_cross 2026-07-13 (backfilled) | evicted 2026-07-23 after 9 sessions in sell zone,2026-07-13,3.56
+LMFA,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,2.84
+GREE,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,2.03
+RTB,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,14.96
+ASBP,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,5.97
+PML,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,7.52
+IPHA,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,1.79
+DLY,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,14.08
+THRM,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,36.12
+RRR,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,64.41
+HRL,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,24.46
+MNPR,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,103.33
+EVEXIA,IN,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,1.59
+UPBD,US,signal,golden_cross 2026-07-13 (backfilled),2026-07-13,21.15
+NAMSW,US,evicted,golden_cross 2026-07-14 (backfilled) | evicted 2026-07-23 after 6 sessions in sell zone,2026-07-14,20.56
+ARL,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,18.37
+CCK,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,111.55
+BN,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,44.47
+CNH,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,10.57
+BAX,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,22.15
+IGI,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,16.02
+FORR,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,10.41
+DORM,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,137.55
+USA,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,5.82
+GEN,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,26.45
+DBX,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,30.35
+VRNS,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,47.33
+ICUI,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,157.96
+DFP,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,21.07
+JYNT,US,signal,golden_cross 2026-07-14 (backfilled),2026-07-14,8.93
+TTWO,US,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,243.8
+AGIO,US,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,39.87
+RPAY,US,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,4.09
+OTLK,US,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,1.56
+MSW,US,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,1.41
+9202,JP,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,3004.0
+9082,JP,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,1537.0
+4221,JP,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,5040.0
+2882,JP,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,2058.0
+3076,JP,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,2712.0
+3632,JP,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,399.0
+9997,JP,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,1045.0
+4728,JP,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,641.0
+9686,JP,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,1633.0
+PNDORA.CO,EU,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,796.0
+OTOEL.AT,EU,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,11.06
+LRE.L,EU,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,651.5
+FSG.L,EU,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,469.0
+ZAL.F,EU,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,27.67
+EXFY,US,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,1.76
+LINK,US,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,4.27
+PMA,US,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,1.37
+IFBD,US,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,1.16
+38880,KR,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,4240.0
+54940,KR,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,867.0
+AUSTENG,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,166.8
+KRISHIVAL,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,399.65
+TOTEM,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,150.6
+360ONE,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,1098.6
+GANESHHOU,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,847.95
+RESPONIND,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,190.53
+NDRAUTO,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,821.0
+GALXBRG,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,910.7
+TRABI,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,3.16
+DATAMATICS,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,853.5
+GKCONS,IN,evicted,golden_cross 2026-07-15 (backfilled) | evicted 2026-07-23 after 6 sessions in sell zone,2026-07-15,11.51
+AJAXENGG,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,615.2
+GARFIBRES,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,770.15
+HOMEFIRST,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,1247.1
+GREENLAM,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,252.45
+IGARASHI,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,465.9
+20MICRONS,IN,signal,golden_cross 2026-07-15 (backfilled),2026-07-15,204.43
+JD.L,EU,signal,golden_cross 2026-07-16 (backfilled),2026-07-16,87.38
+HEN3.F,EU,signal,golden_cross 2026-07-16 (backfilled),2026-07-16,73.7
+NCC.L,EU,signal,golden_cross 2026-07-16 (backfilled),2026-07-16,142.8
+CLDN.L,EU,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,380.5
+BRSC.L,EU,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,269.0
+BBOX.L,EU,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,167.2
+4443,JP,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,1827.0
+7033,JP,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,1362.0
+3475,JP,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,1468.0
+BLUEJET,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,584.55
+HARIOMPIPE,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,403.55
+RAMCOIND,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,353.45
+2820,JP,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,5040.0
+CHOLAFIN,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,1804.9
+PPL,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,257.0
+FOSECOIND,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,5058.0
+PRICOLLTD,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,615.3
+WINDLAS,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,844.25
+APTUS,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,306.85
+PICCADIL,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,729.55
+JINDWORLD,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,32.2
+FDC,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,420.1
+ONMOBILE,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,63.15
+ROTO,IN,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,65.05
+6333,JP,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,3120.0
+8923,JP,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,1783.0
+3420,JP,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,1585.0
+3753,JP,signal,golden_cross 2026-07-17 (backfilled),2026-07-17,190.0
+6276,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,312.0
+5269,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,341.0
+4543,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,2240.5
+8147,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,1470.0
+8075,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,2504.0
+6915,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,3290.0
+5938,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,1861.5
+8424,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,4425.0
+6325,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,403.0
+2818,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,1770.0
+1787,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,6190.0
+7060,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,628.0
+5909,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,1026.0
+5108,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,3778.0
+3020,JP,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,4120.0
+JLHL,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,1558.1
+TCBX,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,40.04
+SBCF,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,33.5
+HQY,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,98.88
+IOTR,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,3.37
+RCL,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,286.16
+ITW,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,271.69
+SHC,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,17.42
+ATRA,US,evicted,golden_cross 2026-07-20 (backfilled) | evicted 2026-07-23 after 7 sessions in sell zone,2026-07-20,8.29
+KMB,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,108.48
+PRPL,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,6.5
+APM,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,8.83
+NMIH,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,42.63
+INDP,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,2.46
+CRNX,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,83.87
+DT,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,44.71
+FWONA,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,91.17
+ONCH,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,10.29
+MS-PQ,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,25.39
+ESNT,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,66.17
+VINCOFE,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,158.93
+INDHOTEL,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,725.05
+IKIO,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,214.37
+MKS.L,EU,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,379.9
+DBK.F,EU,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,30.355
+FME.F,EU,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,42.11
+RED.MC,EU,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,15.45
+NAVKARCORP,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,104.31
+EIMCOELECO,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,1822.3
+MAITHANALL,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,1012.5
+KMEW,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,2445.3
+UDS,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,193.52
+PRINCEPIPE,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,267.5
+PPLPHARMA,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,178.87
+FWONK,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,99.2
+WBX,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,4.15
+TARIL,IN,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,333.6
+NAAS,US,signal,golden_cross 2026-07-20 (backfilled),2026-07-20,3.16
+3536,JP,signal,golden_cross 2026-07-21 (backfilled),2026-07-21,130.0
+4680,JP,signal,golden_cross 2026-07-21 (backfilled),2026-07-21,1270.0
+4206,JP,signal,golden_cross 2026-07-21 (backfilled),2026-07-21,3681.0
+4053,JP,signal,golden_cross 2026-07-21 (backfilled),2026-07-21,456.0
+3769,JP,signal,golden_cross 2026-07-21 (backfilled),2026-07-21,9929.0
+8281,JP,signal,golden_cross 2026-07-21 (backfilled),2026-07-21,1108.0
+6995,JP,signal,golden_cross 2026-07-21 (backfilled),2026-07-21,3115.0
+2533,JP,signal,golden_cross 2026-07-21 (backfilled),2026-07-21,506.0
+457600,KR,signal,technical 2026-07-21,2026-07-21,3310.0
+54410,KR,signal,technical 2026-07-21,2026-07-21,3590.0
+400,KR,signal,technical 2026-07-21,2026-07-21,2180.0
+101160,KR,signal,technical 2026-07-21,2026-07-21,29450.0
+44340,KR,signal,technical 2026-07-21,2026-07-21,4135.0
+5430,KR,signal,technical 2026-07-21,2026-07-21,79300.0
+446540,KR,signal,technical 2026-07-21,2026-07-21,6680.0
+31980,KR,signal,technical 2026-07-21,2026-07-21,135000.0
+127120,KR,signal,technical 2026-07-21,2026-07-21,32600.0
+227610,KR,signal,technical 2026-07-21,2026-07-21,1431.0
+6370,KR,signal,technical 2026-07-21,2026-07-21,5620.0
+30720,KR,signal,technical 2026-07-21,2026-07-21,5730.0
+212560,KR,signal,technical 2026-07-21,2026-07-21,10560.0
+219130,KR,signal,technical 2026-07-21,2026-07-21,75900.0
+26910,KR,signal,technical 2026-07-21,2026-07-21,5390.0
+475150,KR,signal,technical 2026-07-21,2026-07-21,55900.0
+94840,KR,signal,technical 2026-07-21,2026-07-21,12910.0
+61090,KR,signal,technical 2026-07-21,2026-07-21,42350.0
+214260,KR,signal,technical 2026-07-21,2026-07-21,8550.0
+36930,KR,signal,technical 2026-07-21,2026-07-21,169200.0
+33560,KR,signal,technical 2026-07-21,2026-07-21,4365.0
+66590,KR,signal,technical 2026-07-21,2026-07-21,3185.0
+212710,KR,signal,technical 2026-07-21,2026-07-21,9000.0
+144960,KR,signal,technical 2026-07-21,2026-07-21,10000.0
+119850,KR,signal,technical 2026-07-21,2026-07-21,35750.0
+310200,KR,signal,technical 2026-07-21,2026-07-21,2440.0
+270520,KR,signal,technical 2026-07-21,2026-07-21,2875.0
+263800,KR,signal,technical 2026-07-21,2026-07-21,6040.0
+91970,KR,signal,technical 2026-07-21,2026-07-21,3910.0
+348030,KR,signal,technical 2026-07-21,2026-07-21,2900.0
+399720,KR,signal,technical 2026-07-21,2026-07-21,45200.0
+79940,KR,signal,technical 2026-07-21,2026-07-21,47500.0
+1540,KR,signal,technical 2026-07-21,2026-07-21,11560.0
+53350,KR,signal,technical 2026-07-21,2026-07-21,3625.0
+236200,KR,signal,technical 2026-07-21,2026-07-21,47300.0
+71200,KR,signal,technical 2026-07-21,2026-07-21,8600.0
+57540,KR,signal,technical 2026-07-21,2026-07-21,940.0
+104040,KR,signal,technical 2026-07-21,2026-07-21,2880.0
+35610,KR,signal,technical 2026-07-21,2026-07-21,4785.0
+94860,KR,signal,technical 2026-07-21,2026-07-21,1421.0
+6120,KR,signal,technical 2026-07-21,2026-07-21,50400.0
+20120,KR,signal,technical 2026-07-21,2026-07-21,3585.0
+17890,KR,signal,technical 2026-07-21,2026-07-21,13170.0
+6340,KR,signal,technical 2026-07-21,2026-07-21,11840.0
+33130,KR,signal,technical 2026-07-21,2026-07-21,1971.0
+42420,KR,signal,technical 2026-07-21,2026-07-21,22600.0
+93380,KR,signal,technical 2026-07-21,2026-07-21,2665.0
+52330,KR,signal,technical 2026-07-21,2026-07-21,12010.0
+192390,KR,signal,technical 2026-07-21,2026-07-21,1834.0
+91440,KR,signal,technical 2026-07-21,2026-07-21,2915.0
+8490,KR,signal,technical 2026-07-21,2026-07-21,21000.0
+26890,KR,signal,technical 2026-07-21,2026-07-21,8170.0
+120240,KR,signal,technical 2026-07-21,2026-07-21,14640.0
+175330,KR,signal,technical 2026-07-21,2026-07-21,26000.0
+244920,KR,signal,technical 2026-07-21,2026-07-21,11370.0
+131290,KR,signal,technical 2026-07-21,2026-07-21,251000.0
+38390,KR,evicted,technical 2026-07-21 | evicted 2026-07-23 after 50 sessions in sell zone,2026-07-21,9730.0
+348350,KR,signal,technical 2026-07-21,2026-07-21,9480.0
+361670,KR,signal,technical 2026-07-21,2026-07-21,3395.0
+5670,KR,signal,technical 2026-07-21,2026-07-21,6380.0
+90850,KR,signal,technical 2026-07-21,2026-07-21,6060.0
+82210,KR,signal,technical 2026-07-21,2026-07-21,2085.0
+270870,KR,signal,technical 2026-07-21,2026-07-21,4620.0
+105560,KR,signal,technical 2026-07-21,2026-07-21,174000.0
+185490,KR,signal,technical 2026-07-21,2026-07-21,1500.0
+70590,KR,signal,technical 2026-07-21,2026-07-21,1639.0
+318010,KR,signal,technical 2026-07-21,2026-07-21,3685.0
+332370,KR,signal,technical 2026-07-21,2026-07-21,5270.0
+73240,KR,signal,technical 2026-07-21,2026-07-21,6100.0
+3690,KR,signal,technical 2026-07-21,2026-07-21,13380.0
+55550,KR,signal,technical 2026-07-21,2026-07-21,104700.0
+58630,KR,signal,technical 2026-07-21,2026-07-21,4420.0
+71950,KR,signal,technical 2026-07-21,2026-07-21,1750.0
+80010,KR,signal,technical 2026-07-21,2026-07-21,7470.0
+453340,KR,signal,technical 2026-07-21,2026-07-21,18020.0
+14100,KR,signal,technical 2026-07-21,2026-07-21,1889.0
+7070,KR,signal,technical 2026-07-21,2026-07-21,25750.0
+45060,KR,signal,technical 2026-07-21,2026-07-21,2200.0
+21650,KR,signal,technical 2026-07-21,2026-07-21,2190.0
+2820,KR,signal,technical 2026-07-21,2026-07-21,2285.0
+79650,KR,signal,technical 2026-07-21,2026-07-21,4255.0
+14710,KR,signal,technical 2026-07-21,2026-07-21,9170.0
+136490,KR,signal,technical 2026-07-21,2026-07-21,9770.0
+145210,KR,evicted,technical 2026-07-21 | evicted 2026-07-23 after 10 sessions in sell zone,2026-07-21,224.0
+89970,KR,signal,technical 2026-07-21,2026-07-21,89300.0
+86060,KR,signal,technical 2026-07-21,2026-07-21,5150.0
+6090,KR,signal,technical 2026-07-21,2026-07-21,8260.0
+9240,KR,signal,technical 2026-07-21,2026-07-21,35300.0
+4430,KR,signal,technical 2026-07-21,2026-07-21,12080.0
+66620,KR,signal,technical 2026-07-21,2026-07-21,23850.0
+16920,KR,signal,technical 2026-07-21,2026-07-21,1008.0
+95610,KR,signal,technical 2026-07-21,2026-07-21,165700.0
+319660,KR,signal,technical 2026-07-21,2026-07-21,170000.0
+481070,KR,signal,technical 2026-07-21,2026-07-21,16200.0
+290690,KR,signal,technical 2026-07-21,2026-07-21,4300.0
+17650,KR,signal,technical 2026-07-21,2026-07-21,9140.0
+237750,KR,evicted,technical 2026-07-21 | evicted 2026-07-23 after 6 sessions in sell zone,2026-07-21,3995.0
+89860,KR,signal,technical 2026-07-21,2026-07-21,36700.0
+222040,KR,signal,technical 2026-07-21,2026-07-21,8200.0
+85810,KR,signal,technical 2026-07-21,2026-07-21,1719.0
+43590,KR,signal,technical 2026-07-21,2026-07-21,1410.0
+8410,JP,signal,technical 2026-07-21,2026-07-21,311.3
+4197,JP,signal,technical 2026-07-21,2026-07-21,2330.0
+8101,JP,signal,technical 2026-07-21,2026-07-21,2654.0
+7867,JP,signal,technical 2026-07-21,2026-07-21,3690.0
+4441,JP,signal,technical 2026-07-21,2026-07-21,1570.0
+GREEL,US,signal,technical 2026-07-21,2026-07-21,24.7
+GRN,US,signal,technical 2026-07-21,2026-07-21,33.035
+EPR-PC,US,signal,technical 2026-07-21,2026-07-21,27.29
+ACP,US,signal,technical 2026-07-21,2026-07-21,5.31
+CRAC,US,signal,technical 2026-07-21,2026-07-21,10.14
+PANNERGY.BD,EU,signal,technical 2026-07-21,2026-07-21,2500.0
+FCH.L,EU,signal,technical 2026-07-21,2026-07-21,226.0
+PUM.F,EU,signal,technical 2026-07-21,2026-07-21,28.7
+SZG.F,EU,signal,technical 2026-07-21,2026-07-21,54.0
+2175,JP,signal,technical 2026-07-21,2026-07-21,2478.0
+7175,JP,signal,technical 2026-07-22,2026-07-22,1590.0
+3946,JP,signal,technical 2026-07-22,2026-07-22,4465.0
+65690,KR,signal,technical 2026-07-22,2026-07-22,1417.0
+AGM-PD,US,signal,technical 2026-07-22,2026-07-22,21.66
+VOYA-PB,US,signal,technical 2026-07-22,2026-07-22,23.77
+12690,KR,signal,technical 2026-07-22,2026-07-22,1659.0
+SDF.F,EU,signal,technical 2026-07-22,2026-07-22,
+362320,KR,signal,technical 2026-07-22,2026-07-22,4750.0
+1811,JP,signal,technical 2026-07-22,2026-07-22,8210.0
+SMJF,US,signal,technical 2026-07-22,2026-07-22,5.53
+HVII,US,signal,technical 2026-07-22,2026-07-22,10.475
+KCHV,US,signal,technical 2026-07-22,2026-07-22,
+FACT,US,signal,technical 2026-07-22,2026-07-22,10.64
+6138,JP,signal,technical 2026-07-22,2026-07-22,1216.0
+ANSC,US,signal,technical 2026-07-22,2026-07-22,
+4249,JP,signal,technical 2026-07-22,2026-07-22,2546.0
+HELP,US,signal,recurring x2 +13.9% since 2026-07-21,2026-07-21,8.1
+IOVA,US,signal,recurring x2 +9.2% since 2026-07-21,2026-07-21,5.48
+XNCR,US,signal,recurring x2 +8.7% since 2026-07-21,2026-07-21,20.45
+FET,US,signal,recurring x2 +8.4% since 2026-07-21,2026-07-21,57.28
+TPC,US,signal,recurring x2 +7.7% since 2026-07-21,2026-07-21,86.78
+ACVA,US,signal,recurring x2 +7.0% since 2026-07-21,2026-07-21,7.93
+FTK,US,signal,recurring x2 +6.5% since 2026-07-21,2026-07-21,27.28
+BWEN,US,signal,recurring x2 +6.3% since 2026-07-21,2026-07-21,5.09
+FBIO,US,signal,recurring x2 +6.0% since 2026-07-21,2026-07-21,3.53
+BULL,US,signal,recurring x2 +6.0% since 2026-07-21,2026-07-21,8.15
+VOC,US,signal,recurring x2 +5.6% since 2026-07-21,2026-07-21,3.37
+RGP,US,signal,recurring x2 +5.4% since 2026-07-21,2026-07-21,4.66
+ZBIO,US,signal,recurring x2 +5.4% since 2026-07-21,2026-07-21,32.36
+ETON,US,signal,recurring x2 +5.2% since 2026-07-21,2026-07-21,43.2
+HFCL,IN,justified,96.4% of 52w-hi @ 2026-07-22,2026-07-22,217.9
+KPL,IN,justified,95.8% of 52w-hi @ 2026-07-22,2026-07-22,2697.5
+YASHO,IN,justified,100.0% of 52w-hi @ 2026-07-22,2026-07-22,3218.2
+SPORTKING,IN,justified,100.0% of 52w-hi @ 2026-07-22,2026-07-22,200.92
+STLTECH,IN,justified,495.1% 6m mom @ 2026-07-22,2026-07-22,552.95
+DEEDEV,IN,justified,209.9% 6m mom @ 2026-07-22,2026-07-22,661.25
+BLISSGVS,IN,justified,175.8% 6m mom @ 2026-07-22,2026-07-22,448.15
+GVPIL,IN,justified,164.4% 6m mom @ 2026-07-22,2026-07-22,805.05
+CPPLUS,IN,justified,142.7% 6m mom @ 2026-07-22,2026-07-22,3446.3
+CLBK,US,justified,21.5 RSI @ 2026-07-22,2026-07-22,11.045
+KKRT,US,evicted,22.9 RSI @ 2026-07-22 | evicted 2026-07-23 after 18 sessions in sell zone,2026-07-22,23.28
+IONS,US,evicted,24.3 RSI @ 2026-07-22 | evicted 2026-07-23 after 9 sessions in sell zone,2026-07-22,53.43
+SNEX,US,evicted,24.7 RSI @ 2026-07-22 | evicted 2026-07-23 after 7 sessions in sell zone,2026-07-22,74.53
+SSTK,US,evicted,25.0 RSI @ 2026-07-22 | evicted 2026-07-23 after 20 sessions in sell zone,2026-07-22,7.38
+SJT,US,evicted,25.1 RSI @ 2026-07-22 | evicted 2026-07-23 after 116 sessions in sell zone,2026-07-22,2.4794
+PNR,US,evicted,25.9 RSI @ 2026-07-22 | evicted 2026-07-23 after 58 sessions in sell zone,2026-07-22,62.61
+AA,US,evicted,26.1 RSI @ 2026-07-22 | evicted 2026-07-23 after 25 sessions in sell zone,2026-07-22,46.32
+LAC,US,evicted,26.2 RSI @ 2026-07-22 | evicted 2026-07-23 after 31 sessions in sell zone,2026-07-22,3.02
+PRTS,US,evicted,26.7 RSI @ 2026-07-22 | evicted 2026-07-23 after 49 sessions in sell zone,2026-07-22,4.6
+210980.KS,KR,evicted,7.3 RSI @ 2026-07-22 | evicted 2026-07-23 after 55 sessions in sell zone,2026-07-22,5510.0
+051360.KQ,KR,evicted,14.2 RSI @ 2026-07-22 | evicted 2026-07-23 after 25 sessions in sell zone,2026-07-22,16090.0
+084680.KS,KR,evicted,18.1 RSI @ 2026-07-22 | evicted 2026-07-23 after 47 sessions in sell zone,2026-07-22,607.0
+246690.KQ,KR,evicted,19.8 RSI @ 2026-07-22 | evicted 2026-07-23 after 50 sessions in sell zone,2026-07-22,1430.0
+106190.KQ,KR,evicted,20.4 RSI @ 2026-07-22 | evicted 2026-07-23 after 54 sessions in sell zone,2026-07-22,10340.0
+179900.KQ,KR,evicted,20.9 RSI @ 2026-07-22 | evicted 2026-07-23 after 36 sessions in sell zone,2026-07-22,2770.0
+006490.KS,KR,justified,20.9 RSI @ 2026-07-22,2026-07-22,1002.0
+476040.KQ,KR,evicted,21.5 RSI @ 2026-07-22 | evicted 2026-07-23 after 133 sessions in sell zone,2026-07-22,7470.0
+043100.KQ,KR,evicted,21.9 RSI @ 2026-07-22 | evicted 2026-07-23 after 102 sessions in sell zone,2026-07-22,520.0
+365340.KQ,KR,evicted,22.2 RSI @ 2026-07-22 | evicted 2026-07-23 after 48 sessions in sell zone,2026-07-22,29300.0
+6928.T,JP,evicted,25.6 RSI @ 2026-07-22 | evicted 2026-07-23 after 21 sessions in sell zone,2026-07-22,2590.0
+5393.T,JP,evicted,28.2 RSI @ 2026-07-22 | evicted 2026-07-23 after 8 sessions in sell zone,2026-07-22,3311.0
+4109.T,JP,evicted,28.3 RSI @ 2026-07-22 | evicted 2026-07-23 after 17 sessions in sell zone,2026-07-22,5570.0
+4222.T,JP,evicted,28.6 RSI @ 2026-07-22 | evicted 2026-07-23 after 49 sessions in sell zone,2026-07-22,615.0
+6047.T,JP,justified,28.6 RSI @ 2026-07-22,2026-07-22,352.0
+6619.T,JP,evicted,28.7 RSI @ 2026-07-22 | evicted 2026-07-23 after 32 sessions in sell zone,2026-07-22,154.0
+7564.T,JP,evicted,28.9 RSI @ 2026-07-22 | evicted 2026-07-23 after 30 sessions in sell zone,2026-07-22,5580.0
+6616.T,JP,evicted,29.0 RSI @ 2026-07-22 | evicted 2026-07-23 after 13 sessions in sell zone,2026-07-22,1896.0
+6908.T,JP,evicted,29.3 RSI @ 2026-07-22 | evicted 2026-07-23 after 49 sessions in sell zone,2026-07-22,2789.0
+9412.T,JP,evicted,29.4 RSI @ 2026-07-22 | evicted 2026-07-23 after 33 sessions in sell zone,2026-07-22,2299.0
+PLSE,US,signal,recurring x2 +14.2% since 2026-07-21,2026-07-21,30.26
+RAND.AS,EU,signal,recurring x2 +13.1% since 2026-07-21,2026-07-21,31.86
+GNC.L,EU,signal,recurring x2 +11.6% since 2026-07-21,2026-07-21,221.8
+PAG,US,signal,recurring x2 +10.2% since 2026-07-21,2026-07-21,195.19
+SLN,US,signal,recurring x2 +9.6% since 2026-07-21,2026-07-21,10.85
+WTIU,US,signal,recurring x2 +8.7% since 2026-07-21,2026-07-21,18.354
+NRGU,US,signal,recurring x2 +8.0% since 2026-07-21,2026-07-21,43.335
+BLFS,US,signal,recurring x2 +7.8% since 2026-07-21,2026-07-21,29.19
+KSS,US,signal,recurring x2 +7.6% since 2026-07-21,2026-07-21,18.13
+OILU,US,signal,recurring x2 +7.3% since 2026-07-21,2026-07-21,42.5
+SM,US,signal,recurring x2 +7.1% since 2026-07-21,2026-07-21,32.22
+EQNR,US,signal,recurring x2 +6.8% since 2026-07-21,2026-07-21,37.59
+ESEA,US,signal,recurring x2 +6.8% since 2026-07-21,2026-07-21,72.95
+HAS.L,EU,signal,recurring x2 +6.8% since 2026-07-21,2026-07-21,53.8
+RDY,US,evicted,24.5 RSI @ 2026-07-23 | evicted 2026-07-23 after 8 sessions in sell zone,2026-07-23,
+SNPS,US,evicted,26.5 RSI @ 2026-07-23 | evicted 2026-07-23 after 32 sessions in sell zone,2026-07-23,
+CAPR,US,evicted,26.8 RSI @ 2026-07-23 | evicted 2026-07-23 after 17 sessions in sell zone,2026-07-23,
+SPRY,US,evicted,26.9 RSI @ 2026-07-23 | evicted 2026-07-23 after 18 sessions in sell zone,2026-07-23,
+102940.KQ,KR,evicted,19.2 RSI @ 2026-07-23 | evicted 2026-07-23 after 47 sessions in sell zone,2026-07-23,17820.0
+002020.KS,KR,evicted,19.2 RSI @ 2026-07-23 | evicted 2026-07-23 after 39 sessions in sell zone,2026-07-23,25050.0
+7273.T,JP,evicted,25.7 RSI @ 2026-07-23 | evicted 2026-07-23 after 47 sessions in sell zone,2026-07-23,604.0
+3791.T,JP,justified,28.5 RSI @ 2026-07-23,2026-07-23,950.0
+3776.T,JP,justified,28.8 RSI @ 2026-07-23,2026-07-23,240.0
+8783.T,JP,evicted,30.0 RSI @ 2026-07-23 | evicted 2026-07-23 after 61 sessions in sell zone,2026-07-23,68.0

@@ -155,10 +155,14 @@ def sync_watchlist(df: pd.DataFrame, top: int) -> int:
         k = (str(r["symbol"]).upper(), str(r["market"]).upper())
         if k in have:
             continue
+        px = pd.to_numeric(r.get("entry_price"), errors="coerce")
         rows.append({"symbol": r["symbol"], "market": r["market"],
                      "status": "signal",
                      "note": f"recurring x{r['appearances']} "
-                             f"{r['move_pct']:+.1f}% since {r['first_signal']}"})
+                             f"{r['move_pct']:+.1f}% since {r['first_signal']}",
+                     # stamped at add time for the digest's since-entry column
+                     "entry_date": str(r.get("first_signal") or "")[:10] or None,
+                     "entry_price": round(float(px), 4) if pd.notna(px) else None})
         have.add(k); added += 1
     if added:
         pd.concat([wl, pd.DataFrame(rows)], ignore_index=True).to_csv(

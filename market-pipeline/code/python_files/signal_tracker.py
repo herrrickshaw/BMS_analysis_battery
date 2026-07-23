@@ -187,22 +187,28 @@ def sync_watchlist(new: pd.DataFrame) -> int:
     wl = pd.read_csv(WATCHLIST)
     have = {(str(r["symbol"]).upper(), str(r["market"]).upper())
             for _, r in wl.iterrows()}
-    rows = [list(r) for r in wl.itertuples(index=False, name=None)]
     added = 0
     new = _cap_technical(new)
+    add_rows = []
     for _, r in new[new["filter"].isin(WATCHLIST_FILTERS)].iterrows():
         k = (r["symbol"], r["market"])
         if k in have:
             continue
-        rows.append([r["symbol"], r["market"], "signal",
-                     f"{r['filter']} {pd.Timestamp(r['signal_date']):%Y-%m-%d}"])
+        d = f"{pd.Timestamp(r['signal_date']):%Y-%m-%d}"
+        px = pd.to_numeric(r.get("price_at_signal"), errors="coerce")
+        # entry_date/entry_price stamped at ADD time — the digest's zone/return
+        # columns need them, and reconstructing later means parsing notes.
+        add_rows.append({"symbol": r["symbol"], "market": r["market"],
+                         "status": "signal", "note": f"{r['filter']} {d}",
+                         "entry_date": d,
+                         "entry_price": round(float(px), 4) if pd.notna(px) else None})
         have.add(k); added += 1
     if added:
-        import csv
-        with WATCHLIST.open("w", newline="") as f:
-            w = csv.writer(f)
-            w.writerow(["symbol", "market", "status", "note"])
-            w.writerows(rows)
+        # concat + to_csv, NOT a hand-rolled 4-column csv.writer: the watchlist
+        # grew entry_date/entry_price columns (2026-07-23) and a fixed-header
+        # rewrite here would silently shear them off on the next signal day.
+        pd.concat([wl, pd.DataFrame(add_rows)], ignore_index=True).to_csv(
+            WATCHLIST, index=False)
     return added
 
 

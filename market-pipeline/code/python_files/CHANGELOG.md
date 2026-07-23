@@ -2,6 +2,30 @@
 
 Decisions and material changes to the pipeline, newest first.
 
+## 2026-07-23 — Korea fundamentals from DART; J-Quants V2 validator; EC2 gap-fill
+
+- **Korea joins financial_ratios via official DART filings** (`dart_kr_store.py`
+  → `fundamentals/KR_current.parquet`, MARKETS gained `korea`). Shares from
+  `stockTotqySttus` (unlocks mcap/pe/pb). DECISION: `ebit`/`fcf`/`total_debt`
+  left NULL — the single-account endpoint has no borrowings/EBIT tags, and
+  mapping total liabilities to "debt" would overstate D/E (provisions + deferred
+  tax counted as debt). Rejected alternative: `noncurrent_liabs` as
+  `long_term_debt` — same mislabeling, quieter. Absent beats wrong.
+- **`jquants_validator.py` (new)** — validates JP panels against official JPX
+  J-Quants **V2** (V1 is 410 Gone; V2 = `x-api-key` header, `/equities/bars/daily`,
+  `AdjC`). DECISION: compares daily RETURNS, not price levels — our panels are
+  yfinance dividend+split adjusted, J-Quants is split-adjusted only, so levels
+  always drift by the dividend factor; returns isolate the real failure mode
+  (missed splits → one-day >5pp divergence). Free-plan window 2024-04-30→
+  2026-04-30; validator caps its window 13 weeks back so absence ≠ mismatch.
+- **India "staleness" ≠ gaps**: all 2,573 ledger-stale India tickers have
+  max(trade_date) in raw bhavcopy == ledger last_update — illiquid names that
+  didn't trade. Don't backfill India off the ledger's stale count.
+- **EC2 gap-fill collector** (i-0fb61188e3373794f): 10,257 tickers CN/US/EU/JP/KR/HK
+  (incl. first-ever HK 10y backfill, 1,504 syms), yfinance batches of 20 with
+  Pyth-oracle cross-validation (>1.5% close deviation flagged), 5-min logger →
+  dropbox:market-data-ec2/. India excluded (NSE blocks AWS IPs).
+
 **What belongs here:** a change that alters what the pipeline *produces* or what
 a number *means* — a corrected signal, a new data source, a changed threshold, a
 path or store that moves. Also the decisions themselves: what was chosen, what
@@ -19,6 +43,51 @@ mistakes were made, and the mistakes here have repeated.
 ---
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
+
+### Watchlist: country sections, entry tracking, buy/hold/sell zones, auto-eviction
+
+* **Schema** — watchlist.csv grew `entry_date`/`entry_price`, stamped at ADD
+  time by both writers (signal_tracker, recurring_movers) and BACKFILLED for
+  existing rows from the dates already embedded in notes (398/883 rows).
+  signal_tracker's hand-rolled 4-column csv.writer rewrite was replaced with
+  concat+to_csv — the old writer would have silently sheared the new columns
+  off on the next signal day.
+* **Zones** — BUY (close>EMA20>EMA50) / SELL (close<EMA50) / HOLD (between),
+  computed per bar from the price series. Deliberately STATELESS: the sell
+  streak is read off the tail of the series each run, so there is no counter
+  column for a missed run to corrupt. <25 bars → zone "?", never evicted.
+* **Eviction (user rule)** — a watch/signal/justified name in the SELL zone
+  >5 consecutive sessions flips to status `evicted` (row kept, note says when
+  and why; `held` is never auto-exited — exiting the portfolio is not this
+  tool's call). First run purged a 116-name backlog (AARON 222d, 476040.KQ
+  133d in the sell zone) — expected: the rule never existed before. Hygiene
+  runs inside the digest BEFORE rendering (--no-maintain to skip), so the
+  email always shows the post-eviction list.
+* **Mailer layout** — per-country sections (🇮🇳🇺🇸🇯🇵🇰🇷🇪🇺, green-first within
+  each) with new columns: since-entry return + days held, zone chip with the
+  eviction clock visible ("🟥 sell 3d/6"), plus a capped "🪦 Evicted" strip.
+
+### Watchlist digest → dashboard (market × sector × liquidity × returns)
+
+The per-name digest now opens with three aggregate views over every priced row
+(815 of 883 — all tiers count; a sold name is still a market observation):
+
+* **🌍 Market pulse** — per market: n, 🟢/⚪/🔴, median 1d/5d, a stacked 1d
+  return-distribution bar (7 buckets, email-safe nested-table cells — no JS,
+  no images), best/worst mover.
+* **🏭 Sector clusters** — cross-market, hottest median-1d first; 1-name
+  "clusters" suppressed. Sector labels come from a NEW incremental cache
+  (market_cache/sector_map.json): JP is free+total from the japan scan
+  workbook's TSE 33-industry codes (JPX code→name map hardcoded — it is
+  stable and public), everything else via yfinance .info capped at 40
+  lookups per scheduled run so the 07:00 mailer can never hang on a slow
+  API; `--build-sectors` backfills the whole watchlist in one sitting
+  (checkpoints every 25 fetches). Unresolved names group as "Unclassified"
+  and retry next run. Taxonomies deliberately NOT unified: GICS "Industrials"
+  and TSE "Machinery" stay distinct rather than being force-mapped wrong.
+* **💧 Liquidity × returns** — per tier T1..T4/below-floor/unmeasured: median
+  1d/5d, %green, distribution bar. Answers "is today's strength in names I
+  can actually buy?"
 
 ### Watchlist digest: liquidity gate, green-first ordering, "why" column
 

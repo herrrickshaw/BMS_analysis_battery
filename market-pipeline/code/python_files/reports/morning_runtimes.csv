@@ -1,0 +1,10 @@
+surface,started_ist,duration_min,status,ref
+pipeline,2026-07-17 00:30:04,65.4,1 step-failures,daily_pipeline_20260717.log
+pipeline,2026-07-20 00:30:00,92.4,1 step-failures,daily_pipeline_20260720.log
+pipeline,2026-07-21 00:30:00,23.1,ok,daily_pipeline_20260721.log
+digest_chain,2026-07-21 07:00:00,0.5,success,n8n exec 3
+pipeline,2026-07-22 00:30:00,23.5,ok,daily_pipeline_20260722.log
+digest_chain,2026-07-22 07:00:00,0.1,success,n8n exec 4
+pipeline,2026-07-22 19:01:44,167.3,ok,daily_pipeline_20260722.log
+backup,2026-07-22 19:20:01,1.2,success,n8n exec 12
+pipeline,2026-07-23 00:30:02,320.1,2 step-failures,daily_pipeline_20260723.log

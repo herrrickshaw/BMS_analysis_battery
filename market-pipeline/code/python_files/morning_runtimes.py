@@ -65,7 +65,13 @@ def pipeline_runs() -> list[dict]:
                 t1 = datetime.strptime(done.group(1).strip(), fmt)
             except ValueError:
                 continue
-            fails = len(re.findall(r"failed \(continuing\)", section))
+            # The [ALERT] trailer is authoritative: guarded steps register
+            # failures without printing "failed (continuing)" (the 2026-07-23
+            # run had 2 ALERT failures and zero "failed (continuing)" lines —
+            # this ledger's first version scored it "ok").
+            alert = re.search(r"\[ALERT\] (\d+) step\(s\) failed", section)
+            fails = int(alert.group(1)) if alert else \
+                len(re.findall(r"failed \(continuing\)", section))
             rows.append({"surface": "pipeline",
                          "started_ist": t0.strftime("%Y-%m-%d %H:%M:%S"),
                          "duration_min": round((t1 - t0).total_seconds() / 60, 1),

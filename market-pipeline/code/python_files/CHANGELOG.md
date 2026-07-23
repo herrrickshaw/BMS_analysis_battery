@@ -20,6 +20,61 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Watchlist digest: liquidity gate, green-first ordering, "why" column
+
+The 07:00 digest (watchlist_digest.py, n8n-sent) previously ranked by status
+tier (held > watch > signal > sold) and printed the raw machine note. Three
+changes, all user-requested:
+
+* **Green movers first.** Colour is now the PRIMARY sort (🟢 → ⚪ → 🔴 → ❔),
+  status tier demoted to tie-break within a colour. The old "owning something
+  is the reason to look first" ordering lost to "what moved today" — with 883
+  rows the held block buried every mover below the fold.
+* **Liquidity gate + tier column.** Median 60d Close×Volume in USD (FX via
+  liquidity.py's cached rates), tiered on the SAME absolute bands the scan
+  workbooks print (T1 ≥$12M … T4 above floor) so the label means one thing
+  everywhere. Names below the floor (adaptive_liquidity.scan_floor: India
+  ₹1cr/day policy, $10k structural elsewhere) move to a muted bottom strip —
+  visible, not deleted. First run: 76 of 883 below floor, several of them
+  green (EMAMIPAP +20% — exactly the untradeable-mover trap the gate exists
+  for). Unmeasurable liquidity fails OPEN ("?"), matching scan_gate's ethos.
+  REJECTED: percentile tiers (adaptive_liquidity.retier) — the watchlist is a
+  biased ~880-name sample, and a percentile within it would not mean
+  "percentile within the market".
+  REJECTED: liquidity.scan_gate() directly — it derives currency from the
+  ticker suffix, and the watchlist stores IN/KR/JP bare ('RELIANCE' would be
+  read as USD, inflating turnover ~83x). Currency now comes from the suffix
+  when present, else the market column.
+* **"Why on the list" column.** Status + note expanded to a readable reason
+  ("screener signal: grade-A breakout (breakout_quality) on 2026-07-21",
+  "recurring mover x3 +5.2% since …"). Pre-ledger signal rows whose note is
+  just a company name are labelled "source not recorded" rather than passing
+  the name off as a reason.
+* **KR/JP/EU rows finally price.** market_cache/ohlc/ is US-only (7,657 bare
+  tickers), so every KR row — all 125 — had shipped as "not in cache" since
+  the digest existed. Prices were local all along, in the year-partitioned
+  warehouse signal_tracker reads (global-market-data/warehouse/ohlcv, fresh
+  through today). _load_ohlc now falls back to it, loading each market once
+  per run (last TWO year partitions, so early-January still has the 10 bars
+  the turnover median needs; per-symbol filtered reads at ~0.4s each were
+  rejected — 190 of them is minutes). Symbol spelling bridged, not rewritten:
+  the watchlist keeps broker-style bare KR codes ('5360'), the loader tries
+  '005360.KS' then '.KQ' (venue unrecorded), JP gets '.T'. Missing rows
+  282 → 68 (KR 125→5, JP 65→1, EU 23→1); the survivors are genuine gaps —
+  ETFs (EEM, SOXL, NIFTYBEES) and renamed/delisted names, correctly surfaced
+  as ❔ rather than papered over. Digest runtime 3.8s → 8.6s.
+
+### 00:30 run: 2 steps failed on a path both scripts had already abandoned
+
+ingest (market_ingest.py refresh_symbol_names) and ratios (financial_ratios.py)
+both tracebacked reading `~/Downloads/market_cache/symbol_master.parquet` —
+`Operation not permitted`, the TCC/launchd-vs-Downloads failure mode this
+pipeline migrated away from on 2026-07-16. Both scripts still HARDCODED the
+Downloads copy for symbol_master even though the plist exported
+MARKET_CACHE=~/market-pipeline/market_cache. Fixed same morning (04:51): both
+now honor $MARKET_CACHE with the live tree as default. Everything else in the
+run succeeded — brief validated against screener.in (6 names agree) and sent.
+
 ### The XBRL × CA × bhavcopy join is live (pit_event_studies.py)
 
 Three fully point-in-time India studies on adjusted prices, abnormal vs daily

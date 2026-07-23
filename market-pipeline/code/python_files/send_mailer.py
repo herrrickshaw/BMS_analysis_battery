@@ -54,12 +54,13 @@ def _digest_section() -> tuple:
         frames = {}
         rows = W.build_rows(wl, frames_out=frames)
         W.assign_sectors(rows)
+        W.assign_recommendations(rows)
         as_of = max([r["last"] for r in rows if r["last"]] or ["?"])
         # picks-based subject: the digest is portfolio-free (2026-07-23), so
         # the subject counts what the ANALYSIS found, not what is held
         picks = [r for r in rows if r.get("status") in ("watch", "signal", "justified")
                  and not r.get("missing") and not r.get("below_floor")]
-        buy_n = sum(1 for r in picks if r.get("zone") == "BUY")
+        buy_n = sum(1 for r in picks if r.get("rec", r.get("zone")) == "BUY")
         new_n = sum(1 for r in picks
                     if r.get("days_in") is not None and r["days_in"] <= 1)
         # charts (treemap / RRG / breadth) — fail-soft PNGs. Body references
@@ -169,6 +170,22 @@ if __name__ == "__main__":
     if digest_full:
         fname = f"watchlist_full_{_dt.date.today():%Y-%m-%d}.html"
         attachments = [(fname, digest_full)]
+    # bundle-validation report (monthly refresh, [16c]) rides as a small HTML
+    # attachment so the "are we closet-indexing?" answer travels with the picks
+    bv = Path("reports/bundle_validation.md")
+    if attachments and bv.exists():
+        import re as _re
+        md = bv.read_text()
+        h = md
+        h = _re.sub(r"^## (.+)$", r'<h2 style="color:#0B2F4A;font-size:15px;margin:14px 0 4px">\1</h2>', h, flags=_re.M)
+        h = _re.sub(r"^# (.+)$", r'<h1 style="color:#0B2F4A;font-size:18px">\1</h1>', h, flags=_re.M)
+        h = _re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", h)
+        h = _re.sub(r"^- (.+)$", r'<div style="margin:2px 0 2px 12px">• \1</div>', h, flags=_re.M)
+        h = ('<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;'
+             'max-width:680px;font-size:13px;color:#333;background:#eef4f6;'
+             'padding:14px;border-radius:8px">'
+             + h.replace("\n\n", "<br>") + "</div>")
+        attachments.append((f"bundle_validation_{_dt.date.today():%Y-%m}.html", h))
     if "--draft" in sys.argv:
         Path("brief_today.html").write_text(html)
         if digest_full:

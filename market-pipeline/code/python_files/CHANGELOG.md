@@ -29,6 +29,26 @@ Decisions and material changes to the pipeline, newest first.
   change. Rejected alternative: wait for approval before scheduling — that
   turns "approved" into a fact someone must notice manually.
 
+## 2026-07-23 (later) — gap-fill landed + validated; dual-source JP validation
+
+- **EC2 collection COMPLETE**: 3.52M rows / 10,257 tickers, 1 failed ticker
+  (8013.HK, no Yahoo data). Full DB + exports live in dropbox:market-data-ec2/
+  (NOT local — user directive). Instance i-0fb61188e3373794f STOPPED after.
+- **JP backfill validated vs official JPX**: 489/494 return-series checked,
+  ONE real flag — 7343.T 2026-03-30 (ours −4.65% vs official −9.66%, partial-
+  adjustment signature; quarantine that ticker's history before backtesting).
+- **jp_dual_validator.py (new)**: kabupy × J-Quants mutual validation.
+  Identity mapping 119/119 clean (the 1 name flag = full-width-space artifact).
+  ROE/PER divergences are FY-vintage skew (JQ free window ends 2026-04-30 ≈
+  FY2025; kabupy scrapes FY2026) — expected, not corruption. 🔴 kabupy `price`
+  + `market_capitalization` are DOM-broken (2026-07) — never use those fields.
+- **Compact snapshot** (global-stock-screener `compact-snapshot-2026-07-23`,
+  also dropbox:market-data-ec2/compact/): 2025+ OHLCV, 7 markets, 33k symbols
+  incl. full NSE+BSE India and first-ever full HK; liquidity_filters.parquet
+  (ADV/pct_days/Amihud, T1–T4). 🔑 gapfill exports contain duplicate
+  (Symbol,Date) rows from a restart overlap — dedup via QUALIFY row_number
+  (compact builder already does).
+
 ## 2026-07-23 — Korea fundamentals from DART; J-Quants V2 validator; EC2 gap-fill
 
 - **Korea joins financial_ratios via official DART filings** (`dart_kr_store.py`
@@ -70,6 +90,60 @@ mistakes were made, and the mistakes here have repeated.
 ---
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
+
+### Per-market Buy/Hold/Sell rules (the uniform trend rule was wrong)
+
+backtest_zone_rules.py tested 4 candidate zone rules on each market's own 10y
+weekly panel (BUY−SELL forward-2wk spread, penny-floored, ±40% winsorized,
+de-overlapped t). Result overturns the uniform EMA-trend rule:
+
+| market | trend (old) | mean-revert | winner |
+|---|---|---|---|
+| IN | +0.15% t0.6 | +0.24% t1.4 | none sig → keep trend |
+| US | −0.22% t−1.5 | +0.41% t2.0 | **mean-revert** |
+| JP | −0.16% | +0.28% **t3.1** | **mean-revert** |
+| KR | −0.29% **t−2.5** | +0.20% t2.4 | **mean-revert** |
+| EU | −0.18% | +0.24% t1.9 | **mean-revert** |
+
+Trend-following is SIGNIFICANTLY NEGATIVE in Korea (t−2.5) — buying strength
+loses, matching the KOSPI-contrarian / retail-reversal literature (Balvers-Wu
+2005; emerging-market fast reversion; 2026 KR inverse-ETF behaviour). India
+has no significant short-horizon technical edge — consistent with its value
+(not momentum) profile; keeps trend as the incumbent.
+
+Implementation (user chose SPLIT semantics): assign_recommendations() sets
+r['rec'] from each market's winning rule (cache_seed/zone_rules.json) —
+cross-sectional tercile for mean-revert markets, per-name EMA for trend/India.
+The mailer's chip, buy-zone sort, thematic picks, and subject now use `rec`.
+EVICTION/PURGE are untouched — still the trend SELL-streak (`zone`), the
+genuine-decliner check validated earlier — so a mean-revert "SELL/overbought"
+winner shows a trim flag, never a death clock (the ⏳ clock appears only on
+trend-broken names). Header prints the rule per market so a US name reading
+SELL on a green day is explained (overbought, not falling).
+
+### Data gaps fixed at the root (watchlist_repair.py, pipeline [13y])
+
+The three standing gaps were symptoms of identifiable causes, now repaired
+from authoritative sources (user: "use direct NSE website and EDGAR"):
+
+* **Renames** — NSE's own symbolchange.csv (chain-resolved: ITCAGRO→ATFL→
+  SUNDROP): 14 applied incl. AMARAJABAT→ARE&M, TATAMOTORS→TMPV (kills the
+  daily yfinance 404), CENTURYTEX→ABREL, GMRINFRA→GMRAIRPORT. Old symbol
+  preserved in the note.
+* **Wrong symbols** — 6 corrected by conservative unique-prefix match against
+  the current EQUITY list (GMDC→GMDCLTD); ambiguous → untouched.
+* **Delisted/merged/non-equity** — 48 tracking rows archived WITH REASONS:
+  HDFC (merged into HDFCBANK 2023), GSPL (merged into Gujarat Gas), EMBASSY
+  (REIT, not EQ series), BAAZARSTYLE (bad symbol; real one is STYLEBAAZA,
+  prefix rule correctly refused to guess). US rows checked against SEC
+  EDGAR's company_tickers.json. held/sold rows exempt everywhere.
+
+Effect on the mailed gaps: "45 names no price data" → GONE (remaining
+missing are held-tier ETFs, outside the research view); sector-unlabelled
+111→90 (renamed names now resolve; residue is KOSDAQ names yfinance can't
+classify — pykrx's sector API is broken upstream, KeyError '종가');
+stale-vs-market 36→31 (listed-but-thin/suspended, correctly still reported).
+Runs daily as [13y] before the value screen; downloads cached 7 days.
 
 ### Bundle validation vs real funds/indices (user request)
 

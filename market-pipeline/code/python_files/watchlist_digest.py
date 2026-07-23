@@ -551,6 +551,69 @@ def sell_streak(z: Optional[pd.Series]) -> int:
     return n
 
 
+# ── per-market BUY/HOLD/SELL recommendation (backtest_zone_rules.py) ─────────
+# The zone above (EMA trend) is kept for EVICTION — a name below EMA50 for >5
+# sessions is a genuine decliner in ANY market, which is the right thing to
+# purge. But the RECOMMENDATION shown to the reader is per-market: our own 10y
+# backtest (reports/zone_rules_by_market.md) found the uniform trend rule is
+# significantly WRONG in US/JP/KR/EU (negative BUY−SELL spread; Korea t−2.5),
+# where mean-reversion wins; India shows no significant short-horizon technical
+# edge so it keeps trend. The two concepts are split ON PURPOSE (user,
+# 2026-07-23) so a valid overbought winner is recommended SELL/trim without
+# being auto-evicted as if it were dead.
+_ZONE_RULES: Optional[dict] = None
+
+
+def _zone_rules() -> dict:
+    global _ZONE_RULES
+    if _ZONE_RULES is None:
+        import json
+        try:
+            _ZONE_RULES = json.loads(
+                (R.CODE / "cache_seed" / "zone_rules.json").read_text()
+                if hasattr(R, "CODE") else
+                (Path(__file__).parent / "cache_seed" / "zone_rules.json").read_text())
+        except Exception:
+            _ZONE_RULES = {}
+    return _ZONE_RULES
+
+
+RULE_LABEL = {"trend": "trend", "revert": "mean-revert",
+              "mom126": "6mo-momentum", "mom_st": "1mo-momentum"}
+
+
+def assign_recommendations(rows: list) -> None:
+    """Set r['rec'] (BUY/HOLD/SELL) and r['rec_rule'] per each market's winning
+    rule. Cross-sectional rules (mean-revert / momentum) rank WITHIN the
+    market's priced rows this morning; trend reuses the per-name EMA zone.
+    """
+    rules = _zone_rules()
+    for r in rows:
+        r["rec"], r["rec_rule"] = r.get("zone", "?"), "trend"
+    by_mkt = {}
+    for r in rows:
+        if not r.get("missing"):
+            by_mkt.setdefault(r["market"], []).append(r)
+    for mkt, grp in by_mkt.items():
+        rule = rules.get(mkt, {}).get("rule", "trend")
+        for r in grp:
+            r["rec_rule"] = rule
+        if rule == "trend":
+            continue                       # r['rec'] already = EMA zone
+        # cross-sectional signal within the market
+        key = {"revert": "d5", "mom_st": "d5", "mom126": "d5"}.get(rule, "d5")
+        vals = [(r, r.get(key)) for r in grp if r.get(key) is not None]
+        if len(vals) < 6:
+            continue
+        s = pd.Series({id(r): v for r, v in vals}).rank(pct=True)
+        for r, _ in vals:
+            p = s[id(r)]
+            if rule == "revert":           # buy oversold (bottom third)
+                r["rec"] = "BUY" if p <= 1 / 3 else ("SELL" if p >= 2 / 3 else "HOLD")
+            else:                          # momentum: buy strength (top third)
+                r["rec"] = "BUY" if p >= 2 / 3 else ("SELL" if p <= 1 / 3 else "HOLD")
+
+
 _NOTE_DATE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 
 
@@ -905,16 +968,21 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
         return (f'<span style="background:{bg};color:{fg};padding:1px 7px;'
                 f'border-radius:9px;font-weight:600;font-size:12px">{pct:+.1f}%</span>')
 
+    # chip shows the per-market RECOMMENDATION (r['rec']); the eviction clock
+    # rides the separate trend SELL-streak (r['zone']/r['streak']) so a
+    # mean-revert "SELL/overbought" winner shows a trim flag, not a death clock.
     ZCHIP = {"BUY": '<span style="color:#16a085;font-size:11px">🟩 buy</span>',
              "HOLD": '<span style="color:#d35400;font-size:11px">🟨 hold</span>',
              "SELL": '<span style="color:#ca3433;font-size:11px">🟥 sell</span>',
              "?": '<span style="color:#bbb;font-size:11px">—</span>'}
 
     def _zchip(r):
-        c = ZCHIP.get(r.get("zone"), ZCHIP["?"])
+        c = ZCHIP.get(r.get("rec", r.get("zone")), ZCHIP["?"])
+        # eviction clock only where the trend zone (not the recommendation) is
+        # sustained-SELL — the decliner check that actually drives eviction
         if r.get("zone") == "SELL" and r.get("streak", 0):
             c += (f'<span style="color:#ca3433;font-size:10px"> '
-                  f'{r["streak"]}d/{SELL_STREAK_LIMIT + 1}</span>')
+                  f'⏳{r["streak"]}d/{SELL_STREAK_LIMIT + 1}</span>')
         return c
 
     def _since(r):
@@ -961,7 +1029,7 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
     # sort: buy zone first, then green first, then move size — a pick list
     # leads with what is actionable
     zrank = {"BUY": 0, "HOLD": 1, "?": 2, "SELL": 3}
-    priced.sort(key=lambda r: (zrank.get(r.get("zone"), 2),
+    priced.sort(key=lambda r: (zrank.get(r.get("rec", r.get("zone")), 2),
                                -(r["d1"] if r["d1"] is not None else -99)))
 
     # ── categories ───────────────────────────────────────────────────────────
@@ -977,10 +1045,10 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
     ranked_secs = sorted(((sec, _median([x["d1"] for x in g]) or 0, g)
                           for sec, g in secs.items() if len(g) >= 4),
                          key=lambda t: -t[1])[:3]
-    thematic = [r for _, _, g in ranked_secs for r in g if r.get("zone") == "BUY"]
+    thematic = [r for _, _, g in ranked_secs for r in g if r.get("rec") == "BUY"]
     theme_names = " · ".join(f"{sec} {m:+.1f}%" for sec, m, _ in ranked_secs)
 
-    buy_n = sum(1 for r in priced if r.get("zone") == "BUY")
+    buy_n = sum(1 for r in priced if r.get("rec", r.get("zone")) == "BUY")
     new_n = sum(1 for r in priced if r.get("days_in") is not None and r["days_in"] <= 1)
 
     body = [
@@ -994,6 +1062,18 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
         f'<span style="color:#7ce0c3">{buy_n} in buy zone</span> · {new_n} new today · '
         'no portfolio positions in this view</div></div>',
     ]
+    # per-market recommendation rule (backtested), so a reader knows why a US
+    # name reads SELL on a green day (mean-revert = overbought) vs an India one
+    rules_used = {}
+    for r in priced:
+        rules_used.setdefault(r["market"], r.get("rec_rule", "trend"))
+    if rules_used:
+        body.append(
+            '<p style="font-size:11px;color:#5f6368;margin:4px 0 0">'
+            'Buy/Hold/Sell rule per market (backtested, '
+            '<a href="#" style="color:#5f6368">zone_rules_by_market.md</a>): '
+            + " · ".join(f'{FLAG.get(m, m)} {RULE_LABEL.get(rl, rl)}'
+                         for m, rl in sorted(rules_used.items())) + '</p>')
     # moneycontrol-style filter chip row
     chips = []
     for key, title in CATEGORIES:
@@ -1231,6 +1311,7 @@ def main() -> int:
 
     rows = build_rows(wl)
     assign_sectors(rows, fetch_cap=10_000 if args.build_sectors else SECTOR_FETCH_CAP)
+    assign_recommendations(rows)
     as_of = max([r["last"] for r in rows if r["last"]] or ["?"])
     html = render(rows, as_of, purged=purged)
 

@@ -129,6 +129,15 @@ FAILURES=()
   # with NO liquidity gate when the FX fetch failed; India momentum-only) was
   # invisible in its own scan and obvious side by side. Non-fatal: it registers a
   # FAILURE so the alert fires, without blocking a brief that is mostly sound.
+  # [13y] Watchlist repair — fixes data gaps at the ROOT before anything
+  # renders: NSE renames applied (symbolchange.csv, chain-resolved), wrong
+  # symbols corrected against the current EQUITY list, ETFs/delisted names
+  # archived with reasons (EDGAR registry check for US). Cheap: two cached
+  # downloads, refreshed weekly.
+  step "[13y/14] watchlist repair (renames/delists/ETFs)"
+  $PY watchlist_repair.py \
+    || FAILURES+=("repair: watchlist renames/delists")
+
   # [13z] Value re-rating screen (India) — the combined signal the PE
   # backtests earned (2026-07-23): cheap vs own sector ∩ expanding 12M PE,
   # ₹1cr/day liquidity-gated at source, top-15 promoted to watchlist.csv as
@@ -191,6 +200,19 @@ FAILURES=()
   step "[16/16] cloud backup (rclone -> Google Drive)"
   /Users/umashankar/scripts/cloud_backup.sh \
     || FAILURES+=("cloud: rclone backup (see cloud_backup.log)")
+
+  # [16d] Monthly refresh of the per-market zone rules + PE anomaly stats
+  # (backtests over 10y panels; slow-ish, monthly is plenty). Same marker
+  # pattern. zone_rules.json feeds the digest's per-market Buy/Hold/Sell.
+  ZR_MARK="$HOME/.local/state/zone_rules_last_build"
+  if [[ "$(cat "$ZR_MARK" 2>/dev/null)" != "$(date +%Y-%m)" ]]; then
+    step "[16d] monthly zone-rule + PE-anomaly backtests"
+    $PY backtest_zone_rules.py > /dev/null 2>&1 \
+      && $PY backtest_pe_anomalies.py > /dev/null 2>&1 \
+      && { mkdir -p "$(dirname "$ZR_MARK")" && date +%Y-%m > "$ZR_MARK"; \
+           echo "  zone rules + PE anomalies refreshed"; } \
+      || FAILURES+=("backtest: zone rules / PE anomalies")
+  fi
 
   # [16c] Monthly bundle validation vs public benchmarks (user, 2026-07-23).
   # Runs the first pipeline run of each month, AFTER the mailer step has done

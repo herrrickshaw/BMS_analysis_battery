@@ -39,6 +39,9 @@
 #     JP via TSE 33-industry codes, others via capped incremental yfinance —
 #     `--build-sectors` backfills in one sitting), and liquidity × returns
 #     (is the strength in names you can actually buy?).
+#   * ZONE-FIRST LAYOUT — 🟩 Buy zone (all countries, one table) → 🟨 Hold →
+#     🟥 Sell (with eviction-clock Streak column) → ❔ Unmeasured; exited
+#     positions in a muted strip; "🆕 joined / 🪦 left" churn line up top.
 #   * ORDER — 🟢 movers first, then flat, then 🔴, misses last; status tier
 #     (held > watch > signal > sold) breaks ties within a colour.
 #   * LIQUIDITY — every row gets a "Liq" tier (T1..T4, same absolute USD bands
@@ -753,16 +756,13 @@ def render(rows: list, as_of: str) -> str:
         render_dashboard(rows + justified + illiquid),
     ]
 
-    # ── country-specific watchlists ──────────────────────────────────────────
-    # One section per market, green movers first within each (build_rows'
-    # global sort survives the groupby). New per-name columns: return and days
-    # since the name ENTERED the watchlist, and its BUY/HOLD/SELL zone with the
-    # trailing sell-streak (the eviction clock, visible before it fires).
-    FLAGS = {"IN": "🇮🇳 India", "US": "🇺🇸 US", "JP": "🇯🇵 Japan",
-             "KR": "🇰🇷 Korea", "EU": "🇪🇺 Europe"}
-    ZONE_CELL = {"BUY": '<span style="color:#0a0;font-weight:600">🟩 buy</span>',
-                 "HOLD": '<span style="color:#b8860b">🟨 hold</span>',
-                 "SELL": '<span style="color:#c00;font-weight:600">🟥 sell</span>'}
+    # ── zone-first organisation (user, 2026-07-23) ───────────────────────────
+    # BUY recommendations first — ALL countries in one table — then HOLD, then
+    # SELL at the bottom. Green-first ordering survives within each zone
+    # (build_rows' global sort). Exited rows are not recommendations and drop
+    # to a muted strip; ❔/insufficient-history names get their own short table
+    # rather than polluting a zone they were never measured for.
+    FLAG = {"IN": "🇮🇳", "US": "🇺🇸", "JP": "🇯🇵", "KR": "🇰🇷", "EU": "🇪🇺"}
 
     def _since_entry(r) -> str:
         if r.get("ret_entry") is not None:
@@ -774,56 +774,105 @@ def render(rows: list, as_of: str) -> str:
             return f'<span style="color:#999;font-size:11px">{r["entry_date"]}</span>'
         return '<span style="color:#ccc">—</span>'
 
-    def _zone(r) -> str:
-        cell = ZONE_CELL.get(r.get("zone"), '<span style="color:#bbb">?</span>')
-        if r.get("zone") == "SELL" and r.get("streak", 0) > 0:
-            cell += (f'<span style="color:#c00;font-size:10px"> {r["streak"]}d'
-                     f'/{SELL_STREAK_LIMIT + 1}</span>')
-        return cell
+    def _sym_cell(r) -> str:
+        st = r.get("status", "held")
+        tag = {"watch": '<span style="color:#7a9;font-size:10px"> watch</span>',
+               "signal": '<span style="color:#c80;font-size:10px"> signal</span>'}.get(st, "")
+        # 🆕 marks the daily churn: names that entered within the last 2 days.
+        new = ' <span style="font-size:10px">🆕</span>' \
+            if (r.get("days_in") is not None and r["days_in"] <= 1) else ""
+        return (f'{r["mark"]} <b>{r["symbol"]}</b> '
+                f'{FLAG.get(r["market"], r["market"])}{tag}{new}')
 
-    mkts = [m for m in ("IN", "US", "JP", "KR", "EU")
-            if any(r["market"] == m for r in rows)]
-    mkts += sorted({r["market"] for r in rows} - set(mkts))
-    for mkt in mkts:
-        grp = [r for r in rows if r["market"] == mkt]
-        g_up = sum(1 for r in grp if r["mark"] == "🟢")
-        g_dn = sum(1 for r in grp if r["mark"] == "🔴")
+    active = [r for r in rows if r.get("status") in ("held", "watch", "signal")]
+    exited = [r for r in rows if r.get("status") == "sold"]
+    joined = [r for r in active if r.get("days_in") is not None and r["days_in"] <= 1]
+
+    # today's churn, up front — the watchlist is DYNAMIC and the mailer should
+    # say so before the tables do.
+    today = pd.Timestamp.today().strftime("%Y-%m-%d")
+    left_today = [r for r in evicted if f"evicted {today}" in (r.get("note") or "")]
+    if joined or left_today:
+        churn = []
+        if joined:
+            churn.append('<span style="color:#0a0"><b>🆕 joined:</b> '
+                         + ", ".join(f'{r["symbol"]} {FLAG.get(r["market"], r["market"])}'
+                                     for r in joined[:20]) + '</span>')
+        if left_today:
+            churn.append('<span style="color:#c00"><b>🪦 left:</b> '
+                         + ", ".join(f'{r["symbol"]} {FLAG.get(r["market"], r["market"])}'
+                                     for r in left_today[:20]) + '</span>')
+        body.append('<p style="font-size:12px;margin:10px 0 0">'
+                    + ' &nbsp;·&nbsp; '.join(churn) + '</p>')
+
+    ZONES = (("BUY", "🟩 Buy zone", "close > EMA20 > EMA50 — aligned uptrend"),
+             ("HOLD", "🟨 Hold zone", "between the EMAs — no signal either way"),
+             ("SELL", "🟥 Sell zone",
+              f"close < EMA50 — evicted after {SELL_STREAK_LIMIT + 1} straight sessions"),
+             ("?", "❔ Unmeasured", "not in cache or under 25 bars of history"))
+    for zkey, ztitle, zdesc in ZONES:
+        grp = [r for r in active if r.get("zone", "?") == zkey]
+        if not grp:
+            continue
+        held_n = sum(1 for r in grp if r["status"] == "held")
         body.append(
-            f'<h3 style="margin:16px 0 4px">{FLAGS.get(mkt, mkt)} '
+            f'<h3 style="margin:18px 0 4px">{ztitle} '
             f'<span style="font-weight:400;color:#777;font-size:12px">'
-            f'{len(grp)} names · {g_up}🟢 {g_dn}🔴</span></h3>')
+            f'{len(grp)} names ({held_n} held) — {zdesc}</span></h3>')
+        streak_th = '<th>Streak</th>' if zkey == "SELL" else ''
         body.append(
             '<table style="border-collapse:collapse;width:100%;font-size:13px">'
             '<tr style="text-align:left;border-bottom:2px solid #ddd;font-size:12px;color:#555">'
             '<th style="padding:5px 4px">Symbol</th><th>1d</th><th>5d</th>'
-            '<th>Since entry</th><th>Zone</th><th>Close</th><th>Liq</th>'
+            f'<th>Since entry</th>{streak_th}<th>Close</th><th>Liq</th>'
             '<th>As of</th><th>Why on the list</th></tr>')
         for r in grp:
-            st = r.get("status", "held")
-            muted = st in ("sold", "watch")
-            colour = "#999" if muted else {"🟢": "#0a0", "🔴": "#c00"}.get(r["mark"], "#666")
-            tag = {"sold": '<span style="color:#aaa;font-size:10px"> exited</span>',
-                   "watch": '<span style="color:#7a9;font-size:10px"> watch</span>',
-                   "signal": '<span style="color:#c80;font-size:10px"> signal</span>'}.get(st, "")
             if r["missing"]:
                 body.append(
                     f'<tr style="border-bottom:1px solid #f0f0f0;color:#b00">'
-                    f'<td style="padding:5px 4px">❔ <b>{r["symbol"]}</b></td>'
-                    f'<td colspan="7" style="font-size:12px">not in local cache — '
+                    f'<td style="padding:5px 4px">❔ <b>{r["symbol"]}</b> '
+                    f'{FLAG.get(r["market"], r["market"])}</td>'
+                    f'<td colspan="6" style="font-size:12px">not in local cache — '
                     f'ingest.sh has never fetched it</td>'
                     f'<td style="font-size:12px">{r["why"]}</td></tr>')
                 continue
+            colour = ("#999" if r["status"] == "watch"
+                      else {"🟢": "#0a0", "🔴": "#c00"}.get(r["mark"], "#666"))
+            streak_td = ""
+            if zkey == "SELL":
+                s = r.get("streak", 0)
+                warn = "#c00" if s >= SELL_STREAK_LIMIT else "#b8860b"
+                streak_td = (f'<td style="color:{warn};font-size:12px">'
+                             f'{s}d/{SELL_STREAK_LIMIT + 1}</td>')
             body.append(
                 f'<tr style="border-bottom:1px solid #f0f0f0">'
-                f'<td style="padding:5px 4px">{r["mark"]} <b>{r["symbol"]}</b>{tag}</td>'
+                f'<td style="padding:5px 4px">{_sym_cell(r)}</td>'
                 f'<td style="color:{colour};font-weight:600">{_fmt(r["d1"])}</td>'
                 f'<td style="color:#666">{_fmt(r["d5"])}</td>'
                 f'<td style="font-size:12px">{_since_entry(r)}</td>'
-                f'<td style="font-size:12px">{_zone(r)}</td>'
+                f'{streak_td}'
                 f'<td>{r["close"]:,.2f}</td>'
                 f'<td style="color:#999;font-size:11px">{r["liq"]}</td>'
                 f'<td style="color:#999;font-size:11px">{r["last"] or "?"}</td>'
                 f'<td style="color:#666;font-size:12px">{r["why"]}</td></tr>')
+        body.append('</table>')
+
+    if exited:
+        body.append(
+            '<h3 style="margin:18px 0 4px">💼 Exited positions '
+            f'<span style="font-weight:400;color:#777;font-size:12px">'
+            f'({len(exited)} — kept for the record, not recommendations)</span></h3>'
+            '<table style="border-collapse:collapse;width:100%;font-size:12px">')
+        for r in exited:
+            cell = (f'{_fmt(r["d1"])} · close {r["close"]:,.2f}'
+                    if not r["missing"] else "not in cache")
+            body.append(
+                f'<tr style="border-bottom:1px solid #f4f4f4;color:#888">'
+                f'<td style="padding:4px"><b>{r["symbol"]}</b> '
+                f'{FLAG.get(r["market"], r["market"])}</td>'
+                f'<td style="font-size:11px">{cell}</td>'
+                f'<td style="font-size:11px">{_since_entry(r)}</td>'
+                f'<td style="font-size:11px">{r["note"]}</td></tr>')
         body.append('</table>')
 
     if illiquid:

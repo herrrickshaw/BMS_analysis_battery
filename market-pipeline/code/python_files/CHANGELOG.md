@@ -44,6 +44,18 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Watchlist mailer reorganised zone-first (supersedes the country sections)
+
+Same day, second layout iteration on user request: recommendations are now
+grouped by ZONE across all countries — 🟩 Buy zone first (one table, all five
+markets, green-first within), 🟨 Hold below, 🟥 Sell at the bottom (with the
+per-name eviction clock as a Streak column), ❔ Unmeasured last. The
+per-country sections this replaces lived for exactly one send. Exited
+positions drop to a muted strip — they are records, not recommendations.
+Daily churn is surfaced up top: a "🆕 joined / 🪦 left" line names what entered
+(signal_tracker/recurring_movers, nightly) and what the sell-zone rule evicted
+this morning, so the watchlist reads as the living list it now is.
+
 ### Watchlist: country sections, entry tracking, buy/hold/sell zones, auto-eviction
 
 * **Schema** — watchlist.csv grew `entry_date`/`entry_price`, stamped at ADD

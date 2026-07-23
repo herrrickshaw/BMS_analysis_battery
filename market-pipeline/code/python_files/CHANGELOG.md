@@ -57,6 +57,20 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Digest rides the pipeline; smart-investing.in template
+
+* **Trigger moved** — daily_pipeline.sh grew step [18/18]: the digest now
+  sends the moment the pipeline finishes (~05:50 IST), reading data that is
+  minutes old, instead of the fixed 07:00 n8n schedule. The n8n workflow
+  `watchlistdigest001` was DEACTIVATED (kept, not deleted — reactivate in the
+  n8n UI to fall back) and n8n restarted so the trigger deregistered. Two
+  triggers would have double-sent.
+* **Template** — restyled after smart-investing.in (user-supplied reference):
+  deep navy #0B2F4A banner and section strips, ice #eef4f6 canvas, white card
+  tables with #ecf1f6 header rows, teal #16a085 for gains/buy, #ca3433 for
+  losses/sell, coral #F07857 hold strip. Palette lifted from the site's own
+  CSS (styles_custom_2.min.css), not guessed from a screenshot.
+
 ### Watchlist mailer reorganised zone-first (supersedes the country sections)
 
 Same day, second layout iteration on user request: recommendations are now

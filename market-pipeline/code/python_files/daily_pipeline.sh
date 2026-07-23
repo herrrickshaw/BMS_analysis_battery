@@ -196,6 +196,15 @@ FAILURES=()
   /usr/bin/python3 /Users/umashankar/iudx-flood-collector/collector.py \
     || FAILURES+=("iudx: flood collector (see access_log in flood.duckdb)")
 
+  # [18] Watchlist digest — the zone-first mailer (Buy/Hold/Sell across all
+  # markets). Rides the END of the pipeline so it mails the moment the data it
+  # reads (ohlc cache, bhavcopy, warehouse) is fresh, replacing the fixed
+  # 07:00 n8n schedule (deactivated 2026-07-23) that could race a long run.
+  # --send also runs watchlist hygiene: entry backfill + sell-zone eviction.
+  step "[18/18] watchlist digest (zone mailer)"
+  $PY watchlist_digest.py --send \
+    || FAILURES+=("digest: watchlist mailer")
+
   if [[ ${#FAILURES[@]} -gt 0 ]]; then
     echo "[ALERT] ${#FAILURES[@]} step(s) failed: ${FAILURES[*]}"
     $PY send_alert.py "${FAILURES[@]}" || echo "  alert email itself failed to send"

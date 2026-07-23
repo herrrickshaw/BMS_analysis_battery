@@ -137,6 +137,13 @@ def main():
             f"select max(Date) from parquet_scan('{path}')").fetchone()[0]
         smn = sig.loc[sig["market"] == mkt, "signal_date"].min()
         note = f"{matched / n_sig:.0%} anchored · panel ends {str(pmx)[:10]}"
+        # signals newer than a symbol's last bar are PENDING-ENTRY, not
+        # unmatched — yesterday's scan anchors after the next panel refresh
+        fresh = int(sig.loc[(sig["market"] == mkt)
+                            & (sig["signal_date"] >= pd.Timestamp(pmx)),
+                            "signal_id"].nunique())
+        if fresh:
+            note += f" · {fresh} awaiting next bar"
         if pd.Timestamp(pmx) < smn:
             note += " — PANEL STALE, all signals pending until refresh"
         diags.append((mkt, n_sig, matched, note))

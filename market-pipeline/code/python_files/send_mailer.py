@@ -55,9 +55,13 @@ def _digest_section() -> tuple:
         rows = W.build_rows(wl, frames_out=frames)
         W.assign_sectors(rows)
         as_of = max([r["last"] for r in rows if r["last"]] or ["?"])
-        held = [r for r in rows if r.get("status", "held") == "held"]
-        up = sum(1 for r in held if r["mark"] == "🟢")
-        dn = sum(1 for r in held if r["mark"] == "🔴")
+        # picks-based subject: the digest is portfolio-free (2026-07-23), so
+        # the subject counts what the ANALYSIS found, not what is held
+        picks = [r for r in rows if r.get("status") in ("watch", "signal", "justified")
+                 and not r.get("missing") and not r.get("below_floor")]
+        buy_n = sum(1 for r in picks if r.get("zone") == "BUY")
+        new_n = sum(1 for r in picks
+                    if r.get("days_in") is not None and r["days_in"] <= 1)
         # charts (treemap / RRG / breadth) — fail-soft PNGs. Body references
         # them as cid: inline images (image MIME parts do NOT count toward
         # Gmail's ~102KB HTML clip); the full attachment inlines them as data:
@@ -72,12 +76,28 @@ def _digest_section() -> tuple:
         cid_refs = {k: f"cid:{k}" for k in pngs}
         data_refs = {k: "data:image/png;base64," + base64.b64encode(v).decode()
                      for k, v in pngs.items()}
+        # model portfolios: monthly-rebalanced co-movement bundles of the picks
+        bundle_vals = []
+        try:
+            import portfolio_bundles as PB
+            analysis = [r for r in rows
+                        if r.get("status") in ("watch", "signal", "justified")]
+            store = PB.maybe_build(analysis, frames)
+            bundle_vals = PB.value(store, analysis, frames)
+            if bundle_vals:
+                print(f"  bundles: {len(bundle_vals)} model portfolios "
+                      f"(built {store.get('built')})")
+        except Exception as be:  # noqa: BLE001
+            print(f"  bundles skipped: {str(be)[:100]}")
         # body = trimmed (stays under Gmail's ~102KB clip); attachment = the
         # SAME rows rendered untrimmed — attachments don't count toward the
         # clip, so nothing is lost, only demoted a click away.
-        return (W.render(rows, as_of, purged=purged, images=cid_refs),
-                f" + 📊 Watchlist ({up}↑ {dn}↓ of {len(held)} held)",
-                W.render(rows, as_of, purged=purged, full=True, images=data_refs),
+        return (W.render(rows, as_of, purged=purged, images=cid_refs,
+                         bundles=bundle_vals),
+                f" + 📊 Picks ({len(picks)} · {buy_n} buy-zone · "
+                f"{len(bundle_vals)} bundles)",
+                W.render(rows, as_of, purged=purged, full=True, images=data_refs,
+                         bundles=bundle_vals),
                 pngs)
     except Exception as e:  # noqa: BLE001 — isolation is the whole point
         print(f"  digest section failed (brief still sent): {str(e)[:120]}")

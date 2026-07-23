@@ -71,6 +71,60 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Model portfolios — the watchlist as a bundling tool
+
+portfolio_bundles.py (user, 2026-07-23): single-stock picks are now bundled
+into MUTUAL-FUND-STYLE portfolios, on the rationale that stocks which cluster
+together on return behaviour keep behaving similarly — the bundle is the
+tradeable thesis, not the individual name.
+
+* **Clustering**: average-linkage hierarchical on 1−corr of 90d daily returns,
+  per market, universe = above-floor BUY/HOLD picks with ≥60 bars; clusters
+  kept at 4-10 names with intra-corr ≥0.30. First build: 14 bundles — e.g.
+  "US · Energy" intra-corr 0.76, "IN · Financial Services" 0.63.
+* **Weights**: inverse-volatility (60d), 25% cap, renormalised. REJECTED
+  max-Sharpe/Markowitz (the ssrn-2747802 primer approach): mean estimates
+  from 90 daily bars are noise and MV optimisers amplify it into corner
+  solutions; inverse-vol needs no expected-return estimate at all. A future
+  upgrade path is HRP-style recursive bisection or ML-predicted returns
+  (s44199-025-00140-z), both of which slot into build() without changing the
+  store schema.
+* **Rebalance**: monthly, first pipeline run of the month (same exactly-once
+  marker pattern as the Dropbox purge archive); daily valuation reports each
+  bundle's 1d, since-formation return, weight DRIFT, and how many members
+  have decayed into the sell zone.
+* **Rationale per constituent** (procurement trail): which screen nominated
+  it, its avg correlation to the bundle, its vol → weight. In the full
+  attachment; the body shows fund-style cards (weights bar, drift, top-5).
+* Caveat recorded: clustering is instrument-type-blind — one bundle grouped
+  US preferred shares/CEFs (they DO co-move), and OILU (a 2x levered ETP)
+  landed in the Energy bundle. The instrument-type gap already lives in the
+  data-gaps section.
+
+### Mailer redesigned: portfolio-free, strategy-first, data-gaps section
+
+Full render() rewrite (user, 2026-07-23). The digest is now a RESEARCH
+product, not a portfolio tracker:
+
+* **Portfolio excluded** — held/sold rows dropped inside render(), so every
+  caller gets the analysis view; hygiene (maintain/evict/purge) still runs on
+  the full watchlist. Subject counts picks, not holdings: "+ 📊 Picks (442 ·
+  281 buy-zone · 28 new)".
+* **Strategy-first sections** (moneycontrol/INDmoney-style card UI: white
+  rounded cards, change pills, NEW badges, filter-chip index row): 🎯 Thematic
+  (buy-zone names inside the top-3 sectors by median 1d) · 🚀 Breakout (129) ·
+  📈 DMA crossovers (149) · 🏆 Piotroski+ROCE · 🧾 Piotroski+debt · 🎰 Triple ·
+  🔁 Recurring (28) · 🚄 Momentum · 🪫 RSI · 🧪 Justified (14). pick_category()
+  classifies from status+note; validated against all 531 live notes (zero
+  fell to "other"). Watch ideas (manual, not analysis) live in the FULL
+  attachment only. Cards sorted buy-zone first, then 1d move.
+* **🔍 Data gaps section** — computed fresh each run and mailed, because a gap
+  that only lives in a log stays open: names with no price data (45),
+  sector-unlabelled (103), liquidity-unmeasurable, rows staler than their own
+  market's latest bar (36), signals missing entry dates.
+* Body 98 KB (under the clip); zone tables from the previous layout are
+  superseded — zone survives as a per-card chip + the buy-zone-first sort.
+
 ### Three charts in the morning email (treemap / RRG / breadth)
 
 New watchlist_viz.py (matplotlib+numpy only), techniques from the open-source

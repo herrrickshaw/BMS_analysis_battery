@@ -179,6 +179,7 @@ def _pct_change(df: pd.DataFrame, bars: int = 1) -> Optional[float]:
 # the suffix when there is one (EU rows are pre-suffixed) and from the market
 # column otherwise.
 TIER_SHORT = {"T1_MEGA": "T1", "T2_LARGE": "T2", "T3_MID": "T3", "T4_SMALL": "T4"}
+FLAG = {"IN": "🇮🇳", "US": "🇺🇸", "JP": "🇯🇵", "KR": "🇰🇷", "EU": "🇪🇺"}
 
 
 def _fx_map() -> dict:
@@ -770,35 +771,119 @@ def _fmt(p: Optional[float]) -> str:
     return "—" if p is None else f"{p:+.2f}%"
 
 
+
+# ── strategy classification (moneycontrol/INDmoney-style sections) ───────────
+# The mailer is organised by WHICH ANALYSIS produced each pick (user redesign,
+# 2026-07-23) — portfolio holdings are excluded entirely; this is a research
+# product, not a portfolio tracker.
+CATEGORIES = (
+    ("thematic",  "🎯 Thematic — leading sectors"),
+    ("breakout",  "🚀 Breakout picks (grade-A quality)"),
+    ("dma",       "📈 DMA crossover picks"),
+    ("proce",     "🏆 Piotroski + ROCE picks"),
+    ("pdebt",     "🧾 Piotroski + debt-reduction picks"),
+    ("triple",    "🎰 Triple-confluence picks"),
+    ("recurring", "🔁 Recurring movers"),
+    ("momentum",  "🚄 Momentum picks"),
+    ("rsi",       "🪫 RSI-oversold picks"),
+    ("justified", "🧪 Justified screens (evidence-backed)"),
+    ("watch",     "👀 Watch ideas (manually added)"),
+    ("other",     "🧩 Other signals"),
+)
+CATEGORY_TITLE = dict(CATEGORIES)
+
+
+def pick_category(r: dict) -> str:
+    if r.get("status") == "justified":
+        return "justified"
+    if r.get("status") == "watch":
+        return "watch"
+    n = (r.get("note") or "").lower()
+    if n.startswith("technical") or "breakout" in n:
+        return "breakout"
+    if "golden_cross" in n or "dma" in n:
+        return "dma"
+    if "piotroski+roce" in n:
+        return "proce"
+    if "piotroski+debt" in n:
+        return "pdebt"
+    if n.startswith("triple"):
+        return "triple"
+    if n.startswith("recurring"):
+        return "recurring"
+    if re.search(r"mom @|6m mom", n):
+        return "momentum"
+    if "rsi" in n:
+        return "rsi"
+    return "other"
+
+
+def data_gaps(rows: list, as_of: str) -> list:
+    """Coverage gaps in the collected data, computed fresh each morning.
+
+    Surfaced IN the mailer because a gap that only lives in a log is a gap
+    that stays open — the 2026-07-15 lesson (four missing deps, silent for
+    days) applied to data instead of code.
+    """
+    gaps = []
+    miss = [r for r in rows if r.get("missing")]
+    if miss:
+        from collections import Counter
+        per = Counter(r["market"] for r in miss)
+        ex = ", ".join(r["symbol"] for r in miss[:6])
+        gaps.append(f"<b>{len(miss)} names have no price data</b> "
+                    f"({', '.join(f'{m}:{c}' for m, c in per.most_common())}) — "
+                    f"e.g. {ex}. ETFs and renamed/delisted tickers are not in the "
+                    f"equity caches.")
+    unclass = [r for r in rows if not r.get("missing")
+               and r.get("sector") == "Unclassified"]
+    if unclass:
+        gaps.append(f"<b>{len(unclass)} priced names lack a sector label</b> — "
+                    f"excluded from thematic/RRG views until the incremental "
+                    f"yfinance backfill resolves them.")
+    noliq = [r for r in rows if not r.get("missing") and r.get("liq") == "?"]
+    if noliq:
+        gaps.append(f"<b>{len(noliq)} names have unmeasurable liquidity</b> "
+                    f"(no Volume column or FX rate) — shown but untiered.")
+    # staleness vs each market's own freshest bar (US naturally lags IST by a
+    # day; a row older than ITS market is the real signal)
+    mk_max = {}
+    for r in rows:
+        if r.get("last"):
+            mk_max[r["market"]] = max(mk_max.get(r["market"], ""), r["last"])
+    stale = [r for r in rows if r.get("last") and r["last"] < mk_max[r["market"]]]
+    if stale:
+        gaps.append(f"<b>{len(stale)} rows are staler than their own market's "
+                    f"latest bar</b> — their tickers stopped updating in the "
+                    f"cache (rename/delist suspects).")
+    noent = [r for r in rows if r.get("status") == "signal"
+             and not r.get("entry_date")]
+    if noent:
+        gaps.append(f"<b>{len(noent)} signal rows have no entry date</b> — "
+                    f"since-entry returns unavailable for them.")
+    return gaps
+
+
 def render(rows: list, as_of: str, purged: Optional[list] = None,
-           full: bool = False, images: Optional[dict] = None) -> str:
-    """images: {'treemap'|'rrg'|'breadth': src} — src is a cid: reference in
-    the email body and a data: URI in the full attachment / draft."""
-    # Three tiers, not two. 'watch' names are neither owned nor exited — counting
-    # them as held would overstate the portfolio nearly fourfold.
-    live = [r for r in rows if r.get("status", "held") == "held"]
-    exited = [r for r in rows if r.get("status", "held") == "sold"]
-    watch = [r for r in rows if r.get("status", "held") == "watch"]
-    signals = [r for r in rows if r.get("status", "held") == "signal"]
-    # `justified` rows get their OWN table below the main one — they are picks
-    # from the evidence-first mailer, not portfolio state, and mixing them into
-    # the main table would bury both.
-    # Evicted rows are OUT of every live view — they exist only as a short
-    # "recently evicted" strip so a disappearance is explained, never silent.
-    evicted = [r for r in rows if r.get("status", "held") == "evicted"]
-    rows = [r for r in rows if r.get("status", "held") != "evicted"]
-    justified = [r for r in rows if r.get("status", "held") == "justified"]
-    rows = [r for r in rows if r.get("status", "held") != "justified"]
-    # Below-floor names come OUT of the main table into their own strip at the
-    # bottom: they stay visible (the liquidity call may age badly) but no longer
-    # compete for attention with names that can actually be bought.
+           full: bool = False, images: Optional[dict] = None,
+           bundles: Optional[list] = None) -> str:
+    """Strategy-first, portfolio-free mailer (user redesign 2026-07-23).
+
+    held/sold rows are dropped HERE, so every caller gets the research view —
+    the mailer reports what the ANALYSIS found, not what the portfolio holds.
+    images: {'treemap'|'rrg'|'breadth': src} (cid: in the body, data: in the
+    full attachment). full=True removes every cap.
+    """
+    # ── analysis universe: no portfolio, no exits ────────────────────────────
+    evicted = [r for r in rows if r.get("status") == "evicted"]
+    rows = [r for r in rows if r.get("status") in ("watch", "signal", "justified")]
     illiquid = [r for r in rows if r.get("below_floor")]
     rows = [r for r in rows if not r.get("below_floor")]
-    up = sum(1 for r in live if r["mark"] == "🟢")
-    dn = sum(1 for r in live if r["mark"] == "🔴")
-    flat = sum(1 for r in live if r["mark"] == "⚪")
-    miss = sum(1 for r in rows if r["missing"])
+    priced = [r for r in rows if not r["missing"]]
+    miss_rows = [r for r in rows if r["missing"]]
 
+    cap = 10 ** 6 if full else 5
+    scap = 10 ** 6 if full else 5
 
     def _img(key, alt):
         src = (images or {}).get(key)
@@ -807,294 +892,288 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
         return (f'<img src="{src}" alt="{alt}" '
                 f'style="width:100%;max-width:680px;border:1px solid #dfe7ec;'
                 f'border-radius:6px;margin:8px 0;display:block">')
-    # Template styled after smart-investing.in (user request 2026-07-23): deep
-    # navy #0B2F4A banner + section strips, ice #eef4f6 canvas, teal #16a085
-    # for gains/buy, #ca3433 for losses/sell, white card tables.
+
+    def _pill(pct):
+        if pct is None:
+            return '<span style="color:#bbb">—</span>'
+        up = pct >= 0
+        bg, fg = ("#e6f6f1", "#0c6b58") if up else ("#fbeaea", "#ca3433")
+        return (f'<span style="background:{bg};color:{fg};padding:1px 7px;'
+                f'border-radius:9px;font-weight:600;font-size:12px">{pct:+.1f}%</span>')
+
+    ZCHIP = {"BUY": '<span style="color:#16a085;font-size:11px">🟩 buy</span>',
+             "HOLD": '<span style="color:#d35400;font-size:11px">🟨 hold</span>',
+             "SELL": '<span style="color:#ca3433;font-size:11px">🟥 sell</span>',
+             "?": '<span style="color:#bbb;font-size:11px">—</span>'}
+
+    def _zchip(r):
+        c = ZCHIP.get(r.get("zone"), ZCHIP["?"])
+        if r.get("zone") == "SELL" and r.get("streak", 0):
+            c += (f'<span style="color:#ca3433;font-size:10px"> '
+                  f'{r["streak"]}d/{SELL_STREAK_LIMIT + 1}</span>')
+        return c
+
+    def _since(r):
+        if r.get("ret_entry") is not None:
+            colour = "#0c6b58" if r["ret_entry"] >= 0 else "#ca3433"
+            d = f' · {r["days_in"]}d' if r.get("days_in") is not None else ""
+            return f'<span style="color:{colour}">{r["ret_entry"]:+.1f}%{d}</span>'
+        return '<span style="color:#ccc">—</span>'
+
+    def _card_table(grp, sector_col=False):
+        out = ['<table style="border-collapse:collapse;width:100%;font-size:13px;'
+               'background:#fff;border:1px solid #dfe7ec;border-radius:0 0 8px 8px">']
+        for r in grp[:cap]:
+            new = (' <span style="font-size:9px;background:#0B2F4A;color:#fff;'
+                   'padding:0 4px;border-radius:6px">NEW</span>'
+                   if (r.get("days_in") is not None and r["days_in"] <= 1) else "")
+            sec = (f'<div style="color:#8aa0ae;font-size:10px">'
+                   f'{r.get("sector", "")}</div>' if sector_col else "")
+            out.append(
+                f'<tr style="border-bottom:1px solid #f0f4f7">'
+                f'<td style="padding:7px 8px"><b>{r["symbol"]}</b> '
+                f'<span style="font-size:11px">{FLAG.get(r["market"], r["market"])}'
+                f'</span>{new}{sec}</td>'
+                f'<td>{_zchip(r)}</td>'
+                f'<td style="text-align:right">{_pill(r["d1"])}</td>'
+                f'<td style="font-size:12px">{_since(r)}</td>'
+                f'<td style="color:#8aa0ae;font-size:11px">{r["close"]:,.2f} · '
+                f'{r.get("liq", "?")}</td></tr>')
+        if len(grp) > cap:
+            out.append(f'<tr><td colspan="6" style="padding:6px 8px;font-size:11px;'
+                       f'color:#5f6368;background:#f7fafc">… {len(grp) - cap} more — '
+                       f'full list in the attachment</td></tr>')
+        out.append('</table>')
+        return "".join(out)
+
+    def _section(title, sub, grp, sector_col=False):
+        return (f'<h3 style="margin:16px 0 0;background:#0B2F4A;color:#eef4f6;'
+                f'padding:8px 10px;border-radius:8px 8px 0 0;font-size:14px">{title} '
+                f'<span style="background:#16a085;color:#fff;border-radius:9px;'
+                f'padding:0 7px;font-size:11px">{len(grp)}</span> '
+                f'<span style="font-weight:400;color:#9fb8c9;font-size:11px">{sub}'
+                f'</span></h3>' + _card_table(grp, sector_col))
+
+    # sort: buy zone first, then green first, then move size — a pick list
+    # leads with what is actionable
+    zrank = {"BUY": 0, "HOLD": 1, "?": 2, "SELL": 3}
+    priced.sort(key=lambda r: (zrank.get(r.get("zone"), 2),
+                               -(r["d1"] if r["d1"] is not None else -99)))
+
+    # ── categories ───────────────────────────────────────────────────────────
+    cats = {}
+    for r in priced:
+        cats.setdefault(pick_category(r), []).append(r)
+
+    # thematic = BUY-zone names in the strongest sectors (median 1d, ≥4 names)
+    secs = {}
+    for r in priced:
+        if r.get("sector") not in (None, "", "Unclassified"):
+            secs.setdefault(r["sector"], []).append(r)
+    ranked_secs = sorted(((sec, _median([x["d1"] for x in g]) or 0, g)
+                          for sec, g in secs.items() if len(g) >= 4),
+                         key=lambda t: -t[1])[:3]
+    thematic = [r for _, _, g in ranked_secs for r in g if r.get("zone") == "BUY"]
+    theme_names = " · ".join(f"{sec} {m:+.1f}%" for sec, m, _ in ranked_secs)
+
+    buy_n = sum(1 for r in priced if r.get("zone") == "BUY")
+    new_n = sum(1 for r in priced if r.get("days_in") is not None and r["days_in"] <= 1)
+
     body = [
         '<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;'
         'max-width:680px;background:#eef4f6;padding:14px;border-radius:10px">',
         '<div style="background:#0B2F4A;color:#eef4f6;padding:14px 16px;'
         'border-radius:8px;margin-bottom:6px">'
-        '<div style="font-size:19px;font-weight:700">📊 Watchlist Dashboard</div>'
+        '<div style="font-size:19px;font-weight:700">📊 Market Picks — analysis digest</div>'
         f'<div style="font-size:12px;color:#9fb8c9;margin-top:2px">{as_of} · '
-        f'{len(live)} held · <span style="color:#7ce0c3">{up}↑</span> '
-        f'<span style="color:#f0a09a">{dn}↓</span> · zone-first: buy → hold → sell'
-        '</div></div>',
-        f'<p style="color:#5f6368;margin:0 0 12px;font-size:12px;padding:0 2px">'
-        f'<b>{len(live)} held</b> — {up} up · {dn} down · {flat} flat (±{FLAT_BAND_PCT}%)'
-        + (f' · {len(exited)} exited' if exited else '')
-        + (f' · {len(watch)} watchlist' if watch else '')
-        + (f' · {len(signals)} signals' if signals else '')
-        + (f' · {len(justified)} justified' if justified else '')
-        + (f' · {len(illiquid)} below liquidity floor' if illiquid else '')
-        + (f' · {len(evicted)} evicted' if evicted else '')
-        + (f' · <b style="color:#b00">{miss} not in cache</b>' if miss else '')
-        + '</p>',
-        _img("treemap", "market treemap"),
-        render_dashboard(rows + justified + illiquid, full=full),
-        _img("rrg", "sector rotation RRG"),
-        _img("breadth", "market breadth"),
+        f'{len(priced)} picks from {sum(1 for k in cats if cats[k])} screens · '
+        f'<span style="color:#7ce0c3">{buy_n} in buy zone</span> · {new_n} new today · '
+        'no portfolio positions in this view</div></div>',
     ]
+    # moneycontrol-style filter chip row
+    chips = []
+    for key, title in CATEGORIES:
+        n = len(thematic) if key == "thematic" else len(cats.get(key, []))
+        if n:
+            chips.append(f'<span style="display:inline-block;background:#fff;'
+                         f'border:1px solid #cfdde6;color:#0B2F4A;border-radius:12px;'
+                         f'padding:2px 9px;margin:2px 3px 2px 0;font-size:11px">'
+                         f'{title.split(" ", 1)[0]} {title.split(" ", 1)[1].split(" (")[0].split(" —")[0]}'
+                         f' <b>{n}</b></span>')
+    body.append('<p style="margin:6px 0 2px">' + "".join(chips) + '</p>')
 
-    # ── zone-first organisation (user, 2026-07-23) ───────────────────────────
-    # BUY recommendations first — ALL countries in one table — then HOLD, then
-    # SELL at the bottom. Green-first ordering survives within each zone
-    # (build_rows' global sort). Exited rows are not recommendations and drop
-    # to a muted strip; ❔/insufficient-history names get their own short table
-    # rather than polluting a zone they were never measured for.
-    FLAG = {"IN": "🇮🇳", "US": "🇺🇸", "JP": "🇯🇵", "KR": "🇰🇷", "EU": "🇪🇺"}
+    body.append(_img("treemap", "market treemap"))
+    body.append(render_dashboard(priced, full=full))
+    body.append(_img("rrg", "sector rotation RRG"))
+    body.append(_img("breadth", "market breadth"))
 
-    def _since_entry(r) -> str:
-        if r.get("ret_entry") is not None:
-            colour = "#16a085" if r["ret_entry"] >= 0 else "#ca3433"
-            d = f' · {r["days_in"]}d' if r.get("days_in") is not None else ""
-            return f'<span style="color:{colour}">{r["ret_entry"]:+.1f}%{d}</span>'
-        if r.get("entry_date"):
-            return f'<span style="color:#999;font-size:11px">{r["entry_date"]}</span>'
-        return '<span style="color:#ccc">—</span>'
-
-    def _sym_cell(r) -> str:
-        st = r.get("status", "held")
-        tag = {"watch": '<span style="color:#7a9;font-size:10px"> watch</span>',
-               "signal": '<span style="color:#c80;font-size:10px"> signal</span>'}.get(st, "")
-        # 🆕 marks the daily churn: names that entered within the last 2 days.
-        new = ' <span style="font-size:10px">🆕</span>' \
-            if (r.get("days_in") is not None and r["days_in"] <= 1) else ""
-        return (f'{r["mark"]} <b>{r["symbol"]}</b> '
-                f'{FLAG.get(r["market"], r["market"])}{tag}{new}')
-
-    # full=True renders the UNTRIMMED digest (the .html attachment); the email
-    # body uses the capped version that stays under Gmail's clip line.
-    zcap = 10 ** 6 if full else ZONE_TOP_N
-    scap = 10 ** 6 if full else STRIP_TOP_N
-    rollcap = 10 ** 6 if full else 30
-
-    def _why_short(r, cap=36) -> str:
-        w = r["why"]
-        if full or len(w) <= cap:
-            return w
-        return w[:cap - 1] + "…"
-
-    active = [r for r in rows if r.get("status") in ("held", "watch", "signal")]
-    exited = [r for r in rows if r.get("status") == "sold"]
-    joined = [r for r in active if r.get("days_in") is not None and r["days_in"] <= 1]
-
-    # today's churn, up front — the watchlist is DYNAMIC and the mailer should
-    # say so before the tables do.
+    # churn — the pick universe is DYNAMIC by design
     today = pd.Timestamp.today().strftime("%Y-%m-%d")
+    joined = [r for r in priced if r.get("days_in") is not None and r["days_in"] <= 1]
     left_today = [r for r in evicted if f"evicted {today}" in (r.get("note") or "")]
-    if joined or left_today or purged:
-        churn = []
-        if joined:
-            churn.append('<span style="color:#16a085"><b>🆕 joined:</b> '
-                         + ", ".join(f'{r["symbol"]} {FLAG.get(r["market"], r["market"])}'
-                                     for r in joined[:20]) + '</span>')
-        if left_today:
-            churn.append('<span style="color:#ca3433"><b>🪦 left:</b> '
-                         + ", ".join(f'{r["symbol"]} {FLAG.get(r["market"], r["market"])}'
-                                     for r in left_today[:20]) + '</span>')
-        if purged:
-            churn.append('<span style="color:#5f6368"><b>🗑 purged '
-                         f'(&gt;{PURGE_SELL_SESSIONS} sessions in sell):</b> '
-                         + ", ".join(purged[:20]) + '</span>')
+    churn = []
+    if joined:
+        churn.append('<span style="color:#16a085"><b>🆕 joined:</b> '
+                     + ", ".join(f'{r["symbol"]} {FLAG.get(r["market"], r["market"])}'
+                                 for r in joined[:20]) + '</span>')
+    if left_today:
+        churn.append('<span style="color:#ca3433"><b>🪦 left:</b> '
+                     + ", ".join(f'{r["symbol"]} {FLAG.get(r["market"], r["market"])}'
+                                 for r in left_today[:20]) + '</span>')
+    if purged:
+        churn.append('<span style="color:#5f6368"><b>🗑 purged '
+                     f'(&gt;{PURGE_SELL_SESSIONS} sessions in sell):</b> '
+                     + ", ".join(purged[:20]) + '</span>')
+    if churn:
         body.append('<p style="font-size:12px;margin:10px 0 0">'
                     + ' &nbsp;·&nbsp; '.join(churn) + '</p>')
 
-    # zone strips carry the zone's own colour (smart-investing palette): buy
-    # teal, hold coral, sell red, unmeasured slate.
-    ZONES = (("BUY", "🟩 Buy zone", "close > EMA20 > EMA50 — aligned uptrend",
-              "#16a085"),
-             ("HOLD", "🟨 Hold zone", "between the EMAs — no signal either way",
-              "#F07857"),
-             ("SELL", "🟥 Sell zone",
-              f"close < EMA50; 🟢 here = a bounce inside a broken trend — "
-              f"tracked names evict after {SELL_STREAK_LIMIT + 1} straight "
-              f"sessions, held names never auto-exit",
-              "#ca3433"),
-             ("?", "❔ Unmeasured", "not in cache or under 25 bars of history",
-              "#5f6368"))
-    for zkey, ztitle, zdesc, zcol in ZONES:
-        grp = [r for r in active if r.get("zone", "?") == zkey]
-        if not grp:
-            continue
-        held_n = sum(1 for r in grp if r["status"] == "held")
-        body.append(
-            f'<h3 style="margin:18px 0 0;background:{zcol};color:#fff;'
-            f'padding:7px 10px;border-radius:6px 6px 0 0;font-size:14px">{ztitle} '
-            f'<span style="font-weight:400;color:rgba(255,255,255,.85);font-size:11px">'
-            f'{len(grp)} names ({held_n} held) — {zdesc}</span></h3>')
-        if zkey == "?":
-            # unmeasured names carry no numbers worth a table — a symbol roll
-            # keeps them visible at ~2% of the size (this zone also holds the
-            # not-in-cache rows, so the roll IS the coverage-gap report).
-            body.append(
-                '<p style="background:#fff;border:1px solid #dfe7ec;margin:0;'
-                'padding:8px 10px;font-size:11px;color:#5f6368">'
-                + ", ".join(f'{r["symbol"]} {FLAG.get(r["market"], r["market"])}'
-                            for r in grp[:rollcap])
-                + (f' … +{len(grp) - rollcap} more' if len(grp) > rollcap else '')
-                + '</p>')
-            continue
-        vis, hidden = grp[:zcap], grp[zcap:]
-        streak_th = '<th>Streak</th>' if zkey == "SELL" else ''
-        body.append(
-            '<table style="border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid #dfe7ec">'
-            '<tr style="text-align:left;background:#ecf1f6;border-bottom:2px solid #cfdde6;font-size:12px;color:#0B2F4A">'
-            '<th style="padding:5px 4px">Symbol</th><th>1d</th><th>5d</th>'
-            f'<th>Since entry</th>{streak_th}<th>Close</th><th>Liq</th>'
-            '<th>Why on the list</th></tr>')
-        for r in vis:
-            colour = ("#999" if r["status"] == "watch"
-                      else {"🟢": "#16a085", "🔴": "#ca3433"}.get(r["mark"], "#666"))
-            streak_td = ""
-            if zkey == "SELL":
-                n = r.get("streak", 0)
-                if r["status"] == "held":
-                    # held names are NEVER auto-evicted, so no countdown
-                    # denominator — showing "43d/6" implied one (user-caught).
-                    streak_td = (f'<td style="color:#5f6368;font-size:12px">'
-                                 f'{n}d</td>')
-                else:
-                    warn = "#ca3433" if n >= SELL_STREAK_LIMIT else "#d35400"
-                    streak_td = (f'<td style="color:{warn};font-size:12px">'
-                                 f'{n}d/{SELL_STREAK_LIMIT + 1}</td>')
-            # "As of" column dropped for size; a date appears ONLY when the row
-            # is staler than the digest itself — which was its original point.
-            stale = (f' <span style="color:#ca3433;font-size:10px">{r["last"]}</span>'
-                     if r["last"] and r["last"] != as_of else "")
-            body.append(
-                f'<tr style="border-bottom:1px solid #f0f0f0;font-size:12px">'
-                f'<td style="padding:4px">{_sym_cell(r)}{stale}</td>'
-                f'<td style="color:{colour};font-weight:600">{_fmt(r["d1"])}</td>'
-                f'<td style="color:#666">{_fmt(r["d5"])}</td>'
-                f'<td>{_since_entry(r)}</td>'
-                f'{streak_td}'
-                f'<td>{r["close"]:,.2f}</td>'
-                f'<td style="color:#999">{r["liq"]}</td>'
-                f'<td style="color:#666">{_why_short(r)}</td></tr>')
-        if hidden:
-            h_held = sum(1 for r in hidden if r["status"] == "held")
-            body.append(
-                f'<tr><td colspan="9" style="padding:6px;font-size:11px;'
-                f'color:#5f6368;background:#f7fafc">… {len(hidden)} more in this '
-                f'zone ({h_held} held) — top {ZONE_TOP_N} shown, full list in '
-                f'watchlist.csv</td></tr>')
-        body.append('</table>')
 
-    if exited:
+    # ── model portfolios (fund-style bundles) ────────────────────────────────
+    # Correlation bundles the picks; the card shows weights, drift and the
+    # procurement rationale per constituent (see portfolio_bundles.py).
+    if bundles:
+        shown = bundles if full else bundles[:3]
         body.append(
-            '<h3 style="margin:18px 0 0;background:#0B2F4A;color:#eef4f6;padding:7px 10px;border-radius:6px 6px 0 0;font-size:14px">💼 Exited positions '
-            f'<span style="font-weight:400;color:#777;font-size:12px">'
-            f'({len(exited)} — kept for the record, not recommendations)</span></h3>'
-            '<table style="border-collapse:collapse;width:100%;font-size:12px;background:#fff;border:1px solid #dfe7ec">')
-        for r in exited[:scap]:
-            cell = (f'{_fmt(r["d1"])} · close {r["close"]:,.2f}'
-                    if not r["missing"] else "not in cache")
+            '<h3 style="margin:16px 0 0;background:#0B2F4A;color:#eef4f6;'
+            'padding:8px 10px;border-radius:8px 8px 0 0;font-size:14px">'
+            '🧺 Model portfolios '
+            f'<span style="background:#16a085;color:#fff;border-radius:9px;'
+            f'padding:0 7px;font-size:11px">{len(bundles)}</span> '
+            '<span style="font-weight:400;color:#9fb8c9;font-size:11px">'
+            'co-movement clusters of the picks — inverse-vol weights, monthly '
+            'rebalance</span></h3>'
+            '<div style="background:#fff;border:1px solid #dfe7ec;'
+            'border-radius:0 0 8px 8px;padding:4px 8px">')
+        for v in shown:
+            b = v["bundle"]
+            d1c = "#0c6b58" if v["d1"] >= 0 else "#ca3433"
+            sic = "#0c6b58" if v["since"] >= 0 else "#ca3433"
+            warn = (f' <span style="color:#ca3433;font-size:10px">⚠ {v["sell_now"]} '
+                    f'now in sell zone</span>' if v["sell_now"] else "")
+            # weights bar: one cell per constituent, width = weight
+            cells = "".join(
+                f'<td style="background:{"#16a085" if m["d1"] >= 0 else "#ca3433"};'
+                f'opacity:{0.45 + 0.55 * m["m"]["weight"] / 0.25:.2f};'
+                f'width:{max(2, round(m["m"]["weight"] * 300))}px;height:8px;'
+                f'font-size:0">&nbsp;</td>'
+                for m in v["members"])
+            names = " · ".join(
+                f'{m["m"]["symbol"]} <span style="color:#8aa0ae">'
+                f'{m["m"]["weight"] * 100:.0f}%</span>'
+                for m in v["members"][: (len(v["members"]) if full else 5)])
+            more = ("" if full or len(v["members"]) <= 5
+                    else f' <span style="color:#8aa0ae">+{len(v["members"]) - 5}</span>')
             body.append(
-                f'<tr style="color:#888;font-size:11px">'
-                f'<td style="padding:4px"><b>{r["symbol"]}</b> '
-                f'{FLAG.get(r["market"], r["market"])}</td>'
-                f'<td style="font-size:11px">{cell}</td>'
-                f'<td style="font-size:11px">{_since_entry(r)}</td>'
-                f'<td style="font-size:11px">{r["note"]}</td></tr>')
-        if len(exited) > scap:
-            body.append(f'<tr><td colspan="4" style="padding:5px;font-size:11px;'
-                        f'color:#5f6368">… {len(exited) - scap} more exited '
-                        f'names in watchlist.csv</td></tr>')
-        body.append('</table>')
+                f'<div style="border-bottom:1px solid #f0f4f7;padding:7px 2px">'
+                f'<b style="color:#0B2F4A">{b["name"]}</b> '
+                f'<span style="color:#8aa0ae;font-size:11px">{len(v["members"])} '
+                f'stocks · corr {b["intra_corr"]:.2f} · formed {b["formed"]}</span>'
+                f'{warn}<br>'
+                f'<span style="font-size:12px;color:{d1c};font-weight:600">'
+                f'{v["d1"]:+.2f}% today</span> '
+                f'<span style="font-size:12px;color:{sic}">{v["since"]:+.1f}% since '
+                f'formation</span> '
+                f'<span style="font-size:11px;color:#8aa0ae">drift {v["drift"]:.1f}pp</span>'
+                f'<table cellspacing="0" cellpadding="0" style="border-collapse:'
+                f'collapse;margin:3px 0"><tr>{cells}</tr></table>'
+                f'<span style="font-size:11px;color:#5f6368">{names}{more}</span>'
+                + ("".join(
+                    f'<div style="font-size:10px;color:#8aa0ae;margin-top:1px">'
+                    f'{m["m"]["symbol"]}: {m["m"]["rationale"]}</div>'
+                    for m in v["members"]) if full else "")
+                + '</div>')
+        if not full and len(bundles) > 3:
+            body.append(f'<div style="padding:6px 2px;font-size:11px;color:#5f6368">'
+                        f'… {len(bundles) - 3} more bundles in the attachment</div>')
+        body.append('</div>')
 
+    # ── strategy sections ────────────────────────────────────────────────────
+    if thematic:
+        body.append(_section(CATEGORY_TITLE["thematic"],
+                             f"buy-zone names in today's strongest sectors: {theme_names}",
+                             thematic, sector_col=True))
+    SUBTITLE = {
+        "breakout": "breakout_quality grade-A across all five market scans",
+        "dma": "golden-cross / moving-average alignment screens",
+        "proce": "canonical 9-pt Piotroski F + 3-pt ROCE block",
+        "pdebt": "Piotroski F + year-on-year debt reduction",
+        "triple": "passed three independent screens the same day",
+        "recurring": "hit mailer/shortlist repeatedly with a rising price",
+        "momentum": "6-month price momentum screen",
+        "rsi": "RSI < 30 mean-reversion candidates",
+        "justified": "screens with a published backtest behind them",
+        "watch": "manually tracked ideas — not screen output",
+        "other": "uncategorised signal sources",
+    }
+    for key, title in CATEGORIES:
+        if key == "thematic":
+            continue
+        if key == "watch" and not full:
+            # manual ideas are not analysis output — the trimmed body focuses
+            # on screen results; the full attachment still carries them
+            continue
+        grp = cats.get(key, [])
+        if grp:
+            body.append(_section(title, SUBTITLE.get(key, ""), grp))
+
+    # ── strips ───────────────────────────────────────────────────────────────
     if illiquid:
         body.append(
-            '<h3 style="margin:18px 0 0;background:#0B2F4A;color:#eef4f6;padding:7px 10px;border-radius:6px 6px 0 0;font-size:14px">🚱 Below liquidity floor '
-            '<span style="font-weight:400;color:#777;font-size:12px">'
-            '(median daily turnover under the market\'s gate — India ₹1cr/day, '
-            'elsewhere $10k structural; moves here are hard to act on)</span></h3>'
-            '<table style="border-collapse:collapse;width:100%;font-size:12px;background:#fff;border:1px solid #dfe7ec">')
+            '<h3 style="margin:16px 0 0;background:#5f6368;color:#eef4f6;padding:8px 10px;'
+            'border-radius:8px 8px 0 0;font-size:13px">🚱 Below liquidity floor '
+            f'<span style="font-weight:400;color:#cfd8dc;font-size:11px">'
+            f'{len(illiquid)} picks that cannot absorb a position — India ₹1cr/day, '
+            f'$10k structural elsewhere</span></h3>'
+            '<table style="border-collapse:collapse;width:100%;font-size:12px;'
+            'background:#fff;border:1px solid #dfe7ec">')
         for r in illiquid[:scap]:
-            colour = {"🟢": "#16a085", "🔴": "#ca3433"}.get(r["mark"], "#666")
-            body.append(
-                f'<tr style="color:#888;font-size:11px">'
-                f'<td style="padding:4px">{r["mark"]} <b>{r["symbol"]}</b>'
-                f'<span style="font-size:10px"> {r["market"]}</span></td>'
-                f'<td style="color:{colour}">{_fmt(r["d1"])}</td>'
-                f'<td>{r["close"]:,.2f}</td>'
-                f'<td style="font-size:11px">{r["last"] or "?"}</td>'
-                f'<td style="font-size:11px">{_why_short(r)}</td></tr>')
+            body.append(f'<tr style="color:#888;font-size:11px">'
+                        f'<td style="padding:4px 8px"><b>{r["symbol"]}</b> '
+                        f'{FLAG.get(r["market"], r["market"])}</td>'
+                        f'<td>{_pill(r["d1"])}</td>'
+                        f'<td>{CATEGORY_TITLE.get(pick_category(r), "").split(" ", 1)[-1].split(" (")[0]}</td></tr>')
         if len(illiquid) > scap:
-            body.append(f'<tr><td colspan="5" style="padding:5px;font-size:11px;'
-                        f'color:#5f6368">… {len(illiquid) - scap} more '
-                        f'below-floor names in watchlist.csv</td></tr>')
+            body.append(f'<tr><td colspan="3" style="padding:5px 8px;font-size:11px;'
+                        f'color:#5f6368">… {len(illiquid) - scap} more</td></tr>')
         body.append('</table>')
 
-    if justified:
+    gaps = data_gaps(rows + illiquid, as_of)
+    if gaps:
         body.append(
-            '<h3 style="margin:18px 0 0;background:#0B2F4A;color:#eef4f6;padding:7px 10px;border-radius:6px 6px 0 0;font-size:14px">🧪 Justified picks '
-            '<span style="font-weight:400;color:#777;font-size:12px">'
-            '(evidence-backed screens — see the Justified Brief for the backtest '
-            'behind each)</span></h3>'
-            '<table style="border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid #dfe7ec">'
-            '<tr style="text-align:left;background:#ecf1f6;border-bottom:2px solid #cfdde6;color:#0B2F4A">'
-            '<th style="padding:5px 4px">Symbol</th><th>1d</th><th>5d</th>'
-            '<th>Close</th><th>Liq</th><th>As of</th><th>Screen</th></tr>')
-        for r in justified[:(10**6 if full else 8)]:
-            if r["missing"]:
-                body.append(
-                    f'<tr style="border-bottom:1px solid #f0f0f0;color:#b58900">'
-                    f'<td style="padding:5px 4px">❔ <b>{r["symbol"]}</b>'
-                    f'<span style="color:#999;font-size:11px"> {r["market"]}</span></td>'
-                    f'<td colspan="5" style="font-size:12px">not in local cache</td>'
-                    f'<td style="color:#666;font-size:12px">{r["note"]}</td></tr>')
-                continue
-            colour = {"🟢": "#16a085", "🔴": "#ca3433"}.get(r["mark"], "#666")
-            body.append(
-                f'<tr style="border-bottom:1px solid #f0f0f0">'
-                f'<td style="padding:5px 4px">{r["mark"]} <b>{r["symbol"]}</b>'
-                f'<span style="color:#999;font-size:11px"> {r["market"]}</span></td>'
-                f'<td style="color:{colour};font-weight:600">{_fmt(r["d1"])}</td>'
-                f'<td style="color:#666">{_fmt(r["d5"])}</td>'
-                f'<td>{r["close"]:,.2f}</td>'
-                f'<td style="color:#999;font-size:11px">{r["liq"]}</td>'
-                f'<td style="color:#999;font-size:12px">{r["last"] or "?"}</td>'
-                f'<td style="color:#666;font-size:12px">{r["note"]}</td></tr>')
-        if not full and len(justified) > 8:
-            body.append(f'<tr><td colspan="7" style="padding:5px;font-size:11px;'
-                        f'color:#5f6368">… {len(justified) - 8} more justified '
-                        f'picks in watchlist.csv</td></tr>')
-        body.append('</table>')
+            '<h3 style="margin:16px 0 0;background:#d35400;color:#fff;padding:8px 10px;'
+            'border-radius:8px 8px 0 0;font-size:13px">🔍 Data gaps '
+            f'<span style="font-weight:400;color:#ffe0cc;font-size:11px">'
+            f'{len(gaps)} coverage issues in today\'s collection</span></h3>'
+            '<div style="background:#fff;border:1px solid #dfe7ec;padding:8px 12px;'
+            'font-size:12px;color:#444">'
+            + "".join(f'<p style="margin:5px 0">• {g}</p>' for g in gaps) + '</div>')
 
     if evicted:
-        # newest first; the note carries "evicted YYYY-MM-DD after Nd" so the
-        # strip is self-explaining. Capped — the point is "what just left and
-        # why", not a graveyard tour.
         recent = sorted(evicted, key=lambda r: r.get("note", ""), reverse=True)[:scap]
         body.append(
-            '<h3 style="margin:18px 0 0;background:#0B2F4A;color:#eef4f6;padding:7px 10px;border-radius:6px 6px 0 0;font-size:14px">🪦 Evicted '
-            '<span style="font-weight:400;color:#777;font-size:12px">'
-            f'(sell zone &gt;{SELL_STREAK_LIMIT} consecutive sessions — '
-            f'{len(evicted)} total, latest {len(recent)})</span></h3>'
-            '<table style="border-collapse:collapse;width:100%;font-size:12px;background:#fff;border:1px solid #dfe7ec">')
+            '<h3 style="margin:16px 0 0;background:#0B2F4A;color:#eef4f6;padding:8px 10px;'
+            'border-radius:8px 8px 0 0;font-size:13px">🪦 Evicted '
+            f'<span style="font-weight:400;color:#9fb8c9;font-size:11px">sell zone '
+            f'&gt;{SELL_STREAK_LIMIT} straight sessions — {len(evicted)} total</span></h3>'
+            '<table style="border-collapse:collapse;width:100%;font-size:12px;'
+            'background:#fff;border:1px solid #dfe7ec">')
         for r in recent:
             ev = r["note"].rsplit("evicted", 1)[-1].strip() if "evicted" in r["note"] else ""
-            body.append(
-                f'<tr style="color:#888;font-size:11px">'
-                f'<td style="padding:4px"><b>{r["symbol"]}</b>'
-                f'<span style="font-size:10px"> {r["market"]}</span></td>'
-                f'<td style="font-size:11px">{_since_entry(r)}</td>'
-                f'<td style="font-size:11px">evicted {ev}</td></tr>')
+            body.append(f'<tr style="color:#888;font-size:11px">'
+                        f'<td style="padding:4px 8px"><b>{r["symbol"]}</b> '
+                        f'{FLAG.get(r["market"], r["market"])}</td>'
+                        f'<td>{_since(r)}</td><td>evicted {ev}</td></tr>')
         body.append('</table>')
 
     body.append(
-        '<p style="color:#999;font-size:11px;margin-top:14px">'
-        'Prices from the local cache refreshed by ingest.sh — no external API. '
-        '"As of" is the last bar actually held, so a stale row is visible rather '
-        'than silently shown as current. Sorted 🟢 first, then flat, then 🔴; '
-        'names below their market\'s liquidity floor sink to the bottom strip. '
-        '"Liq" = median 60d USD turnover tier (T1 ≥$12M · T2 ≥$3M · T3 ≥$600k · '
-        'T4 above floor · ? unmeasurable). '
-        'Zone: 🟩 close&gt;EMA20&gt;EMA50 · 🟥 close&lt;EMA50 · 🟨 between; a tracked '
-        f'name (watch/signal/justified) in 🟥 for &gt;{SELL_STREAK_LIMIT} consecutive '
-        'sessions is auto-evicted; held positions are never auto-exited. '
-        'Not investment advice.</p></div>')
+        '<p style="color:#8aa0ae;font-size:11px;margin-top:14px">'
+        'Research digest — analysis output only, portfolio positions excluded by '
+        'design. Prices from the local cache refreshed by ingest.sh. Zone: 🟩 '
+        'close&gt;EMA20&gt;EMA50 · 🟥 close&lt;EMA50 · 🟨 between; picks in 🟥 for '
+        f'&gt;{SELL_STREAK_LIMIT} sessions are evicted, &gt;{PURGE_SELL_SESSIONS} '
+        'purged. Liq: T1 ≥$12M/d … T4 above floor. Sorted buy-zone first, then by '
+        '1d move. Not investment advice.</p></div>')
     return "\n".join(body)
 
 

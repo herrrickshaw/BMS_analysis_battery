@@ -12,14 +12,18 @@ global-market-data warehouse, plus market-median excess return, and writes:
 Signals whose horizon hasn't elapsed yet are 'pending' and fill in on the
 next run (weekly cron). Re-runs are idempotent — full recompute, cheap.
 
-Uses India ADJUSTED prices (warehouse/ohlcv_adj/IN) so splits/bonuses don't
-fake outcomes; other markets are raw Close (flagged in the report until
-adjusted panels exist — see claims.yaml in global-market-data).
+Prices: IN reads the full adjusted copy (warehouse/ohlcv_adj/IN); JP/KR/US
+read overlay-first (yf-adjusted base panels + confirmed residual-split
+corrections in ohlcv_adj/<MKT>/corrected_symbols.parquet); CN/EU read the
+base panels (yf-adjusted, no residuals). Each signal also gets a PIT-safe
+volatility-regime label (build_regimes.py) and the report conditions
+outcomes on it.
 """
 import os
+from datetime import datetime
+
 import duckdb
 import pandas as pd
-from datetime import datetime
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 GMD = os.path.expanduser("~/repos/global-market-data")
@@ -28,10 +32,29 @@ OUT_PARQUET = os.path.join(BASE, "reports", "signal_outcomes.parquet")
 OUT_MD = os.path.join(BASE, "reports", "SIGNAL_CALIBRATION.md")
 HORIZONS = [5, 21, 63, 252]
 
-MARKET_SRC = {  # market -> price partition (IN uses adjusted)
+MARKET_SRC = {  # market -> base price partition (IN uses full adjusted copy)
     "IN": "ohlcv_adj/IN", "US": "ohlcv/US", "JP": "ohlcv/JP",
     "KR": "ohlcv/KR", "CN": "ohlcv/CN", "EU": "ohlcv/EU",
 }
+
+
+def px_source_sql(mkt: str, sub: str) -> str:
+    """OVERLAY-FIRST price source: non-IN panels are yfinance-adjusted at
+    collection, but symbols with confirmed post-assembly split breaks live
+    corrected in ohlcv_adj/<MKT>/corrected_symbols.parquet — those rows
+    supersede the base panel (see gmd DATA_ACCESS.md, price_adjuster_global)."""
+    base = os.path.join(GMD, "warehouse", sub, "*.parquet")
+    overlay = os.path.join(GMD, "warehouse", "ohlcv_adj", mkt,
+                           "corrected_symbols.parquet")
+    if mkt == "IN" or not os.path.exists(overlay):
+        return f"select Symbol, Date, Close from parquet_scan('{base}')"
+    return f"""(
+      select Symbol, Date, Close from parquet_scan('{base}')
+      where Symbol not in (select distinct Symbol
+                           from parquet_scan('{overlay}'))
+      union all
+      select Symbol, Date, Close from parquet_scan('{overlay}')
+    )"""
 
 
 def main():
@@ -74,21 +97,25 @@ def main():
             diags.append((mkt, n_sig, 0, "NO PRICE DATA"))
             continue
         q = f"""
-        with px as (
+        with src as ({px_source_sql(mkt, sub)}),
+        px as (
           select Symbol as symbol, Date as date, Close as close,
                  row_number() over (partition by Symbol order by Date) as rn
-          from parquet_scan('{path}')
+          from src
         ),
         s as (select * from sig where market = '{mkt}'),
         entry as (
-          select s.signal_id, s.symbol, s.signal_date, s.price_at_signal,
-                 min(px.rn) as rn0
+          -- join AND all downstream price lookups use wh_symbol (the
+          -- warehouse-suffixed form): joining on the bare ledger symbol
+          -- silently zeroed out every JP/KR score until 2026-07-23
+          select s.signal_id, s.symbol, s.wh_symbol, s.signal_date,
+                 s.price_at_signal, min(px.rn) as rn0
           from s join px on px.symbol = s.wh_symbol and px.date >= s.signal_date
-          group by 1,2,3,4
+          group by 1,2,3,4,5
         ),
         entry_px as (
           select e.*, px.close as entry_close
-          from entry e join px on px.symbol = e.symbol and px.rn = e.rn0
+          from entry e join px on px.symbol = e.wh_symbol and px.rn = e.rn0
         ),
         horizons as (select unnest([{','.join(map(str, HORIZONS))}]) as h),
         joined as (
@@ -97,7 +124,7 @@ def main():
                  f.close as exit_price, f.date as exit_date
           from entry_px e
           cross join horizons h
-          left join px f on f.symbol = e.symbol and f.rn = e.rn0 + h.h
+          left join px f on f.symbol = e.wh_symbol and f.rn = e.rn0 + h.h
         )
         select *, case when exit_price is not null
                        then exit_price / entry_price - 1 end as fwd_ret
@@ -116,10 +143,11 @@ def main():
         # market-median benchmark per (signal_date, horizon): median forward
         # return across ALL warehouse symbols entered on the same date
         bq = f"""
-        with px as (
+        with src as ({px_source_sql(mkt, sub)}),
+        px as (
           select Symbol as symbol, Date as date, Close as close,
                  row_number() over (partition by Symbol order by Date) as rn
-          from parquet_scan('{path}')
+          from src
         ),
         dates as (select distinct signal_date from sig where market = '{mkt}'),
         entry as (
@@ -146,6 +174,19 @@ def main():
         .drop_duplicates("signal_id")
     out = meta.merge(out.drop(columns=["market"]), on="signal_id", how="left")
     out["excess_ret"] = out["fwd_ret"] - out["mkt_median"]
+
+    # volatility-regime label at signal date (PIT-safe trailing terciles;
+    # build_regimes.py). India conditions on IndiaVIX, everything else on VIX.
+    reg_path = os.path.join(GMD, "warehouse", "regimes.parquet")
+    if os.path.exists(reg_path):
+        regimes = pd.read_parquet(reg_path).rename(columns={"date": "signal_date"})
+        out = out.merge(
+            regimes[["signal_date", "vix_regime", "indiavix_regime"]],
+            on="signal_date", how="left")
+        out["regime"] = out["indiavix_regime"].where(
+            out["market"] == "IN", out["vix_regime"])
+    else:
+        out["regime"] = None
     out["status"] = out["fwd_ret"].apply(
         lambda x: "scored" if pd.notna(x) else "pending")
     os.makedirs(os.path.dirname(OUT_PARQUET), exist_ok=True)
@@ -160,9 +201,10 @@ def main():
         f"scored rows: {len(scored):,} / {len(out):,} "
         "(rest pending — horizons not yet elapsed or symbol unmatched)",
         "",
-        "Prices: IN = split/bonus-ADJUSTED; US/JP/KR/CN/EU = raw Close "
-        "(un-adjusted — treat big negative outliers with suspicion until "
-        "adjusted panels land).",
+        "Prices: IN = split/bonus-ADJUSTED (full copy); JP/KR/US = "
+        "yfinance-adjusted panels + confirmed residual-split overlays "
+        "(overlay-first); CN/EU = yfinance-adjusted, no residuals "
+        "(2026-07-23 — see gmd claims.yaml non-india-panels-already-adjusted).",
         "",
         "## Symbol match diagnostics",
         "",
@@ -184,6 +226,30 @@ def main():
             hit = ((grp.fwd_ret < 0) if d == "SELL" else (grp.fwd_ret > 0)).mean()
             lines.append(
                 f"| {m} | {f} {d} | {h}d | {len(grp)} | {hit:.0%} "
+                f"| {grp.fwd_ret.median():+.2%} | {grp.excess_ret.median():+.2%} |")
+
+    # regime conditioning: same outcomes split by the vol regime AT signal
+    # date (IN: IndiaVIX terciles; others: VIX terciles; PIT-safe trailing
+    # windows). One caution baked into the header: a cohort recorded inside a
+    # single fortnight sits in a single regime — regime spread only becomes
+    # meaningful as multi-month cohorts accrue.
+    if len(scored) and scored["regime"].notna().any():
+        lines += ["", "## Outcomes by volatility regime at signal date", "",
+                  "Regime = tercile of the market's vol index vs its trailing "
+                  "~3y window (PIT-safe, build_regimes.py). IN uses IndiaVIX; "
+                  "others VIX. NB: a cohort from one short window sits in one "
+                  "regime — read spreads only across multi-month samples.", "",
+                  "| market | direction | h | regime | n | hit% | median ret "
+                  "| median excess |",
+                  "|---|---|---|---|---|---|---|---|"]
+        gr = scored[scored["regime"].notna()].groupby(
+            ["market", "direction", "h", "regime"])
+        for (m, d, h, r), grp in gr:
+            if h not in (5, 21) or len(grp) < 10:
+                continue
+            hit = ((grp.fwd_ret < 0) if d == "SELL" else (grp.fwd_ret > 0)).mean()
+            lines.append(
+                f"| {m} | {d} | {h}d | {r} | {len(grp)} | {hit:.0%} "
                 f"| {grp.fwd_ret.median():+.2%} | {grp.excess_ret.median():+.2%} |")
     with open(OUT_MD, "w") as fh:
         fh.write("\n".join(lines) + "\n")

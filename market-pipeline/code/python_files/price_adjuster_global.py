@@ -52,11 +52,11 @@ FACTORS_PQ = WH / "adjustment_factors_heuristic.parquet"
 # corporate event, so this restriction buys near-perfect precision there.
 _FWD = [2, 3, 4, 5, 6, 8, 10, 20, 25, 50, 100]
 RATIOS = sorted([1 / k for k in _FWD] + [float(k) for k in _FWD])
-TOL = 0.06          # snap tolerance around each ratio
-EXACT = 0.02        # "exact" ratio => volume corroboration not required
+TOL = 0.06  # snap tolerance around each ratio
+EXACT = 0.02  # "exact" ratio => volume corroboration not required
 PERSIST_TOL = 0.25  # post/pre median level must stay within 25% of r
-RANGE_TOL = 0.12    # split day trades calmly at the new level (High/Low near it)
-MAX_GAP_DAYS = 5    # sparse OTC names gap for weeks; their "overnight" moves lie
+RANGE_TOL = 0.12  # split day trades calmly at the new level (High/Low near it)
+MAX_GAP_DAYS = 5  # sparse OTC names gap for weeks; their "overnight" moves lie
 # liquidity gate on median daily TURNOVER (close x volume, local currency) —
 # a share-count gate wrongly killed 7946.T (3,600 shares/day but ¥13M turnover;
 # real, calendar-confirmed 5:1). Turnover separates thin-but-real JP/KR names
@@ -119,8 +119,10 @@ def detect(market: str) -> pd.DataFrame:
     # calm-day guard: on a real split the WHOLE day trades near pclose*factor;
     # a crash day opens higher / ranges wide and fails this band
     new_lvl = c["pclose"] * c["factor"]
-    c = c[(c["High"] <= new_lvl * (1 + RANGE_TOL)) &
-          (c["Low"] >= new_lvl * (1 - RANGE_TOL))]
+    c = c[
+        (c["High"] <= new_lvl * (1 + RANGE_TOL))
+        & (c["Low"] >= new_lvl * (1 - RANGE_TOL))
+    ]
 
     # corroboration: exact ratio, or volume moving inversely to price
     vr = c["post_vol"] / c["pre_vol"].replace(0, np.nan)
@@ -139,6 +141,7 @@ def confirm(factors: pd.DataFrame) -> pd.DataFrame:
     Only calendar-confirmed events may adjust prices; unconfirmed ones are kept
     in the factors file (confirmed=False) as an audit trail."""
     import yfinance as yf
+
     out = []
     for sym, ev in factors.groupby("symbol"):
         try:
@@ -147,8 +150,14 @@ def confirm(factors: pd.DataFrame) -> pd.DataFrame:
         except Exception:
             s = pd.Series(dtype=float)
         for _, e in ev.iterrows():
-            near = s[(s.index >= e.ex_date - pd.Timedelta(days=7))
-                     & (s.index <= e.ex_date + pd.Timedelta(days=7))] if len(s) else s
+            near = (
+                s[
+                    (s.index >= e.ex_date - pd.Timedelta(days=7))
+                    & (s.index <= e.ex_date + pd.Timedelta(days=7))
+                ]
+                if len(s)
+                else s
+            )
             row = e.to_dict()
             if len(near):
                 # yfinance ratio is new/old shares; our factor is new/old price.
@@ -196,13 +205,19 @@ def build_adjusted(market: str, factors: pd.DataFrame) -> None:
         f = np.ones(len(dates))
         for _, e in ev.iterrows():
             # yfinance calendar factor is authoritative once confirmed
-            use = e["yf_factor"] if np.isfinite(e.get("yf_factor", np.nan)) else e["factor"]
+            use = (
+                e["yf_factor"]
+                if np.isfinite(e.get("yf_factor", np.nan))
+                else e["factor"]
+            )
             f = np.where(dates < e["ex_date"], f * use, f)
         d.loc[mask, "adj_factor"] = f
 
     for c in ("Open", "High", "Low", "Close"):
         d[c] = d[c] * d["adj_factor"]
-    d["Volume"] = np.where(d["adj_factor"] > 0, d["Volume"] / d["adj_factor"], d["Volume"])
+    d["Volume"] = np.where(
+        d["adj_factor"] > 0, d["Volume"] / d["adj_factor"], d["Volume"]
+    )
 
     dst.mkdir(parents=True, exist_ok=True)
     p = dst / "corrected_symbols.parquet"
@@ -210,14 +225,17 @@ def build_adjusted(market: str, factors: pd.DataFrame) -> None:
     d.to_parquet(tmp, compression="zstd", index=False)
     tmp.replace(p)
     touched = (d["adj_factor"] != 1.0).sum()
-    print(f"  {market}: {len(ev_m)} confirmed events, {len(syms)} symbols, "
-          f"{touched:,} bars re-scaled -> {p}")
+    print(
+        f"  {market}: {len(ev_m)} confirmed events, {len(syms)} symbols, "
+        f"{touched:,} bars re-scaled -> {p}"
+    )
 
 
 def validate(markets: list[str], n: int) -> int:
     """Cross-check detected events against yfinance auto_adjust, across each
     ex-date (same common-dates protocol as price_adjuster.py --validate)."""
     import yfinance as yf
+
     f = pd.read_parquet(FACTORS_PQ)
     ok = bad = 0
     for market in markets:
@@ -234,22 +252,28 @@ def validate(markets: list[str], n: int) -> int:
                 y = yf.Ticker(sym).history(
                     start=(ex - pd.Timedelta(days=25)).strftime("%Y-%m-%d"),
                     end=(ex + pd.Timedelta(days=25)).strftime("%Y-%m-%d"),
-                    auto_adjust=True)["Close"]
+                    auto_adjust=True,
+                )["Close"]
                 y.index = pd.to_datetime(y.index).tz_localize(None)
             except Exception:
                 continue
             common = a.index.intersection(y.index)
-            common = common[(common > ex - pd.Timedelta(days=20)) &
-                            (common < ex + pd.Timedelta(days=20))]
+            common = common[
+                (common > ex - pd.Timedelta(days=20))
+                & (common < ex + pd.Timedelta(days=20))
+            ]
             if len(common) < 6 or not (common < ex).any() or not (common >= ex).any():
                 continue
             ra = a.loc[common].iloc[-1] / a.loc[common].iloc[0] - 1
             ry = y.loc[common].iloc[-1] / y.loc[common].iloc[0] - 1
             good = abs(ra - ry) < 0.05
-            ok += good; bad += not good
-            print(f"  {'OK ' if good else 'DIFF'} {market} {sym:12} {e.kind:13} "
-                  f"ex {ex.date()} factor {e.factor:.4g} "
-                  f"| adj {ra:+.1%} vs yf {ry:+.1%}")
+            ok += good
+            bad += not good
+            print(
+                f"  {'OK ' if good else 'DIFF'} {market} {sym:12} {e.kind:13} "
+                f"ex {ex.date()} factor {e.factor:.4g} "
+                f"| adj {ra:+.1%} vs yf {ry:+.1%}"
+            )
     print(f"\n  {ok} OK · {bad} DIFF")
     return 0 if bad == 0 else 1
 
@@ -268,9 +292,11 @@ def main() -> int:
     for m in a.markets:
         ev = detect(m)
         frames.append(ev)
-        print(f"  {m}: {len(ev)} events detected "
-              f"({(ev['kind'] == 'split').sum() if len(ev) else 0} splits, "
-              f"{(ev['kind'] == 'reverse_split').sum() if len(ev) else 0} reverse)")
+        print(
+            f"  {m}: {len(ev)} events detected "
+            f"({(ev['kind'] == 'split').sum() if len(ev) else 0} splits, "
+            f"{(ev['kind'] == 'reverse_split').sum() if len(ev) else 0} reverse)"
+        )
     factors = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 
     if not a.detect_only and len(factors):

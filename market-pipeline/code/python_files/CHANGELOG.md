@@ -18,6 +18,39 @@ mistakes were made, and the mistakes here have repeated.
 
 ---
 
+## 2026-07-23 (later: regime conditioning; JP/KR scoring was silently broken)
+
+### CORRECTION: JP/KR signals never scored — join bug, not stale panels
+
+The "~2,000 JP/KR scores blocked on panel refresh" diagnosis was wrong on the
+mechanism. `score_signals.py`'s `entry_px`/horizon joins used the BARE ledger
+symbol ('9202') instead of the warehouse-suffixed `wh_symbol` ('9202.T'), so
+JP/KR matched **0%** even against a fresh panel — masked because IN/US/EU
+symbols are identical in both forms and the stale-panel note gave the zeros an
+innocent explanation. Fixed: all price joins now use wh_symbol; JP/KR anchor
+100% (1,568 + 223 signals). Lesson: a 0% match rate with a plausible excuse
+still deserves a direct join test.
+
+### Regime conditioning added (CIO-review gap #7)
+
+`build_regimes.py` → `warehouse/regimes.parquet`: daily ^VIX + ^INDIAVIX with
+POINT-IN-TIME tercile labels (each day vs its trailing ~3y window — expanding
+full-sample terciles were rejected as lookahead). The scorer joins the regime
+at signal date (IN→IndiaVIX, others→VIX) and SIGNAL_CALIBRATION.md now has an
+outcomes-by-regime section. First read: IN Darvas BUY +21d hits 63% in
+HIGH-IndiaVIX regime vs 43% in MID (excess +0.47% vs −0.55%); IN SELL works in
+MID (56%) but inverts in HIGH (42%) — with the standing caveat that regime is
+confounded with cohort timing until multi-month cohorts accrue.
+
+### Panels: JP/KR/EU refreshed + refresh tooling
+
+`refresh_panels.py`: incremental yf refresh of any non-IN warehouse panel
+(auto_adjust=True, same convention as collection; always re-run
+price_adjuster_global.py after). JP +45,218 rows, KR +36,019, EU +13,598 —
+all three now end 2026-07-23. EU remains a COVERAGE gap: 1-year/852-symbol
+panel matches only 12% of EU scan signals — a full EU collection (10y, scan
+universe) is the fix, not a refresh.
+
 ## 2026-07-23 (adjusted-price propagation — and a premise correction)
 
 ### CORRECTION: JP/KR/CN/US panels were never raw Close

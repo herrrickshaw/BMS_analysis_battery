@@ -71,6 +71,35 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Three charts in the morning email (treemap / RRG / breadth)
+
+New watchlist_viz.py (matplotlib+numpy only), techniques from the open-source
+screener ecosystem the user asked to mine (PKScreener itself is table-only;
+the good viz lives around it):
+
+* **Market map** — Finviz-style squarified treemap (openalgo-heatmap's
+  approach, layout hand-rolled — no `squarify` dep): 5 market panels, tile
+  area = median USD turnover (tradeability), colour = 1d move. Two bugs
+  caught by LOOKING at the rendered image, not the code: the worst-aspect
+  function compared an area against a length (every row degenerated into
+  full-width strips), and unclamped panel widths let the US eat 2/3 of the
+  figure.
+* **Sector rotation RRG** — JdK RS-Ratio × RS-Momentum per sector basket vs
+  market equal-weight benchmark (RRGPy-style approximation), 5-session
+  smoothed tails, fixed 94-106 frame. Bug found the same way: normalising by
+  the union calendar's first row NaN'd 320/322 India columns (names start on
+  different dates) — normalise by each name's own first valid bar.
+* **Breadth** — % of names above EMA50 per market, 30 sessions, straight out
+  of the digest's own zone engine (breadth IS the zone series aggregated —
+  zero extra data work). Korea's 20%→82% V-recovery is immediately visible.
+
+Delivery: body references cid: inline MIME images (image parts do NOT count
+toward Gmail's ~102KB HTML clip — body stays 99 KB); the full attachment
+inlines them as data: URIs to stay self-contained. All three fail SOFT: a
+crashed chart is a missing image, never a missing mailer. build_rows() now
+exposes turn_usd per row and hands loaded frames to the viz pass so nothing
+re-reads ~800 parquets.
+
 ### Sell-zone audit (user query) — data verified sound; held-row clock fixed
 
 User challenged green rows in the Sell zone (CME +5.28% showing "43d/6").

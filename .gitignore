@@ -106,3 +106,5 @@ claude-provenance/claude-ai-export/
 # consolidated credential store — never commit
 .config/market-secrets/
 .jquants.env
+market-pipeline/code/python_files/digest_*.png
+market-pipeline/code/python_files/watchlist_full.html

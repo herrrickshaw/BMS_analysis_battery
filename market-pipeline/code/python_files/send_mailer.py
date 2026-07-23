@@ -51,28 +51,52 @@ def _digest_section() -> tuple:
             print("  digest: evicted " + ", ".join(evicted))
         if purged:
             print("  digest: purged " + ", ".join(purged))
-        rows = W.build_rows(wl)
+        frames = {}
+        rows = W.build_rows(wl, frames_out=frames)
         W.assign_sectors(rows)
         as_of = max([r["last"] for r in rows if r["last"]] or ["?"])
         held = [r for r in rows if r.get("status", "held") == "held"]
         up = sum(1 for r in held if r["mark"] == "🟢")
         dn = sum(1 for r in held if r["mark"] == "🔴")
+        # charts (treemap / RRG / breadth) — fail-soft PNGs. Body references
+        # them as cid: inline images (image MIME parts do NOT count toward
+        # Gmail's ~102KB HTML clip); the full attachment inlines them as data:
+        # URIs so it stays a self-contained file.
+        pngs = {}
+        try:
+            import watchlist_viz as V
+            pngs = V.build_all(rows, frames, W.zone_series)
+        except Exception as ve:  # noqa: BLE001
+            print(f"  digest charts skipped: {str(ve)[:100]}")
+        import base64
+        cid_refs = {k: f"cid:{k}" for k in pngs}
+        data_refs = {k: "data:image/png;base64," + base64.b64encode(v).decode()
+                     for k, v in pngs.items()}
         # body = trimmed (stays under Gmail's ~102KB clip); attachment = the
         # SAME rows rendered untrimmed — attachments don't count toward the
         # clip, so nothing is lost, only demoted a click away.
-        return (W.render(rows, as_of, purged=purged),
+        return (W.render(rows, as_of, purged=purged, images=cid_refs),
                 f" + 📊 Watchlist ({up}↑ {dn}↓ of {len(held)} held)",
-                W.render(rows, as_of, purged=purged, full=True))
+                W.render(rows, as_of, purged=purged, full=True, images=data_refs),
+                pngs)
     except Exception as e:  # noqa: BLE001 — isolation is the whole point
         print(f"  digest section failed (brief still sent): {str(e)[:120]}")
         return (f'<p style="color:#ca3433;font-size:12px">watchlist digest '
-                f'failed this morning: {str(e)[:200]}</p>', "", None)
+                f'failed this morning: {str(e)[:200]}</p>', "", None, {})
 
 
-def send(subject: str, text: str, html: str, attachments=None) -> bool:
+def send(subject: str, text: str, html: str, attachments=None,
+         inline_images=None) -> bool:
     """attachments: optional [(filename, html_str), ...] — attached as
-    text/html files. Attachments don't count toward Gmail's ~102KB clip, which
-    is exactly why the full digest rides here while the body stays trimmed."""
+    text/html files. inline_images: optional {cid: png_bytes} referenced from
+    the body as <img src="cid:...">. Neither counts toward Gmail's ~102KB HTML
+    clip, which is exactly why charts and the full digest ride here while the
+    body stays trimmed.
+
+    MIME shape: mixed( related( alternative(text, html), images... ), files )
+    """
+    from email.mime.image import MIMEImage
+
     user = _env.get("GMAIL_USER")
     pw = _env.get("GMAIL_APP_PASSWORD")
     to = (_env.get("MAIL_TO") or user)
@@ -83,15 +107,24 @@ def send(subject: str, text: str, html: str, attachments=None) -> bool:
     alt = MIMEMultipart("alternative")
     alt.attach(MIMEText(text, "plain"))
     alt.attach(MIMEText(html, "html"))
+    core = alt
+    if inline_images:
+        core = MIMEMultipart("related")
+        core.attach(alt)
+        for cid, png in inline_images.items():
+            img = MIMEImage(png, "png")
+            img.add_header("Content-ID", f"<{cid}>")
+            img.add_header("Content-Disposition", "inline", filename=f"{cid}.png")
+            core.attach(img)
     if attachments:
         msg = MIMEMultipart("mixed")
-        msg.attach(alt)
+        msg.attach(core)
         for fname, content in attachments:
             part = MIMEText(content, "html")
             part.add_header("Content-Disposition", "attachment", filename=fname)
             msg.attach(part)
     else:
-        msg = alt
+        msg = core
     msg["Subject"] = subject
     msg["From"] = user
     msg["To"] = to
@@ -107,7 +140,7 @@ if __name__ == "__main__":
     import datetime as _dt
 
     subject, text, html = build()
-    digest_html, digest_subj, digest_full = _digest_section()
+    digest_html, digest_subj, digest_full, pngs = _digest_section()
     html = (html
             + '<div style="margin:22px 0 10px;border-top:3px solid #0B2F4A"></div>'
             + digest_html)
@@ -121,6 +154,10 @@ if __name__ == "__main__":
         if digest_full:
             Path("watchlist_full.html").write_text(digest_full)
             print("  full digest draft → watchlist_full.html")
+        for k, v in pngs.items():
+            Path(f"digest_{k}.png").write_bytes(v)
+        if pngs:
+            print(f"  charts → {', '.join('digest_' + k + '.png' for k in pngs)}")
         print(f"  draft saved → brief_today.html ({subject})")
     else:
-        send(subject, text, html, attachments=attachments)
+        send(subject, text, html, attachments=attachments, inline_images=pngs)

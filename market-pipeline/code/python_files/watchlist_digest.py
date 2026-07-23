@@ -690,7 +690,7 @@ def _text(v) -> str:
     return "" if s.lower() in ("nan", "none") else s
 
 
-def build_rows(watchlist: pd.DataFrame) -> list:
+def build_rows(watchlist: pd.DataFrame, frames_out: Optional[dict] = None) -> list:
     fx = _fx_map()
     rows = []
     for _, w in watchlist.iterrows():
@@ -721,7 +721,12 @@ def build_rows(watchlist: pd.DataFrame) -> list:
         if last_date is None and isinstance(df.index, pd.DatetimeIndex):
             last_date = str(df.index.max())[:10]
         d1 = _pct_change(df, 1)
-        liq, below = _liq_label(_turnover_usd(df, sym, mkt, fx), mkt)
+        if frames_out is not None:
+            # hand the already-loaded frame to the caller (the viz pass) so it
+            # does not re-read ~800 parquets for the same data
+            frames_out[(mkt, sym)] = df
+        turn = _turnover_usd(df, sym, mkt, fx)
+        liq, below = _liq_label(turn, mkt)
         z = zone_series(df)
         zone = z.iloc[-1] if z is not None else "?"
         last_close = float(close.iloc[-1]) if len(close) else None
@@ -741,6 +746,7 @@ def build_rows(watchlist: pd.DataFrame) -> list:
                      "d5": _pct_change(df, 5), "close": last_close,
                      "last": last_date, "note": note, "status": status,
                      "missing": False, "liq": liq, "below_floor": below,
+                     "turn_usd": turn,
                      "why": why_listed(status, note),
                      "zone": zone, "streak": sell_streak(z),
                      "entry_date": entry_date, "ret_entry": ret_entry,
@@ -765,7 +771,9 @@ def _fmt(p: Optional[float]) -> str:
 
 
 def render(rows: list, as_of: str, purged: Optional[list] = None,
-           full: bool = False) -> str:
+           full: bool = False, images: Optional[dict] = None) -> str:
+    """images: {'treemap'|'rrg'|'breadth': src} — src is a cid: reference in
+    the email body and a data: URI in the full attachment / draft."""
     # Three tiers, not two. 'watch' names are neither owned nor exited — counting
     # them as held would overstate the portfolio nearly fourfold.
     live = [r for r in rows if r.get("status", "held") == "held"]
@@ -791,6 +799,14 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
     flat = sum(1 for r in live if r["mark"] == "⚪")
     miss = sum(1 for r in rows if r["missing"])
 
+
+    def _img(key, alt):
+        src = (images or {}).get(key)
+        if not src:
+            return ""
+        return (f'<img src="{src}" alt="{alt}" '
+                f'style="width:100%;max-width:680px;border:1px solid #dfe7ec;'
+                f'border-radius:6px;margin:8px 0;display:block">')
     # Template styled after smart-investing.in (user request 2026-07-23): deep
     # navy #0B2F4A banner + section strips, ice #eef4f6 canvas, teal #16a085
     # for gains/buy, #ca3433 for losses/sell, white card tables.
@@ -814,7 +830,10 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
         + (f' · {len(evicted)} evicted' if evicted else '')
         + (f' · <b style="color:#b00">{miss} not in cache</b>' if miss else '')
         + '</p>',
+        _img("treemap", "market treemap"),
         render_dashboard(rows + justified + illiquid, full=full),
+        _img("rrg", "sector rotation RRG"),
+        _img("breadth", "market breadth"),
     ]
 
     # ── zone-first organisation (user, 2026-07-23) ───────────────────────────
@@ -888,7 +907,9 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
              ("HOLD", "🟨 Hold zone", "between the EMAs — no signal either way",
               "#F07857"),
              ("SELL", "🟥 Sell zone",
-              f"close < EMA50 — evicted after {SELL_STREAK_LIMIT + 1} straight sessions",
+              f"close < EMA50; 🟢 here = a bounce inside a broken trend — "
+              f"tracked names evict after {SELL_STREAK_LIMIT + 1} straight "
+              f"sessions, held names never auto-exit",
               "#ca3433"),
              ("?", "❔ Unmeasured", "not in cache or under 25 bars of history",
               "#5f6368"))
@@ -927,10 +948,16 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
                       else {"🟢": "#16a085", "🔴": "#ca3433"}.get(r["mark"], "#666"))
             streak_td = ""
             if zkey == "SELL":
-                s = r.get("streak", 0)
-                warn = "#ca3433" if s >= SELL_STREAK_LIMIT else "#d35400"
-                streak_td = (f'<td style="color:{warn};font-size:12px">'
-                             f'{s}d/{SELL_STREAK_LIMIT + 1}</td>')
+                n = r.get("streak", 0)
+                if r["status"] == "held":
+                    # held names are NEVER auto-evicted, so no countdown
+                    # denominator — showing "43d/6" implied one (user-caught).
+                    streak_td = (f'<td style="color:#5f6368;font-size:12px">'
+                                 f'{n}d</td>')
+                else:
+                    warn = "#ca3433" if n >= SELL_STREAK_LIMIT else "#d35400"
+                    streak_td = (f'<td style="color:{warn};font-size:12px">'
+                                 f'{n}d/{SELL_STREAK_LIMIT + 1}</td>')
             # "As of" column dropped for size; a date appears ONLY when the row
             # is staler than the digest itself — which was its original point.
             stale = (f' <span style="color:#ca3433;font-size:10px">{r["last"]}</span>'

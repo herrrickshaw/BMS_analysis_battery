@@ -20,9 +20,17 @@
 # generalised and cached.
 #
 # PRECEDENCE (first hit wins):
-#   1. os.environ            — explicit override; how CI and one-off runs inject
-#   2. <this dir>/.env       — the pipeline's own secrets
-#   3. ~/.env.local          — machine-wide fallback
+#   1. os.environ                          — explicit override; CI / one-off runs
+#   2. ~/.config/market-secrets/credentials.env  — the CANONICAL consolidated store
+#   3. <this dir>/.env                     — legacy, kept as fallback during migration
+#   4. ~/.env.local                        — legacy machine-wide fallback
+#
+# The canonical store (2026-07-23) collapses five scattered credential files
+# (this .env, ~/.env.local, ~/.jquants.env, global-stock-screener/.env,
+# ~/.aws/credentials) into ONE gitignored, mode-600 file so every data fetch
+# resolves keys from a single place and rotation touches one file. The legacy
+# files are still read AFTER it, so a key not yet migrated still resolves and
+# nothing breaks; once verified they can be emptied. See market-secrets/README.
 #
 # stdlib only, and no dependency on python-dotenv: this is imported by
 # send_alert.py, which must work even when the environment is broken enough that
@@ -35,7 +43,8 @@ from pathlib import Path
 from typing import Dict, Optional
 
 _HERE = Path(__file__).resolve().parent
-_FILES = (_HERE / ".env", Path.home() / ".env.local")
+_CANONICAL = Path.home() / ".config" / "market-secrets" / "credentials.env"
+_FILES = (_CANONICAL, _HERE / ".env", Path.home() / ".env.local")
 
 _cache: Optional[Dict[str, str]] = None
 

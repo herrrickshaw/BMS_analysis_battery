@@ -508,10 +508,15 @@ def main() -> int:
             print("  ✗ cannot send: GMAIL_USER / GMAIL_APP_PASSWORD / MAIL_TO not set",
                   file=sys.stderr)
             return 1
-        up = sum(1 for r in rows if r["mark"] == "🟢")
-        dn = sum(1 for r in rows if r["mark"] == "🔴")
+        # Held-only, matching the body's headline count. Counting every tier
+        # made the subject balloon once KR/JP/EU started pricing (195↑ 352↓ on
+        # 2026-07-23) — a number about the whole tracking universe, not the
+        # portfolio the subject line is glanced for.
+        held = [r for r in rows if r.get("status", "held") == "held"]
+        up = sum(1 for r in held if r["mark"] == "🟢")
+        dn = sum(1 for r in held if r["mark"] == "🔴")
         msg = MIMEMultipart("alternative")
-        msg["Subject"] = f"📊 Watchlist — {as_of} ({up}↑ {dn}↓)"
+        msg["Subject"] = f"📊 Watchlist — {as_of} ({up}↑ {dn}↓ of {len(held)} held)"
         msg["From"], msg["To"] = user, to
         msg.attach(MIMEText(html, "html"))
         try:

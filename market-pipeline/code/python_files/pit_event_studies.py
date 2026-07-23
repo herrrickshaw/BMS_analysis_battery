@@ -145,6 +145,36 @@ def ca_events() -> pd.DataFrame:
     return ev
 
 
+def ann_ca_events(ca: pd.DataFrame) -> pd.DataFrame:
+    """Match each split/bonus ex-date to its earliest board-meeting INTIMATION
+    (bm_timestamp within 180d before ex) — the first public, timestamped
+    signal. corp_actions' own caBroadcastDate is null in every row (verified
+    against the live API 2026-07-23); the intimation is the honest anchor."""
+    bm_path = os.path.join(MC, "exchange_extras",
+                           "board_meetings_bonus_split.parquet")
+    if not os.path.exists(bm_path):
+        return pd.DataFrame()
+    bm = pd.read_parquet(bm_path)
+    bm["ann"] = pd.to_datetime(bm["bm_timestamp"],
+                               format="%d-%b-%Y %H:%M:%S", errors="coerce")
+    bm = bm.dropna(subset=["ann"])
+    m = ca.merge(bm[["bm_symbol", "ann"]], left_on="symbol",
+                 right_on="bm_symbol")
+    ex = pd.to_datetime(m["eff_date"])
+    m = m[(m["ann"] < ex) & (m["ann"] >= ex - pd.Timedelta(days=180))]
+    if m.empty:
+        return pd.DataFrame()
+    idxmin = m.groupby("event_id")["ann"].idxmin()
+    m = m.loc[idxmin, ["event_id", "symbol", "kind", "eff_date", "ann"]]
+    # intimation after 15:30 -> tradeable from the next day
+    m["ann_eff"] = np.where(
+        m["ann"].dt.time <= pd.Timestamp("15:30").time(),
+        m["ann"].dt.normalize(),
+        m["ann"].dt.normalize() + pd.Timedelta(days=1))
+    m["ann_eff"] = pd.to_datetime(m["ann_eff"]).dt.date
+    return m.reset_index(drop=True)
+
+
 def surprise_events() -> pd.DataFrame:
     q = pd.read_parquet(os.path.join(MC, "nse_xbrl", "pit_quarterly.parquet"))
     q["filing"] = pd.to_datetime(q["filing_date"],
@@ -194,6 +224,7 @@ def main() -> int:
 
     # ---- Study 1: announcement-return-sorted PEAD -------------------------
     ev = pead_events()
+    n_events_total = len(ev)
     print(f"PEAD events: {len(ev):,}")
     anch = anchor_events(con, ev)
     ev = ev.merge(anch[["event_id", "rn0", "day0"]], on="event_id")
@@ -231,11 +262,49 @@ def main() -> int:
         hit_0_20=("car_0_20", lambda s: (s > 0).mean()),
     )
 
+    # ---- Study 3b: intimation-anchored (was the run-up tradeable?) --------
+    av = ann_ca_events(ca_events())
+    t4 = None
+    if len(av):
+        # anchor the intimation day
+        ann_frame = av[["event_id", "symbol"]].assign(eff_date=av["ann_eff"])
+        ann_anchor = anchor_events(con, ann_frame)
+        av = av.merge(ann_anchor[["event_id", "rn0"]].rename(
+            columns={"rn0": "rn_ann"}), on="event_id")
+        # anchor the ex day
+        ex_anchor = anchor_events(con, av[["event_id", "symbol", "eff_date"]])
+        av = av.merge(ex_anchor[["event_id", "rn0"]].rename(
+            columns={"rn0": "rn_ex"}), on="event_id")
+        av = av[av["rn_ex"] > av["rn_ann"] + 2]
+        con.register("av", av[["event_id", "symbol", "rn_ann", "rn_ex"]])
+        seg = con.sql("""
+        SELECT e.event_id,
+               r1.acum - a0.acum AS car_react,      -- intimation day 0..+1
+               x1.acum - r1.acum AS car_drift_ex    -- +2 .. ex-1 (tradeable)
+        FROM av e
+        JOIN acum a0 ON a0.symbol = e.symbol AND a0.rn = e.rn_ann - 1
+        JOIN acum r1 ON r1.symbol = e.symbol AND r1.rn = e.rn_ann + 1
+        JOIN acum x1 ON x1.symbol = e.symbol AND x1.rn = e.rn_ex - 1
+        """).df()
+        av = av.merge(seg, on="event_id", how="left")
+        av["gap_td"] = av["rn_ex"] - av["rn_ann"]
+        t4 = av.dropna(subset=["car_drift_ex"]).groupby("kind").agg(
+            n=("event_id", "size"),
+            gap_med=("gap_td", "median"),
+            car_react_mean=("car_react", "mean"),
+            car_drift_mean=("car_drift_ex", "mean"),
+            hit_drift=("car_drift_ex", lambda s: (s > 0).mean()),
+        )
+
     # ---- persist ----------------------------------------------------------
     ev["study"] = "pead_annret"
     sv["study"] = "pead_surprise"
     cv["study"] = "post_ca"
-    allrows = pd.concat([ev, sv, cv], ignore_index=True)
+    parts = [ev, sv, cv]
+    if t4 is not None:
+        av["study"] = "post_ca_intimation"
+        parts.append(av)
+    allrows = pd.concat(parts, ignore_index=True)
     os.makedirs(os.path.dirname(OUT_PQ), exist_ok=True)
     allrows.to_parquet(OUT_PQ, index=False)
 
@@ -251,8 +320,9 @@ def main() -> int:
         "",
         "## 1. PEAD sorted on announcement-window [0,+1] abnormal return",
         "",
-        f"{len(ev):,} filing-dated events (of {66229:,} in the index; the",
-        "rest fall outside the 2016+ adjusted panel or lack price coverage).",
+        f"{len(ev):,} anchored filing-dated events (deduped index universe:",
+        f"{n_events_total:,}; the rest fall outside the 2016+ adjusted panel",
+        "or lack price coverage).",
         "Quintiles are WITHIN calendar quarter (cross-sectional).",
         "",
         "| quintile | n | ann ret (med) | CAR +2..+21 | CAR +2..+63 | hit(63d) |",
@@ -298,6 +368,31 @@ def main() -> int:
         lines.append(f"| {k} | {int(r.n):,} | {pct(r.car_pre_mean)} "
                      f"| {pct(r.car_0_20_mean)} | {pct(r.car_21_60_mean)} "
                      f"| {r.hit_0_20:.0%} |")
+    if t4 is not None:
+        lines += [
+            "",
+            "## 3b. Intimation-anchored: was the pre-ex run-up tradeable?",
+            "",
+            "Anchor = board-meeting INTIMATION broadcast (bm_timestamp — the",
+            "first public signal a bonus/split is being considered; NSE's",
+            "caBroadcastDate field is null in every corp-actions row).",
+            "`react` = intimation day 0..+1 (not tradeable in advance);",
+            "`drift` = day +2 .. ex−1 (fully tradeable window).",
+            "",
+            "| kind | n | gap (td, med) | CAR react [0,+1] | CAR drift [+2,ex−1] "
+            "| hit(drift) |",
+            "|---|---|---|---|---|---|",
+        ]
+        for k, r in t4.iterrows():
+            lines.append(f"| {k} | {int(r.n):,} | {r.gap_med:.0f} "
+                         f"| {pct(r.car_react_mean)} | {pct(r.car_drift_mean)} "
+                         f"| {r.hit_drift:.0%} |")
+        lines += [
+            "",
+            "Sum react+drift vs Study 3's pre-ex run-up tells how much of the",
+            "anticipation was announced-then-earned vs already priced before",
+            "any public intimation.",
+        ]
     lines += [
         "",
         "## Caveats (encode before citing)",
@@ -309,9 +404,12 @@ def main() -> int:
         "  interpretable; never cite a level.",
         "- Median-market abnormal returns, no beta adjustment — factor-model",
         "  CARs are the upgrade path.",
-        "- results_index 2025 is thin (3,960 rows vs ~11k/yr) — collection",
-        "  gap, not a market fact; drift estimates for 2025 cohorts are",
-        "  under-sampled.",
+        "- 2025-26 index coverage RESTORED 2026-07-23 via the integrated-",
+        "  filing API (NSE silently migrated post-2024 results there); the",
+        "  legacy-API-only era of this index under-sampled 2025 cohorts.",
+        "- Study 3b hit rates ride the same universe-level bias — compare",
+        "  its 75-83% drift hits against the ~70-75% baseline hit of the",
+        "  filing universe, not against 50%.",
         "- Announcement-return sorting conditions on day-0/+1 price action",
         "  (tradeable from day +2); it is NOT a fundamentals surprise.",
         "- No FDR pass yet: treat every spread here as PROVISIONAL until",

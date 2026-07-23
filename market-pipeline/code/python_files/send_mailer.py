@@ -57,15 +57,22 @@ def _digest_section() -> tuple:
         held = [r for r in rows if r.get("status", "held") == "held"]
         up = sum(1 for r in held if r["mark"] == "🟢")
         dn = sum(1 for r in held if r["mark"] == "🔴")
+        # body = trimmed (stays under Gmail's ~102KB clip); attachment = the
+        # SAME rows rendered untrimmed — attachments don't count toward the
+        # clip, so nothing is lost, only demoted a click away.
         return (W.render(rows, as_of, purged=purged),
-                f" + 📊 Watchlist ({up}↑ {dn}↓ of {len(held)} held)")
+                f" + 📊 Watchlist ({up}↑ {dn}↓ of {len(held)} held)",
+                W.render(rows, as_of, purged=purged, full=True))
     except Exception as e:  # noqa: BLE001 — isolation is the whole point
         print(f"  digest section failed (brief still sent): {str(e)[:120]}")
         return (f'<p style="color:#ca3433;font-size:12px">watchlist digest '
-                f'failed this morning: {str(e)[:200]}</p>', "")
+                f'failed this morning: {str(e)[:200]}</p>', "", None)
 
 
-def send(subject: str, text: str, html: str) -> bool:
+def send(subject: str, text: str, html: str, attachments=None) -> bool:
+    """attachments: optional [(filename, html_str), ...] — attached as
+    text/html files. Attachments don't count toward Gmail's ~102KB clip, which
+    is exactly why the full digest rides here while the body stays trimmed."""
     user = _env.get("GMAIL_USER")
     pw = _env.get("GMAIL_APP_PASSWORD")
     to = (_env.get("MAIL_TO") or user)
@@ -73,28 +80,47 @@ def send(subject: str, text: str, html: str) -> bool:
         Path("brief_today.html").write_text(html)
         print("  no valid GMAIL_APP_PASSWORD set — saved brief_today.html instead of sending")
         return False
-    msg = MIMEMultipart("alternative")
+    alt = MIMEMultipart("alternative")
+    alt.attach(MIMEText(text, "plain"))
+    alt.attach(MIMEText(html, "html"))
+    if attachments:
+        msg = MIMEMultipart("mixed")
+        msg.attach(alt)
+        for fname, content in attachments:
+            part = MIMEText(content, "html")
+            part.add_header("Content-Disposition", "attachment", filename=fname)
+            msg.attach(part)
+    else:
+        msg = alt
     msg["Subject"] = subject
     msg["From"] = user
     msg["To"] = to
-    msg.attach(MIMEText(text, "plain"))
-    msg.attach(MIMEText(html, "html"))
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as s:
         s.login(user, pw)
         s.sendmail(user, [a.strip() for a in to.split(",")], msg.as_string())
-    print(f"  sent '{subject}' → {to}")
+    print(f"  sent '{subject}' → {to}"
+          + (f" (+{len(attachments)} attachment)" if attachments else ""))
     return True
 
 
 if __name__ == "__main__":
+    import datetime as _dt
+
     subject, text, html = build()
-    digest_html, digest_subj = _digest_section()
+    digest_html, digest_subj, digest_full = _digest_section()
     html = (html
             + '<div style="margin:22px 0 10px;border-top:3px solid #0B2F4A"></div>'
             + digest_html)
     subject += digest_subj
+    attachments = None
+    if digest_full:
+        fname = f"watchlist_full_{_dt.date.today():%Y-%m-%d}.html"
+        attachments = [(fname, digest_full)]
     if "--draft" in sys.argv:
         Path("brief_today.html").write_text(html)
+        if digest_full:
+            Path("watchlist_full.html").write_text(digest_full)
+            print("  full digest draft → watchlist_full.html")
         print(f"  draft saved → brief_today.html ({subject})")
     else:
-        send(subject, text, html)
+        send(subject, text, html, attachments=attachments)

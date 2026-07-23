@@ -57,6 +57,16 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Full digest rides as an .html attachment
+
+render() grew a `full=True` mode (same rows, no caps: every zone row, all
+sectors, untruncated whys) and send() grew attachment support (mixed/
+alternative MIME). The morning email now carries the trimmed body (~98 KB,
+under the clip) PLUS `watchlist_full_YYYY-MM-DD.html` (~330 KB) — attachments
+don't count toward Gmail's clip, so the trim demotes detail a click away
+instead of dropping it. --draft writes watchlist_full.html beside
+brief_today.html.
+
 ### Digest trimmed under Gmail's clip line (442 KB → 99 KB combined)
 
 Gmail clips HTML above ~102 KB; the combined email ran 442 KB. The digest is

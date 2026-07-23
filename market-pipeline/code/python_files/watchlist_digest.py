@@ -392,7 +392,7 @@ def _pctfmt(v, bold=False) -> str:
     return f'<span style="{w}color:{colour}">{v:+.2f}%</span>'
 
 
-def render_dashboard(rows: list) -> str:
+def render_dashboard(rows: list, full: bool = False) -> str:
     priced = [r for r in rows if not r["missing"] and r["d1"] is not None]
     if not priced:
         return ""
@@ -435,7 +435,7 @@ def render_dashboard(rows: list) -> str:
             th + '<th style="padding:5px 4px">Sector</th><th>n</th><th>med 1d</th>'
                  '<th>med 5d</th><th>🟢%</th><th>leaders</th></tr>']
     ranked = [kv for kv in ranked if len(kv[1]) >= 2 or kv[0] == "Unclassified"]
-    if len(ranked) > 9:
+    if not full and len(ranked) > 9:
         # both ends matter for rotation; the middle is where nothing happened
         dropped = len(ranked) - 8
         ranked = ranked[:6] + ranked[-2:]
@@ -764,7 +764,8 @@ def _fmt(p: Optional[float]) -> str:
     return "—" if p is None else f"{p:+.2f}%"
 
 
-def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
+def render(rows: list, as_of: str, purged: Optional[list] = None,
+           full: bool = False) -> str:
     # Three tiers, not two. 'watch' names are neither owned nor exited — counting
     # them as held would overstate the portfolio nearly fourfold.
     live = [r for r in rows if r.get("status", "held") == "held"]
@@ -813,7 +814,7 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
         + (f' · {len(evicted)} evicted' if evicted else '')
         + (f' · <b style="color:#b00">{miss} not in cache</b>' if miss else '')
         + '</p>',
-        render_dashboard(rows + justified + illiquid),
+        render_dashboard(rows + justified + illiquid, full=full),
     ]
 
     # ── zone-first organisation (user, 2026-07-23) ───────────────────────────
@@ -843,9 +844,17 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
         return (f'{r["mark"]} <b>{r["symbol"]}</b> '
                 f'{FLAG.get(r["market"], r["market"])}{tag}{new}')
 
+    # full=True renders the UNTRIMMED digest (the .html attachment); the email
+    # body uses the capped version that stays under Gmail's clip line.
+    zcap = 10 ** 6 if full else ZONE_TOP_N
+    scap = 10 ** 6 if full else STRIP_TOP_N
+    rollcap = 10 ** 6 if full else 30
+
     def _why_short(r, cap=36) -> str:
         w = r["why"]
-        return w if len(w) <= cap else w[:cap - 1] + "…"
+        if full or len(w) <= cap:
+            return w
+        return w[:cap - 1] + "…"
 
     active = [r for r in rows if r.get("status") in ("held", "watch", "signal")]
     exited = [r for r in rows if r.get("status") == "sold"]
@@ -901,11 +910,11 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
                 '<p style="background:#fff;border:1px solid #dfe7ec;margin:0;'
                 'padding:8px 10px;font-size:11px;color:#5f6368">'
                 + ", ".join(f'{r["symbol"]} {FLAG.get(r["market"], r["market"])}'
-                            for r in grp[:30])
-                + (f' … +{len(grp) - 30} more' if len(grp) > 30 else '')
+                            for r in grp[:rollcap])
+                + (f' … +{len(grp) - rollcap} more' if len(grp) > rollcap else '')
                 + '</p>')
             continue
-        vis, hidden = grp[:ZONE_TOP_N], grp[ZONE_TOP_N:]
+        vis, hidden = grp[:zcap], grp[zcap:]
         streak_th = '<th>Streak</th>' if zkey == "SELL" else ''
         body.append(
             '<table style="border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid #dfe7ec">'
@@ -951,7 +960,7 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
             f'<span style="font-weight:400;color:#777;font-size:12px">'
             f'({len(exited)} — kept for the record, not recommendations)</span></h3>'
             '<table style="border-collapse:collapse;width:100%;font-size:12px;background:#fff;border:1px solid #dfe7ec">')
-        for r in exited[:STRIP_TOP_N]:
+        for r in exited[:scap]:
             cell = (f'{_fmt(r["d1"])} · close {r["close"]:,.2f}'
                     if not r["missing"] else "not in cache")
             body.append(
@@ -961,9 +970,9 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
                 f'<td style="font-size:11px">{cell}</td>'
                 f'<td style="font-size:11px">{_since_entry(r)}</td>'
                 f'<td style="font-size:11px">{r["note"]}</td></tr>')
-        if len(exited) > STRIP_TOP_N:
+        if len(exited) > scap:
             body.append(f'<tr><td colspan="4" style="padding:5px;font-size:11px;'
-                        f'color:#5f6368">… {len(exited) - STRIP_TOP_N} more exited '
+                        f'color:#5f6368">… {len(exited) - scap} more exited '
                         f'names in watchlist.csv</td></tr>')
         body.append('</table>')
 
@@ -974,7 +983,7 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
             '(median daily turnover under the market\'s gate — India ₹1cr/day, '
             'elsewhere $10k structural; moves here are hard to act on)</span></h3>'
             '<table style="border-collapse:collapse;width:100%;font-size:12px;background:#fff;border:1px solid #dfe7ec">')
-        for r in illiquid[:STRIP_TOP_N]:
+        for r in illiquid[:scap]:
             colour = {"🟢": "#16a085", "🔴": "#ca3433"}.get(r["mark"], "#666")
             body.append(
                 f'<tr style="color:#888;font-size:11px">'
@@ -984,9 +993,9 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
                 f'<td>{r["close"]:,.2f}</td>'
                 f'<td style="font-size:11px">{r["last"] or "?"}</td>'
                 f'<td style="font-size:11px">{_why_short(r)}</td></tr>')
-        if len(illiquid) > STRIP_TOP_N:
+        if len(illiquid) > scap:
             body.append(f'<tr><td colspan="5" style="padding:5px;font-size:11px;'
-                        f'color:#5f6368">… {len(illiquid) - STRIP_TOP_N} more '
+                        f'color:#5f6368">… {len(illiquid) - scap} more '
                         f'below-floor names in watchlist.csv</td></tr>')
         body.append('</table>')
 
@@ -1000,7 +1009,7 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
             '<tr style="text-align:left;background:#ecf1f6;border-bottom:2px solid #cfdde6;color:#0B2F4A">'
             '<th style="padding:5px 4px">Symbol</th><th>1d</th><th>5d</th>'
             '<th>Close</th><th>Liq</th><th>As of</th><th>Screen</th></tr>')
-        for r in justified[:8]:
+        for r in justified[:(10**6 if full else 8)]:
             if r["missing"]:
                 body.append(
                     f'<tr style="border-bottom:1px solid #f0f0f0;color:#b58900">'
@@ -1020,7 +1029,7 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
                 f'<td style="color:#999;font-size:11px">{r["liq"]}</td>'
                 f'<td style="color:#999;font-size:12px">{r["last"] or "?"}</td>'
                 f'<td style="color:#666;font-size:12px">{r["note"]}</td></tr>')
-        if len(justified) > 8:
+        if not full and len(justified) > 8:
             body.append(f'<tr><td colspan="7" style="padding:5px;font-size:11px;'
                         f'color:#5f6368">… {len(justified) - 8} more justified '
                         f'picks in watchlist.csv</td></tr>')
@@ -1030,7 +1039,7 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
         # newest first; the note carries "evicted YYYY-MM-DD after Nd" so the
         # strip is self-explaining. Capped — the point is "what just left and
         # why", not a graveyard tour.
-        recent = sorted(evicted, key=lambda r: r.get("note", ""), reverse=True)[:STRIP_TOP_N]
+        recent = sorted(evicted, key=lambda r: r.get("note", ""), reverse=True)[:scap]
         body.append(
             '<h3 style="margin:18px 0 0;background:#0B2F4A;color:#eef4f6;padding:7px 10px;border-radius:6px 6px 0 0;font-size:14px">🪦 Evicted '
             '<span style="font-weight:400;color:#777;font-size:12px">'

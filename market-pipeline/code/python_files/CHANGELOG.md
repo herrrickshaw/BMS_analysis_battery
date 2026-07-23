@@ -71,6 +71,33 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### PE anomaly backtests (India, 2017-2026) — both user hypotheses tested
+
+backtest_pe_anomalies.py + reports/pe_anomaly_backtest.md. 1,458 NSE names,
+109 monthly formations, PIT annual EPS (fy_end+90d lag), adjusted closes.
+🔴 DATA TRAP found en route: fundamentals_history/IN.parquet mixes screener_in
+rows (₹ crore) with yfinance rows carrying QUARTERLY magnitudes mislabelled
+annual (TCS "FY26" = one quarter) — a 4x EPS error. Used
+IN_screener_only_backup (pure screener.in, validated TCS EPS 120/133/136 ✓).
+
+Findings (survivorship-biased levels; SPREADS are the statistic):
+* **Sector-relative PE anomalies DO correct**: cheap-vs-own-industry Q1 beats
+  rich Q5 monotonically — +0.85%/1M, +2.60%/3M, +5.26%/6M (de-overlapped
+  t ≈ 2.5-2.9). Sector-level stretch corrects ASYMMETRICALLY: sectors at
+  z<−1.5 vs own 36M PE history return +9.37% fwd-3M vs +6.96% neutral;
+  rich-stretched sectors (+7.34%) barely lag neutral — buying beaten-down
+  sectors pays, fading hot ones does not.
+* **PE trend is MOMENTUM, not reversion (3-6M)**: 12M multiple-expanders beat
+  compressors (fwd-3M +5.6/+5.2% vs +3.5/+2.7%) — even "hope rallies"
+  (PE↑ EPS↓) beat "cheapening on delivery". Consistent with the standing
+  India-is-momentum-friendly finding.
+* **High PEs are EARNED on average**: subsequent-12M EPS growth is monotone
+  in PE quintile (−37% cheap → +34% rich) — the market forecasts growth
+  correctly, yet the value spread survives → systematic OVERPAYMENT for
+  correctly-predicted growth. Level (cheap-vs-sector) and trend (re-rating)
+  are separate, compatible signals; their intersection is an obvious future
+  WATCHLIST_FILTER.
+
 ### Bundles report ALPHA, not absolute return
 
 Takeaway adopted from the user-supplied active-vs-index literature (Weiner

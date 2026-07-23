@@ -57,6 +57,19 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Digest trimmed under Gmail's clip line (442 KB → 99 KB combined)
+
+Gmail clips HTML above ~102 KB; the combined email ran 442 KB. The digest is
+now 41 KB (brief 57 KB → combined 99 KB) via visible-never-silent caps:
+top-10 rows per zone table ("… N more in this zone (M held)" trailer), sector
+clusters cut to strongest 6 + weakest 2 (both ends matter for rotation; the
+elided middle is counted), record strips capped at 8, the ❔ zone collapsed
+to a symbol roll, per-row "As of" column dropped (a date now appears ONLY on
+rows staler than the digest — its original job), why-remarks truncated at 36
+chars, and inline-style diet across dashboard/zone/strip rows. The margin is
+~3 KB — if a busy brief day re-clips, next lever is attaching the full
+untrimmed digest as an .html attachment (attachments don't count).
+
 ### One morning email (brief + digest); 3-week sell-zone purge
 
 * **Combined email** — send_mailer.py now appends the watchlist digest below

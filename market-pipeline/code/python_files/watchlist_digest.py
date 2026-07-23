@@ -378,7 +378,7 @@ def _dist_bar(d1s, width=180) -> str:
     total = sum(c for c, _ in counts) or 1
     cells = "".join(
         f'<td style="background:{colour};width:{max(1, round(c / total * width))}px;'
-        f'height:10px;font-size:0;line-height:0">&nbsp;</td>'
+        f'height:9px;font-size:0">&nbsp;</td>'
         for c, colour in counts if c)
     return (f'<table cellspacing="0" cellpadding="0" style="border-collapse:collapse">'
             f'<tr>{cells}</tr></table>')
@@ -398,7 +398,7 @@ def render_dashboard(rows: list) -> str:
         return ""
     th = ('<tr style="text-align:left;background:#ecf1f6;'
           'border-bottom:2px solid #cfdde6;font-size:12px;color:#0B2F4A">')
-    td = 'style="padding:5px 4px;border-bottom:1px solid #f0f0f0"'
+    td = 'style="padding:4px"'
     out = ['<h3 style="margin:16px 0 0;background:#0B2F4A;color:#eef4f6;padding:7px 10px;border-radius:6px 6px 0 0;font-size:14px">🌍 Market pulse</h3>',
            '<table style="border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid #dfe7ec">',
            th + '<th style="padding:5px 4px">Market</th><th>n</th><th>🟢/⚪/🔴</th>'
@@ -412,7 +412,7 @@ def render_dashboard(rows: list) -> str:
         dn = sum(1 for r in g if r["mark"] == "🔴")
         best = max(g, key=lambda r: r["d1"]); worst = min(g, key=lambda r: r["d1"])
         out.append(
-            f'<tr><td {td}><b>{mkt}</b></td><td {td}>{len(g)}</td>'
+            f'<tr style="border-bottom:1px solid #f0f0f0"><td {td}><b>{mkt}</b></td><td {td}>{len(g)}</td>'
             f'<td {td} style="font-size:12px">{up}/{len(g) - up - dn}/{dn}</td>'
             f'<td {td}>{_pctfmt(_median([r["d1"] for r in g]), True)}</td>'
             f'<td {td}>{_pctfmt(_median([r["d5"] for r in g]))}</td>'
@@ -434,26 +434,33 @@ def render_dashboard(rows: list) -> str:
             '<table style="border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid #dfe7ec">',
             th + '<th style="padding:5px 4px">Sector</th><th>n</th><th>med 1d</th>'
                  '<th>med 5d</th><th>🟢%</th><th>leaders</th></tr>']
+    ranked = [kv for kv in ranked if len(kv[1]) >= 2 or kv[0] == "Unclassified"]
+    if len(ranked) > 9:
+        # both ends matter for rotation; the middle is where nothing happened
+        dropped = len(ranked) - 8
+        ranked = ranked[:6] + ranked[-2:]
+    else:
+        dropped = 0
     for sec, g in ranked:
-        if len(g) < 2 and sec != "Unclassified":
-            continue                      # a 1-name "cluster" is just the name
         up_pct = 100.0 * sum(1 for r in g if r["mark"] == "🟢") / len(g)
-        leaders = sorted(g, key=lambda r: -r["d1"])[:2]
-        lead = " · ".join(f'{r["symbol"]}<span style="color:#999;font-size:10px">'
-                          f' {r["market"]}</span> {_pctfmt(r["d1"])}' for r in leaders)
+        leaders = sorted(g, key=lambda r: -r["d1"])[:1]
+        lead = " ".join(f'{r["symbol"]} {_pctfmt(r["d1"])}' for r in leaders)
         out.append(
-            f'<tr><td {td}>{sec}</td><td {td}>{len(g)}</td>'
+            f'<tr style="border-bottom:1px solid #f0f0f0"><td {td}>{sec}</td><td {td}>{len(g)}</td>'
             f'<td {td}>{_pctfmt(_median([r["d1"] for r in g]), True)}</td>'
             f'<td {td}>{_pctfmt(_median([r["d5"] for r in g]))}</td>'
             f'<td {td}>{up_pct:.0f}%</td>'
             f'<td {td} style="font-size:12px">{lead}</td></tr>')
+    if dropped:
+        out.append(f'<tr><td colspan="6" style="padding:5px;font-size:11px;'
+                   f'color:#5f6368">… {dropped} mid-table sectors elided</td></tr>')
     out.append('</table>')
 
     # liquidity × returns — is the strength in names you can actually buy?
     out += ['<h3 style="margin:16px 0 0;background:#0B2F4A;color:#eef4f6;padding:7px 10px;border-radius:6px 6px 0 0;font-size:14px">💧 Liquidity × returns</h3>',
             '<table style="border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid #dfe7ec">',
             th + '<th style="padding:5px 4px">Tier</th><th>n</th><th>med 1d</th>'
-                 '<th>med 5d</th><th>🟢%</th><th>1d distribution</th></tr>']
+                 '<th>med 5d</th><th>🟢%</th></tr>']
     tier_label = {"T1": "T1 most liquid (≥$12M/d)", "T2": "T2 (≥$3M/d)",
                   "T3": "T3 (≥$600k/d)", "T4": "T4 above floor",
                   "—": "below floor", "?": "unmeasured"}
@@ -463,11 +470,10 @@ def render_dashboard(rows: list) -> str:
             continue
         up_pct = 100.0 * sum(1 for r in g if r["mark"] == "🟢") / len(g)
         out.append(
-            f'<tr><td {td}>{tier_label[tkey]}</td><td {td}>{len(g)}</td>'
+            f'<tr style="border-bottom:1px solid #f0f0f0"><td {td}>{tier_label[tkey]}</td><td {td}>{len(g)}</td>'
             f'<td {td}>{_pctfmt(_median([r["d1"] for r in g]), True)}</td>'
             f'<td {td}>{_pctfmt(_median([r["d5"] for r in g]))}</td>'
-            f'<td {td}>{up_pct:.0f}%</td>'
-            f'<td {td}>{_dist_bar([r["d1"] for r in g])}</td></tr>')
+            f'<td {td}>{up_pct:.0f}%</td></tr>')
     out.append('</table>')
     return "\n".join(out)
 
@@ -495,6 +501,14 @@ MIN_BARS_FOR_ZONE = 25     # below this EMA50 is noise; zone "?" and no eviction
 # sold rows are trade history, not tracking state.
 PURGE_SELL_SESSIONS = 15   # ≈ 3 trading weeks; strictly more → row removed
 PURGED_ARCHIVE = Path(__file__).resolve().parent / "watchlist_purged.csv"
+
+# Gmail clips messages around ~102KB, and the combined brief+digest ran 440KB
+# — most of it zone rows. Each zone shows its top N rows (the global sort
+# already puts green movers and held names first); every cap prints the hidden
+# remainder, so trimming is visible, never silent. Record strips (exited /
+# below-floor / evicted) are capped harder — they are context, not decisions.
+ZONE_TOP_N = 10
+STRIP_TOP_N = 8
 
 
 def _close_series(df: pd.DataFrame) -> Optional[pd.Series]:
@@ -814,8 +828,7 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
         if r.get("ret_entry") is not None:
             colour = "#16a085" if r["ret_entry"] >= 0 else "#ca3433"
             d = f' · {r["days_in"]}d' if r.get("days_in") is not None else ""
-            return f'<span style="color:{colour}">{r["ret_entry"]:+.1f}%</span>' \
-                   f'<span style="color:#999;font-size:11px">{d}</span>'
+            return f'<span style="color:{colour}">{r["ret_entry"]:+.1f}%{d}</span>'
         if r.get("entry_date"):
             return f'<span style="color:#999;font-size:11px">{r["entry_date"]}</span>'
         return '<span style="color:#ccc">—</span>'
@@ -829,6 +842,10 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
             if (r.get("days_in") is not None and r["days_in"] <= 1) else ""
         return (f'{r["mark"]} <b>{r["symbol"]}</b> '
                 f'{FLAG.get(r["market"], r["market"])}{tag}{new}')
+
+    def _why_short(r, cap=36) -> str:
+        w = r["why"]
+        return w if len(w) <= cap else w[:cap - 1] + "…"
 
     active = [r for r in rows if r.get("status") in ("held", "watch", "signal")]
     exited = [r for r in rows if r.get("status") == "sold"]
@@ -876,23 +893,27 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
             f'padding:7px 10px;border-radius:6px 6px 0 0;font-size:14px">{ztitle} '
             f'<span style="font-weight:400;color:rgba(255,255,255,.85);font-size:11px">'
             f'{len(grp)} names ({held_n} held) — {zdesc}</span></h3>')
+        if zkey == "?":
+            # unmeasured names carry no numbers worth a table — a symbol roll
+            # keeps them visible at ~2% of the size (this zone also holds the
+            # not-in-cache rows, so the roll IS the coverage-gap report).
+            body.append(
+                '<p style="background:#fff;border:1px solid #dfe7ec;margin:0;'
+                'padding:8px 10px;font-size:11px;color:#5f6368">'
+                + ", ".join(f'{r["symbol"]} {FLAG.get(r["market"], r["market"])}'
+                            for r in grp[:30])
+                + (f' … +{len(grp) - 30} more' if len(grp) > 30 else '')
+                + '</p>')
+            continue
+        vis, hidden = grp[:ZONE_TOP_N], grp[ZONE_TOP_N:]
         streak_th = '<th>Streak</th>' if zkey == "SELL" else ''
         body.append(
             '<table style="border-collapse:collapse;width:100%;font-size:13px;background:#fff;border:1px solid #dfe7ec">'
             '<tr style="text-align:left;background:#ecf1f6;border-bottom:2px solid #cfdde6;font-size:12px;color:#0B2F4A">'
             '<th style="padding:5px 4px">Symbol</th><th>1d</th><th>5d</th>'
             f'<th>Since entry</th>{streak_th}<th>Close</th><th>Liq</th>'
-            '<th>As of</th><th>Why on the list</th></tr>')
-        for r in grp:
-            if r["missing"]:
-                body.append(
-                    f'<tr style="border-bottom:1px solid #f0f0f0;color:#b00">'
-                    f'<td style="padding:5px 4px">❔ <b>{r["symbol"]}</b> '
-                    f'{FLAG.get(r["market"], r["market"])}</td>'
-                    f'<td colspan="6" style="font-size:12px">not in local cache — '
-                    f'ingest.sh has never fetched it</td>'
-                    f'<td style="font-size:12px">{r["why"]}</td></tr>')
-                continue
+            '<th>Why on the list</th></tr>')
+        for r in vis:
             colour = ("#999" if r["status"] == "watch"
                       else {"🟢": "#16a085", "🔴": "#ca3433"}.get(r["mark"], "#666"))
             streak_td = ""
@@ -901,17 +922,27 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
                 warn = "#ca3433" if s >= SELL_STREAK_LIMIT else "#d35400"
                 streak_td = (f'<td style="color:{warn};font-size:12px">'
                              f'{s}d/{SELL_STREAK_LIMIT + 1}</td>')
+            # "As of" column dropped for size; a date appears ONLY when the row
+            # is staler than the digest itself — which was its original point.
+            stale = (f' <span style="color:#ca3433;font-size:10px">{r["last"]}</span>'
+                     if r["last"] and r["last"] != as_of else "")
             body.append(
-                f'<tr style="border-bottom:1px solid #f0f0f0">'
-                f'<td style="padding:5px 4px">{_sym_cell(r)}</td>'
+                f'<tr style="border-bottom:1px solid #f0f0f0;font-size:12px">'
+                f'<td style="padding:4px">{_sym_cell(r)}{stale}</td>'
                 f'<td style="color:{colour};font-weight:600">{_fmt(r["d1"])}</td>'
                 f'<td style="color:#666">{_fmt(r["d5"])}</td>'
-                f'<td style="font-size:12px">{_since_entry(r)}</td>'
+                f'<td>{_since_entry(r)}</td>'
                 f'{streak_td}'
                 f'<td>{r["close"]:,.2f}</td>'
-                f'<td style="color:#999;font-size:11px">{r["liq"]}</td>'
-                f'<td style="color:#999;font-size:11px">{r["last"] or "?"}</td>'
-                f'<td style="color:#666;font-size:12px">{r["why"]}</td></tr>')
+                f'<td style="color:#999">{r["liq"]}</td>'
+                f'<td style="color:#666">{_why_short(r)}</td></tr>')
+        if hidden:
+            h_held = sum(1 for r in hidden if r["status"] == "held")
+            body.append(
+                f'<tr><td colspan="9" style="padding:6px;font-size:11px;'
+                f'color:#5f6368;background:#f7fafc">… {len(hidden)} more in this '
+                f'zone ({h_held} held) — top {ZONE_TOP_N} shown, full list in '
+                f'watchlist.csv</td></tr>')
         body.append('</table>')
 
     if exited:
@@ -920,16 +951,20 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
             f'<span style="font-weight:400;color:#777;font-size:12px">'
             f'({len(exited)} — kept for the record, not recommendations)</span></h3>'
             '<table style="border-collapse:collapse;width:100%;font-size:12px;background:#fff;border:1px solid #dfe7ec">')
-        for r in exited:
+        for r in exited[:STRIP_TOP_N]:
             cell = (f'{_fmt(r["d1"])} · close {r["close"]:,.2f}'
                     if not r["missing"] else "not in cache")
             body.append(
-                f'<tr style="border-bottom:1px solid #f4f4f4;color:#888">'
+                f'<tr style="color:#888;font-size:11px">'
                 f'<td style="padding:4px"><b>{r["symbol"]}</b> '
                 f'{FLAG.get(r["market"], r["market"])}</td>'
                 f'<td style="font-size:11px">{cell}</td>'
                 f'<td style="font-size:11px">{_since_entry(r)}</td>'
                 f'<td style="font-size:11px">{r["note"]}</td></tr>')
+        if len(exited) > STRIP_TOP_N:
+            body.append(f'<tr><td colspan="4" style="padding:5px;font-size:11px;'
+                        f'color:#5f6368">… {len(exited) - STRIP_TOP_N} more exited '
+                        f'names in watchlist.csv</td></tr>')
         body.append('</table>')
 
     if illiquid:
@@ -939,16 +974,20 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
             '(median daily turnover under the market\'s gate — India ₹1cr/day, '
             'elsewhere $10k structural; moves here are hard to act on)</span></h3>'
             '<table style="border-collapse:collapse;width:100%;font-size:12px;background:#fff;border:1px solid #dfe7ec">')
-        for r in illiquid:
+        for r in illiquid[:STRIP_TOP_N]:
             colour = {"🟢": "#16a085", "🔴": "#ca3433"}.get(r["mark"], "#666")
             body.append(
-                f'<tr style="border-bottom:1px solid #f4f4f4;color:#888">'
+                f'<tr style="color:#888;font-size:11px">'
                 f'<td style="padding:4px">{r["mark"]} <b>{r["symbol"]}</b>'
                 f'<span style="font-size:10px"> {r["market"]}</span></td>'
                 f'<td style="color:{colour}">{_fmt(r["d1"])}</td>'
                 f'<td>{r["close"]:,.2f}</td>'
                 f'<td style="font-size:11px">{r["last"] or "?"}</td>'
-                f'<td style="font-size:11px">{r["why"]}</td></tr>')
+                f'<td style="font-size:11px">{_why_short(r)}</td></tr>')
+        if len(illiquid) > STRIP_TOP_N:
+            body.append(f'<tr><td colspan="5" style="padding:5px;font-size:11px;'
+                        f'color:#5f6368">… {len(illiquid) - STRIP_TOP_N} more '
+                        f'below-floor names in watchlist.csv</td></tr>')
         body.append('</table>')
 
     if justified:
@@ -961,7 +1000,7 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
             '<tr style="text-align:left;background:#ecf1f6;border-bottom:2px solid #cfdde6;color:#0B2F4A">'
             '<th style="padding:5px 4px">Symbol</th><th>1d</th><th>5d</th>'
             '<th>Close</th><th>Liq</th><th>As of</th><th>Screen</th></tr>')
-        for r in justified:
+        for r in justified[:8]:
             if r["missing"]:
                 body.append(
                     f'<tr style="border-bottom:1px solid #f0f0f0;color:#b58900">'
@@ -981,13 +1020,17 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
                 f'<td style="color:#999;font-size:11px">{r["liq"]}</td>'
                 f'<td style="color:#999;font-size:12px">{r["last"] or "?"}</td>'
                 f'<td style="color:#666;font-size:12px">{r["note"]}</td></tr>')
+        if len(justified) > 8:
+            body.append(f'<tr><td colspan="7" style="padding:5px;font-size:11px;'
+                        f'color:#5f6368">… {len(justified) - 8} more justified '
+                        f'picks in watchlist.csv</td></tr>')
         body.append('</table>')
 
     if evicted:
         # newest first; the note carries "evicted YYYY-MM-DD after Nd" so the
         # strip is self-explaining. Capped — the point is "what just left and
         # why", not a graveyard tour.
-        recent = sorted(evicted, key=lambda r: r.get("note", ""), reverse=True)[:15]
+        recent = sorted(evicted, key=lambda r: r.get("note", ""), reverse=True)[:STRIP_TOP_N]
         body.append(
             '<h3 style="margin:18px 0 0;background:#0B2F4A;color:#eef4f6;padding:7px 10px;border-radius:6px 6px 0 0;font-size:14px">🪦 Evicted '
             '<span style="font-weight:400;color:#777;font-size:12px">'
@@ -997,7 +1040,7 @@ def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
         for r in recent:
             ev = r["note"].rsplit("evicted", 1)[-1].strip() if "evicted" in r["note"] else ""
             body.append(
-                f'<tr style="border-bottom:1px solid #f4f4f4;color:#888">'
+                f'<tr style="color:#888;font-size:11px">'
                 f'<td style="padding:4px"><b>{r["symbol"]}</b>'
                 f'<span style="font-size:10px"> {r["market"]}</span></td>'
                 f'<td style="font-size:11px">{_since_entry(r)}</td>'

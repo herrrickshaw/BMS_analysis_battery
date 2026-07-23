@@ -30,6 +30,41 @@ from pathlib import Path
 from build_mailer import build
 
 
+def _digest_section() -> tuple:
+    """(html, subject_suffix) for the watchlist digest, appended below the
+    brief so the morning is ONE email, not two (user, 2026-07-23).
+
+    Failure-isolated on purpose: the digest importing half the pipeline must
+    never block the brief — a broken digest renders as an error strip and the
+    brief still ships. Running it here also runs watchlist hygiene (entry
+    backfill, sell-zone eviction, >3-week purge) exactly once per morning.
+    """
+    try:
+        import pandas as pd
+        import watchlist_digest as W
+        wl_path = Path(W.__file__).resolve().parent / "watchlist.csv"
+        wl = pd.read_csv(wl_path)
+        wl, evicted, purged, changed = W.maintain(wl)
+        if changed:
+            wl.to_csv(wl_path, index=False)
+        if evicted:
+            print("  digest: evicted " + ", ".join(evicted))
+        if purged:
+            print("  digest: purged " + ", ".join(purged))
+        rows = W.build_rows(wl)
+        W.assign_sectors(rows)
+        as_of = max([r["last"] for r in rows if r["last"]] or ["?"])
+        held = [r for r in rows if r.get("status", "held") == "held"]
+        up = sum(1 for r in held if r["mark"] == "🟢")
+        dn = sum(1 for r in held if r["mark"] == "🔴")
+        return (W.render(rows, as_of, purged=purged),
+                f" + 📊 Watchlist ({up}↑ {dn}↓ of {len(held)} held)")
+    except Exception as e:  # noqa: BLE001 — isolation is the whole point
+        print(f"  digest section failed (brief still sent): {str(e)[:120]}")
+        return (f'<p style="color:#ca3433;font-size:12px">watchlist digest '
+                f'failed this morning: {str(e)[:200]}</p>', "")
+
+
 def send(subject: str, text: str, html: str) -> bool:
     user = _env.get("GMAIL_USER")
     pw = _env.get("GMAIL_APP_PASSWORD")
@@ -53,6 +88,11 @@ def send(subject: str, text: str, html: str) -> bool:
 
 if __name__ == "__main__":
     subject, text, html = build()
+    digest_html, digest_subj = _digest_section()
+    html = (html
+            + '<div style="margin:22px 0 10px;border-top:3px solid #0B2F4A"></div>'
+            + digest_html)
+    subject += digest_subj
     if "--draft" in sys.argv:
         Path("brief_today.html").write_text(html)
         print(f"  draft saved → brief_today.html ({subject})")

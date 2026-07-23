@@ -487,6 +487,14 @@ def render_dashboard(rows: list) -> str:
 # CSV (status → "evicted", note says when and why) — history is never deleted.
 SELL_STREAK_LIMIT = 5      # strictly more than this → evicted
 MIN_BARS_FOR_ZONE = 25     # below this EMA50 is noise; zone "?" and no eviction
+# Second, harder threshold (user, 2026-07-23): more than ~3 trading weeks in
+# the sell zone and the ROW ITSELF is removed from watchlist.csv — eviction
+# hides a name from the live views, purging stops carrying it at all. Purged
+# rows are archived to watchlist_purged.csv (append-only), never just lost.
+# `held` and `sold` are exempt: the portfolio is not this tool's to prune, and
+# sold rows are trade history, not tracking state.
+PURGE_SELL_SESSIONS = 15   # ≈ 3 trading weeks; strictly more → row removed
+PURGED_ARCHIVE = Path(__file__).resolve().parent / "watchlist_purged.csv"
 
 
 def _close_series(df: pd.DataFrame) -> Optional[pd.Series]:
@@ -532,11 +540,13 @@ _NOTE_DATE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 
 
 def maintain(wl: pd.DataFrame) -> tuple:
-    """Backfill entry_date/entry_price and evict stale SELL-zone names.
+    """Backfill entry_date/entry_price, evict stale SELL-zone names, purge
+    rows that have sat in the sell zone past PURGE_SELL_SESSIONS.
 
-    Returns (wl, evicted_symbols, changed). Mutation lives HERE, once per run,
-    before rendering — the mailer then shows the post-hygiene list, and a name
-    never appears green in the email while already evicted underneath.
+    Returns (wl, evicted_symbols, purged_symbols, changed). Mutation lives
+    HERE, once per run, before rendering — the mailer then shows the
+    post-hygiene list, and a name never appears green in the email while
+    already evicted underneath.
     """
     changed = False
     for col in ("entry_date", "entry_price"):
@@ -544,10 +554,21 @@ def maintain(wl: pd.DataFrame) -> tuple:
             wl[col] = None
             changed = True
     today = pd.Timestamp.today().strftime("%Y-%m-%d")
-    evicted = []
+    evicted, purged, drop_idx = [], [], []
     for i, w in wl.iterrows():
         status = (_text(w.get("status")) or "held").lower()
-        if status in ("sold", "evicted"):
+        if status == "evicted":
+            # already out of the live views; the only remaining question is
+            # whether it has now been down long enough to purge entirely.
+            sym = str(w["symbol"]).strip().upper()
+            mkt = (_text(w.get("market")) or "US").upper()
+            df = _load_ohlc(sym, mkt)
+            if df is not None and not getattr(df, "empty", True):
+                if sell_streak(zone_series(df)) > PURGE_SELL_SESSIONS:
+                    drop_idx.append(i)
+                    purged.append(f"{sym} ({mkt})")
+            continue
+        if status == "sold":
             continue
         sym = str(w["symbol"]).strip().upper()
         mkt = (_text(w.get("market")) or "US").upper()
@@ -570,16 +591,29 @@ def maintain(wl: pd.DataFrame) -> tuple:
             if len(after):
                 wl.at[i, "entry_price"] = round(float(after.iloc[0]), 4)
                 changed = True
-        # eviction — tracking tiers only
+        # eviction / purge — tracking tiers only
         if status in ("watch", "signal", "justified"):
             streak = sell_streak(zone_series(df))
-            if streak > SELL_STREAK_LIMIT:
+            if streak > PURGE_SELL_SESSIONS:
+                # so far gone it skips the evicted halfway house entirely
+                drop_idx.append(i)
+                purged.append(f"{sym} ({mkt})")
+            elif streak > SELL_STREAK_LIMIT:
                 wl.at[i, "status"] = "evicted"
                 wl.at[i, "note"] = (f"{note} | evicted {today} after {streak} "
                                     f"sessions in sell zone").strip(" |")
                 evicted.append(f"{sym} ({mkt}, {streak}d)")
                 changed = True
-    return wl, evicted, changed
+    if drop_idx:
+        # archive first, drop second — a purge is a deletion from the live
+        # list, not from history.
+        arch = wl.loc[drop_idx].copy()
+        arch["purged_date"] = today
+        arch.to_csv(PURGED_ARCHIVE, mode="a", index=False,
+                    header=not PURGED_ARCHIVE.exists())
+        wl = wl.drop(index=drop_idx).reset_index(drop=True)
+        changed = True
+    return wl, evicted, purged, changed
 
 
 # ── why is this name on the list ─────────────────────────────────────────────
@@ -716,7 +750,7 @@ def _fmt(p: Optional[float]) -> str:
     return "—" if p is None else f"{p:+.2f}%"
 
 
-def render(rows: list, as_of: str) -> str:
+def render(rows: list, as_of: str, purged: Optional[list] = None) -> str:
     # Three tiers, not two. 'watch' names are neither owned nor exited — counting
     # them as held would overstate the portfolio nearly fourfold.
     live = [r for r in rows if r.get("status", "held") == "held"]
@@ -804,7 +838,7 @@ def render(rows: list, as_of: str) -> str:
     # say so before the tables do.
     today = pd.Timestamp.today().strftime("%Y-%m-%d")
     left_today = [r for r in evicted if f"evicted {today}" in (r.get("note") or "")]
-    if joined or left_today:
+    if joined or left_today or purged:
         churn = []
         if joined:
             churn.append('<span style="color:#16a085"><b>🆕 joined:</b> '
@@ -814,6 +848,10 @@ def render(rows: list, as_of: str) -> str:
             churn.append('<span style="color:#ca3433"><b>🪦 left:</b> '
                          + ", ".join(f'{r["symbol"]} {FLAG.get(r["market"], r["market"])}'
                                      for r in left_today[:20]) + '</span>')
+        if purged:
+            churn.append('<span style="color:#5f6368"><b>🗑 purged '
+                         f'(&gt;{PURGE_SELL_SESSIONS} sessions in sell):</b> '
+                         + ", ".join(purged[:20]) + '</span>')
         body.append('<p style="font-size:12px;margin:10px 0 0">'
                     + ' &nbsp;·&nbsp; '.join(churn) + '</p>')
 
@@ -1007,21 +1045,26 @@ def main() -> int:
         print("watchlist needs a 'symbol' column", file=sys.stderr)
         return 1
 
+    purged = []
     if not args.no_maintain:
         # Hygiene BEFORE rendering, so the email always reflects the
-        # post-eviction list. maintain() only touches entry_date/entry_price
-        # and flips watch/signal/justified → evicted; nothing is deleted.
-        wl, evicted, changed = maintain(wl)
+        # post-eviction list. Evictions flip status; purges (>3 trading weeks
+        # in the sell zone) DELETE the row after archiving it to
+        # watchlist_purged.csv.
+        wl, evicted, purged, changed = maintain(wl)
         if changed:
             wl.to_csv(wl_path, index=False)
         if evicted:
             print(f"  evicted (> {SELL_STREAK_LIMIT} sessions in sell zone): "
                   + ", ".join(evicted))
+        if purged:
+            print(f"  purged (> {PURGE_SELL_SESSIONS} sessions in sell zone, "
+                  f"archived to {PURGED_ARCHIVE.name}): " + ", ".join(purged))
 
     rows = build_rows(wl)
     assign_sectors(rows, fetch_cap=10_000 if args.build_sectors else SECTOR_FETCH_CAP)
     as_of = max([r["last"] for r in rows if r["last"]] or ["?"])
-    html = render(rows, as_of)
+    html = render(rows, as_of, purged=purged)
 
     miss = sum(1 for r in rows if r["missing"])
     if args.out:

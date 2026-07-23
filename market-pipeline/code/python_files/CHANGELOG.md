@@ -57,6 +57,24 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### One morning email (brief + digest); 3-week sell-zone purge
+
+* **Combined email** — send_mailer.py now appends the watchlist digest below
+  the brief (navy divider between) and extends the subject: "📈 Daily Market
+  Brief — … + 📊 Watchlist (42↑ 32↓ of 126 held)". One send at [14/14], still
+  behind the screener.in validation gate; step [18/18] removed. The digest
+  section is failure-ISOLATED: if it throws, the brief still ships with an
+  error strip where the digest would be. Hygiene (entry backfill, eviction,
+  purge) now runs inside that call — once per morning, draft or send.
+* **Purge rule (user)** — sell-zone streak > 15 sessions (~3 trading weeks)
+  DELETES the row from watchlist.csv: evicted rows get purged once they cross
+  it, and a live row that far gone skips the evicted halfway house entirely.
+  Rows are archived to watchlist_purged.csv (append-only, purged_date column)
+  before deletion — removal from the live list, never from history. held and
+  sold rows are exempt. First run: 73 rows purged (INFY, ITC, ONGC, COALINDIA,
+  VEDL, WIPRO among them), watchlist 883 → 810, evicted 114 → 41. Purges are
+  announced in the 🗑 churn line.
+
 ### Digest rides the pipeline; smart-investing.in template
 
 * **Trigger moved** — daily_pipeline.sh grew step [18/18]: the digest now

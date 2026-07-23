@@ -1,0 +1,74 @@
+symbol,market,status,note,entry_date,entry_price,purged_date
+AJANTSOY,IN,evicted,evicted 2026-07-23 after 47 sessions in sell zone,,,2026-07-23
+AVANTIFEED,IN,evicted,evicted 2026-07-23 after 39 sessions in sell zone,,,2026-07-23
+AXITA,IN,evicted,evicted 2026-07-23 after 106 sessions in sell zone,,,2026-07-23
+BANARISUG,IN,evicted,evicted 2026-07-23 after 26 sessions in sell zone,,,2026-07-23
+BCCL,IN,evicted,evicted 2026-07-23 after 107 sessions in sell zone,,,2026-07-23
+BLS,IN,evicted,evicted 2026-07-23 after 50 sessions in sell zone,,,2026-07-23
+CANBK,IN,evicted,evicted 2026-07-23 after 21 sessions in sell zone,,,2026-07-23
+CESC,IN,evicted,evicted 2026-07-23 after 21 sessions in sell zone,,,2026-07-23
+COALINDIA,IN,evicted,evicted 2026-07-23 after 30 sessions in sell zone,,,2026-07-23
+DONEAR,IN,evicted,evicted 2026-07-23 after 19 sessions in sell zone,,,2026-07-23
+GSAUTO,IN,evicted,evicted 2026-07-23 after 45 sessions in sell zone,,,2026-07-23
+HERANBA,IN,evicted,evicted 2026-07-23 after 48 sessions in sell zone,,,2026-07-23
+HINDALCO,IN,evicted,evicted 2026-07-23 after 30 sessions in sell zone,,,2026-07-23
+INFY,IN,evicted,evicted 2026-07-23 after 35 sessions in sell zone,,,2026-07-23
+INOXWIND,IN,evicted,evicted 2026-07-23 after 21 sessions in sell zone,,,2026-07-23
+IRCTC,IN,evicted,evicted 2026-07-23 after 51 sessions in sell zone,,,2026-07-23
+ITC,IN,evicted,evicted 2026-07-23 after 44 sessions in sell zone,,,2026-07-23
+JKLAKSHMI,IN,evicted,evicted 2026-07-23 after 47 sessions in sell zone,,,2026-07-23
+KRIDHANINF,IN,evicted,evicted 2026-07-23 after 21 sessions in sell zone,,,2026-07-23
+MHRIL,IN,evicted,evicted 2026-07-23 after 16 sessions in sell zone,,,2026-07-23
+NATIONALUM,IN,evicted,evicted 2026-07-23 after 33 sessions in sell zone,,,2026-07-23
+NLCINDIA,IN,evicted,evicted 2026-07-23 after 16 sessions in sell zone,,,2026-07-23
+NSDL,IN,evicted,evicted 2026-07-23 after 18 sessions in sell zone,,,2026-07-23
+ONGC,IN,evicted,evicted 2026-07-23 after 39 sessions in sell zone,,,2026-07-23
+PFC,IN,evicted,evicted 2026-07-23 after 18 sessions in sell zone,,,2026-07-23
+RHFL,IN,evicted,evicted 2026-07-23 after 62 sessions in sell zone,,,2026-07-23
+RVNL,IN,evicted,evicted 2026-07-23 after 50 sessions in sell zone,,,2026-07-23
+SANDUMA,IN,evicted,evicted 2026-07-23 after 30 sessions in sell zone,,,2026-07-23
+SIMBHALS,IN,evicted,evicted 2026-07-23 after 39 sessions in sell zone,,,2026-07-23
+TARAPUR,IN,evicted,evicted 2026-07-23 after 65 sessions in sell zone,,,2026-07-23
+TATACONSUM,IN,evicted,evicted 2026-07-23 after 37 sessions in sell zone,,,2026-07-23
+TATAPOWER,IN,evicted,evicted 2026-07-23 after 35 sessions in sell zone,,,2026-07-23
+TATASTEEL,IN,evicted,evicted 2026-07-23 after 33 sessions in sell zone,,,2026-07-23
+TIRUMALCHM,IN,evicted,evicted 2026-07-23 after 37 sessions in sell zone,,,2026-07-23
+UGROCAP,IN,evicted,evicted 2026-07-23 after 52 sessions in sell zone,,,2026-07-23
+UNITEDTEA,IN,evicted,evicted 2026-07-23 after 35 sessions in sell zone,,,2026-07-23
+VEDL,IN,evicted,evicted 2026-07-23 after 57 sessions in sell zone,,,2026-07-23
+WAAREEENER,IN,evicted,evicted 2026-07-23 after 22 sessions in sell zone,,,2026-07-23
+WIPRO,IN,evicted,evicted 2026-07-23 after 33 sessions in sell zone,,,2026-07-23
+ZODIAC,IN,evicted,evicted 2026-07-23 after 37 sessions in sell zone,,,2026-07-23
+ATUL,IN,evicted,piotroski+debt 2026-07-21 | evicted 2026-07-23 after 18 sessions in sell zone,2026-07-21,6191.5,2026-07-23
+AARON,IN,evicted,piotroski+debt 2026-07-21 | evicted 2026-07-23 after 222 sessions in sell zone,2026-07-21,119.95,2026-07-23
+38390,KR,evicted,technical 2026-07-21 | evicted 2026-07-23 after 50 sessions in sell zone,2026-07-21,9730.0,2026-07-23
+KKRT,US,evicted,22.9 RSI @ 2026-07-22 | evicted 2026-07-23 after 18 sessions in sell zone,2026-07-22,23.28,2026-07-23
+SSTK,US,evicted,25.0 RSI @ 2026-07-22 | evicted 2026-07-23 after 20 sessions in sell zone,2026-07-22,7.38,2026-07-23
+SJT,US,evicted,25.1 RSI @ 2026-07-22 | evicted 2026-07-23 after 116 sessions in sell zone,2026-07-22,2.4794,2026-07-23
+PNR,US,evicted,25.9 RSI @ 2026-07-22 | evicted 2026-07-23 after 58 sessions in sell zone,2026-07-22,62.61,2026-07-23
+AA,US,evicted,26.1 RSI @ 2026-07-22 | evicted 2026-07-23 after 25 sessions in sell zone,2026-07-22,46.32,2026-07-23
+LAC,US,evicted,26.2 RSI @ 2026-07-22 | evicted 2026-07-23 after 31 sessions in sell zone,2026-07-22,3.02,2026-07-23
+PRTS,US,evicted,26.7 RSI @ 2026-07-22 | evicted 2026-07-23 after 49 sessions in sell zone,2026-07-22,4.6,2026-07-23
+210980.KS,KR,evicted,7.3 RSI @ 2026-07-22 | evicted 2026-07-23 after 55 sessions in sell zone,2026-07-22,5510.0,2026-07-23
+051360.KQ,KR,evicted,14.2 RSI @ 2026-07-22 | evicted 2026-07-23 after 25 sessions in sell zone,2026-07-22,16090.0,2026-07-23
+084680.KS,KR,evicted,18.1 RSI @ 2026-07-22 | evicted 2026-07-23 after 47 sessions in sell zone,2026-07-22,607.0,2026-07-23
+246690.KQ,KR,evicted,19.8 RSI @ 2026-07-22 | evicted 2026-07-23 after 50 sessions in sell zone,2026-07-22,1430.0,2026-07-23
+106190.KQ,KR,evicted,20.4 RSI @ 2026-07-22 | evicted 2026-07-23 after 54 sessions in sell zone,2026-07-22,10340.0,2026-07-23
+179900.KQ,KR,evicted,20.9 RSI @ 2026-07-22 | evicted 2026-07-23 after 36 sessions in sell zone,2026-07-22,2770.0,2026-07-23
+476040.KQ,KR,evicted,21.5 RSI @ 2026-07-22 | evicted 2026-07-23 after 133 sessions in sell zone,2026-07-22,7470.0,2026-07-23
+043100.KQ,KR,evicted,21.9 RSI @ 2026-07-22 | evicted 2026-07-23 after 102 sessions in sell zone,2026-07-22,520.0,2026-07-23
+365340.KQ,KR,evicted,22.2 RSI @ 2026-07-22 | evicted 2026-07-23 after 48 sessions in sell zone,2026-07-22,29300.0,2026-07-23
+6928.T,JP,evicted,25.6 RSI @ 2026-07-22 | evicted 2026-07-23 after 21 sessions in sell zone,2026-07-22,2590.0,2026-07-23
+4109.T,JP,evicted,28.3 RSI @ 2026-07-22 | evicted 2026-07-23 after 17 sessions in sell zone,2026-07-22,5570.0,2026-07-23
+4222.T,JP,evicted,28.6 RSI @ 2026-07-22 | evicted 2026-07-23 after 49 sessions in sell zone,2026-07-22,615.0,2026-07-23
+6619.T,JP,evicted,28.7 RSI @ 2026-07-22 | evicted 2026-07-23 after 32 sessions in sell zone,2026-07-22,154.0,2026-07-23
+7564.T,JP,evicted,28.9 RSI @ 2026-07-22 | evicted 2026-07-23 after 30 sessions in sell zone,2026-07-22,5580.0,2026-07-23
+6908.T,JP,evicted,29.3 RSI @ 2026-07-22 | evicted 2026-07-23 after 49 sessions in sell zone,2026-07-22,2789.0,2026-07-23
+9412.T,JP,evicted,29.4 RSI @ 2026-07-22 | evicted 2026-07-23 after 33 sessions in sell zone,2026-07-22,2299.0,2026-07-23
+SNPS,US,evicted,26.5 RSI @ 2026-07-23 | evicted 2026-07-23 after 32 sessions in sell zone,2026-07-23,,2026-07-23
+CAPR,US,evicted,26.8 RSI @ 2026-07-23 | evicted 2026-07-23 after 17 sessions in sell zone,2026-07-23,,2026-07-23
+SPRY,US,evicted,26.9 RSI @ 2026-07-23 | evicted 2026-07-23 after 18 sessions in sell zone,2026-07-23,,2026-07-23
+102940.KQ,KR,evicted,19.2 RSI @ 2026-07-23 | evicted 2026-07-23 after 47 sessions in sell zone,2026-07-23,17820.0,2026-07-23
+002020.KS,KR,evicted,19.2 RSI @ 2026-07-23 | evicted 2026-07-23 after 39 sessions in sell zone,2026-07-23,25050.0,2026-07-23
+7273.T,JP,evicted,25.7 RSI @ 2026-07-23 | evicted 2026-07-23 after 47 sessions in sell zone,2026-07-23,604.0,2026-07-23
+8783.T,JP,evicted,30.0 RSI @ 2026-07-23 | evicted 2026-07-23 after 61 sessions in sell zone,2026-07-23,68.0,2026-07-23

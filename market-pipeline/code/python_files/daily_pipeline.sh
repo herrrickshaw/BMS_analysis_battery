@@ -196,14 +196,11 @@ FAILURES=()
   /usr/bin/python3 /Users/umashankar/iudx-flood-collector/collector.py \
     || FAILURES+=("iudx: flood collector (see access_log in flood.duckdb)")
 
-  # [18] Watchlist digest — the zone-first mailer (Buy/Hold/Sell across all
-  # markets). Rides the END of the pipeline so it mails the moment the data it
-  # reads (ohlc cache, bhavcopy, warehouse) is fresh, replacing the fixed
-  # 07:00 n8n schedule (deactivated 2026-07-23) that could race a long run.
-  # --send also runs watchlist hygiene: entry backfill + sell-zone eviction.
-  step "[18/18] watchlist digest (zone mailer)"
-  $PY watchlist_digest.py --send \
-    || FAILURES+=("digest: watchlist mailer")
+  # NOTE: the watchlist digest no longer has its own step. It rides INSIDE
+  # send_mailer.py at [14/14] — brief + digest are ONE email (user,
+  # 2026-07-23) — and that call also runs watchlist hygiene (entry backfill,
+  # sell-zone eviction, >3-week purge). The old 07:00 n8n schedule stays
+  # deactivated; a second sender would double-mail.
 
   if [[ ${#FAILURES[@]} -gt 0 ]]; then
     echo "[ALERT] ${#FAILURES[@]} step(s) failed: ${FAILURES[*]}"

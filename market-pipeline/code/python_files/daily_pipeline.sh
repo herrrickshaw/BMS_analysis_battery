@@ -192,6 +192,22 @@ FAILURES=()
   /Users/umashankar/scripts/cloud_backup.sh \
     || FAILURES+=("cloud: rclone backup (see cloud_backup.log)")
 
+  # [16c] Monthly bundle validation vs public benchmarks (user, 2026-07-23).
+  # Runs the first pipeline run of each month, AFTER the mailer step has done
+  # the monthly bundle rebuild — validates the fresh bundles against SPDR
+  # holdings + NSE constituent lists (network, so it lives HERE and never
+  # inside the mailer path). Same exactly-once marker pattern as [16b].
+  BV_MARK="$HOME/.local/state/bundle_validation_last_run"
+  if [[ -f cache_seed/portfolio_bundles.json && "$(cat "$BV_MARK" 2>/dev/null)" != "$(date +%Y-%m)" ]]; then
+    step "[16c] monthly bundle validation vs benchmarks"
+    if $PY bundle_validation.py > /dev/null; then
+      mkdir -p "$(dirname "$BV_MARK")" && date +%Y-%m > "$BV_MARK"
+      echo "  bundle validation refreshed -> reports/bundle_validation.md"
+    else
+      FAILURES+=("validate: bundle benchmark comparison")
+    fi
+  fi
+
   # [16b] Monthly snapshot of the purged-watchlist archive to Dropbox (user,
   # 2026-07-23). Rides the pipeline instead of owning a monthly schedule: the
   # pmset 00:25 wake guarantees THIS job fires, while a standalone monthly

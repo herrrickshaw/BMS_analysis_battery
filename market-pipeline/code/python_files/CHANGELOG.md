@@ -71,6 +71,26 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Bundle validation vs real funds/indices (user request)
+
+bundle_validation.py + reports/bundle_validation.md: every bundle is compared
+against the closest PUBLIC benchmark — SPDR sector ETF daily holdings for US
+(with weights → constituent overlap, active share, HHI/concentration) and NSE
+index constituent lists for India (membership + Nifty-500 check). MSCI MCP
+was tried first: connected but UNENTITLED ("data access could not be
+verified") — no index data without a subscription. JP/KR/EU have no free
+constituent feed; skipped explicitly, never silently.
+
+Result: **every US/IN bundle is a differentiated satellite, not a closet
+index** — 0-1 of 4-10 names overlap the sector ETF/index, active share ≈100%
+across the board. IN Financials: 8/10 names are Nifty-500 members yet only
+1/10 sits in Nifty Financial Services — mid-cap financials the sector index
+does not carry. Weight style is deliberately more concentrated (HHI 0.11-0.22,
+25% cap) than cap-weighted ETFs (0.05-0.09) — satellite sizing, not index
+mimicry. Interpretation: the screens are selecting off-benchmark; the bundles
+COMPLEMENT index funds rather than replicate them, and validation would flag
+any future drift toward closet indexing (verdict thresholds encoded).
+
 ### value_rerating — the screen the backtests earned
 
 screen_value_rerating.py, pipeline step [13z/14] (runs BEFORE the mailer so

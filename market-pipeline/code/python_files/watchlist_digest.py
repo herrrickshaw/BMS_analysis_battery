@@ -330,18 +330,31 @@ def assign_sectors(rows: list, fetch_cap: int = SECTOR_FETCH_CAP) -> None:
         if sector is None and not r["missing"] and fetched < fetch_cap:
             try:
                 import yfinance as yf
-                sector = yf.Ticker(_yf_ticker(r["symbol"], r["market"])).info.get("sector")
-                fetched += 1
-                # checkpoint during long --build-sectors runs: a crash at name
-                # 600 of 700 must not throw away 599 answers.
-                if fetched % 25 == 0:
+                # KOSDAQ names are .KQ, KOSPI .KS — the watchlist stores neither
+                # (bare 6-digit codes), so try BOTH KR suffixes. yfinance DOES
+                # classify KOSDAQ (119850.KQ→Industrials) but only on the right
+                # venue: 119850.KS returns nothing. Same fix as the price
+                # fallback's _wh_candidates.
+                cands = ([f"{r['symbol'].zfill(6)}.KS", f"{r['symbol'].zfill(6)}.KQ"]
+                         if r["market"] == "KR" and r["symbol"].isdigit()
+                         else [_yf_ticker(r["symbol"], r["market"])])
+                for cand in cands:
+                    sector = yf.Ticker(cand).info.get("sector")
+                    fetched += 1
+                    if sector:
+                        break
+                if fetched % 25 < len(cands):
                     _save_sector_cache(cache)
             except Exception:
                 sector = None
-        if sector is not None or r["market"] == "JP":
-            # cache resolved names AND JP misses (a code absent from the JPX map
-            # will not appear tomorrow either); leave yf failures uncached so
-            # the next run retries them.
+        if not r["missing"] and (sector is not None or fetched > 0
+                                 or r["market"] == "JP"):
+            # cache the RESULT — including a genuine yfinance blank — so the
+            # daily 40-fetch budget is spent on NEW names, not re-asking about
+            # the 44 KR/US names yfinance has no sector for (they were burning
+            # the whole budget every run, starving fresh picks). The monthly
+            # --build-sectors rebuild re-attempts every blank, so a sector that
+            # later becomes available is still picked up.
             cache[key] = sector
             dirty = True
         r["sector"] = sector or "Unclassified"
@@ -905,24 +918,44 @@ def data_gaps(rows: list, as_of: str) -> list:
     unclass = [r for r in rows if not r.get("missing")
                and r.get("sector") == "Unclassified"]
     if unclass:
-        gaps.append(f"<b>{len(unclass)} priced names lack a sector label</b> — "
-                    f"excluded from thematic/RRG views until the incremental "
-                    f"yfinance backfill resolves them.")
+        from collections import Counter as _CC
+        by = _CC(r["market"] for r in unclass)
+        mix = ", ".join(f"{m}:{c}" for m, c in by.most_common())
+        gaps.append(f"<b>{len(unclass)} priced names have no sector label</b> "
+                    f"({mix}) — yfinance returns no sector for these (mostly "
+                    f"KOSDAQ micro-caps); retried at the monthly cache rebuild. "
+                    f"Excluded from thematic/RRG only.")
     noliq = [r for r in rows if not r.get("missing") and r.get("liq") == "?"]
     if noliq:
         gaps.append(f"<b>{len(noliq)} names have unmeasurable liquidity</b> "
                     f"(no Volume column or FX rate) — shown but untiered.")
-    # staleness vs each market's own freshest bar (US naturally lags IST by a
-    # day; a row older than ITS market is the real signal)
-    mk_max = {}
+    # staleness vs each market's TYPICAL last bar. Reference is the MODAL
+    # last-date per market, NOT the max: on a JP/KR non-trading tail a handful
+    # of names carry a phantom next-day stamp (timezone / ADR artefact), and
+    # keying off the max flagged the entire market's correct last session as
+    # stale (33 false positives on 2026-07-24). A row is genuinely stale only
+    # if it is MORE THAN ONE session behind the market's mode.
+    from collections import Counter as _C
+    mk_mode, per_mkt = {}, {}
     for r in rows:
         if r.get("last"):
-            mk_max[r["market"]] = max(mk_max.get(r["market"], ""), r["last"])
-    stale = [r for r in rows if r.get("last") and r["last"] < mk_max[r["market"]]]
+            per_mkt.setdefault(r["market"], []).append(r["last"])
+    for m, ds in per_mkt.items():
+        mk_mode[m] = _C(ds).most_common(1)[0][0]
+    # >1 session = the row's last bar is strictly less than the day BEFORE the
+    # market mode (dates are ISO strings; sort the market's distinct days)
+    prev_day = {}
+    for m, ds in per_mkt.items():
+        uniq = sorted(set(ds))
+        i = uniq.index(mk_mode[m])
+        prev_day[m] = uniq[i - 1] if i > 0 else mk_mode[m]
+    stale = [r for r in rows if r.get("last") and r["last"] < prev_day[r["market"]]]
     if stale:
-        gaps.append(f"<b>{len(stale)} rows are staler than their own market's "
-                    f"latest bar</b> — their tickers stopped updating in the "
-                    f"cache (rename/delist suspects).")
+        egs = ", ".join(f'{r["symbol"]}({r["last"][5:]})' for r in stale[:6])
+        gaps.append(f"<b>{len(stale)} rows are &gt;1 session behind their "
+                    f"market's last bar</b> — {egs} — tickers that stopped "
+                    f"updating (halt/delist suspects; equity-list repair only "
+                    f"covers IN/US).")
     noent = [r for r in rows if r.get("status") == "signal"
              and not r.get("entry_date")]
     if noent:

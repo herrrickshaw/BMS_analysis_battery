@@ -229,6 +229,17 @@ FAILURES=()
   # the monthly bundle rebuild — validates the fresh bundles against SPDR
   # holdings + NSE constituent lists (network, so it lives HERE and never
   # inside the mailer path). Same exactly-once marker pattern as [16b].
+  # [16e] Monthly full sector-cache rebuild — re-attempts every name incl. the
+  # yfinance blanks the daily budget caches and skips, so a sector that becomes
+  # available later is picked up. Slow (full yfinance sweep), monthly only.
+  SEC_MARK="$HOME/.local/state/sector_cache_last_rebuild"
+  if [[ "$(cat "$SEC_MARK" 2>/dev/null)" != "$(date +%Y-%m)" ]]; then
+    step "[16e] monthly sector-cache rebuild"
+    $PY watchlist_digest.py --build-sectors --no-maintain --out /dev/null > /dev/null 2>&1 \
+      && { mkdir -p "$(dirname "$SEC_MARK")" && date +%Y-%m > "$SEC_MARK"; } \
+      || FAILURES+=("sector: monthly rebuild")
+  fi
+
   BV_MARK="$HOME/.local/state/bundle_validation_last_run"
   if [[ -f cache_seed/portfolio_bundles.json && "$(cat "$BV_MARK" 2>/dev/null)" != "$(date +%Y-%m)" ]]; then
     step "[16c] monthly bundle validation vs benchmarks"

@@ -91,6 +91,24 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Two data gaps fixed: KR sectors (.KQ), staleness false-positives
+
+* **Sector: 91 → 44 unlabelled.** Root cause = the sector fetch mapped every
+  KR code to `.KS`, but KOSDAQ names are `.KQ` and yfinance only classifies
+  them on the right venue (119850.KQ→Industrials, .KS→nothing) — the same
+  suffix-ambiguity as the price fallback. Now tries both KR suffixes; resolved
+  ~50 KR names. The residual 44 are genuine yfinance blanks (mostly KOSDAQ
+  micro-caps; pykrx sector API broken KeyError 종가, FDR/KRX carry no sector,
+  KR scan workbook has no sector column) — now CACHED so they stop burning the
+  daily 40-fetch budget (they were starving new names), and re-attempted by a
+  new monthly full rebuild [16e]. Gap message now names the real cause.
+* **Stale: 33 → 2.** The reference was each market's MAX last-bar; on a JP/KR
+  non-trading tail a few names carry a phantom next-day stamp, so the whole
+  market's correct last session read as stale. Switched to the MODAL last-bar
+  with a >1-session tolerance — only genuinely-halted names remain (MSW 07-17,
+  LMFA 07-21). Message now lists them and notes equity-list repair covers only
+  IN/US (JP/KR/EU halts aren't auto-detected).
+
 ### Watchlist as report card + "act today"; paper-track scorecard
 
 * **🔔 Act today** (mailer, top section): the watchlist now surfaces earlier

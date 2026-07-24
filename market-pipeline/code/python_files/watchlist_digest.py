@@ -591,6 +591,26 @@ def _zone_rules() -> dict:
     return _ZONE_RULES
 
 
+_ZONE_REGIME: Optional[dict] = None
+
+
+def _zone_regime() -> dict:
+    """Regime-conditional map from strategy_regime_survival.py:
+    {mkt: {bull_rule, bear_rule, current_regime, active_rule}}. When present it
+    overrides the flat zone_rules.json rule — bull markets use the momentum/trend
+    rule, bear markets switch to mean-reversion (backtested per market, liquidity-
+    gated). Absent -> fall back to the flat single rule (backward compatible)."""
+    global _ZONE_REGIME
+    if _ZONE_REGIME is None:
+        import json
+        base = R.CODE if hasattr(R, "CODE") else Path(__file__).parent
+        try:
+            _ZONE_REGIME = json.loads((base / "cache_seed" / "zone_regime.json").read_text())
+        except Exception:
+            _ZONE_REGIME = {}
+    return _ZONE_REGIME
+
+
 RULE_LABEL = {"trend": "trend", "revert": "mean-revert",
               "mom126": "6mo-momentum", "mom_st": "1mo-momentum"}
 
@@ -601,6 +621,7 @@ def assign_recommendations(rows: list) -> None:
     market's priced rows this morning; trend reuses the per-name EMA zone.
     """
     rules = _zone_rules()
+    regime = _zone_regime()
     for r in rows:
         r["rec"], r["rec_rule"] = r.get("zone", "?"), "trend"
     by_mkt = {}
@@ -608,9 +629,17 @@ def assign_recommendations(rows: list) -> None:
         if not r.get("missing"):
             by_mkt.setdefault(r["market"], []).append(r)
     for mkt, grp in by_mkt.items():
-        rule = rules.get(mkt, {}).get("rule", "trend")
+        zr = regime.get(mkt)
+        if zr:                              # regime-conditional (preferred)
+            rule = zr.get("active_rule", "trend")
+            cur = zr.get("current_regime", "?")
+        else:                               # flat single rule (fallback)
+            rule = rules.get(mkt, {}).get("rule", "trend")
+            cur = None
         for r in grp:
             r["rec_rule"] = rule
+            if cur:
+                r["rec_regime"] = cur       # BULL/BEAR the rule is keyed off
         if rule == "trend":
             continue                       # r['rec'] already = EMA zone
         # cross-sectional signal within the market
@@ -625,6 +654,39 @@ def assign_recommendations(rows: list) -> None:
                 r["rec"] = "BUY" if p <= 1 / 3 else ("SELL" if p >= 2 / 3 else "HOLD")
             else:                          # momentum: buy strength (top third)
                 r["rec"] = "BUY" if p >= 2 / 3 else ("SELL" if p <= 1 / 3 else "HOLD")
+
+
+_LEARNED_RECS: Optional[dict] = None
+
+
+def _learned_recs() -> dict:
+    """(market, symbol) -> rec_learned from the offline learned model
+    (learned_recommender.py). Empty if the cache is absent."""
+    global _LEARNED_RECS
+    if _LEARNED_RECS is None:
+        base = R.CODE if hasattr(R, "CODE") else Path(__file__).parent
+        p = base / "cache_seed" / "learned_recs.parquet"
+        try:
+            df = pd.read_parquet(p)
+            _LEARNED_RECS = {(r.market, str(r.symbol).upper()): r.rec_learned
+                             for r in df.itertuples()}
+        except Exception:
+            _LEARNED_RECS = {}
+    return _LEARNED_RECS
+
+
+def annotate_learned(rows: list) -> None:
+    """SHADOW mode: attach the learned-model recommendation (r['rec_learned']) and
+    whether it agrees with the live rule (r['rec_agree']). Does NOT change r['rec'].
+    Only markets where Lasso kept factors have a learned rec; others stay None."""
+    lr = _learned_recs()
+    if not lr:
+        return
+    for r in rows:
+        rl = lr.get((r.get("market"), str(r.get("symbol", "")).upper()))
+        if rl is not None:
+            r["rec_learned"] = rl
+            r["rec_agree"] = (rl == r.get("rec"))
 
 
 _NOTE_DATE = re.compile(r"(\d{4}-\d{2}-\d{2})")
@@ -1009,6 +1071,13 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
              "SELL": '<span style="color:#ca3433;font-size:11px">🟥 sell</span>',
              "?": '<span style="color:#bbb;font-size:11px">—</span>'}
 
+    # SELL-signal news catalyst (sell_news.annotate_sell_news): tells the reader
+    # whether an exit is backed by the tape or is pure price action.
+    CAT = {"news-confirmed":   ("#ca3433", "📰 news-confirmed"),
+           "news-contradicts": ("#0c6b58", "📰 news up — reconsider"),
+           "mixed":            ("#8a6d3b", "📰 mixed"),
+           "technical-only":   ("#8aa0ae", "technical-only")}
+
     def _zchip(r):
         c = ZCHIP.get(r.get("rec", r.get("zone")), ZCHIP["?"])
         # eviction clock only where the trend zone (not the recommendation) is
@@ -1016,6 +1085,15 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
         if r.get("zone") == "SELL" and r.get("streak", 0):
             c += (f'<span style="color:#ca3433;font-size:10px"> '
                   f'⏳{r["streak"]}d/{SELL_STREAK_LIMIT + 1}</span>')
+        # news catalyst on anything we're telling the reader to exit
+        cat = r.get("sell_catalyst")
+        if cat and (str(r.get("rec")) == "SELL" or r.get("status") == "evicted"):
+            col, lab = CAT.get(cat, CAT["technical-only"])
+            c += f'<div style="color:{col};font-size:10px">{lab}</div>'
+            nf = r.get("sell_news")
+            if nf and cat in ("news-confirmed", "news-contradicts"):
+                c += (f'<div style="color:#8aa0ae;font-size:9px;max-width:220px">'
+                      f'“{nf["headline"]}” <i>{nf["outlet"]}</i></div>')
         return c
 
     def _since(r):
@@ -1413,6 +1491,15 @@ def main() -> int:
     rows = build_rows(wl)
     assign_sectors(rows, fetch_cap=10_000 if args.build_sectors else SECTOR_FETCH_CAP)
     assign_recommendations(rows)
+    try:                                       # shadow-mode learned-model recs (IN/KR)
+        annotate_learned(rows)
+    except Exception as e:
+        print(f"  learned recs skipped ({e})")
+    try:                                       # link SELL signals to the news flow
+        from sell_news import annotate_sell_news
+        annotate_sell_news(rows)
+    except Exception as e:
+        print(f"  sell-news skipped ({e})")
     as_of = max([r["last"] for r in rows if r["last"]] or ["?"])
     html = render(rows, as_of, purged=purged)
 

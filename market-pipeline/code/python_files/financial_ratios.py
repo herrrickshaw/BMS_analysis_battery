@@ -65,6 +65,11 @@ MARKETS = {
     # market -> (store parquet, close parquet, currency)
     "india": (FUND_DIR / "IN_current.parquet", BHAV / "cleaned_long.parquet", "INR"),
     "us":    (FUND_DIR / "US_current.parquet", BHAV / "ohlcv_US.parquet",     "USD"),
+    # Korea: official DART filings via dart_kr_store.py (IFRS-tagged, 2 FYs).
+    # ebit/fcf/debt are deliberately NULL there (no borrowings/EBIT tag in the
+    # single-account endpoint) → roce/operating_margin/fcf_yield/d-e stay NULL
+    # rather than mislabeling total liabilities as debt.
+    "korea": (FUND_DIR / "KR_current.parquet", BHAV / "ohlcv_KOREA.parquet",  "KRW"),
 }
 
 

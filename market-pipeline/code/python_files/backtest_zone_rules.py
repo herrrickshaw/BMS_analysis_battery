@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import glob
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -44,7 +45,7 @@ import numpy as np
 import pandas as pd
 
 HERE = Path(__file__).resolve().parent
-WH = "/Users/umashankar/repos/global-market-data/warehouse/ohlcv"
+WH = os.environ.get("MARKET_WH", "/Users/umashankar/repos/global-market-data/warehouse/ohlcv")
 OUT_MD = HERE / "reports" / "zone_rules_by_market.md"
 OUT_JSON = HERE / "cache_seed" / "zone_rules.json"
 

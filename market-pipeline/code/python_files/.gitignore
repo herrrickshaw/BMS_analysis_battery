@@ -29,3 +29,6 @@ brief_today_draft*.html
 # Raw third-party downloads cached locally before being parsed into a
 # tracked cache_seed/*.parquet -- same daily-refreshed-cache convention.
 docs_cache/
+
+# runtime observability artifacts (obs.py)
+logs/

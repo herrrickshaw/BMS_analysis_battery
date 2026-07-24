@@ -2,6 +2,240 @@
 
 Decisions and material changes to the pipeline, newest first.
 
+## 2026-07-24 — Weekly maintenance consolidated; correlation matrices → parquet; LFS
+
+- **`weekly_maintenance.sh`** — ONE weekly entry point chaining clean → dedup-verify →
+  compress → backup, wired to a single Monday-10:00 cron. It *calls* the existing
+  `cloud_backup.sh --with-pg` + `cloud_backup_verify.sh` gate rather than
+  reimplementing them; every step is idempotent and single-instance-locked.
+  DECISION: one coupled job, not four schedules — uncoupled off-wake schedules are
+  what drifted ingest 8 days before. It deliberately does NOT absorb the separate
+  `repo-data-dedup` Monday crons (different repo, already scheduled) — absorbing them
+  is how things double-fire.
+- **`compress_correlation_matrices.py`** — `correlation_scan/*_correlation_matrix.csv`
+  → same-named **float16 zstd parquet** (retain base name so a consumer only swaps
+  `.csv`→`.parquet`). One-off result: europe 16→2.8 MB, nse 93→13, korea 137→19,
+  japan 238→33, us 805→113 MB. ~1.3 GB of regenerable CSV reclaimed; disk 94→92 %.
+  This is now the weekly compress step so the matrices don't re-bloat each scan.
+- **Correlation matrices pushed to `market-correlation-matrices`** as REGULAR git
+  objects (verified `filter: unspecified`, 0 LFS files) — EU/IN/JP/KR only. DECISION:
+  **us (113 MB float16, incompressible further even at zstd-22) exceeds GitHub's
+  100 MB regular-object limit; LFS is banned (8.9 GB / 8× over the 1 GiB free tier,
+  no-paid-packs policy), so us lives in `dropbox:market-data-archive/current/
+  correlation_matrices/` instead.** Big data → Dropbox, never LFS, is the anti-billing rule.
+- **LFS situation (2026-07-24):** billed 8.90 GB across 6 real repos (research-platform
+  3.56, working-files 1.42, global-market-data 1.31, global-stock-screener 0.91,
+  market-screener-backtests 0.77, market-data-artifacts 0.24; ocaml-stock-screener ≡
+  stock-screener-platform 0.19 dup). Archive-2026-07-17 twins confirmed deleted.
+  Weekly job now asserts 0 LFS files in the correlation repo so LFS can't creep.
+
+## 2026-07-24 — Learned model wired into digest (shadow mode)
+
+- **`learned_recommender.py`** — applies the Lasso factor weights offline to the live
+  liquid universe, caches `cache_seed/learned_recs.parquet` (market,symbol,score,
+  rec_learned). Active only where Lasso kept factors: IN (1,438 names, `trend`) + KR
+  (1,725, 4 factors); US/JP/EU skipped (regime rule stands).
+- **Digest `annotate_learned(rows)`** joins the cache → `r['rec_learned']` +
+  `r['rec_agree']` (agreement vs live rule). SHADOW MODE: does NOT change `r['rec']`,
+  eviction, or the mailer — it accrues an A/B record vs the regime rule for later
+  promotion. Wired after assign_recommendations in send_mailer + digest, fully
+  try-wrapped. DECISION: shadow not live, because the static Lasso model is still weak
+  (Deflated-Sharpe + Lasso both flag fragility); promote only after it beats the
+  regime rule on forward paper-track data.
+
+## 2026-07-24 — Adaptive ML layer: Lasso factor selection + online learning rate
+
+- **`factor_learning.py`** — learns a sparse, adaptive factor model instead of
+  hand-picking one factor:
+  - LASSO (CV-tuned α, `LassoCV`) → sparse factor weights per market. FINDING:
+    static Lasso zeros most factors OOS (US/JP/EU keep 0; IN keeps only `trend`;
+    KR keeps 4) — the discrete factor signals have weak *linear* predictive power,
+    corroborating the Deflated-Sharpe fragility.
+  - ONLINE SGD with a LEARNING RATE η (grid-tuned; η=0.01 won everywhere) that
+    `partial_fit`s on each new week of realised outcomes → weights ADAPT to regime
+    drift. OOS IR jumps to ~2.8-3.9. 🔴 Stress-tested for leakage: a per-week
+    target-shuffle null collapses KR's OOS IR 3.86→0.47, so it's REAL signal, not a
+    leak — the adaptation is what generalises where the static fit doesn't. Caveats:
+    gross of costs, broad dollar-neutral book inflates IR, ~0.47 null floor to
+    discount.
+  - Writes `cache_seed/factor_weights.json` (learned per-market weights + weight
+    evolution by year) — a drop-in learned model. Instrumented via obs.py.
+- METHODOLOGY NOTE: online adaptive learning > static single-factor selection here;
+  the learning rate is the key hyperparameter (how fast to trust new outcomes).
+
+## 2026-07-24 — Methodology features: risk overlay + Deflated-Sharpe overfitting guard
+
+- **`risk_management.py`** — the risk overlay the book lacked: inverse-vol sizing
+  (risk parity within the book), portfolio vol-targeting (10%), and a drawdown
+  KILL-SWITCH (halve exposure >15% DD, restore <7%). Big win: vol-target+KS roughly
+  HALVES max drawdown (IN −77%→−31%, US −52%→−20%, JP −61%→−26%, KR −69%→−25%,
+  EU −59%→−20%) while RAISING Sharpe (JP 0.89→1.42, EU 0.88→1.34). Kill-switch
+  fired 3-4×/desk over 10y. This is the balance-sheet protection + a known vol
+  budget for sizing the carry leverage.
+- **`deflated_sharpe.py`** — López de Prado multiple-testing correction on the
+  factor optimiser (best-of-10 selection inflates the winner's Sharpe). 🔴 FINDING:
+  only 3/10 selected factors clear DSR≥0.95 — the BULL edges are real (IN trend
+  0.994, KR breakout 0.99, EU mom252 0.985) but the BEAR-regime picks are largely
+  FRAGILE (US bear 0.25, JP bear 0.11, KR bear 0.16) — statistically within the
+  best-of-10 noise. DECISION: treat fragile bear cells as unproven — default to the
+  incumbent rule or re-test OOS; do NOT over-trust the bear factor selection.
+- Both wired to obs.py (logged + decision-logged). Near-normal returns assumed in
+  DSR (skew≈0) — the AWS run can plug in realised skew/kurtosis per factor.
+- Methodology features still open (next): purged/embargoed CV, pre-trade risk
+  checks (fat-finger/exposure caps), formal walk-forward (walk_forward_backtest.py
+  exists), turnover-surge accumulation factor.
+
+## 2026-07-24 — Observability: loggers, clocks, decision logs (obs.py)
+
+- **`obs.py`** — shared production observability, motivated by the HFT literature's
+  requirement that algo traders log input/output parameters for back-testing and
+  supervisory review:
+  - `get_logger(name)` — UTC-timestamped, leveled, stdout + `logs/<name>_<UTCdate>.log`.
+  - `timed(log, label)` context manager + `Stopwatch` — phase timing (AWS cost/
+    profiling); logs elapsed seconds even on failure.
+  - `DecisionLog` — append-only JSONL audit trail (`logs/decisions_<UTCdate>.jsonl`),
+    each record tagged with a run id so a whole run is reconstructable. `.read(run)`
+    replays it.
+  - `MARKET_LOGDIR` env override for the log location on EC2.
+- Wired into `strategy_regime_survival.py`: `main()` and `refresh_regime()` now time
+  each market, log a WARNING on any REGIME FLIP, and record every rule decision
+  (market, bull/bear rule, current_regime, active_rule, breadth_asof, flip) to the
+  decision log. Verified end-to-end (refresh logged 5 markets in 5.9s + audit trail).
+- `logs/` added to `.gitignore` (runtime artifacts, not committed).
+
+## 2026-07-24 — Production hardening for AWS (path portability + bug fixes)
+
+- **Env-configurable warehouse path** — `strategy_regime_survival.py` and
+  `backtest_zone_rules.py` now read `WH = os.environ.get("MARKET_WH", <local>)`.
+  Every session module imports `S.WH`, so setting `MARKET_WH` on EC2 (to wherever
+  the panels were pulled from Dropbox/S3) makes the whole stack run unchanged.
+  The two hardcoded `/Users/umashankar/...` paths were the only AWS blockers.
+- **Fixed `long_short_tp.py` year-attribution bug** — `book_series` now returns a
+  DATE-indexed Series (tracks the weeks that actually passed the min-names filter);
+  the firm-PAT rollup groups straight by `index.year`. The old code mapped values
+  onto `wk_idx[:len(series)]`, misaligning every skipped week and producing the
+  spurious negative firm PAT reported earlier. Verified: KR bear def_revert now
+  attributes cleanly per year.
+- **Headless-safe FX** — `currency_matrix` loads from `cache_seed/fx_matrix.parquet`
+  with no network; verified `usd_per`/`convert` work offline (EC2 needs no live FX).
+- All 10 session modules compile; env override + default fallback + offline FX
+  smoke-tested. Fixed stale ADV-percentile label in the capacity report.
+
+## 2026-07-24 — HFT-research-driven orchestration: execution/impact model + FX matrix
+
+Research inputs: Gomber et al. "High-Frequency Trading" (Goethe/Deutsche Börse) +
+github.com/baobach/hft_papers. Key frame adopted: "HFT is a technical means to
+implement established strategies, not a strategy" → we upgrade the EXECUTION/COST
+layer, not chase latency.
+- **`execution_cost_model.py`** — replaces flat-bps cost with Almgren-Chriss
+  square-root impact (`half_spread + η·σ·√(Q/ADV)`) + 15%-ADV participation cap.
+  Computes per-desk CAPACITY (AUM where net edge → 0). FINDING: this is a
+  small-money edge — low single-digit $M/desk at η=1 (η-sensitive) — which is the
+  hard ceiling on how far JPY-carry leverage can deploy before impact eats the
+  edge. Directly motivates the AWS capacity×leverage sweep.
+- **`currency_matrix.py`** — historical FX layer (yfinance, 2016-2026, 10 ccys →
+  `cache_seed/fx_matrix.parquet`) with `usd_per(ccy,date)` / `convert()` /
+  `matrix(date)`. Fixes the recurring local-currency contamination (marketCap, ADV
+  both hit it). Shows INR −30% / JPY −35% / KRW −23% over 10y — a single spot rate
+  is wrong across the backtest, and the yen's 35% slide is *why* JPY carry paid.
+  🔴 prior hardcoded FX (INR 83/JPY 150/KRW 1350) was stale — real is 96.5/163.8/1466.
+- Research→strategy links already in place: `def_revert` (oversold ∩ low-vol) IS
+  the adverse-selection-screened liquidity-provision the report warns about;
+  long/short (`long_short_tp.py`) IS market-neutral statistical arbitrage; the
+  sell-news linkage IS a newsreader-algorithm analog. Next factors to add:
+  turnover-surge accumulation (liquidity-detection analog).
+
+## 2026-07-24 — Reward-optimised factor selection + real-firm profitability benchmark
+
+- **`profitability_optimizer.py`** — treats each desk's (market × regime) screener
+  as the decision variable and MAXIMISES a reward = annualised information ratio of
+  the liquidity-gated long-only book's excess over its index (risk-adjusted, so it
+  lifts income AND shrinks loss-year drawdowns → balance sheet). Expands the factor
+  library with low-vol, 12m-momentum (mom252) and multi-factor blends (qual_mom =
+  momentum ∩ low-vol; def_revert = oversold ∩ low-vol). Writes
+  `cache_seed/zone_regime_optimized.json` (drop-in for zone_regime.json once
+  validated). Wins: def_revert > plain revert in bear (IN/US/KR), mom252 > mom126
+  in bull (US/EU), breakout for KR bull (IR 1.52→2.04).
+- **`firm_benchmark.py`** — quantifies the lift (one panel pass, current vs
+  optimised map) and benchmarks vs REAL listed firms (live yfinance). Optimised map
+  lifts mean annual PAT $0.19M→$0.34M, ROE 3.9%→6.8%, annual Sharpe 0.29→0.54,
+  worst year −1.12→−0.96M, and improves EVERY one of 11 years. Reality check: our
+  6.8% prop-book ROE sits below Motilal Oswal (15.6%), IBKR (24%), Nomura (10%) —
+  pure long-only prop lacks the fee/interest/AMC income + leverage of a real
+  brokerage. 🔴 yfinance marketCap is LOCAL currency — labelled "local bn", not USD.
+- Carry pitch (`carry_funding_model.py`, scratchpad): JPY carry hedged into INR
+  costs ~8.1% (CIP kills the cheap-yen illusion; only the ~40bp xccy basis survives).
+  Two structures that work: JPY→Japan natural FX match (+3.1% cycle, no swap), and
+  regime-gated JPY→India (unhedged+levered in bull, swap-hedged in bear — same
+  breadth signal drives rule + hedge ratio + leverage).
+
+## 2026-07-24 — Regime-conditional zone rule + news-linked sell signals + quarterly earnings
+
+- **Regime-conditional Buy/Hold/Sell** — `strategy_regime_survival.py` now emits
+  `cache_seed/zone_regime.json` = per market `{bull_rule, bear_rule,
+  current_regime, active_rule}`. `watchlist_digest.assign_recommendations` reads
+  it (falls back to flat `zone_rules.json` if absent) and applies the rule keyed
+  to today's regime: momentum/trend in bull, **mean-revert in bear** everywhere.
+  Backtest verdict driving it: uniform trend dies in bear (US −0.43, JP −0.54,
+  KR −0.77, EU −0.39 excess); the single per-market rule survived both regimes
+  only for IN & EU. Restricted to rules the digest can apply cross-sectionally
+  (trend/revert/mom126/mom_st). current_regime = live breadth.
+  - Freshness: `[13c/14]` runs `strategy_regime_survival.py --refresh-regime`
+    daily (fast, ~2y panel, only updates current_regime/active_rule) BEFORE the
+    mailer; monthly `[16d]` reruns the full backtest (bull/bear rule table).
+    DECISION: split fast-daily vs full-monthly because regime flips faster than
+    the rule table changes, and a full 10y reload every morning is wasteful.
+- **News-linked sell signals** — `sell_news.py` reverse-matches every SELL /
+  evicted holding against the live RSS pool (reuses `news_picks._distinctive_phrase`
+  + `sentiment_pipeline`), classifying the exit: **news-confirmed** (negative
+  tape backs it), **technical-only** (no catalyst), **news-contradicts**
+  (positive tape — reconsider). Wired after `assign_recommendations` in both
+  `send_mailer.py` and `watchlist_digest.py`; the SELL chip shows the catalyst +
+  headline. IN/US only (RSS pools); other markets = technical-only. Fully
+  try/wrapped — a news/network failure never breaks the mailer.
+- **Quarterly earnings** — `quarterly_earnings.py` builds a listed-brokerage-style
+  (Motilal-Oswal-style) quarterly P&L from the 10y backtest: 5 geography desks as
+  segments, regime-conditional + liquidity-gated, fixed AUM, with trading revenue,
+  treasury income, fees/opex, PBT, per-jurisdiction tax (no cross-desk offset),
+  PAT, margin, EPS, QoQ/YoY + annual roll-up. Outputs `reports/quarterly_earnings.
+  {md,csv}` + `segment_revenue_by_quarter.csv`. FINDING: profitable across the
+  cycle but LOSS years in 2018 (−$1.15M) and 2022 (−$0.78M) — the regime switch
+  cushions bear drawdowns, doesn't erase them (an honest cyclical prop-desk P&L).
+
+## 2026-07-24 — Trading financial statements + bull/bear strategy-survival backtest
+
+- **`trading_financials.py`** — turns the paper-track ledger
+  (`reports/signal_outcomes.parquet`) into firm-wise + per-geography income
+  statement and balance sheet: revenue (realized gains), losses, txn costs,
+  jurisdiction cap-gains tax (losses offset within geography+term), net income,
+  ROIC, cost-of-capital charge (EVA). Outputs `reports/{income_statement_by_geo,
+  balance_sheet_by_geo,firm_financials,strategy_vs_benchmark}.csv`. DECISION:
+  $10k equal-weight/position, USD, so returns stay currency-neutral (no FX).
+  CAVEAT baked into output: the ledger is a ~2-week window (87% entered
+  2026-07-21), so ROIC is un-annualized and raw EVA over-penalizes — not a
+  live P&L.
+- **`strategy_regime_survival.py`** — the historical answer the paper book
+  can't give: runs 6 price-based filters (trend/revert/mom126/mom_st/
+  golden_cross/breakout) PIT on each market's 10y warehouse panel
+  (`repos/global-market-data/warehouse/ohlcv`), scored SEPARATELY in bull vs
+  bear, excess vs the equal-weight index. Outputs
+  `reports/strategy_regime_survival.{md,csv}` + `cache_seed/*.json`.
+  - LIQUIDITY SURVIVAL (user req): universe each week = HIGH+MEDIUM turnover
+    tier only (bottom-tercile illiquid names dropped). India breakout still
+    nets +0.44/+0.41 excess after the cut — the all-weather edge is not purely
+    a microcap artifact.
+  - REGIME PROXY — rejected alternatives: (1) equal-weight MEAN index vs 40wk
+    MA → US got 2 bear weeks (strong uptrend never dips below own MA);
+    (2) drawdown of MEAN index → US IPO/SPAC inflation, still 9 bear weeks;
+    (3) drawdown of liquid-MEDIAN index → KR microcap bleed gave 8 bull /
+    488 bear. ADOPTED: BREADTH (% of liquid names above 40wk trend, BEAR
+    <45%) — drift-neutral, all 5 markets get non-degenerate splits.
+  - FINDING: uniform trend rule (digest incumbent) dies in bear everywhere
+    (US −0.43, JP −0.54, KR −0.77, EU −0.39). Only IN & EU single zone-rules
+    survive both regimes; US/JP/KR need a REGIME-CONDITIONAL rule
+    (momentum/breakout in bull, mean-revert in bear) — a concrete upgrade to
+    `zone_rules.json` / the digest.
+
 ## 2026-07-23 — Annual IMD rainfall refresh as [18/18] (self-guarded no-op)
 
 - **`~/iudx-flood-collector/annual_refresh.py` appended as [18/18]** — each

@@ -160,6 +160,12 @@ FAILURES=()
   step "[13a/14] cross-market consistency audit"
   $PY consistency_audit.py || FAILURES+=("consistency: cross-market anomaly (see audit above)")
 
+  # fast daily refresh of the LIVE market regime (bull/bear per market) so the
+  # digest's regime-conditional Buy/Hold/Sell rule uses today's breadth. Cheap
+  # (~2y panel per market); the monthly [16d] rebuilds the bull/bear rule table.
+  step "[13c/14] refresh live market regime (zone_regime.json)"
+  $PY strategy_regime_survival.py --refresh-regime || echo "  regime refresh failed (continuing)"
+
   step "[13b/14] validate brief against screener.in"
   if $PY validate_brief.py --sample 6; then
       step "[14/14] build + send mailer"
@@ -216,12 +222,13 @@ FAILURES=()
   # pattern. zone_rules.json feeds the digest's per-market Buy/Hold/Sell.
   ZR_MARK="$HOME/.local/state/zone_rules_last_build"
   if [[ "$(cat "$ZR_MARK" 2>/dev/null)" != "$(date +%Y-%m)" ]]; then
-    step "[16d] monthly zone-rule + PE-anomaly backtests"
+    step "[16d] monthly zone-rule + regime-survival + PE-anomaly backtests"
     $PY backtest_zone_rules.py > /dev/null 2>&1 \
+      && $PY strategy_regime_survival.py > /dev/null 2>&1 \
       && $PY backtest_pe_anomalies.py > /dev/null 2>&1 \
       && { mkdir -p "$(dirname "$ZR_MARK")" && date +%Y-%m > "$ZR_MARK"; \
-           echo "  zone rules + PE anomalies refreshed"; } \
-      || FAILURES+=("backtest: zone rules / PE anomalies")
+           echo "  zone rules + regime survival + PE anomalies refreshed"; } \
+      || FAILURES+=("backtest: zone rules / regime survival / PE anomalies")
   fi
 
   # [16c] Monthly bundle validation vs public benchmarks (user, 2026-07-23).

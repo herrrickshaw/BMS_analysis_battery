@@ -55,6 +55,15 @@ def _digest_section() -> tuple:
         rows = W.build_rows(wl, frames_out=frames)
         W.assign_sectors(rows)
         W.assign_recommendations(rows)
+        try:                                   # shadow-mode learned-model recs (IN/KR)
+            W.annotate_learned(rows)
+        except Exception as e:
+            print(f"  digest: learned recs skipped ({e})")
+        try:                                   # link SELL signals to the news flow
+            from sell_news import annotate_sell_news
+            annotate_sell_news(rows)
+        except Exception as e:
+            print(f"  digest: sell-news skipped ({e})")
         as_of = max([r["last"] for r in rows if r["last"]] or ["?"])
         # picks-based subject: the digest is portfolio-free (2026-07-23), so
         # the subject counts what the ANALYSIS found, not what is held

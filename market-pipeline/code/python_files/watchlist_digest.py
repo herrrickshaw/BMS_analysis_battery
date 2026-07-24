@@ -949,8 +949,8 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
     priced = [r for r in rows if not r["missing"]]
     miss_rows = [r for r in rows if r["missing"]]
 
-    cap = 10 ** 6 if full else 4
-    scap = 10 ** 6 if full else 4
+    cap = 10 ** 6 if full else 3
+    scap = 10 ** 6 if full else 3
 
     def _img(key, alt):
         src = (images or {}).get(key)
@@ -1112,6 +1112,74 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
         body.append('<p style="font-size:12px;margin:10px 0 0">'
                     + ' &nbsp;·&nbsp; '.join(churn) + '</p>')
 
+    # ── 🔔 ACT TODAY + report card ───────────────────────────────────────────
+    # The watchlist is a RUNNING RECORD of every past recommendation (entry
+    # date/price kept). Two questions it now answers up front (user, 2026-07-23):
+    #   ACT TODAY — which earlier BUYs are due to SELL/TRIM now: the per-market
+    #     rule flipped to SELL, or the trend eviction clock is at/over the
+    #     limit. Shown WITH the P&L since we recommended them, so a sell call
+    #     is graded, not blind.
+    #   REPORT CARD — of everything we've recommended that has an entry, how
+    #     much is up, and the average move since entry.
+    graded = [r for r in priced if r.get("ret_entry") is not None]
+    sell_today, evict_due = [], []
+    for r in priced:
+        # "act today" is about EARLIER recommendations coming due — a name
+        # flagged ≥3 sessions ago, not one that merely reads overbought on the
+        # day it entered. Fresh overbought names are just today's HOLD/SELL
+        # label in the zone tables, not an action on a prior call.
+        aged = (r.get("days_in") or 0) >= 3
+        streak = r.get("streak", 0)
+        if streak > PURGE_SELL_SESSIONS:
+            evict_due.append((r, "purge (>3wk in sell)"))
+        elif streak >= SELL_STREAK_LIMIT:
+            evict_due.append((r, f"eviction imminent ({streak}d/{SELL_STREAK_LIMIT + 1})"))
+        elif r.get("rec") == "SELL" and aged:
+            sell_today.append(r)
+    if sell_today or evict_due:
+        # winners first among sells — trim strength, cut losers with a plan
+        sell_today.sort(key=lambda r: -(r.get("ret_entry") or -999))
+        body.append(
+            '<h3 style="margin:16px 0 0;background:#ca3433;color:#fff;'
+            'padding:8px 10px;border-radius:8px 8px 0 0;font-size:14px">🔔 Act today '
+            f'<span style="font-weight:400;color:#ffdedd;font-size:11px">'
+            f'{len(sell_today)} sell/trim · {len(evict_due)} exiting — '
+            f'graded by return since we flagged them</span></h3>'
+            '<table style="border-collapse:collapse;width:100%;font-size:13px;'
+            'background:#fff;border:1px solid #dfe7ec;border-radius:0 0 8px 8px">')
+        for r in (sell_today[:8] if not full else sell_today):
+            body.append(
+                f'<tr style="border-bottom:1px solid #f0f4f7">'
+                f'<td style="padding:6px 8px"><b>{r["symbol"]}</b> '
+                f'{FLAG.get(r["market"], r["market"])}</td>'
+                f'<td style="color:#ca3433;font-size:12px">🟥 sell '
+                f'<span style="color:#8aa0ae">({r.get("rec_rule", "")})</span></td>'
+                f'<td style="font-size:12px">since flagged {_since(r)}</td>'
+                f'<td style="color:#8aa0ae;font-size:11px">{r.get("why", "")[:34]}</td></tr>')
+        for r, reason in (evict_due[:6] if not full else evict_due):
+            body.append(
+                f'<tr style="border-bottom:1px solid #f0f4f7;background:#fff6f6">'
+                f'<td style="padding:6px 8px"><b>{r["symbol"]}</b> '
+                f'{FLAG.get(r["market"], r["market"])}</td>'
+                f'<td style="color:#8b201f;font-size:12px">⏳ {reason}</td>'
+                f'<td style="font-size:12px">since flagged {_since(r)}</td>'
+                f'<td style="color:#8aa0ae;font-size:11px">exiting the watchlist</td></tr>')
+        body.append('</table>')
+
+    if graded:
+        up = sum(1 for r in graded if r["ret_entry"] > 0)
+        avg = sum(r["ret_entry"] for r in graded) / len(graded)
+        med_days = sorted(r["days_in"] for r in graded if r.get("days_in") is not None)
+        md = med_days[len(med_days) // 2] if med_days else 0
+        col = "#16a085" if avg >= 0 else "#ca3433"
+        body.append(
+            f'<p style="font-size:12px;color:#5f6368;margin:8px 0 0;'
+            f'background:#fff;border:1px solid #dfe7ec;border-radius:6px;padding:7px 10px">'
+            f'📇 <b>Report card</b> — {len(graded)} live recommendations with an '
+            f'entry price: <b style="color:{col}">{up} up / {len(graded) - up} down</b> '
+            f'({up/len(graded)*100:.0f}% green), average '
+            f'<b style="color:{col}">{avg:+.1f}%</b> since flagged (median hold '
+            f'{md}d). Full P&amp;L history in the attachment.</p>')
 
     # ── model portfolios (fund-style bundles) ────────────────────────────────
     # Correlation bundles the picks; the card shows weights, drift and the
@@ -1208,7 +1276,7 @@ def render(rows: list, as_of: str, purged: Optional[list] = None,
             body.append(_section(title, SUBTITLE.get(key, ""), grp))
 
     # ── strips ───────────────────────────────────────────────────────────────
-    if illiquid:
+    if illiquid and full:
         body.append(
             '<h3 style="margin:16px 0 0;background:#5f6368;color:#eef4f6;padding:8px 10px;'
             'border-radius:8px 8px 0 0;font-size:13px">🚱 Below liquidity floor '

@@ -147,6 +147,16 @@ FAILURES=()
   $PY screen_value_rerating.py \
     || FAILURES+=("screen: value re-rating (India)")
 
+  # [13x] Paper-track scorecard — accumulates every past mailer pick (signal
+  # ledger) and marks to today, so the mailer carries a running report card.
+  # Weekly (Mondays) — the forward horizons only move meaningfully week to
+  # week, and it reads the same panels the digest already loads.
+  if [[ "$(date +%u)" == "1" ]]; then
+    step "[13x/14] paper-track scorecard (weekly)"
+    $PY paper_track.py > /dev/null 2>&1 \
+      || FAILURES+=("scorecard: paper_track")
+  fi
+
   step "[13a/14] cross-market consistency audit"
   $PY consistency_audit.py || FAILURES+=("consistency: cross-market anomaly (see audit above)")
 

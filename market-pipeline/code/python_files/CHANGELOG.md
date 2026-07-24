@@ -91,6 +91,29 @@ mistakes were made, and the mistakes here have repeated.
 
 ## 2026-07-23 (latest: PIT event studies; NSE results API silently migrated)
 
+### Watchlist as report card + "act today"; paper-track scorecard
+
+* **🔔 Act today** (mailer, top section): the watchlist now surfaces earlier
+  recommendations coming DUE — names flagged ≥3 sessions ago now reading SELL
+  (per-market rule) or with the eviction/purge clock at/over the limit — each
+  shown WITH its return since we flagged it, so a sell call is graded not
+  blind. Fresh same-day overbought names stay in the zone tables, not here.
+* **📇 Report card** line: of all live recommendations with an entry price,
+  how many are up and the average move since flagged. First read: 338 recs,
+  43% green, −0.3% avg over a 3-day-median hold — market-neutral in a
+  drawdown window, matching paper_track.
+* **paper_track.py** (pipeline [13x], weekly Mondays): accumulates every past
+  mailer pick from the signal ledger, marks to today, reports return + excess
+  vs market by book / market / filter / entry-cohort. Finding: CURATION is the
+  value-add (raw −0.41% excess → graded-A+fundamentals −0.02%; KR raw −1.51%
+  → curated +0.60%, dodging the KOSDAQ crash; piotroski+debt +2.99% excess).
+  🔴 The window (87% of picks entered 21 Jul, 2-3 forward sessions, mid-crash)
+  CANNOT test the 2-week mean-revert rule — a lookahead bug that applied
+  today's oversold flag to old entries was caught and fixed (rule now applied
+  point-in-time at entry); rule validation stays in backtest_zone_rules.py.
+  Below-floor strip moved to attachment-only; strategy cards 4→3 to hold the
+  body under the Gmail clip.
+
 ### Per-market Buy/Hold/Sell rules (the uniform trend rule was wrong)
 
 backtest_zone_rules.py tested 4 candidate zone rules on each market's own 10y

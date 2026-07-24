@@ -108,3 +108,6 @@ claude-provenance/claude-ai-export/
 .jquants.env
 market-pipeline/code/python_files/digest_*.png
 market-pipeline/code/python_files/watchlist_full.html
+market-pipeline/code/python_files/data/benchmark_holdings/
+market-pipeline/code/python_files/data/nse_equity_list.csv
+market-pipeline/code/python_files/data/nse_symbolchange.csv
